@@ -34,6 +34,7 @@ pub use crate::{
         cid::{Cid, CidLink},
         datetime::Datetime,
         did::Did,
+        did_service::DidService,
         handle::Handle,
         ident::AtIdentifier,
         language::Language,

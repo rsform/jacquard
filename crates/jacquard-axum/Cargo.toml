@@ -22,12 +22,14 @@ path = "../../examples/axum_server.rs"
 [dependencies]
 axum = "0.8.6"
 bytes.workspace = true
+chrono.workspace = true
 jacquard = { version = "0.12.0-beta.1", path = "../jacquard", default-features = false, features = ["api"] }
 jacquard-common = { version = "0.12.0-beta.1", path = "../jacquard-common", features = ["reqwest-client"] }
 jacquard-derive = { version = "0.12.0-beta.1", path = "../jacquard-derive" }
 jacquard-identity = { version = "0.12.0-beta.1", path = "../jacquard-identity", optional = true }
 miette.workspace = true
 multibase = { version = "0.9.1", optional = true }
+mini-moka = { package = "mini-moka-wasm", version = "0.10", path = "../mini-moka-wasm", optional = true }
 serde.workspace = true
 serde_html_form.workspace = true
 serde_json.workspace = true
@@ -37,8 +39,9 @@ tower-http = { version = "0.6.6", features = ["trace", "tracing"] }
 tracing = "0.1.41"
 
 [features]
-default = ["service-auth"]
+default = ["service-auth", "service-auth-replay"]
 service-auth = ["jacquard-common/service-auth", "dep:jacquard-identity", "dep:multibase"]
+service-auth-replay = ["service-auth", "dep:mini-moka"]
 tracing = []
 
 [dev-dependencies]

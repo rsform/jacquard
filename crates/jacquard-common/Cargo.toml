@@ -66,7 +66,6 @@ oxilangtag = { version = "0.1", default-features = false, features = ["alloc", "
 miette = { workspace = true, optional = true } # also need to gate this to std only
 multibase = { version = "0.9.1", default-features = false }
 multihash = { version = "0.19.3", default-features = false, features = ["alloc"] }
-ouroboros = "0.18.5"
 rand = { version = "0.9.2", default-features = false, features = ["alloc"] }
 serde.workspace = true
 serde_html_form.workspace = true # need to check these at workspace level

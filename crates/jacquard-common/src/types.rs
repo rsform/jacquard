@@ -18,6 +18,8 @@ pub mod datetime;
 pub mod did;
 /// DID Document types and helpers
 pub mod did_doc;
+/// DID service audience types and validation.
+pub mod did_service;
 /// AT Protocol handle types and validation
 pub mod handle;
 /// AT Protocol identifier types (handle or DID)

@@ -18,13 +18,12 @@
 
 use crate::CowStr;
 use crate::IntoStatic;
-use crate::types::string::{Did, Nsid};
+use crate::bos::{BosStr, DefaultStr};
+use crate::types::string::{Did, DidService, Nsid};
 use alloc::string::String;
-use alloc::string::ToString;
 use alloc::vec::Vec;
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
-use ouroboros::self_referencing;
 use serde::{Deserialize, Serialize};
 use signature::Verifier;
 use smol_str::SmolStr;
@@ -73,13 +72,22 @@ pub enum ServiceAuthError {
         now: i64,
     },
 
-    /// Audience mismatch
+    /// Audience mismatch.
     #[error("audience mismatch: expected {expected}, got {actual}")]
     AudienceMismatch {
-        /// Expected audience DID
+        /// Expected audience DID.
         expected: Did,
-        /// Actual audience DID in token
-        actual: Did,
+        /// Actual audience DID service in token.
+        actual: DidService,
+    },
+
+    /// Service id mismatch.
+    #[error("service id mismatch: allowed {allowed:?}, got {actual:?}")]
+    ServiceIdMismatch {
+        /// Allowed service ids.
+        allowed: Vec<SmolStr>,
+        /// Actual service id in token.
+        actual: Option<SmolStr>,
     },
 
     /// Method mismatch (lxm field)
@@ -102,17 +110,19 @@ pub enum ServiceAuthError {
 
 /// JWT header for service auth tokens.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct JwtHeader<'a> {
-    /// Algorithm used for signing
-    #[serde(borrow)]
-    pub alg: CowStr<'a>,
-    /// Type (always "JWT")
-    #[serde(borrow)]
-    pub typ: CowStr<'a>,
+pub struct JwtHeader<S: BosStr = DefaultStr> {
+    /// Algorithm used for signing.
+    pub alg: S,
+    /// Type (always "JWT").
+    pub typ: S,
 }
 
-impl IntoStatic for JwtHeader<'_> {
-    type Output = JwtHeader<'static>;
+impl<S> IntoStatic for JwtHeader<S>
+where
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = JwtHeader<S::Output>;
 
     fn into_static(self) -> Self::Output {
         JwtHeader {
@@ -126,30 +136,34 @@ impl IntoStatic for JwtHeader<'_> {
 ///
 /// These are the payload fields in a service auth JWT.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ServiceAuthClaims<'a> {
-    /// Issuer (user's DID)
-    pub iss: Did,
+pub struct ServiceAuthClaims<S: BosStr = DefaultStr> {
+    /// Issuer (user's DID).
+    pub iss: Did<S>,
 
-    /// Audience (target service DID)
-    pub aud: Did,
+    /// Audience (target service DID with optional service-id fragment).
+    pub aud: DidService<S>,
 
-    /// Expiration time (unix timestamp)
+    /// Expiration time (unix timestamp).
     pub exp: i64,
 
-    /// Issued at (unix timestamp)
+    /// Issued at (unix timestamp).
     pub iat: i64,
 
-    /// JWT ID (nonce for replay protection)
-    #[serde(borrow, skip_serializing_if = "Option::is_none")]
-    pub jti: Option<CowStr<'a>>,
-
-    /// Lexicon method NSID (method binding)
+    /// JWT ID (nonce for replay protection).
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub lxm: Option<Nsid>,
+    pub jti: Option<S>,
+
+    /// Lexicon method NSID (method binding).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lxm: Option<Nsid<S>>,
 }
 
-impl<'a> IntoStatic for ServiceAuthClaims<'a> {
-    type Output = ServiceAuthClaims<'static>;
+impl<S> IntoStatic for ServiceAuthClaims<S>
+where
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ServiceAuthClaims<S::Output>;
 
     fn into_static(self) -> Self::Output {
         ServiceAuthClaims {
@@ -163,22 +177,46 @@ impl<'a> IntoStatic for ServiceAuthClaims<'a> {
     }
 }
 
-impl<'a> ServiceAuthClaims<'a> {
+impl<S: BosStr> ServiceAuthClaims<S> {
     /// Validate the claims against expected values.
     ///
     /// Checks:
-    /// - Audience matches expected DID
-    /// - Token is not expired
-    pub fn validate(&self, expected_aud: &Did<&str>) -> Result<(), ServiceAuthError> {
-        // Check audience
-        if self.aud.as_str() != expected_aud.as_str() {
+    /// - The fragmentless audience matches the expected DID.
+    /// - A present service-id fragment is in the allowed service list when configured.
+    /// - The token is not expired.
+    pub fn validate<B, Svc>(
+        &self,
+        expected_aud: &Did<B>,
+        allowed_services: &[Svc],
+    ) -> Result<(), ServiceAuthError>
+    where
+        B: BosStr,
+        Svc: AsRef<str>,
+    {
+        if self.aud.audience().as_str() != expected_aud.as_str() {
             return Err(ServiceAuthError::AudienceMismatch {
-                expected: expected_aud.clone().into_static(),
-                actual: self.aud.clone().into_static(),
+                expected: expected_aud.borrow().into_static(),
+                actual: DidService::new_owned(self.aud.as_str()).unwrap(),
             });
         }
 
-        // Check expiration
+        if !allowed_services.is_empty() {
+            if let Some(service) = self.aud.service() {
+                if !allowed_services
+                    .iter()
+                    .any(|allowed| allowed.as_ref() == service)
+                {
+                    return Err(ServiceAuthError::ServiceIdMismatch {
+                        allowed: allowed_services
+                            .iter()
+                            .map(|allowed| SmolStr::new(allowed.as_ref()))
+                            .collect(),
+                        actual: Some(SmolStr::new(service)),
+                    });
+                }
+            }
+        }
+
         if self.is_expired() {
             let now = chrono::Utc::now().timestamp();
             return Err(ServiceAuthError::Expired { exp: self.exp, now });
@@ -219,68 +257,55 @@ impl<'a> ServiceAuthClaims<'a> {
 
 /// Parsed JWT components.
 ///
-/// This struct owns the decoded buffers and parsed components using ouroboros
-/// self-referencing. The header and claims borrow from their respective buffers.
-#[self_referencing]
-pub struct ParsedJwt {
-    /// Decoded header buffer (owned)
-    header_buf: Vec<u8>,
-    /// Decoded payload buffer (owned)
-    payload_buf: Vec<u8>,
-    /// Original token string for signing_input
-    token: String,
-    /// Signature bytes
+/// This struct owns decoded and parsed JWT data. `signing_input` stores the
+/// original `header.payload` bytes used for signature verification.
+pub struct ParsedJwt<S: BosStr = DefaultStr> {
+    /// Parsed JWT header.
+    header: JwtHeader,
+    /// Parsed service-auth claims.
+    claims: ServiceAuthClaims<S>,
+    /// Original `header.payload` signing input.
+    signing_input: String,
+    /// Decoded signature bytes.
     signature: Vec<u8>,
-    /// Parsed header borrowing from header_buf
-    #[borrows(header_buf)]
-    #[covariant]
-    header: JwtHeader<'this>,
-    /// Parsed claims borrowing from payload_buf
-    #[borrows(payload_buf)]
-    #[covariant]
-    claims: ServiceAuthClaims<'this>,
 }
 
-impl ParsedJwt {
+impl<S: BosStr> ParsedJwt<S> {
     /// Get the signing input (header.payload) for signature verification.
     pub fn signing_input(&self) -> &[u8] {
-        self.with_token(|token| {
-            let dot_pos = token.find('.').unwrap();
-            let second_dot_pos = token[dot_pos + 1..].find('.').unwrap() + dot_pos + 1;
-            token[..second_dot_pos].as_bytes()
-        })
+        self.signing_input.as_bytes()
     }
 
     /// Get a reference to the header.
-    pub fn header(&self) -> &JwtHeader<'_> {
-        self.borrow_header()
+    pub fn header(&self) -> &JwtHeader {
+        &self.header
     }
 
     /// Get a reference to the claims.
-    pub fn claims(&self) -> &ServiceAuthClaims<'_> {
-        self.borrow_claims()
+    pub fn claims(&self) -> &ServiceAuthClaims<S> {
+        &self.claims
     }
 
     /// Get a reference to the signature.
     pub fn signature(&self) -> &[u8] {
-        self.borrow_signature()
+        &self.signature
     }
 
     /// Get owned header with 'static lifetime.
-    pub fn into_header(self) -> JwtHeader<'static> {
-        self.with_header(|header| header.clone().into_static())
+    pub fn into_header(self) -> JwtHeader {
+        self.header
     }
 
-    /// Get owned claims with 'static lifetime.
-    pub fn into_claims(self) -> ServiceAuthClaims<'static> {
-        self.with_claims(|claims| claims.clone().into_static())
+    /// Get owned claims.
+    pub fn into_claims(self) -> ServiceAuthClaims<S> {
+        self.claims
     }
 }
 
 /// Parse a JWT token into its components without verifying the signature.
 ///
 /// This extracts and decodes all JWT components. The header and claims are parsed
-/// and borrow from their respective owned buffers using ouroboros self-referencing.
+/// into their default owned backing types.
 pub fn parse_jwt(token: &str) -> Result<ParsedJwt, ServiceAuthError> {
     let parts: Vec<&str> = token.split('.').collect();
     if parts.len() != 3 {
@@ -293,31 +318,19 @@ pub fn parse_jwt(token: &str) -> Result<ParsedJwt, ServiceAuthError> {
     let payload_b64 = parts[1];
     let signature_b64 = parts[2];
 
-    // Decode all components
     let header_buf = URL_SAFE_NO_PAD.decode(header_b64)?;
     let payload_buf = URL_SAFE_NO_PAD.decode(payload_b64)?;
     let signature = URL_SAFE_NO_PAD.decode(signature_b64)?;
+    let header: JwtHeader = serde_json::from_slice(&header_buf)?;
+    let claims: ServiceAuthClaims = serde_json::from_slice(&payload_buf)?;
+    let signing_input = format!("{}.{}", header_b64, payload_b64);
 
-    // Validate that buffers contain valid JSON for their types
-    // We parse once here to validate, then again in the builder (unavoidable with ouroboros)
-    let _header: JwtHeader = serde_json::from_slice(&header_buf)?;
-    let _claims: ServiceAuthClaims = serde_json::from_slice(&payload_buf)?;
-
-    Ok(ParsedJwtBuilder {
-        header_buf,
-        payload_buf,
-        token: token.to_string(),
+    Ok(ParsedJwt {
+        header,
+        claims,
+        signing_input,
         signature,
-        header_builder: |buf| {
-            // Safe: we validated this succeeds above
-            serde_json::from_slice(buf).expect("header was validated")
-        },
-        claims_builder: |buf| {
-            // Safe: we validated this succeeds above
-            serde_json::from_slice(buf).expect("claims were validated")
-        },
-    }
-    .build())
+    })
 }
 
 /// Public key types for signature verification.
@@ -402,7 +415,7 @@ pub fn verify_signature(
 pub fn verify_service_jwt(
     token: &str,
     public_key: &PublicKey,
-) -> Result<ServiceAuthClaims<'static>, ServiceAuthError> {
+) -> Result<ServiceAuthClaims, ServiceAuthError> {
     let parsed = parse_jwt(token)?;
     verify_signature(&parsed, public_key)?;
     Ok(parsed.into_claims())
@@ -421,9 +434,9 @@ mod tests {
     #[test]
     fn test_claims_expiration() {
         let now = chrono::Utc::now().timestamp();
-        let expired_claims = ServiceAuthClaims {
+        let expired_claims: ServiceAuthClaims = ServiceAuthClaims {
             iss: Did::new_static("did:plc:test").unwrap(),
-            aud: Did::new_static("did:web:example.com").unwrap(),
+            aud: DidService::new_static("did:web:example.com").unwrap(),
             exp: now - 100,
             iat: now - 200,
             jti: None,
@@ -432,9 +445,9 @@ mod tests {
 
         assert!(expired_claims.is_expired());
 
-        let valid_claims = ServiceAuthClaims {
+        let valid_claims: ServiceAuthClaims = ServiceAuthClaims {
             iss: Did::new_static("did:plc:test").unwrap(),
-            aud: Did::new_static("did:web:example.com").unwrap(),
+            aud: DidService::new_static("did:web:example.com").unwrap(),
             exp: now + 100,
             iat: now,
             jti: None,
@@ -444,33 +457,58 @@ mod tests {
         assert!(!valid_claims.is_expired());
     }
 
-    #[test]
-    fn test_audience_validation() {
-        let now = chrono::Utc::now().timestamp();
-        let claims = ServiceAuthClaims {
+    fn claims_with_aud(aud: &str) -> ServiceAuthClaims {
+        ServiceAuthClaims {
             iss: Did::new_static("did:plc:test").unwrap(),
-            aud: Did::new_static("did:web:example.com").unwrap(),
-            exp: now + 100,
-            iat: now,
+            aud: DidService::new_owned(aud).unwrap(),
+            exp: chrono::Utc::now().timestamp() + 100,
+            iat: chrono::Utc::now().timestamp(),
             jti: None,
             lxm: None,
-        };
+        }
+    }
 
+    #[test]
+    fn test_audience_validation() {
         let expected_aud = Did::new("did:web:example.com").unwrap();
-        assert!(claims.validate(&expected_aud).is_ok());
+        assert!(
+            claims_with_aud("did:web:example.com")
+                .validate(&expected_aud, &[] as &[&str])
+                .is_ok()
+        );
+        assert!(
+            claims_with_aud("did:web:example.com#bsky_appview")
+                .validate(&expected_aud, &[] as &[&str])
+                .is_ok()
+        );
+        assert!(
+            claims_with_aud("did:web:example.com")
+                .validate(&expected_aud, &["bsky_appview"])
+                .is_ok()
+        );
+        assert!(
+            claims_with_aud("did:web:example.com#bsky_appview")
+                .validate(&expected_aud, &["bsky_appview"])
+                .is_ok()
+        );
+        assert!(matches!(
+            claims_with_aud("did:web:example.com#other").validate(&expected_aud, &["bsky_appview"]),
+            Err(ServiceAuthError::ServiceIdMismatch { .. })
+        ));
 
         let wrong_aud = Did::new("did:web:wrong.com").unwrap();
         assert!(matches!(
-            claims.validate(&wrong_aud),
+            claims_with_aud("did:web:example.com#bsky_appview")
+                .validate(&wrong_aud, &["bsky_appview"]),
             Err(ServiceAuthError::AudienceMismatch { .. })
         ));
     }
 
     #[test]
     fn test_method_check() {
-        let claims = ServiceAuthClaims {
+        let claims: ServiceAuthClaims = ServiceAuthClaims {
             iss: Did::new_static("did:plc:test").unwrap(),
-            aud: Did::new_static("did:web:example.com").unwrap(),
+            aud: DidService::new_static("did:web:example.com").unwrap(),
             exp: chrono::Utc::now().timestamp() + 100,
             iat: chrono::Utc::now().timestamp(),
             jti: None,
