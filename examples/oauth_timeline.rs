@@ -10,7 +10,6 @@ use jacquard::xrpc::XrpcClient;
 #[cfg(not(feature = "loopback"))]
 use jacquard_oauth::types::AuthorizeOptions;
 use miette::IntoDiagnostic;
-use smol_str::SmolStr;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Jacquard - OAuth (DPoP) loopback demo")]

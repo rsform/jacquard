@@ -8,19 +8,22 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_showcase::ItemImage;
+use crate::social_showcase::ItemView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::social_showcase::ItemImage;
-use crate::social_showcase::ItemView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -43,7 +46,6 @@ pub struct UpdateItem<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateItemVisibility<S: BosStr = DefaultStr> {
@@ -121,16 +123,16 @@ where
             UpdateItemVisibility::Public => UpdateItemVisibility::Public,
             UpdateItemVisibility::Unlisted => UpdateItemVisibility::Unlisted,
             UpdateItemVisibility::Private => UpdateItemVisibility::Private,
-            UpdateItemVisibility::Other(v) => {
-                UpdateItemVisibility::Other(v.into_static())
-            }
+            UpdateItemVisibility::Other(v) => UpdateItemVisibility::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateItemOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ItemView<S>,
@@ -149,9 +151,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateItemResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateItem<S> {
     const NSID: &'static str = "social.showcase.library.updateItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateItemResponse;
 }
 
@@ -159,16 +160,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateItem<S> {
 pub struct UpdateItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateItemRequest {
     const PATH: &'static str = "/xrpc/social.showcase.library.updateItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateItem<S>;
     type Response = UpdateItemResponse;
 }
 
 pub mod update_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -363,10 +363,7 @@ where
 
 impl<St: update_item_state::State, S: BosStr> UpdateItemBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(
-        mut self,
-        value: impl Into<Option<UpdateItemVisibility<S>>>,
-    ) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<UpdateItemVisibility<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -398,10 +395,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UpdateItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateItem<S> {
         UpdateItem {
             category: self._fields.0,
             description: self._fields.1,

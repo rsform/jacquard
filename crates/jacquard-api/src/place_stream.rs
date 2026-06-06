@@ -30,13 +30,12 @@ pub mod server;
 pub mod video;
 pub mod vod;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -47,16 +46,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::app_bsky::graph::block::Block;
 use crate::place_stream;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A game from the gamesgamesgamesgames catalog, identified by its AT URI.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActivityGame<S: BosStr = DefaultStr> {
     ///Cached display name of the game.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,13 +71,15 @@ pub struct ActivityGame<S: BosStr = DefaultStr> {
 /// A non-game activity with a well-known label.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActivityLabel<S: BosStr = DefaultStr> {
     pub label: ActivityLabelLabel<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ActivityLabelLabel<S: BosStr = DefaultStr> {
@@ -186,9 +190,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlockView<S: BosStr = DefaultStr> {
     pub blocker: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -199,18 +205,22 @@ pub struct BlockView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Rendition<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Renditions<S: BosStr = DefaultStr> {
     pub renditions: Vec<place_stream::Rendition<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -294,7 +304,7 @@ impl<S: BosStr> LexiconSchema for Renditions<S> {
 
 pub mod activity_game_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -413,10 +423,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ActivityGame<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ActivityGame<S> {
         ActivityGame {
             name: self._fields.0,
             uri: self._fields.1.unwrap(),
@@ -426,10 +433,10 @@ where
 }
 
 fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.defs"),
@@ -438,11 +445,9 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activityGame"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A game from the gamesgamesgamesgames catalog, identified by its AT URI.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A game from the gamesgamesgamesgames catalog, identified by its AT URI.",
+                    )),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -450,9 +455,9 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Cached display name of the game."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Cached display name of the game.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -471,18 +476,18 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activityLabel"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A non-game activity with a well-known label.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A non-game activity with a well-known label.",
+                    )),
                     required: Some(vec![SmolStr::new_static("label")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("label"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -492,23 +497,20 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blockView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("blocker"),
-                            SmolStr::new_static("record"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("blocker"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blocker"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -554,7 +556,9 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -591,7 +595,7 @@ fn lexicon_doc_place_stream_defs() -> LexiconDoc<'static> {
 
 pub mod block_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -846,10 +850,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BlockView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockView<S> {
         BlockView {
             blocker: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -863,7 +864,7 @@ where
 
 pub mod renditions_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -968,10 +969,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Renditions<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Renditions<S> {
         Renditions {
             renditions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

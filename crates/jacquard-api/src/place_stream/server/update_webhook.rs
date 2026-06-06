@@ -8,19 +8,22 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::place_stream::server::RewriteRule;
+use crate::place_stream::server::Webhook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::place_stream::server::RewriteRule;
-use crate::place_stream::server::Webhook;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateWebhook<S: BosStr = DefaultStr> {
     ///Whether this webhook should be active.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,27 +58,20 @@ pub struct UpdateWebhook<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateWebhookOutput<S: BosStr = DefaultStr> {
     pub webhook: Webhook<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateWebhookError {
     /// The specified webhook was not found.
@@ -92,7 +88,10 @@ pub enum UpdateWebhookError {
     DuplicateWebhook(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateWebhookError {
@@ -148,9 +147,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateWebhookResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateWebhook<S> {
     const NSID: &'static str = "place.stream.server.updateWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateWebhookResponse;
 }
 
@@ -158,9 +156,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateWebhook<S> {
 pub struct UpdateWebhookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateWebhookRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.updateWebhook";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateWebhook<S>;
     type Response = UpdateWebhookResponse;
 }

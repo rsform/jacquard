@@ -10,10 +10,9 @@ pub mod get_files;
 pub mod get_metadata;
 pub mod get_temporary_link;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +23,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_rocksky::dropbox;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_rocksky::dropbox;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FileListView<S: BosStr = DefaultStr> {
     ///A list of files in the Dropbox.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,9 +41,11 @@ pub struct FileListView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FileView<S: BosStr = DefaultStr> {
     ///The last modified date and time of the file on the client.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -65,9 +69,11 @@ pub struct FileView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TemporaryLinkView<S: BosStr = DefaultStr> {
     ///The temporary link to access the file.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -122,10 +128,10 @@ impl<S: BosStr> LexiconSchema for TemporaryLinkView<S> {
 }
 
 fn lexicon_doc_app_rocksky_dropbox_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.dropbox.defs"),
@@ -140,13 +146,11 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("files"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("A list of files in the Dropbox."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A list of files in the Dropbox.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "app.rocksky.dropbox.defs#fileView",
-                                    ),
+                                    r#ref: CowStr::new_static("app.rocksky.dropbox.defs#fileView"),
                                     ..Default::default()
                                 }),
                                 ..Default::default()
@@ -166,11 +170,9 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("clientModified"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The last modified date and time of the file on the client.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The last modified date and time of the file on the client.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -178,47 +180,43 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the file."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the file.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The name of the file."),
-                                ),
+                                description: Some(CowStr::new_static("The name of the file.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("pathDisplay"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The display path of the file."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The display path of the file.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("pathLower"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The lowercased path of the file."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The lowercased path of the file.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("serverModified"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The last modified date and time of the file on the server.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The last modified date and time of the file on the server.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -237,9 +235,9 @@ fn lexicon_doc_app_rocksky_dropbox_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("link"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The temporary link to access the file."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The temporary link to access the file.",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),

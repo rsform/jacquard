@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A goal to track daily completions for a year.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -184,19 +184,16 @@ impl<S: BosStr> LexiconSchema for Goal<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("completed_piece_blob"),
@@ -264,19 +261,16 @@ impl<S: BosStr> LexiconSchema for Goal<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("piece_blob"),
@@ -311,7 +305,7 @@ impl<S: BosStr> LexiconSchema for Goal<S> {
 
 pub mod goal_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -426,20 +420,7 @@ impl GoalBuilder<goal_state::Empty, DefaultStr> {
         GoalBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -453,20 +434,7 @@ impl<S: BosStr> GoalBuilder<goal_state::Empty, S> {
         GoalBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -590,10 +558,7 @@ where
     St::GoalId: goal_state::IsUnset,
 {
     /// Set the `goalId` field (required)
-    pub fn goal_id(
-        mut self,
-        value: impl Into<S>,
-    ) -> GoalBuilder<goal_state::SetGoalId<St>, S> {
+    pub fn goal_id(mut self, value: impl Into<S>) -> GoalBuilder<goal_state::SetGoalId<St>, S> {
         self._fields.8 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -609,10 +574,7 @@ where
     St::Name: goal_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> GoalBuilder<goal_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> GoalBuilder<goal_state::SetName<St>, S> {
         self._fields.9 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -680,10 +642,7 @@ where
     St::Year: goal_state::IsUnset,
 {
     /// Set the `year` field (required)
-    pub fn year(
-        mut self,
-        value: impl Into<i64>,
-    ) -> GoalBuilder<goal_state::SetYear<St>, S> {
+    pub fn year(mut self, value: impl Into<i64>) -> GoalBuilder<goal_state::SetYear<St>, S> {
         self._fields.14 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
@@ -746,10 +705,10 @@ where
 }
 
 fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.goals.goal"),
@@ -758,31 +717,26 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A goal to track daily completions for a year.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A goal to track daily completions for a year.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("goalId"), SmolStr::new_static("name"),
-                                SmolStr::new_static("year"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("goalId"),
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("year"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("accentColor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Preset name or hex color for incomplete state",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Preset name or hex color for incomplete state",
+                                    )),
                                     max_length: Some(50usize),
                                     ..Default::default()
                                 }),
@@ -790,11 +744,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("categories"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Array of category UUIDs this goal belongs to",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Array of category UUIDs this goal belongs to",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
                                         ..Default::default()
@@ -805,11 +757,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("completedAccentColor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Preset name or hex color for complete state",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Preset name or hex color for complete state",
+                                    )),
                                     max_length: Some(50usize),
                                     ..Default::default()
                                 }),
@@ -817,23 +767,25 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("completedPiece"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Shape name or emoji for complete state"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Shape name or emoji for complete state",
+                                    )),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("completedPieceBlob"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("completedPieceUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Favicon URL for complete state"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Favicon URL for complete state",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -841,9 +793,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Timestamp when the goal was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the goal was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -851,9 +803,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Optional description of the goal"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Optional description of the goal",
+                                    )),
                                     max_length: Some(500usize),
                                     ..Default::default()
                                 }),
@@ -861,9 +813,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("goalId"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Unique identifier for the goal (UUID)"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Unique identifier for the goal (UUID)",
+                                    )),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -871,9 +823,9 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Display name of the goal"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Display name of the goal",
+                                    )),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -881,25 +833,25 @@ fn lexicon_doc_garden_goals_goal() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("piece"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Shape name or emoji for incomplete state",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Shape name or emoji for incomplete state",
+                                    )),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("pieceBlob"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("pieceUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Favicon URL for incomplete state"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Favicon URL for incomplete state",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

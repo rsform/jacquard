@@ -10,14 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeleteStorageOutput<S: BosStr = DefaultStr> {
     pub success: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -39,9 +42,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteStorageResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteStorage {
     const NSID: &'static str = "place.stream.server.deleteStorage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteStorageResponse;
 }
 
@@ -49,9 +51,8 @@ impl jacquard_common::xrpc::XrpcRequest for DeleteStorage {
 pub struct DeleteStorageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteStorageRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.deleteStorage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DeleteStorage;
     type Response = DeleteStorageResponse;
 }

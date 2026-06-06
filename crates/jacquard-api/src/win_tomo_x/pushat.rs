@@ -8,13 +8,12 @@
 pub mod allow;
 pub mod push_notify;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,14 +24,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::win_tomo_x::pushat;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::win_tomo_x::pushat;
+use serde::{Deserialize, Serialize};
 pub type DeviceList<S = DefaultStr> = Vec<pushat::DeviceListItem<S>>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeviceListItem<S: BosStr = DefaultStr> {
     /// Defaults to `false`.
     #[serde(default = "_default_device_list_item_current")]
@@ -43,9 +45,11 @@ pub struct DeviceListItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotifyBody<S: BosStr = DefaultStr> {
     ///Body text of the notification.
     pub body: S,
@@ -121,7 +125,7 @@ fn _default_device_list_item_current() -> bool {
 
 pub mod device_list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,10 +182,7 @@ pub mod device_list_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeviceListItemBuilder<
-    St: device_list_item_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct DeviceListItemBuilder<St: device_list_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<Tid>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -297,10 +298,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> DeviceListItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeviceListItem<S> {
         DeviceListItem {
             current: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -311,10 +309,10 @@ where
 }
 
 fn lexicon_doc_win_tomo_x_pushat_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("win.tomo-x.pushat.defs"),
@@ -333,12 +331,11 @@ fn lexicon_doc_win_tomo_x_pushat_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("deviceListItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("name"), SmolStr::new_static("id"),
-                            SmolStr::new_static("current")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("current"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

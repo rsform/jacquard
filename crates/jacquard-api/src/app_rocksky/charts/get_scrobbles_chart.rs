@@ -8,19 +8,22 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_rocksky::charts::ChartsView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_rocksky::charts::ChartsView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetScrobblesChart<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub albumuri: Option<AtUri<S>>,
@@ -32,9 +35,11 @@ pub struct GetScrobblesChart<S: BosStr = DefaultStr> {
     pub songuri: Option<AtUri<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetScrobblesChartOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ChartsView<S>,
@@ -68,7 +73,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {
 
 pub mod get_scrobbles_chart_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -86,10 +91,7 @@ pub mod get_scrobbles_chart_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetScrobblesChartBuilder<
-    St: get_scrobbles_chart_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetScrobblesChartBuilder<St: get_scrobbles_chart_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -102,10 +104,7 @@ pub struct GetScrobblesChartBuilder<
 
 impl GetScrobblesChart<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetScrobblesChartBuilder<
-        get_scrobbles_chart_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetScrobblesChartBuilder<get_scrobbles_chart_state::Empty, DefaultStr> {
         GetScrobblesChartBuilder::new()
     }
 }

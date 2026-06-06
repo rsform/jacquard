@@ -222,6 +222,13 @@ impl<'a> FromStaticStr for CowStr<'a> {
     }
 }
 
+impl<'a> FromStaticStr for Cow<'a, str> {
+    #[inline]
+    fn from_static(s: &'static str) -> Self {
+        Cow::Borrowed(s)
+    }
+}
+
 impl<'a> FromStaticStr for &'a str {
     #[inline]
     fn from_static(s: &'a str) -> Self {

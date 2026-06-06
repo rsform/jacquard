@@ -10,40 +10,47 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime, UriValue};
+use jacquard_common::types::string::{Datetime, Did, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::network_slices::slice::get_o_auth_clients;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::network_slices::slice::get_o_auth_clients;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetOAuthClients<S: BosStr = DefaultStr> {
     pub slice: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetOAuthClientsOutput<S: BosStr = DefaultStr> {
     pub clients: Vec<get_o_auth_clients::OauthClientDetails<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct OauthClientDetails<S: BosStr = DefaultStr> {
     ///OAuth client ID
     pub client_id: S,
@@ -122,7 +129,7 @@ impl<S: BosStr> LexiconSchema for OauthClientDetails<S> {
 
 pub mod get_o_auth_clients_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -153,10 +160,7 @@ pub mod get_o_auth_clients_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetOAuthClientsBuilder<
-    St: get_o_auth_clients_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetOAuthClientsBuilder<St: get_o_auth_clients_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -232,7 +236,7 @@ where
 
 pub mod oauth_client_details_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -365,10 +369,8 @@ pub mod oauth_client_details_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OauthClientDetailsBuilder<
-    St: oauth_client_details_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct OauthClientDetailsBuilder<St: oauth_client_details_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -390,10 +392,7 @@ pub struct OauthClientDetailsBuilder<
 
 impl OauthClientDetails<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> OauthClientDetailsBuilder<
-        oauth_client_details_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> OauthClientDetailsBuilder<oauth_client_details_state::Empty, DefaultStr> {
         OauthClientDetailsBuilder::new()
     }
 }
@@ -411,19 +410,7 @@ impl OauthClientDetailsBuilder<oauth_client_details_state::Empty, DefaultStr> {
         OauthClientDetailsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -436,19 +423,7 @@ impl<S: BosStr> OauthClientDetailsBuilder<oauth_client_details_state::Empty, S> 
         OauthClientDetailsBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -697,10 +672,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> OauthClientDetails<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OauthClientDetails<S> {
         OauthClientDetails {
             client_id: self._fields.0.unwrap(),
             client_name: self._fields.1.unwrap(),
@@ -721,10 +693,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getOAuthClients"),
@@ -733,45 +705,39 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("slice")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("slice"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "AT-URI of the slice to get OAuth clients for",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("slice")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("slice"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "AT-URI of the slice to get OAuth clients for",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("oauthClientDetails"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("clientId"),
-                            SmolStr::new_static("clientName"),
-                            SmolStr::new_static("redirectUris"),
-                            SmolStr::new_static("grantTypes"),
-                            SmolStr::new_static("responseTypes"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("createdByDid")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("clientId"),
+                        SmolStr::new_static("clientName"),
+                        SmolStr::new_static("redirectUris"),
+                        SmolStr::new_static("grantTypes"),
+                        SmolStr::new_static("responseTypes"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("createdByDid"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -785,31 +751,27 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("clientName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Human-readable name of the OAuth client",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Human-readable name of the OAuth client",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("clientSecret"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "OAuth client secret (only returned on creation)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "OAuth client secret (only returned on creation)",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("clientUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URI of the client application"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URI of the client application",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -817,9 +779,9 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When the OAuth client was created"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the OAuth client was created",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -827,11 +789,9 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdByDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "DID of the user who created this client",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the user who created this client",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -839,9 +799,7 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("grantTypes"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Allowed OAuth grant types"),
-                                ),
+                                description: Some(CowStr::new_static("Allowed OAuth grant types")),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -851,9 +809,7 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("logoUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URI of the client logo"),
-                                ),
+                                description: Some(CowStr::new_static("URI of the client logo")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -861,9 +817,7 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("policyUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URI of the privacy policy"),
-                                ),
+                                description: Some(CowStr::new_static("URI of the privacy policy")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -871,9 +825,9 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("redirectUris"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Allowed redirect URIs for OAuth flow"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Allowed redirect URIs for OAuth flow",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
@@ -884,9 +838,9 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("responseTypes"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Allowed OAuth response types"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Allowed OAuth response types",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -903,9 +857,9 @@ fn lexicon_doc_network_slices_slice_getOAuthClients() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tosUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URI of the terms of service"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URI of the terms of service",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),

@@ -10,24 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, Datetime};
+use jacquard_common::types::string::{Datetime, Did, Handle};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::network_slices::slice::get_actors;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::network_slices::slice::get_actors;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Actor<S: BosStr = DefaultStr> {
     ///Decentralized identifier of the actor
     pub did: Did<S>,
@@ -42,9 +45,11 @@ pub struct Actor<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActors<S: BosStr = DefaultStr> {
     ///Pagination cursor from previous response
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,9 +67,11 @@ pub struct GetActors<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorsOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<get_actors::Actor<S>>,
     ///Pagination cursor for next page
@@ -100,9 +107,8 @@ impl jacquard_common::xrpc::XrpcResp for GetActorsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActors<S> {
     const NSID: &'static str = "network.slices.slice.getActors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GetActorsResponse;
 }
 
@@ -110,16 +116,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActors<S> {
 pub struct GetActorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getActors";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = GetActors<S>;
     type Response = GetActorsResponse;
 }
 
 pub mod actor_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,7 +183,12 @@ pub mod actor_state {
 /// Builder for constructing an instance of this type.
 pub struct ActorBuilder<St: actor_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<Handle<S>>, Option<Datetime>, Option<S>),
+    _fields: (
+        Option<Did<S>>,
+        Option<Handle<S>>,
+        Option<Datetime>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -224,10 +234,7 @@ where
     St::Did: actor_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> ActorBuilder<actor_state::SetDid<St>, S> {
+    pub fn did(mut self, value: impl Into<Did<S>>) -> ActorBuilder<actor_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
@@ -318,10 +325,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getActors() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getActors"),
@@ -330,21 +337,20 @@ fn lexicon_doc_network_slices_slice_getActors() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("actor"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"), SmolStr::new_static("sliceUri"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("sliceUri"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Decentralized identifier of the actor"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Decentralized identifier of the actor",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -352,9 +358,9 @@ fn lexicon_doc_network_slices_slice_getActors() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Human-readable handle of the actor"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Human-readable handle of the actor",
+                                )),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),
@@ -362,9 +368,9 @@ fn lexicon_doc_network_slices_slice_getActors() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("indexedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("When this actor was indexed"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When this actor was indexed",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -372,11 +378,9 @@ fn lexicon_doc_network_slices_slice_getActors() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sliceUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "AT-URI of the slice this actor is indexed in",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the slice this actor is indexed in",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -390,51 +394,47 @@ fn lexicon_doc_network_slices_slice_getActors() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(vec![SmolStr::new_static("slice")]),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("cursor"),
-                                        LexObjectProperty::String(LexString {
-                                            description: Some(
-                                                CowStr::new_static(
-                                                    "Pagination cursor from previous response",
-                                                ),
-                                            ),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("limit"),
-                                        LexObjectProperty::Integer(LexInteger {
-                                            minimum: Some(1i64),
-                                            maximum: Some(100i64),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("slice"),
-                                        LexObjectProperty::String(LexString {
-                                            description: Some(
-                                                CowStr::new_static("AT-URI of the slice to query"),
-                                            ),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("where"),
-                                        LexObjectProperty::Unknown(LexUnknown {
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![SmolStr::new_static("slice")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexObjectProperty::String(LexString {
+                                        description: Some(CowStr::new_static(
+                                            "Pagination cursor from previous response",
+                                        )),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexObjectProperty::Integer(LexInteger {
+                                        minimum: Some(1i64),
+                                        maximum: Some(100i64),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("slice"),
+                                    LexObjectProperty::String(LexString {
+                                        description: Some(CowStr::new_static(
+                                            "AT-URI of the slice to query",
+                                        )),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("where"),
+                                    LexObjectProperty::Unknown(LexUnknown {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()

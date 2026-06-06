@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// The real-world feature that an Observation is about.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -142,7 +142,7 @@ impl<S: BosStr> LexiconSchema for FeatureOfInterest<S> {
 
 pub mod feature_of_interest_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -215,21 +215,21 @@ pub mod feature_of_interest_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FeatureOfInterestBuilder<
-    St: feature_of_interest_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct FeatureOfInterestBuilder<St: feature_of_interest_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<Data<S>>, Option<S>),
+    _fields: (
+        Option<Datetime>,
+        Option<S>,
+        Option<S>,
+        Option<Data<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl FeatureOfInterest<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> FeatureOfInterestBuilder<
-        feature_of_interest_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> FeatureOfInterestBuilder<feature_of_interest_state::Empty, DefaultStr> {
         FeatureOfInterestBuilder::new()
     }
 }
@@ -372,10 +372,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> FeatureOfInterest<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeatureOfInterest<S> {
         FeatureOfInterest {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -388,10 +385,10 @@ where
 }
 
 fn lexicon_doc_dev_sensorthings_featureOfInterest() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.sensorthings.featureOfInterest"),

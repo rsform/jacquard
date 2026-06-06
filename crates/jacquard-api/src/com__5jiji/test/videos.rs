@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A video
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -118,7 +118,7 @@ impl<S: BosStr> LexiconSchema for Videos<S> {
 
 pub mod videos_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -242,10 +242,7 @@ where
     St::Id: videos_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<Data<S>>,
-    ) -> VideosBuilder<videos_state::SetId<St>, S> {
+    pub fn id(mut self, value: impl Into<Data<S>>) -> VideosBuilder<videos_state::SetId<St>, S> {
         self._fields.1 = Option::Some(value.into());
         VideosBuilder {
             _state: PhantomData,
@@ -261,10 +258,7 @@ where
     St::Title: videos_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> VideosBuilder<videos_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> VideosBuilder<videos_state::SetTitle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         VideosBuilder {
             _state: PhantomData,
@@ -302,10 +296,10 @@ where
 }
 
 fn lexicon_doc_com_5jiji_test_videos() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.5jiji.test.videos"),
@@ -317,12 +311,11 @@ fn lexicon_doc_com_5jiji_test_videos() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A video")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("id"), SmolStr::new_static("title"),
-                                SmolStr::new_static("creator")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("id"),
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("creator"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

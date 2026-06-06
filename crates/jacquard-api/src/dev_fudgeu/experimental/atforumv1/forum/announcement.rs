@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A forum-wide announcement
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -150,7 +150,7 @@ impl<S: BosStr> LexiconSchema for Announcement<S> {
 
 pub mod announcement_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -360,10 +360,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Announcement<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Announcement<S> {
         Announcement {
             body: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -374,13 +371,11 @@ where
     }
 }
 
-fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.fudgeu.experimental.atforumv1.forum.announcement"),
@@ -392,13 +387,12 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_forum_announcement() -> Lexicon
                     description: Some(CowStr::new_static("A forum-wide announcement")),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"), SmolStr::new_static("body"),
-                                SmolStr::new_static("createdAt"),
-                                SmolStr::new_static("expiresAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("body"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("expiresAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

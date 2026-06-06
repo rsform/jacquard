@@ -10,13 +10,12 @@ pub mod get_song;
 pub mod get_songs;
 pub mod match_song;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,7 +32,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A declaration of a song.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -122,9 +121,11 @@ pub struct SongGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Song<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SongViewBasic<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -178,9 +179,11 @@ pub struct SongViewBasic<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SongViewDetailed<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -316,25 +319,20 @@ impl<S: BosStr> LexiconSchema for Song<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("album_art"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -576,7 +574,7 @@ impl<S: BosStr> LexiconSchema for SongViewDetailed<S> {
 
 pub mod song_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -737,29 +735,8 @@ impl SongBuilder<song_state::Empty, DefaultStr> {
         SongBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -772,29 +749,8 @@ impl<S: BosStr> SongBuilder<song_state::Empty, S> {
         SongBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -807,10 +763,7 @@ where
     St::Album: song_state::IsUnset,
 {
     /// Set the `album` field (required)
-    pub fn album(
-        mut self,
-        value: impl Into<S>,
-    ) -> SongBuilder<song_state::SetAlbum<St>, S> {
+    pub fn album(mut self, value: impl Into<S>) -> SongBuilder<song_state::SetAlbum<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -871,10 +824,7 @@ where
     St::Artist: song_state::IsUnset,
 {
     /// Set the `artist` field (required)
-    pub fn artist(
-        mut self,
-        value: impl Into<S>,
-    ) -> SongBuilder<song_state::SetArtist<St>, S> {
+    pub fn artist(mut self, value: impl Into<S>) -> SongBuilder<song_state::SetArtist<St>, S> {
         self._fields.4 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -1071,10 +1021,7 @@ where
     St::Title: song_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> SongBuilder<song_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> SongBuilder<song_state::SetTitle<St>, S> {
         self._fields.18 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -1207,10 +1154,10 @@ where
 }
 
 fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.song"),
@@ -1222,24 +1169,21 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A declaration of a song.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"), SmolStr::new_static("artist"),
-                                SmolStr::new_static("album"),
-                                SmolStr::new_static("albumArtist"),
-                                SmolStr::new_static("duration"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("artist"),
+                            SmolStr::new_static("album"),
+                            SmolStr::new_static("albumArtist"),
+                            SmolStr::new_static("duration"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("album"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The album of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static("The album of the song.")),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -1247,14 +1191,16 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("albumArt"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("albumArtist"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The album artist of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The album artist of the song.",
+                                    )),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -1263,9 +1209,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("appleMusicLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The Apple Music link of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The Apple Music link of the song.",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1273,9 +1219,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("artist"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The artist of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The artist of the song.",
+                                    )),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -1284,9 +1230,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("composer"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The composer of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The composer of the song.",
+                                    )),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -1294,9 +1240,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("copyrightMessage"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The copyright message of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The copyright message of the song.",
+                                    )),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -1304,9 +1250,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The date when the song was created."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The date when the song was created.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -1328,9 +1274,7 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("genre"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The genre of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static("The genre of the song.")),
                                     min_length: Some(1usize),
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -1339,9 +1283,7 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("label"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The label of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static("The label of the song.")),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -1349,9 +1291,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("lyrics"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The lyrics of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The lyrics of the song.",
+                                    )),
                                     max_length: Some(10000usize),
                                     ..Default::default()
                                 }),
@@ -1359,18 +1301,18 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("mbid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The MusicBrainz ID of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The MusicBrainz ID of the song.",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("releaseDate"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The release date of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The release date of the song.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -1378,9 +1320,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("spotifyLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The Spotify link of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The Spotify link of the song.",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1388,9 +1330,7 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("The tags of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static("The tags of the song.")),
                                     items: LexArrayItem::String(LexString {
                                         min_length: Some(1usize),
                                         max_length: Some(256usize),
@@ -1402,9 +1342,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tidalLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The Tidal link of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The Tidal link of the song.",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1412,9 +1352,7 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The title of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static("The title of the song.")),
                                     min_length: Some(1usize),
                                     max_length: Some(512usize),
                                     ..Default::default()
@@ -1430,9 +1368,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("wiki"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Informations about the song"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Informations about the song",
+                                    )),
                                     max_length: Some(10000usize),
                                     ..Default::default()
                                 }),
@@ -1446,9 +1384,9 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("youtubeLink"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The YouTube link of the song."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The YouTube link of the song.",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -1467,10 +1405,10 @@ fn lexicon_doc_app_rocksky_song() -> LexiconDoc<'static> {
 }
 
 fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.song.defs"),
@@ -1485,18 +1423,16 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("album"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The album of the song."),
-                                ),
+                                description: Some(CowStr::new_static("The album of the song.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("albumArt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL of the album art image."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL of the album art image.",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1504,22 +1440,18 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("albumArtist"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The artist of the album the song belongs to.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The artist of the album the song belongs to.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("albumUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The URI of the album the song belongs to.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URI of the album the song belongs to.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1527,18 +1459,16 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The artist of the song."),
-                                ),
+                                description: Some(CowStr::new_static("The artist of the song.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("artistUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URI of the artist of the song."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URI of the artist of the song.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1546,11 +1476,9 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The timestamp when the song was created.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The timestamp when the song was created.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1570,9 +1498,9 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the song."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the song.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -1586,18 +1514,16 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sha256"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The SHA256 hash of the song."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The SHA256 hash of the song.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The title of the song."),
-                                ),
+                                description: Some(CowStr::new_static("The title of the song.")),
                                 ..Default::default()
                             }),
                         );
@@ -1617,9 +1543,7 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URI of the song."),
-                                ),
+                                description: Some(CowStr::new_static("The URI of the song.")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1638,18 +1562,16 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("album"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The album of the song."),
-                                ),
+                                description: Some(CowStr::new_static("The album of the song.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("albumArt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL of the album art image."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL of the album art image.",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -1657,22 +1579,18 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("albumArtist"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The artist of the album the song belongs to.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The artist of the album the song belongs to.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("albumUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The URI of the album the song belongs to.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URI of the album the song belongs to.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1680,18 +1598,16 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The artist of the song."),
-                                ),
+                                description: Some(CowStr::new_static("The artist of the song.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("artistUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URI of the artist of the song."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URI of the artist of the song.",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1699,11 +1615,9 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The timestamp when the song was created.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The timestamp when the song was created.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1723,9 +1637,9 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the song."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the song.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -1739,18 +1653,16 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sha256"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The SHA256 hash of the song."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The SHA256 hash of the song.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The title of the song."),
-                                ),
+                                description: Some(CowStr::new_static("The title of the song.")),
                                 ..Default::default()
                             }),
                         );
@@ -1770,9 +1682,7 @@ fn lexicon_doc_app_rocksky_song_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URI of the song."),
-                                ),
+                                description: Some(CowStr::new_static("The URI of the song.")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

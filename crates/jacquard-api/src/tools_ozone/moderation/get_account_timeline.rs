@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,45 +21,44 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::tools_ozone::moderation::get_account_timeline;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::moderation::get_account_timeline;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetAccountTimeline<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetAccountTimelineOutput<S: BosStr = DefaultStr> {
     pub timeline: Vec<get_account_timeline::TimelineItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetAccountTimelineError {
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetAccountTimelineError {
@@ -83,9 +82,11 @@ impl core::fmt::Display for GetAccountTimelineError {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TimelineItem<S: BosStr = DefaultStr> {
     pub day: S,
     pub summary: Vec<get_account_timeline::TimelineItemSummary<S>>,
@@ -93,9 +94,11 @@ pub struct TimelineItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TimelineItemSummary<S: BosStr = DefaultStr> {
     pub count: i64,
     pub event_subject_type: TimelineItemSummaryEventSubjectType<S>,
@@ -103,7 +106,6 @@ pub struct TimelineItemSummary<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TimelineItemSummaryEventSubjectType<S: BosStr = DefaultStr> {
@@ -155,7 +157,8 @@ impl<S: BosStr> Serialize for TimelineItemSummaryEventSubjectType<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for TimelineItemSummaryEventSubjectType<S> {
+    for TimelineItemSummaryEventSubjectType<S>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -185,16 +188,13 @@ where
             TimelineItemSummaryEventSubjectType::Record => {
                 TimelineItemSummaryEventSubjectType::Record
             }
-            TimelineItemSummaryEventSubjectType::Chat => {
-                TimelineItemSummaryEventSubjectType::Chat
-            }
+            TimelineItemSummaryEventSubjectType::Chat => TimelineItemSummaryEventSubjectType::Chat,
             TimelineItemSummaryEventSubjectType::Other(v) => {
                 TimelineItemSummaryEventSubjectType::Other(v.into_static())
             }
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TimelineItemSummaryEventType<S: BosStr = DefaultStr> {
@@ -236,36 +236,24 @@ impl<S: BosStr> TimelineItemSummaryEventType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ModEventTakedown => "tools.ozone.moderation.defs#modEventTakedown",
-            Self::ModEventReverseTakedown => {
-                "tools.ozone.moderation.defs#modEventReverseTakedown"
-            }
+            Self::ModEventReverseTakedown => "tools.ozone.moderation.defs#modEventReverseTakedown",
             Self::ModEventComment => "tools.ozone.moderation.defs#modEventComment",
             Self::ModEventReport => "tools.ozone.moderation.defs#modEventReport",
             Self::ModEventLabel => "tools.ozone.moderation.defs#modEventLabel",
-            Self::ModEventAcknowledge => {
-                "tools.ozone.moderation.defs#modEventAcknowledge"
-            }
+            Self::ModEventAcknowledge => "tools.ozone.moderation.defs#modEventAcknowledge",
             Self::ModEventEscalate => "tools.ozone.moderation.defs#modEventEscalate",
             Self::ModEventMute => "tools.ozone.moderation.defs#modEventMute",
             Self::ModEventUnmute => "tools.ozone.moderation.defs#modEventUnmute",
-            Self::ModEventMuteReporter => {
-                "tools.ozone.moderation.defs#modEventMuteReporter"
-            }
-            Self::ModEventUnmuteReporter => {
-                "tools.ozone.moderation.defs#modEventUnmuteReporter"
-            }
+            Self::ModEventMuteReporter => "tools.ozone.moderation.defs#modEventMuteReporter",
+            Self::ModEventUnmuteReporter => "tools.ozone.moderation.defs#modEventUnmuteReporter",
             Self::ModEventEmail => "tools.ozone.moderation.defs#modEventEmail",
-            Self::ModEventResolveAppeal => {
-                "tools.ozone.moderation.defs#modEventResolveAppeal"
-            }
+            Self::ModEventResolveAppeal => "tools.ozone.moderation.defs#modEventResolveAppeal",
             Self::ModEventDivert => "tools.ozone.moderation.defs#modEventDivert",
             Self::ModEventTag => "tools.ozone.moderation.defs#modEventTag",
             Self::AccountEvent => "tools.ozone.moderation.defs#accountEvent",
             Self::IdentityEvent => "tools.ozone.moderation.defs#identityEvent",
             Self::RecordEvent => "tools.ozone.moderation.defs#recordEvent",
-            Self::ModEventPriorityScore => {
-                "tools.ozone.moderation.defs#modEventPriorityScore"
-            }
+            Self::ModEventPriorityScore => "tools.ozone.moderation.defs#modEventPriorityScore",
             Self::RevokeAccountCredentialsEvent => {
                 "tools.ozone.moderation.defs#revokeAccountCredentialsEvent"
             }
@@ -273,28 +261,18 @@ impl<S: BosStr> TimelineItemSummaryEventType<S> {
             Self::AgeAssuranceOverrideEvent => {
                 "tools.ozone.moderation.defs#ageAssuranceOverrideEvent"
             }
-            Self::TimelineEventPlcCreate => {
-                "tools.ozone.moderation.defs#timelineEventPlcCreate"
-            }
+            Self::TimelineEventPlcCreate => "tools.ozone.moderation.defs#timelineEventPlcCreate",
             Self::TimelineEventPlcOperation => {
                 "tools.ozone.moderation.defs#timelineEventPlcOperation"
             }
             Self::TimelineEventPlcTombstone => {
                 "tools.ozone.moderation.defs#timelineEventPlcTombstone"
             }
-            Self::AccountCreated => {
-                "tools.ozone.hosting.getAccountHistory#accountCreated"
-            }
-            Self::EmailConfirmed => {
-                "tools.ozone.hosting.getAccountHistory#emailConfirmed"
-            }
-            Self::PasswordUpdated => {
-                "tools.ozone.hosting.getAccountHistory#passwordUpdated"
-            }
+            Self::AccountCreated => "tools.ozone.hosting.getAccountHistory#accountCreated",
+            Self::EmailConfirmed => "tools.ozone.hosting.getAccountHistory#emailConfirmed",
+            Self::PasswordUpdated => "tools.ozone.hosting.getAccountHistory#passwordUpdated",
             Self::HandleUpdated => "tools.ozone.hosting.getAccountHistory#handleUpdated",
-            Self::ScheduleTakedownEvent => {
-                "tools.ozone.moderation.defs#scheduleTakedownEvent"
-            }
+            Self::ScheduleTakedownEvent => "tools.ozone.moderation.defs#scheduleTakedownEvent",
             Self::CancelScheduledTakedownEvent => {
                 "tools.ozone.moderation.defs#cancelScheduledTakedownEvent"
             }
@@ -305,36 +283,24 @@ impl<S: BosStr> TimelineItemSummaryEventType<S> {
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
             "tools.ozone.moderation.defs#modEventTakedown" => Self::ModEventTakedown,
-            "tools.ozone.moderation.defs#modEventReverseTakedown" => {
-                Self::ModEventReverseTakedown
-            }
+            "tools.ozone.moderation.defs#modEventReverseTakedown" => Self::ModEventReverseTakedown,
             "tools.ozone.moderation.defs#modEventComment" => Self::ModEventComment,
             "tools.ozone.moderation.defs#modEventReport" => Self::ModEventReport,
             "tools.ozone.moderation.defs#modEventLabel" => Self::ModEventLabel,
-            "tools.ozone.moderation.defs#modEventAcknowledge" => {
-                Self::ModEventAcknowledge
-            }
+            "tools.ozone.moderation.defs#modEventAcknowledge" => Self::ModEventAcknowledge,
             "tools.ozone.moderation.defs#modEventEscalate" => Self::ModEventEscalate,
             "tools.ozone.moderation.defs#modEventMute" => Self::ModEventMute,
             "tools.ozone.moderation.defs#modEventUnmute" => Self::ModEventUnmute,
-            "tools.ozone.moderation.defs#modEventMuteReporter" => {
-                Self::ModEventMuteReporter
-            }
-            "tools.ozone.moderation.defs#modEventUnmuteReporter" => {
-                Self::ModEventUnmuteReporter
-            }
+            "tools.ozone.moderation.defs#modEventMuteReporter" => Self::ModEventMuteReporter,
+            "tools.ozone.moderation.defs#modEventUnmuteReporter" => Self::ModEventUnmuteReporter,
             "tools.ozone.moderation.defs#modEventEmail" => Self::ModEventEmail,
-            "tools.ozone.moderation.defs#modEventResolveAppeal" => {
-                Self::ModEventResolveAppeal
-            }
+            "tools.ozone.moderation.defs#modEventResolveAppeal" => Self::ModEventResolveAppeal,
             "tools.ozone.moderation.defs#modEventDivert" => Self::ModEventDivert,
             "tools.ozone.moderation.defs#modEventTag" => Self::ModEventTag,
             "tools.ozone.moderation.defs#accountEvent" => Self::AccountEvent,
             "tools.ozone.moderation.defs#identityEvent" => Self::IdentityEvent,
             "tools.ozone.moderation.defs#recordEvent" => Self::RecordEvent,
-            "tools.ozone.moderation.defs#modEventPriorityScore" => {
-                Self::ModEventPriorityScore
-            }
+            "tools.ozone.moderation.defs#modEventPriorityScore" => Self::ModEventPriorityScore,
             "tools.ozone.moderation.defs#revokeAccountCredentialsEvent" => {
                 Self::RevokeAccountCredentialsEvent
             }
@@ -342,28 +308,18 @@ impl<S: BosStr> TimelineItemSummaryEventType<S> {
             "tools.ozone.moderation.defs#ageAssuranceOverrideEvent" => {
                 Self::AgeAssuranceOverrideEvent
             }
-            "tools.ozone.moderation.defs#timelineEventPlcCreate" => {
-                Self::TimelineEventPlcCreate
-            }
+            "tools.ozone.moderation.defs#timelineEventPlcCreate" => Self::TimelineEventPlcCreate,
             "tools.ozone.moderation.defs#timelineEventPlcOperation" => {
                 Self::TimelineEventPlcOperation
             }
             "tools.ozone.moderation.defs#timelineEventPlcTombstone" => {
                 Self::TimelineEventPlcTombstone
             }
-            "tools.ozone.hosting.getAccountHistory#accountCreated" => {
-                Self::AccountCreated
-            }
-            "tools.ozone.hosting.getAccountHistory#emailConfirmed" => {
-                Self::EmailConfirmed
-            }
-            "tools.ozone.hosting.getAccountHistory#passwordUpdated" => {
-                Self::PasswordUpdated
-            }
+            "tools.ozone.hosting.getAccountHistory#accountCreated" => Self::AccountCreated,
+            "tools.ozone.hosting.getAccountHistory#emailConfirmed" => Self::EmailConfirmed,
+            "tools.ozone.hosting.getAccountHistory#passwordUpdated" => Self::PasswordUpdated,
             "tools.ozone.hosting.getAccountHistory#handleUpdated" => Self::HandleUpdated,
-            "tools.ozone.moderation.defs#scheduleTakedownEvent" => {
-                Self::ScheduleTakedownEvent
-            }
+            "tools.ozone.moderation.defs#scheduleTakedownEvent" => Self::ScheduleTakedownEvent,
             "tools.ozone.moderation.defs#cancelScheduledTakedownEvent" => {
                 Self::CancelScheduledTakedownEvent
             }
@@ -393,8 +349,7 @@ impl<S: BosStr> Serialize for TimelineItemSummaryEventType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for TimelineItemSummaryEventType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for TimelineItemSummaryEventType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -460,18 +415,14 @@ where
             TimelineItemSummaryEventType::ModEventDivert => {
                 TimelineItemSummaryEventType::ModEventDivert
             }
-            TimelineItemSummaryEventType::ModEventTag => {
-                TimelineItemSummaryEventType::ModEventTag
-            }
+            TimelineItemSummaryEventType::ModEventTag => TimelineItemSummaryEventType::ModEventTag,
             TimelineItemSummaryEventType::AccountEvent => {
                 TimelineItemSummaryEventType::AccountEvent
             }
             TimelineItemSummaryEventType::IdentityEvent => {
                 TimelineItemSummaryEventType::IdentityEvent
             }
-            TimelineItemSummaryEventType::RecordEvent => {
-                TimelineItemSummaryEventType::RecordEvent
-            }
+            TimelineItemSummaryEventType::RecordEvent => TimelineItemSummaryEventType::RecordEvent,
             TimelineItemSummaryEventType::ModEventPriorityScore => {
                 TimelineItemSummaryEventType::ModEventPriorityScore
             }
@@ -574,7 +525,7 @@ impl<S: BosStr> LexiconSchema for TimelineItemSummary<S> {
 
 pub mod get_account_timeline_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -605,10 +556,8 @@ pub mod get_account_timeline_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAccountTimelineBuilder<
-    St: get_account_timeline_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetAccountTimelineBuilder<St: get_account_timeline_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -616,10 +565,7 @@ pub struct GetAccountTimelineBuilder<
 
 impl GetAccountTimeline<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetAccountTimelineBuilder<
-        get_account_timeline_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetAccountTimelineBuilder<get_account_timeline_state::Empty, DefaultStr> {
         GetAccountTimelineBuilder::new()
     }
 }
@@ -687,7 +633,7 @@ where
 
 pub mod timeline_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -732,7 +678,10 @@ pub mod timeline_item_state {
 /// Builder for constructing an instance of this type.
 pub struct TimelineItemBuilder<St: timeline_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Vec<get_account_timeline::TimelineItemSummary<S>>>),
+    _fields: (
+        Option<S>,
+        Option<Vec<get_account_timeline::TimelineItemSummary<S>>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -825,10 +774,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TimelineItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TimelineItem<S> {
         TimelineItem {
             day: self._fields.0.unwrap(),
             summary: self._fields.1.unwrap(),
@@ -838,10 +784,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.moderation.getAccountTimeline"),
@@ -850,39 +796,40 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> LexiconDoc<'static
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("did")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("did"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("did")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("did"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("timelineItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("day"), SmolStr::new_static("summary")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("day"),
+                        SmolStr::new_static("summary"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("day"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("summary"),
@@ -902,13 +849,11 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> LexiconDoc<'static
             map.insert(
                 SmolStr::new_static("timelineItemSummary"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("eventSubjectType"),
-                            SmolStr::new_static("eventType"),
-                            SmolStr::new_static("count")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("eventSubjectType"),
+                        SmolStr::new_static("eventType"),
+                        SmolStr::new_static("count"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -920,11 +865,15 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> LexiconDoc<'static
                         );
                         map.insert(
                             SmolStr::new_static("eventSubjectType"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("eventType"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -939,7 +888,7 @@ fn lexicon_doc_tools_ozone_moderation_getAccountTimeline() -> LexiconDoc<'static
 
 pub mod timeline_item_summary_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1011,20 +960,14 @@ pub struct TimelineItemSummaryBuilder<
 
 impl TimelineItemSummary<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> TimelineItemSummaryBuilder<
-        timeline_item_summary_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> TimelineItemSummaryBuilder<timeline_item_summary_state::Empty, DefaultStr> {
         TimelineItemSummaryBuilder::new()
     }
 }
 
 impl<S: BosStr> TimelineItemSummary<S> {
     /// Create a new builder for this type
-    pub fn builder() -> TimelineItemSummaryBuilder<
-        timeline_item_summary_state::Empty,
-        S,
-    > {
+    pub fn builder() -> TimelineItemSummaryBuilder<timeline_item_summary_state::Empty, S> {
         TimelineItemSummaryBuilder::builder()
     }
 }
@@ -1079,10 +1022,7 @@ where
     pub fn event_subject_type(
         mut self,
         value: impl Into<TimelineItemSummaryEventSubjectType<S>>,
-    ) -> TimelineItemSummaryBuilder<
-        timeline_item_summary_state::SetEventSubjectType<St>,
-        S,
-    > {
+    ) -> TimelineItemSummaryBuilder<timeline_item_summary_state::SetEventSubjectType<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TimelineItemSummaryBuilder {
             _state: PhantomData,
@@ -1128,10 +1068,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TimelineItemSummary<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TimelineItemSummary<S> {
         TimelineItemSummary {
             count: self._fields.0.unwrap(),
             event_subject_type: self._fields.1.unwrap(),

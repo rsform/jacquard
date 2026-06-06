@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HiddenRef<S: BosStr = DefaultStr> {
     ///Fork reference name
     pub fork_ref: S,
@@ -30,9 +33,11 @@ pub struct HiddenRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HiddenRefOutput<S: BosStr = DefaultStr> {
     ///Error message if creation failed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,9 +62,8 @@ impl jacquard_common::xrpc::XrpcResp for HiddenRefResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for HiddenRef<S> {
     const NSID: &'static str = "sh.tangled.repo.hiddenRef";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = HiddenRefResponse;
 }
 
@@ -67,16 +71,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for HiddenRef<S> {
 pub struct HiddenRefRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HiddenRefRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.hiddenRef";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = HiddenRef<S>;
     type Response = HiddenRefResponse;
 }
 
 pub mod hidden_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -249,10 +252,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> HiddenRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HiddenRef<S> {
         HiddenRef {
             fork_ref: self._fields.0.unwrap(),
             remote_ref: self._fields.1.unwrap(),

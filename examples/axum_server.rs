@@ -1,31 +1,33 @@
 use std::sync::Arc;
 
-use axum::{Json, Router, extract::State, http::StatusCode, response::IntoResponse};
+use axum::{Router, extract::State};
 use jacquard::{
-    CowStr, DefaultStr,
     api::com_atproto::identity::resolve_did::{ResolveDidOutput, ResolveDidRequest},
     identity::{JacquardResolver, resolver::IdentityResolver},
     types::value::to_data,
 };
-use jacquard_axum::{ExtractXrpc, IntoRouter};
+use jacquard_axum::{ExtractXrpc, GenericXrpcErrorResponse, IntoRouter, XrpcResponse};
 use miette::{IntoDiagnostic, Result};
 use tracing_subscriber::EnvFilter;
 
 #[axum_macros::debug_handler]
 async fn resolve_did(
     State(state): State<Arc<AppState>>,
-    ExtractXrpc(args): ExtractXrpc<ResolveDidRequest, DefaultStr>,
-) -> Result<Json<ResolveDidOutput<CowStr<'static>>>, XrpcErrorResponse> {
+    ExtractXrpc(args): ExtractXrpc<ResolveDidRequest>,
+) -> Result<XrpcResponse<ResolveDidRequest>, GenericXrpcErrorResponse> {
     let doc = state
         .resolver
         .resolve_did_doc_owned(&args.did)
         .await
-        .map_err(|_| XrpcErrorResponse::internal_server_error())?;
-    Ok(ResolveDidOutput {
-        did_doc: to_data(&doc).map_err(|_| XrpcErrorResponse::internal_server_error())?,
+        .map_err(|err| {
+            GenericXrpcErrorResponse::internal_server_error_with_message(err.to_string())
+        })?;
+    Ok(XrpcResponse(ResolveDidOutput {
+        did_doc: to_data(&doc).map_err(|err| {
+            GenericXrpcErrorResponse::internal_server_error_with_message(err.to_string())
+        })?,
         extra_data: Default::default(),
-    }
-    .into())
+    }))
 }
 
 #[tokio::main]
@@ -44,36 +46,6 @@ async fn main() -> Result<()> {
         .into_diagnostic()?;
     axum::serve(listener, app).await.into_diagnostic()?;
     Ok(())
-}
-
-pub struct XrpcErrorResponse {
-    error: XrpcError,
-    pub status: StatusCode,
-}
-
-impl XrpcErrorResponse {
-    pub fn internal_server_error() -> Self {
-        Self {
-            error: XrpcError {
-                error: "InternalServerError".to_string(),
-                message: None,
-            },
-            status: StatusCode::INTERNAL_SERVER_ERROR,
-        }
-    }
-}
-
-#[derive(serde::Deserialize, serde::Serialize)]
-pub struct XrpcError {
-    pub error: String,
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub message: Option<String>,
-}
-
-impl IntoResponse for XrpcErrorResponse {
-    fn into_response(self) -> axum::response::Response {
-        Json(self.error).into_response()
-    }
 }
 
 pub struct AppState {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A Looking For Group record that broadcasts interest in finding activity partners within a geographic area.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -52,7 +52,6 @@ pub struct Lfg<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -141,7 +140,7 @@ impl<S: BosStr> LexiconSchema for Lfg<S> {
 
 pub mod lfg_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -307,10 +306,7 @@ where
     St::Active: lfg_state::IsUnset,
 {
     /// Set the `active` field (required)
-    pub fn active(
-        mut self,
-        value: impl Into<bool>,
-    ) -> LfgBuilder<lfg_state::SetActive<St>, S> {
+    pub fn active(mut self, value: impl Into<bool>) -> LfgBuilder<lfg_state::SetActive<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LfgBuilder {
             _state: PhantomData,
@@ -402,10 +398,7 @@ where
     St::Tags: lfg_state::IsUnset,
 {
     /// Set the `tags` field (required)
-    pub fn tags(
-        mut self,
-        value: impl Into<Vec<S>>,
-    ) -> LfgBuilder<lfg_state::SetTags<St>, S> {
+    pub fn tags(mut self, value: impl Into<Vec<S>>) -> LfgBuilder<lfg_state::SetTags<St>, S> {
         self._fields.5 = Option::Some(value.into());
         LfgBuilder {
             _state: PhantomData,
@@ -452,10 +445,10 @@ where
 }
 
 fn lexicon_doc_events_smokesignal_lfg() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("events.smokesignal.lfg"),

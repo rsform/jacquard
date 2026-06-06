@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/jacquard", "crates/jacquard-common", "crates/jacquard-api", "crates/jacquard-lexgen", "crates/jacquard-lexicon", "crates/jacquard-derive", "crates/jacquard-repo", "crates/jacquard-codegen-tests", "crates/mini-moka-wasm"]
+members = ["crates/*"]
 
 
 [workspace.package]

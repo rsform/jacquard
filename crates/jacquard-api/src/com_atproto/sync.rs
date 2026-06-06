@@ -21,11 +21,10 @@ pub mod list_repos_by_collection;
 pub mod notify_of_update;
 pub mod request_crawl;
 
-
 #[cfg(feature = "streaming")]
 pub mod subscribe_repos;
 
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum HostStatus<S: BosStr = DefaultStr> {
@@ -82,8 +81,7 @@ impl<S: BosStr> serde::Serialize for HostStatus<S> {
     }
 }
 
-impl<'de, S: serde::Deserialize<'de> + BosStr> serde::Deserialize<'de>
-for HostStatus<S> {
+impl<'de, S: serde::Deserialize<'de> + BosStr> serde::Deserialize<'de> for HostStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,

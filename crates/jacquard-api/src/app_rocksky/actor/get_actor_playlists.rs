@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_rocksky::playlist::PlaylistViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_rocksky::playlist::PlaylistViewBasic;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorPlaylists<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     ///(min: 1)
@@ -30,9 +33,11 @@ pub struct GetActorPlaylists<S: BosStr = DefaultStr> {
     pub offset: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorPlaylistsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub playlists: Option<Vec<PlaylistViewBasic<S>>>,
@@ -66,7 +71,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorPlaylistsRequest {
 
 pub mod get_actor_playlists_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -97,10 +102,7 @@ pub mod get_actor_playlists_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorPlaylistsBuilder<
-    St: get_actor_playlists_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetActorPlaylistsBuilder<St: get_actor_playlists_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -108,10 +110,7 @@ pub struct GetActorPlaylistsBuilder<
 
 impl GetActorPlaylists<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetActorPlaylistsBuilder<
-        get_actor_playlists_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetActorPlaylistsBuilder<get_actor_playlists_state::Empty, DefaultStr> {
         GetActorPlaylistsBuilder::new()
     }
 }

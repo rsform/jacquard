@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Archive<S: BosStr = DefaultStr> {
     ///Defaults to `"tar.gz"`.
     #[serde(default = "_default_format")]
@@ -38,18 +41,9 @@ pub struct ArchiveOutput {
     pub body: Bytes,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum ArchiveError {
     /// Repository not found or access denied
@@ -66,7 +60,10 @@ pub enum ArchiveError {
     ArchiveError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for ArchiveError {
@@ -160,7 +157,7 @@ fn _default_format<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod archive_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -277,10 +274,7 @@ where
     St::Ref: archive_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<S>,
-    ) -> ArchiveBuilder<archive_state::SetRef<St>, S> {
+    pub fn r#ref(mut self, value: impl Into<S>) -> ArchiveBuilder<archive_state::SetRef<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ArchiveBuilder {
             _state: PhantomData,
@@ -296,10 +290,7 @@ where
     St::Repo: archive_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<S>,
-    ) -> ArchiveBuilder<archive_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<S>) -> ArchiveBuilder<archive_state::SetRepo<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ArchiveBuilder {
             _state: PhantomData,

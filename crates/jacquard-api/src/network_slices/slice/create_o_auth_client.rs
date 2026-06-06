@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateOAuthClient<S: BosStr = DefaultStr> {
     ///Human-readable name of the OAuth client
     pub client_name: S,
@@ -52,9 +55,11 @@ pub struct CreateOAuthClient<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateOAuthClientOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: OauthClientDetails<S>,
@@ -73,9 +78,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateOAuthClientResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateOAuthClient<S> {
     const NSID: &'static str = "network.slices.slice.createOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateOAuthClientResponse;
 }
 
@@ -83,16 +87,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateOAuthClient<S> {
 pub struct CreateOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.createOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateOAuthClient<S>;
     type Response = CreateOAuthClientResponse;
 }
 
 pub mod create_o_auth_client_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,10 +152,7 @@ pub mod create_o_auth_client_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateOAuthClientBuilder<
-    St: create_o_auth_client_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CreateOAuthClientBuilder<St: create_o_auth_client_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -171,10 +171,7 @@ pub struct CreateOAuthClientBuilder<
 
 impl CreateOAuthClient<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CreateOAuthClientBuilder<
-        create_o_auth_client_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CreateOAuthClientBuilder<create_o_auth_client_state::Empty, DefaultStr> {
         CreateOAuthClientBuilder::new()
     }
 }
@@ -380,10 +377,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateOAuthClient<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateOAuthClient<S> {
         CreateOAuthClient {
             client_name: self._fields.0.unwrap(),
             client_uri: self._fields.1,

@@ -27,7 +27,7 @@ async fn main() -> miette::Result<()> {
 
     println!("Tangled Repository\n");
     println!("URI: {}", uri);
-    println!("Name: {}", output.name);
+    println!("Name: {}", output.name.unwrap_or_default());
 
     if let Some(desc) = &output.description {
         println!("Description: {}", desc);

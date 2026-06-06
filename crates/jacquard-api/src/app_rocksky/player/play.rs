@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// XRPC request marker type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
@@ -30,9 +30,8 @@ impl jacquard_common::xrpc::XrpcResp for PlayResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Play {
     const NSID: &'static str = "app.rocksky.player.play";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PlayResponse;
 }
 
@@ -40,9 +39,8 @@ impl jacquard_common::xrpc::XrpcRequest for Play {
 pub struct PlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.play";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Play;
     type Response = PlayResponse;
 }

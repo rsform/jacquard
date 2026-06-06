@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A user submission of a project to AlternativeProto
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -239,27 +239,26 @@ impl<S: BosStr> LexiconSchema for Submission<S> {
                     "image/x-icon",
                     "image/vnd.microsoft.icon",
                 ];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string(), "image/svg+xml".to_string(),
-                            "image/x-icon".to_string(), "image/vnd.microsoft.icon"
-                            .to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
+                            "image/svg+xml".to_string(),
+                            "image/x-icon".to_string(),
+                            "image/vnd.microsoft.icon".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -283,7 +282,7 @@ impl<S: BosStr> LexiconSchema for Submission<S> {
 
 pub mod submission_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -613,10 +612,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Submission<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Submission<S> {
         Submission {
             alternative_to: self._fields.0,
             auth_type: self._fields.1.unwrap(),
@@ -634,10 +630,10 @@ where
 }
 
 fn lexicon_doc_net_alternativeproto_submission() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.alternativeproto.submission"),
@@ -646,32 +642,27 @@ fn lexicon_doc_net_alternativeproto_submission() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A user submission of a project to AlternativeProto",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A user submission of a project to AlternativeProto",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"),
-                                SmolStr::new_static("description"),
-                                SmolStr::new_static("url"), SmolStr::new_static("authType"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("description"),
+                            SmolStr::new_static("url"),
+                            SmolStr::new_static("authType"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("alternativeTo"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Services this project is an alternative to",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Services this project is an alternative to",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(100usize),
                                         ..Default::default()
@@ -682,22 +673,18 @@ fn lexicon_doc_net_alternativeproto_submission() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("authType"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Authentication method used by the project",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Authentication method used by the project",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp when the submission was created",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the submission was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -705,16 +692,18 @@ fn lexicon_doc_net_alternativeproto_submission() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Description of the project"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Description of the project",
+                                    )),
                                     max_length: Some(5000usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("icon"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("isOpenSource"),
@@ -733,9 +722,9 @@ fn lexicon_doc_net_alternativeproto_submission() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("repositoryUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Source code repository URL"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Source code repository URL",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -743,9 +732,9 @@ fn lexicon_doc_net_alternativeproto_submission() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Tags for categorization"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Tags for categorization",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(50usize),
                                         ..Default::default()

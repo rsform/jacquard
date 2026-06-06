@@ -15,7 +15,6 @@ pub mod sign_plc_operation;
 pub mod submit_plc_operation;
 pub mod update_handle;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -34,10 +33,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct IdentityInfo<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///The complete DID document for the identity.
@@ -65,7 +67,7 @@ impl<S: BosStr> LexiconSchema for IdentityInfo<S> {
 
 pub mod identity_info_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -238,10 +240,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> IdentityInfo<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IdentityInfo<S> {
         IdentityInfo {
             did: self._fields.0.unwrap(),
             did_doc: self._fields.1.unwrap(),
@@ -252,10 +251,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_identity_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.identity.defs"),

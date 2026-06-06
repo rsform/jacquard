@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateCrewTier<S: BosStr = DefaultStr> {
     ///Tier rank index (0-based, maps to hold tier list by position).
     pub tier_rank: i64,
@@ -28,9 +31,11 @@ pub struct UpdateCrewTier<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateCrewTierOutput<S: BosStr = DefaultStr> {
     ///Resolved tier name on this hold.
     pub tier_name: S,
@@ -38,18 +43,9 @@ pub struct UpdateCrewTierOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateCrewTierError {
     /// Valid appview token required.
@@ -60,7 +56,10 @@ pub enum UpdateCrewTierError {
     UserNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateCrewTierError {
@@ -102,9 +101,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateCrewTierResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<S> {
     const NSID: &'static str = "io.atcr.hold.updateCrewTier";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateCrewTierResponse;
 }
 
@@ -112,16 +110,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<S> {
 pub struct UpdateCrewTierRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateCrewTierRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.updateCrewTier";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateCrewTier<S>;
     type Response = UpdateCrewTierResponse;
 }
 
 pub mod update_crew_tier_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -164,10 +161,7 @@ pub mod update_crew_tier_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateCrewTierBuilder<
-    St: update_crew_tier_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct UpdateCrewTierBuilder<St: update_crew_tier_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -262,10 +256,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UpdateCrewTier<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateCrewTier<S> {
         UpdateCrewTier {
             tier_rank: self._fields.0.unwrap(),
             user_did: self._fields.1.unwrap(),

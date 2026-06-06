@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,13 +21,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::games_gamesgamesgamesgames::migrate_claim;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::games_gamesgamesgamesgames::migrate_claim;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MigrateClaim<S: BosStr = DefaultStr> {
     pub claim: AtUri<S>,
     pub claim_review: AtUri<S>,
@@ -35,18 +38,22 @@ pub struct MigrateClaim<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MigrateClaimOutput<S: BosStr = DefaultStr> {
     pub results: Vec<migrate_claim::MigrationResult<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MigrationResult<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<S>,
@@ -57,7 +64,6 @@ pub struct MigrationResult<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MigrationResultStatus<S: BosStr = DefaultStr> {
@@ -135,9 +141,7 @@ where
             MigrationResultStatus::Success => MigrationResultStatus::Success,
             MigrationResultStatus::Failed => MigrationResultStatus::Failed,
             MigrationResultStatus::Skipped => MigrationResultStatus::Skipped,
-            MigrationResultStatus::Other(v) => {
-                MigrationResultStatus::Other(v.into_static())
-            }
+            MigrationResultStatus::Other(v) => MigrationResultStatus::Other(v.into_static()),
         }
     }
 }
@@ -153,9 +157,8 @@ impl jacquard_common::xrpc::XrpcResp for MigrateClaimResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for MigrateClaim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.migrateClaim";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = MigrateClaimResponse;
 }
 
@@ -163,9 +166,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for MigrateClaim<S> {
 pub struct MigrateClaimRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MigrateClaimRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.migrateClaim";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = MigrateClaim<S>;
     type Response = MigrateClaimResponse;
 }
@@ -187,7 +189,7 @@ impl<S: BosStr> LexiconSchema for MigrationResult<S> {
 
 pub mod migrate_claim_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -325,10 +327,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MigrateClaim<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MigrateClaim<S> {
         MigrateClaim {
             claim: self._fields.0.unwrap(),
             claim_review: self._fields.1.unwrap(),
@@ -339,7 +338,7 @@ where
 
 pub mod migration_result_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -382,10 +381,7 @@ pub mod migration_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MigrationResultBuilder<
-    St: migration_result_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct MigrationResultBuilder<St: migration_result_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -513,10 +509,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> MigrationResult<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MigrationResult<S> {
         MigrationResult {
             error: self._fields.0,
             game_uri: self._fields.1.unwrap(),
@@ -528,10 +521,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.migrateClaim"),
@@ -542,36 +535,32 @@ fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> 
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(
-                                    vec![
-                                        SmolStr::new_static("claim"),
-                                        SmolStr::new_static("claimReview")
-                                    ],
-                                ),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("claim"),
-                                        LexObjectProperty::String(LexString {
-                                            format: Some(LexStringFormat::AtUri),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("claimReview"),
-                                        LexObjectProperty::String(LexString {
-                                            format: Some(LexStringFormat::AtUri),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![
+                                SmolStr::new_static("claim"),
+                                SmolStr::new_static("claimReview"),
+                            ]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("claim"),
+                                    LexObjectProperty::String(LexString {
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("claimReview"),
+                                    LexObjectProperty::String(LexString {
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -580,17 +569,18 @@ fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("migrationResult"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("gameUri"), SmolStr::new_static("status")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("gameUri"),
+                        SmolStr::new_static("status"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("error"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("gameUri"),
@@ -608,7 +598,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_migrateClaim() -> LexiconDoc<'static> 
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },

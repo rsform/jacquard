@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A request for someone to draw something
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -167,7 +167,7 @@ fn _default_request_is_open() -> Option<bool> {
 
 pub mod request_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -293,10 +293,7 @@ impl<St: request_state::State, S: BosStr> RequestBuilder<St, S> {
 
 impl<St: request_state::State, S: BosStr> RequestBuilder<St, S> {
     /// Set the `referenceImages` field (optional)
-    pub fn reference_images(
-        mut self,
-        value: impl Into<Option<Vec<BlobRef<S>>>>,
-    ) -> Self {
+    pub fn reference_images(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -339,10 +336,7 @@ where
     St::Text: request_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(
-        mut self,
-        value: impl Into<S>,
-    ) -> RequestBuilder<request_state::SetText<St>, S> {
+    pub fn text(mut self, value: impl Into<S>) -> RequestBuilder<request_state::SetText<St>, S> {
         self._fields.5 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
@@ -385,10 +379,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.kaku.request"),
@@ -397,17 +391,15 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A request for someone to draw something"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A request for someone to draw something",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("text"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("text"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -427,10 +419,12 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("referenceImages"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Reference images for the request"),
-                                    ),
-                                    items: LexArrayItem::Blob(LexBlob { ..Default::default() }),
+                                    description: Some(CowStr::new_static(
+                                        "Reference images for the request",
+                                    )),
+                                    items: LexArrayItem::Blob(LexBlob {
+                                        ..Default::default()
+                                    }),
                                     max_length: Some(4usize),
                                     ..Default::default()
                                 }),
@@ -438,9 +432,9 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Tags for categorization"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Tags for categorization",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
                                         ..Default::default()
@@ -452,9 +446,9 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("targetActor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Optional: specific artist to request"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Optional: specific artist to request",
+                                    )),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -462,9 +456,9 @@ fn lexicon_doc_tech_tokimeki_kaku_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Description of what to draw"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Description of what to draw",
+                                    )),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(300usize),
                                     ..Default::default()

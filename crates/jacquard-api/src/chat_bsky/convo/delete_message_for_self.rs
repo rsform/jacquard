@@ -8,17 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::chat_bsky::convo::DeletedMessageView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::chat_bsky::convo::DeletedMessageView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeleteMessageForSelf<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message_id: S,
@@ -26,9 +29,11 @@ pub struct DeleteMessageForSelf<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeleteMessageForSelfOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: DeletedMessageView<S>,
@@ -36,18 +41,9 @@ pub struct DeleteMessageForSelfOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum DeleteMessageForSelfError {
     #[serde(rename = "InvalidConvo")]
@@ -57,7 +53,10 @@ pub enum DeleteMessageForSelfError {
     MessageDeleteNotAllowed(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for DeleteMessageForSelfError {
@@ -99,9 +98,8 @@ impl jacquard_common::xrpc::XrpcResp for DeleteMessageForSelfResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteMessageForSelf<S> {
     const NSID: &'static str = "chat.bsky.convo.deleteMessageForSelf";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeleteMessageForSelfResponse;
 }
 
@@ -109,9 +107,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteMessageForSelf<S> {
 pub struct DeleteMessageForSelfRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteMessageForSelfRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.deleteMessageForSelf";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DeleteMessageForSelf<S>;
     type Response = DeleteMessageForSelfResponse;
 }

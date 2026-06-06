@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
 use crate::at_inlay::Element;
 use crate::at_inlay::Response;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_derive::IntoStatic;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Placeholder<S: BosStr = DefaultStr> {
     pub children: Vec<Element<S>>,
     pub fallback: Element<S>,
@@ -27,9 +30,11 @@ pub struct Placeholder<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlaceholderOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -48,9 +53,8 @@ impl jacquard_common::xrpc::XrpcResp for PlaceholderResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Placeholder<S> {
     const NSID: &'static str = "at.inlay.Placeholder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PlaceholderResponse;
 }
 
@@ -58,16 +62,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Placeholder<S> {
 pub struct PlaceholderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlaceholderRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Placeholder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Placeholder<S>;
     type Response = PlaceholderResponse;
 }
 
 pub mod placeholder_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -205,10 +208,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Placeholder<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Placeholder<S> {
         Placeholder {
             children: self._fields.0.unwrap(),
             fallback: self._fields.1.unwrap(),

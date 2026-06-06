@@ -12,13 +12,12 @@ pub mod get_values;
 pub mod query_sets;
 pub mod upsert_set;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,10 +30,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Set<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -43,9 +45,11 @@ pub struct Set<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SetView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -176,10 +180,10 @@ impl<S: BosStr> LexiconSchema for SetView<S> {
 }
 
 fn lexicon_doc_tools_ozone_set_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.set.defs"),
@@ -216,13 +220,12 @@ fn lexicon_doc_tools_ozone_set_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("setView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("name"), SmolStr::new_static("setSize"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("updatedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("setSize"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("updatedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -275,7 +278,7 @@ fn lexicon_doc_tools_ozone_set_defs() -> LexiconDoc<'static> {
 
 pub mod set_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -350,7 +353,13 @@ pub mod set_view_state {
 /// Builder for constructing an instance of this type.
 pub struct SetViewBuilder<St: set_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<i64>, Option<Datetime>),
+    _fields: (
+        Option<Datetime>,
+        Option<S>,
+        Option<S>,
+        Option<i64>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -428,10 +437,7 @@ where
     St::Name: set_view_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> SetViewBuilder<set_view_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> SetViewBuilder<set_view_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SetViewBuilder {
             _state: PhantomData,

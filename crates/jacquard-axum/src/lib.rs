@@ -1,85 +1,97 @@
-//! # Axum helpers for jacquard XRPC server implementations
+//! # Axum helpers for jacquard XRPC server implementations.
 //!
-//! ## Usage
+//! ## Usage.
+//!
+//! This crate provides server-side helpers for wiring generated Jacquard XRPC
+//! endpoint marker types into axum routers. [`ExtractXrpc`] decodes query
+//! parameters or procedure bodies into owned request values, defaulting to
+//! `DefaultStr`-backed generated types, and [`XrpcResponse`] encodes endpoint
+//! outputs with the content type declared by the endpoint response marker.
 //!
 //! ```no_run
-//! use axum::{Router, routing::get, http::StatusCode, response::IntoResponse,  Json};
-//! use jacquard_axum::{ ExtractXrpc, IntoRouter };
-//! use std::collections::BTreeMap;
+//! use axum::Router;
+//! use jacquard::api::com_atproto::identity::resolve_handle::{
+//!     ResolveHandleOutput, ResolveHandleRequest,
+//! };
+//! use jacquard::types::string::Did;
+//! use jacquard_axum::{ExtractXrpc, IntoRouter, XrpcResponse};
 //! use miette::{IntoDiagnostic, Result};
-//! use jacquard::api::com_atproto::identity::resolve_handle::{ResolveHandle, ResolveHandleRequest, ResolveHandleOutput};
-//! use jacquard_common::types::string::Did;
 //!
 //! async fn handle_resolve(
-//!     ExtractXrpc(req): ExtractXrpc<ResolveHandleRequest>
-//! ) -> Result<Json<ResolveHandleOutput<'static>>, StatusCode> {
-//!     // req is ResolveHandle<'static>, ready to use
-//!     let handle = req.handle;
-//!     // ... resolve logic
-//! #   let output = ResolveHandleOutput { did: Did::new_static("did:plc:test").unwrap(), extra_data: None  };
-//!     Ok(Json(output))
+//!     ExtractXrpc(req): ExtractXrpc<ResolveHandleRequest>,
+//! ) -> XrpcResponse<ResolveHandleRequest> {
+//!     let _handle = req.handle;
+//!     XrpcResponse(ResolveHandleOutput {
+//!         did: Did::new_static("did:plc:test").unwrap(),
+//!         extra_data: None,
+//!     })
 //! }
 //!
 //! #[tokio::main]
 //! async fn main() -> Result<()> {
 //!     let app = Router::new()
-//!          .route("/", axum::routing::get(|| async { "hello world!" }))
-//!          .merge(ResolveHandleRequest::into_router(handle_resolve));
+//!         .route("/", axum::routing::get(|| async { "hello world!" }))
+//!         .merge(ResolveHandleRequest::into_router(handle_resolve));
 //!
 //!     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
 //!         .await
 //!         .into_diagnostic()?;
-//!         axum::serve(listener, app).await.unwrap();
+//!     axum::serve(listener, app).await.unwrap();
 //!     Ok(())
 //! }
 //! ```
 //!
-//!
 //! The extractor uses the [`XrpcEndpoint`] trait to determine request type:
-//! - **Query**: Deserializes from query string parameters
-//! - **Procedure**: Deserializes from request body (supports custom encodings via `decode_body`)
 //!
-//! Deserialization errors return a 400 Bad Request with a JSON error body matching
-//! the XRPC error format.
+//! - Query endpoints deserialize from query string parameters.
+//! - Procedure endpoints deserialize from request bodies and preserve custom
+//!   encodings through [`XrpcRequest::decode_body`].
 //!
-//! The extractor deserializes to borrowed types first, then converts to `'static` via
-//! [`IntoStatic`], avoiding the DeserializeOwned requirement of the Json axum extractor and similar.
+//! Deserialization errors return a 400 Bad Request with a JSON body matching the
+//! XRPC error format.
+//!
+//! [`IntoRouter`] is implemented for endpoint marker types. The endpoint marker
+//! receiver style, such as `ResolveHandleRequest::into_router(handle_resolve)`,
+//! keeps routing no-turbofish while still deriving the path and HTTP method from
+//! [`XrpcEndpoint`].
 
 pub mod did_web;
 #[cfg(feature = "service-auth")]
 pub mod service_auth;
 
+use std::borrow::Cow;
+
 use axum::{
     Json, Router,
     body::Bytes,
     extract::{FromRequest, Request},
-    http::StatusCode,
+    http::{StatusCode, header::CONTENT_TYPE},
     response::{IntoResponse, Response},
 };
 use jacquard::{
-    BosStr, CowStr, IntoStatic,
-    xrpc::{XrpcEndpoint, XrpcError, XrpcMethod, XrpcRequest},
+    BosStr, CowStr, DefaultStr, IntoStatic,
+    xrpc::{XrpcEndpoint, XrpcError, XrpcMethod, XrpcRequest, XrpcResp},
 };
-use serde::Deserialize;
-use serde_json::json;
+use serde::{Deserialize, de::DeserializeOwned};
+use serde_json::{Value, json};
 
-/// Axum extractor for XRPC requests
+/// Axum extractor for XRPC requests.
 ///
-/// Deserializes incoming requests based on the endpoint's method type (Query or Procedure)
-/// and returns the owned (`'static`) request type ready for handler logic.
-pub struct ExtractXrpc<E: XrpcEndpoint, S: BosStr>(pub E::Request<S>);
+/// Deserializes incoming requests based on the endpoint's method type and
+/// returns the request type ready for handler logic.
+pub struct ExtractXrpc<R: XrpcEndpoint, B: BosStr = DefaultStr>(pub R::Request<B>);
 
-impl<R> FromRequest<CowStr<'_>> for ExtractXrpc<R, CowStr<'static>>
+impl<R, B, State> FromRequest<State> for ExtractXrpc<R, B>
 where
     R: XrpcEndpoint,
-    for<'de> R::Request<CowStr<'de>>: Deserialize<'de>,
-    for<'a> R::Request<CowStr<'a>>: IntoStatic<Output = R::Request<CowStr<'static>>>,
+    B: XrpcExtractBacking<R>,
+    State: Send + Sync,
 {
     type Rejection = Response;
 
     fn from_request(
         req: Request,
-        state: &CowStr<'_>,
+        state: &State,
     ) -> impl Future<Output = Result<Self, Self::Rejection>> + Send {
         async {
             match R::METHOD {
@@ -87,76 +99,166 @@ where
                     let body = Bytes::from_request(req, state)
                         .await
                         .map_err(IntoResponse::into_response)?;
-                    let decoded = R::Request::decode_body(&body);
-                    match decoded {
-                        Ok(value) => Ok(ExtractXrpc(value.into_static())),
-                        Err(err) => Err((
-                            StatusCode::BAD_REQUEST,
-                            Json(json!({
-                                "error": "InvalidRequest",
-                                "message": format!("failed to decode request: {}", err)
-                            })),
-                        )
-                            .into_response()),
-                    }
+                    B::decode_body(&body).map(ExtractXrpc)
                 }
                 XrpcMethod::Query => {
-                    if let Some(path_query) = req.uri().path_and_query() {
-                        let query = path_query.query().unwrap_or("");
-                        let value: R::Request<CowStr<'_>> = serde_html_form::from_str::<
-                            R::Request<CowStr<'_>>,
-                        >(query)
-                        .map_err(|e| {
-                            (
-                                StatusCode::BAD_REQUEST,
-                                Json(json!({
-                                    "error": "InvalidRequest",
-                                    "message": format!("failed to decode request: {}", e)
-                                })),
-                            )
-                                .into_response()
-                        })?;
-                        Ok(ExtractXrpc(value.into_static()))
-                    } else {
-                        Err((
-                            StatusCode::BAD_REQUEST,
-                            Json(json!({
-                                "error": "InvalidRequest",
-                                "message": "malformed request URI: missing path component"
-                            })),
-                        )
-                            .into_response())
-                    }
+                    let query = req.uri().query().unwrap_or("");
+                    B::decode_query(query).map(ExtractXrpc)
                 }
             }
         }
     }
 }
 
-/// Conversion trait to turn an XrpcEndpoint and a handler into an axum Router
-pub trait IntoRouter {
-    fn into_router<T, S, U>(handler: U) -> Router<S>
-    where
-        T: 'static,
-        S: Clone + Send + Sync + 'static,
-        U: axum::handler::Handler<T, S>;
+/// Backing-specific XRPC request extraction policy.
+///
+/// Implementations choose the decode backing separately from the handler-visible
+/// backing to avoid overlapping axum extractor impls.
+pub trait XrpcExtractBacking<R>: private::Sealed + BosStr + Sized + 'static
+where
+    R: XrpcEndpoint,
+{
+    /// Decodes a query request into this handler-visible backing.
+    fn decode_query(query: &str) -> Result<R::Request<Self>, Response>;
+
+    /// Decodes a procedure body into this handler-visible backing.
+    fn decode_body(body: &[u8]) -> Result<R::Request<Self>, Response>;
 }
 
-impl<X> IntoRouter for X
+macro_rules! impl_owned_extract_backing {
+    ($backing:ty) => {
+        impl private::Sealed for $backing {}
+
+        impl<R> XrpcExtractBacking<R> for $backing
+        where
+            R: XrpcEndpoint,
+            R::Request<Self>: DeserializeOwned,
+        {
+            fn decode_query(query: &str) -> Result<R::Request<Self>, Response> {
+                serde_html_form::from_str::<R::Request<Self>>(query)
+                    .map_err(|err| invalid_request(format!("failed to decode request: {err}")))
+            }
+
+            fn decode_body(body: &[u8]) -> Result<R::Request<Self>, Response> {
+                <R::Request<Self> as XrpcRequest>::decode_body(body)
+                    .map_err(|err| invalid_request(format!("failed to decode request: {err}")))
+            }
+        }
+    };
+}
+
+impl_owned_extract_backing!(DefaultStr);
+impl_owned_extract_backing!(String);
+
+impl private::Sealed for CowStr<'static> {}
+
+impl<R> XrpcExtractBacking<R> for CowStr<'static>
 where
-    X: XrpcEndpoint,
+    R: XrpcEndpoint,
+    for<'de> R::Request<CowStr<'de>>: Deserialize<'de>,
+    for<'a> R::Request<CowStr<'a>>: IntoStatic<Output = R::Request<CowStr<'static>>>,
 {
-    /// Creates an axum router that will invoke `handler` in response to xrpc
-    /// request `X`.
-    fn into_router<T, S, U>(handler: U) -> Router<S>
+    fn decode_query(query: &str) -> Result<R::Request<Self>, Response> {
+        serde_html_form::from_str::<R::Request<CowStr<'_>>>(query)
+            .map(IntoStatic::into_static)
+            .map_err(|err| invalid_request(format!("failed to decode request: {err}")))
+    }
+
+    fn decode_body(body: &[u8]) -> Result<R::Request<Self>, Response> {
+        <R::Request<CowStr<'_>> as XrpcRequest>::decode_body(body)
+            .map(IntoStatic::into_static)
+            .map_err(|err| invalid_request(format!("failed to decode request: {err}")))
+    }
+}
+
+impl private::Sealed for Cow<'static, str> {}
+
+impl<R> XrpcExtractBacking<R> for Cow<'static, str>
+where
+    R: XrpcEndpoint,
+    for<'de> R::Request<Cow<'de, str>>: Deserialize<'de>,
+    for<'a> R::Request<Cow<'a, str>>: IntoStatic<Output = R::Request<Cow<'static, str>>>,
+{
+    fn decode_query(query: &str) -> Result<R::Request<Self>, Response> {
+        serde_html_form::from_str::<R::Request<Cow<'_, str>>>(query)
+            .map(IntoStatic::into_static)
+            .map_err(|err| invalid_request(format!("failed to decode request: {err}")))
+    }
+
+    fn decode_body(body: &[u8]) -> Result<R::Request<Self>, Response> {
+        <R::Request<Cow<'_, str>> as XrpcRequest>::decode_body(body)
+            .map(IntoStatic::into_static)
+            .map_err(|err| invalid_request(format!("failed to decode request: {err}")))
+    }
+}
+
+mod private {
+    pub trait Sealed {}
+}
+
+/// Typed axum response wrapper for XRPC endpoint outputs.
+pub struct XrpcResponse<R: XrpcEndpoint, B: BosStr = DefaultStr>(
+    pub <R::Response as XrpcResp>::Output<B>,
+);
+
+impl<R, B> XrpcResponse<R, B>
+where
+    R: XrpcEndpoint,
+    B: BosStr,
+{
+    /// Creates a typed XRPC response from an endpoint output value.
+    pub fn new(value: <R::Response as XrpcResp>::Output<B>) -> Self {
+        Self(value)
+    }
+}
+
+impl<R, B> IntoResponse for XrpcResponse<R, B>
+where
+    R: XrpcEndpoint,
+    B: BosStr,
+    <R::Response as XrpcResp>::Output<B>: serde::Serialize,
+{
+    fn into_response(self) -> Response {
+        match <R::Response as XrpcResp>::encode_output(&self.0) {
+            Ok(body) => (
+                StatusCode::OK,
+                [(CONTENT_TYPE, <R::Response as XrpcResp>::ENCODING)],
+                body,
+            )
+                .into_response(),
+            Err(err) => internal_server_error_response(format!("failed to encode response: {err}")),
+        }
+    }
+}
+
+/// Conversion trait to turn an XRPC endpoint marker and a handler into a router.
+///
+/// This trait is implemented for endpoint marker types (`R: XrpcEndpoint`). It
+/// registers `R::PATH` and maps `R::METHOD` to GET for query endpoints or POST
+/// for procedure endpoints. The endpoint-associated call style intentionally
+/// avoids turbofish while keeping the endpoint type explicit to the compiler.
+pub trait IntoRouter {
+    /// Creates an axum router that invokes `handler` for this endpoint marker.
+    fn into_router<HandlerArgs, State, Handler>(handler: Handler) -> Router<State>
     where
-        T: 'static,
-        S: Clone + Send + Sync + 'static,
-        U: axum::handler::Handler<T, S>,
+        HandlerArgs: 'static,
+        State: Clone + Send + Sync + 'static,
+        Handler: axum::handler::Handler<HandlerArgs, State>;
+}
+
+impl<R> IntoRouter for R
+where
+    R: XrpcEndpoint,
+{
+    fn into_router<HandlerArgs, State, Handler>(handler: Handler) -> Router<State>
+    where
+        HandlerArgs: 'static,
+        State: Clone + Send + Sync + 'static,
+        Handler: axum::handler::Handler<HandlerArgs, State>,
     {
         Router::new().route(
-            X::PATH,
-            (match X::METHOD {
+            R::PATH,
+            (match R::METHOD {
                 XrpcMethod::Query => axum::routing::get,
                 XrpcMethod::Procedure(_) => axum::routing::post,
             })(handler),
@@ -164,17 +266,69 @@ where
     }
 }
 
-/// Axum-compatible Xrpc error wrapper
+/// Axum-compatible generic XRPC error response.
 ///
-/// Implements IntoResponse, and does some mildly opinionated mapping.
+/// Use this type when no generated endpoint error value is available, such as
+/// local infrastructure failures in a handler.
+#[derive(Debug, Clone)]
+pub struct GenericXrpcErrorResponse {
+    pub status: StatusCode,
+    error: String,
+    message: Option<String>,
+}
+
+impl GenericXrpcErrorResponse {
+    /// Creates an internal server error response.
+    pub fn internal_server_error() -> Self {
+        Self::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "InternalServerError",
+            Some("internal server error"),
+        )
+    }
+
+    /// Creates a generic XRPC error response with a custom message.
+    pub fn internal_server_error_with_message(message: impl Into<String>) -> Self {
+        Self::new(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "InternalServerError",
+            Some(message),
+        )
+    }
+
+    /// Creates a generic XRPC error response.
+    pub fn new(
+        status: StatusCode,
+        error: impl Into<String>,
+        message: Option<impl Into<String>>,
+    ) -> Self {
+        Self {
+            status,
+            error: error.into(),
+            message: message.map(Into::into),
+        }
+    }
+}
+
+impl IntoResponse for GenericXrpcErrorResponse {
+    fn into_response(self) -> Response {
+        let mut body = json!({ "error": self.error });
+        if let Some(message) = self.message {
+            body["message"] = json!(message);
+        }
+        (self.status, Json(body)).into_response()
+    }
+}
+
+/// Axum-compatible typed XRPC error wrapper.
 ///
-/// Currently assumes that the internal xrpc errors are well-formed and
-/// compatible with [the spec](https://atproto.com/specs/xrpc#error-responses).
+/// Implements [`IntoResponse`] for generated endpoint error enums and common
+/// XRPC client-side error variants.
 #[derive(Debug, thiserror::Error, miette::Diagnostic)]
-#[error("Xrpc error: {error}")]
+#[error("XRPC error: {error}")]
 pub struct XrpcErrorResponse<E>
 where
-    E: std::error::Error + IntoStatic,
+    E: std::error::Error,
 {
     pub status: StatusCode,
     #[diagnostic_source]
@@ -183,9 +337,9 @@ where
 
 impl<E> XrpcErrorResponse<E>
 where
-    E: std::error::Error + IntoStatic + serde::Serialize,
+    E: std::error::Error,
 {
-    /// Creates a new XrpcErrorResponse from the given status code and error.
+    /// Creates a new `XrpcErrorResponse` from the given status code and error.
     pub fn new(status: StatusCode, error: XrpcError<E>) -> Self {
         Self { status, error }
     }
@@ -201,53 +355,32 @@ where
 
 impl<E> IntoResponse for XrpcErrorResponse<E>
 where
-    E: std::error::Error + IntoStatic + serde::Serialize,
+    E: std::error::Error + serde::Serialize,
 {
     fn into_response(self) -> Response {
-        let (status, json) = match self.error {
-            XrpcError::Xrpc(error) => (
-                self.status,
-                serde_json::to_value(&error).unwrap_or(json!({
-                    "error": "InternalError",
-                    "message": format!("{error}")
-                })),
-            ),
-            XrpcError::Auth(auth_error) => (
-                self.status,
-                json!({
-                    "error": "Authentication",
-                    "message": format!("{auth_error}")
-                }),
-            ),
-            XrpcError::Generic(generic) => (
-                self.status,
-                serde_json::to_value(&generic).unwrap_or(json!({
-                    "error": "InternalError",
-                    "message": format!("{generic}", )
-                })),
-            ),
-            XrpcError::Decode(error) => (
-                self.status,
-                json!({
-                    "error": "InvalidRequest",
-                    "message": format!("failed to decode request: {error}", )
-                }),
-            ),
-            _ => (
-                self.status,
-                json!({
-                    "error": "InternalError",
-                    "message": "unknown error"
-                }),
-            ),
+        let json = match self.error {
+            XrpcError::Xrpc(error) => typed_error_json(&error),
+            XrpcError::Auth(auth_error) => json!({
+                "error": "Authentication",
+                "message": format!("{auth_error}")
+            }),
+            XrpcError::Generic(generic) => typed_error_json(&generic),
+            XrpcError::Decode(error) => json!({
+                "error": "InvalidRequest",
+                "message": format!("failed to decode request: {error}")
+            }),
+            _ => json!({
+                "error": "InternalServerError",
+                "message": "unknown error"
+            }),
         };
-        (status, Json(json)).into_response()
+        (self.status, Json(json)).into_response()
     }
 }
 
 impl<E> From<XrpcError<E>> for XrpcErrorResponse<E>
 where
-    E: std::error::Error + IntoStatic,
+    E: std::error::Error,
 {
     fn from(value: XrpcError<E>) -> Self {
         Self {
@@ -259,9 +392,40 @@ where
 
 impl<E> From<XrpcErrorResponse<E>> for XrpcError<E>
 where
-    E: std::error::Error + IntoStatic,
+    E: std::error::Error,
 {
     fn from(value: XrpcErrorResponse<E>) -> Self {
         value.error
     }
+}
+
+fn invalid_request(message: impl Into<String>) -> Response {
+    (
+        StatusCode::BAD_REQUEST,
+        Json(json!({
+            "error": "InvalidRequest",
+            "message": message.into()
+        })),
+    )
+        .into_response()
+}
+
+fn internal_server_error_response(message: impl Into<String>) -> Response {
+    (
+        StatusCode::INTERNAL_SERVER_ERROR,
+        Json(json!({
+            "error": "InternalServerError",
+            "message": message.into()
+        })),
+    )
+        .into_response()
+}
+
+fn typed_error_json(error: &(impl std::error::Error + serde::Serialize)) -> Value {
+    serde_json::to_value(error).unwrap_or_else(|_| {
+        json!({
+            "error": "InternalServerError",
+            "message": format!("{error}")
+        })
+    })
 }

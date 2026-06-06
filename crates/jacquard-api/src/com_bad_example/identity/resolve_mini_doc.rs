@@ -10,35 +10,40 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ResolveMiniDoc<S: BosStr = DefaultStr> {
     pub identifier: AtIdentifier<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ResolveMiniDocOutput<S: BosStr = DefaultStr> {
     ///DID, bi-directionally verified if a handle was provided in the query.
     pub did: Did<S>,
     /**The validated handle of the account or `handle.invalid` if the handle
-did not bi-directionally match the DID document.*/
+    did not bi-directionally match the DID document.*/
     pub handle: Handle<S>,
     ///The identity's PDS URL
     pub pds: UriValue<S>,
     /**The atproto signing key publicKeyMultibase
 
-Legacy key encoding not supported. the key is returned directly; `id`,
-`type`, and `controller` are omitted.*/
+    Legacy key encoding not supported. the key is returned directly; `id`,
+    `type`, and `controller` are omitted.*/
     pub signing_key: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -70,7 +75,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveMiniDocRequest {
 
 pub mod resolve_mini_doc_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,10 +106,7 @@ pub mod resolve_mini_doc_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveMiniDocBuilder<
-    St: resolve_mini_doc_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ResolveMiniDocBuilder<St: resolve_mini_doc_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,

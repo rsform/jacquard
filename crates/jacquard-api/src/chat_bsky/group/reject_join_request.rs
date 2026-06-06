@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RejectJoinRequest<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub member: Did<S>,
@@ -26,26 +29,19 @@ pub struct RejectJoinRequest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RejectJoinRequestOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RejectJoinRequestError {
     #[serde(rename = "InvalidConvo")]
@@ -54,7 +50,10 @@ pub enum RejectJoinRequestError {
     InsufficientRole(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RejectJoinRequestError {
@@ -96,9 +95,8 @@ impl jacquard_common::xrpc::XrpcResp for RejectJoinRequestResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RejectJoinRequest<S> {
     const NSID: &'static str = "chat.bsky.group.rejectJoinRequest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RejectJoinRequestResponse;
 }
 
@@ -106,16 +104,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RejectJoinRequest<S> {
 pub struct RejectJoinRequestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RejectJoinRequestRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.group.rejectJoinRequest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RejectJoinRequest<S>;
     type Response = RejectJoinRequestResponse;
 }
 
 pub mod reject_join_request_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -158,10 +155,7 @@ pub mod reject_join_request_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RejectJoinRequestBuilder<
-    St: reject_join_request_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RejectJoinRequestBuilder<St: reject_join_request_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -169,10 +163,7 @@ pub struct RejectJoinRequestBuilder<
 
 impl RejectJoinRequest<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RejectJoinRequestBuilder<
-        reject_join_request_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> RejectJoinRequestBuilder<reject_join_request_state::Empty, DefaultStr> {
         RejectJoinRequestBuilder::new()
     }
 }
@@ -259,10 +250,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RejectJoinRequest<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RejectJoinRequest<S> {
         RejectJoinRequest {
             convo_id: self._fields.0.unwrap(),
             member: self._fields.1.unwrap(),

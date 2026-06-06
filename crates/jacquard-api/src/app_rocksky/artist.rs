@@ -10,13 +10,12 @@ pub mod get_artist_albums;
 pub mod get_artist_tracks;
 pub mod get_artists;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,7 +32,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A declaration of an artist.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -81,9 +80,11 @@ pub struct ArtistGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Artist<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ArtistViewBasic<S: BosStr = DefaultStr> {
     ///The unique identifier of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -110,9 +111,11 @@ pub struct ArtistViewBasic<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ArtistViewDetailed<S: BosStr = DefaultStr> {
     ///The unique identifier of the artist.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -241,25 +244,20 @@ impl<S: BosStr> LexiconSchema for Artist<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("picture"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -337,7 +335,7 @@ impl<S: BosStr> LexiconSchema for ArtistViewDetailed<S> {
 
 pub mod artist_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -508,10 +506,7 @@ where
     St::Name: artist_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ArtistBuilder<artist_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ArtistBuilder<artist_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ArtistBuilder {
             _state: PhantomData,
@@ -584,10 +579,10 @@ where
 }
 
 fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.artist"),
@@ -599,21 +594,19 @@ fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A declaration of an artist.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("bio"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The biography of the artist."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The biography of the artist.",
+                                    )),
                                     max_length: Some(1000usize),
                                     ..Default::default()
                                 }),
@@ -621,9 +614,9 @@ fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("born"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The birth date of the artist."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The birth date of the artist.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -631,9 +624,9 @@ fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("bornIn"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The birth place of the artist."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The birth place of the artist.",
+                                    )),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -641,9 +634,9 @@ fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The date when the artist was created."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The date when the artist was created.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -651,9 +644,9 @@ fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("died"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The death date of the artist."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The death date of the artist.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -661,9 +654,9 @@ fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The name of the artist."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The name of the artist.",
+                                    )),
                                     min_length: Some(1usize),
                                     max_length: Some(512usize),
                                     ..Default::default()
@@ -671,14 +664,16 @@ fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("picture"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("The tags of the artist."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The tags of the artist.",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         min_length: Some(1usize),
                                         max_length: Some(256usize),
@@ -701,10 +696,10 @@ fn lexicon_doc_app_rocksky_artist() -> LexiconDoc<'static> {
 }
 
 fn lexicon_doc_app_rocksky_artist_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.artist.defs"),
@@ -719,27 +714,23 @@ fn lexicon_doc_app_rocksky_artist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the artist."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the artist.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The name of the artist."),
-                                ),
+                                description: Some(CowStr::new_static("The name of the artist.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("picture"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The picture of the artist."),
-                                ),
+                                description: Some(CowStr::new_static("The picture of the artist.")),
                                 ..Default::default()
                             }),
                         );
@@ -753,9 +744,9 @@ fn lexicon_doc_app_rocksky_artist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sha256"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The SHA256 hash of the artist."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The SHA256 hash of the artist.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -769,9 +760,7 @@ fn lexicon_doc_app_rocksky_artist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URI of the artist."),
-                                ),
+                                description: Some(CowStr::new_static("The URI of the artist.")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -790,27 +779,23 @@ fn lexicon_doc_app_rocksky_artist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the artist."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the artist.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The name of the artist."),
-                                ),
+                                description: Some(CowStr::new_static("The name of the artist.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("picture"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The picture of the artist."),
-                                ),
+                                description: Some(CowStr::new_static("The picture of the artist.")),
                                 ..Default::default()
                             }),
                         );
@@ -824,9 +809,9 @@ fn lexicon_doc_app_rocksky_artist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sha256"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The SHA256 hash of the artist."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The SHA256 hash of the artist.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -840,9 +825,7 @@ fn lexicon_doc_app_rocksky_artist_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URI of the artist."),
-                                ),
+                                description: Some(CowStr::new_static("The URI of the artist.")),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

@@ -15,7 +15,9 @@ use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::client::OAuthSession;
 use jacquard_oauth::resolver::OAuthResolver;
-use jacquard_oauth::scopes::{RepoAction, RepoCollection, RepoScope, RpcAudience, RpcLexicon, RpcScope, Scope, Scopes};
+use jacquard_oauth::scopes::{
+    RepoAction, RepoCollection, RepoScope, RpcAudience, RpcLexicon, RpcScope, Scope, Scopes,
+};
 use jacquard_oauth::session::SessionRegistry;
 use jacquard_oauth::session::{ClientData, ClientSessionData, DpopClientData};
 use jacquard_oauth::types::{OAuthAuthorizationServerMetadata, OAuthTokenType, TokenSet};
@@ -427,9 +429,7 @@ fn resolved_scopes_auth_create_posts() -> Vec<Scope<SmolStr>> {
     // RPC scopes for video endpoints.
     let mut lxm = BTreeSet::new();
     for nsid in &video_rpcs {
-        lxm.insert(RpcLexicon::Nsid(
-            Nsid::<SmolStr>::new_static(nsid).unwrap(),
-        ));
+        lxm.insert(RpcLexicon::Nsid(Nsid::<SmolStr>::new_static(nsid).unwrap()));
     }
     let mut aud = BTreeSet::new();
     aud.insert(RpcAudience::All);
@@ -458,10 +458,7 @@ async fn test_realistic_scopes_video_rpc_permitted() {
             HttpResponse::builder()
                 .status(StatusCode::OK)
                 .header(http::header::CONTENT_TYPE, "application/json")
-                .body(
-                    serde_json::to_vec(&serde_json::json!({"key": "value"}))
-                        .unwrap(),
-                )
+                .body(serde_json::to_vec(&serde_json::json!({"key": "value"})).unwrap())
                 .unwrap(),
         )
         .await;
@@ -482,8 +479,7 @@ async fn test_realistic_scopes_video_rpc_permitted() {
         ),
     };
 
-    let session_data =
-        create_session_data(Some(resolved_scopes_auth_create_posts())).into_static();
+    let session_data = create_session_data(Some(resolved_scopes_auth_create_posts())).into_static();
     let client_arc = client.clone();
     let registry = Arc::new(SessionRegistry::new(store, client_arc.clone(), client_data));
     registry.set(session_data.clone()).await.unwrap();
@@ -523,8 +519,7 @@ async fn test_realistic_scopes_ungated_rpc_denied() {
         ),
     };
 
-    let session_data =
-        create_session_data(Some(resolved_scopes_auth_create_posts())).into_static();
+    let session_data = create_session_data(Some(resolved_scopes_auth_create_posts())).into_static();
     let client_arc = client.clone();
     let registry = Arc::new(SessionRegistry::new(store, client_arc.clone(), client_data));
     registry.set(session_data.clone()).await.unwrap();
@@ -563,10 +558,7 @@ async fn test_realistic_scopes_audience_specific_rpc_permitted() {
             HttpResponse::builder()
                 .status(StatusCode::OK)
                 .header(http::header::CONTENT_TYPE, "application/json")
-                .body(
-                    serde_json::to_vec(&serde_json::json!({"key": "value"}))
-                        .unwrap(),
-                )
+                .body(serde_json::to_vec(&serde_json::json!({"key": "value"})).unwrap())
                 .unwrap(),
         )
         .await;

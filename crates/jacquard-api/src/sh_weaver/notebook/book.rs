@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,9 +24,6 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::actor::Author;
 use crate::sh_weaver::notebook::ContentRating;
@@ -34,6 +31,9 @@ use crate::sh_weaver::notebook::ContentWarnings;
 use crate::sh_weaver::notebook::Path;
 use crate::sh_weaver::notebook::Tags;
 use crate::sh_weaver::notebook::Title;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Authors of a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -132,7 +132,7 @@ impl<S: BosStr> LexiconSchema for Book<S> {
 
 pub mod book_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -212,7 +212,9 @@ impl BookBuilder<book_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         BookBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -223,7 +225,9 @@ impl<S: BosStr> BookBuilder<book_state::Empty, S> {
     pub fn builder() -> Self {
         BookBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -250,10 +254,7 @@ where
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(
-        mut self,
-        value: impl Into<Option<ContentWarnings<S>>>,
-    ) -> Self {
+    pub fn content_warnings(mut self, value: impl Into<Option<ContentWarnings<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -430,10 +431,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_book() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.book"),

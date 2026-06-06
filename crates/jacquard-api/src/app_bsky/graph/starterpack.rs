@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_bsky::graph::starterpack;
+use crate::app_bsky::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::richtext::facet::Facet;
-use crate::app_bsky::graph::starterpack;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FeedItem<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -206,7 +209,7 @@ impl<S: BosStr> LexiconSchema for Starterpack<S> {
 
 pub mod feed_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -320,10 +323,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.graph.starterpack"),
@@ -351,19 +354,16 @@ fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Record defining a starter pack of actors and feeds for new users.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Record defining a starter pack of actors and feeds for new users.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"), SmolStr::new_static("list"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("list"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -406,9 +406,9 @@ fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("list"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Reference (AT-URI) to the list record."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Reference (AT-URI) to the list record.",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -416,11 +416,9 @@ fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Display name for starter pack; can not be empty.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Display name for starter pack; can not be empty.",
+                                    )),
                                     min_length: Some(1usize),
                                     max_length: Some(500usize),
                                     max_graphemes: Some(50usize),
@@ -442,7 +440,7 @@ fn lexicon_doc_app_bsky_graph_starterpack() -> LexiconDoc<'static> {
 
 pub mod starterpack_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -582,10 +580,7 @@ impl<St: starterpack_state::State, S: BosStr> StarterpackBuilder<St, S> {
 
 impl<St: starterpack_state::State, S: BosStr> StarterpackBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(
-        mut self,
-        value: impl Into<Option<Vec<Facet<S>>>>,
-    ) -> Self {
+    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -598,10 +593,7 @@ impl<St: starterpack_state::State, S: BosStr> StarterpackBuilder<St, S> {
 
 impl<St: starterpack_state::State, S: BosStr> StarterpackBuilder<St, S> {
     /// Set the `feeds` field (optional)
-    pub fn feeds(
-        mut self,
-        value: impl Into<Option<Vec<starterpack::FeedItem<S>>>>,
-    ) -> Self {
+    pub fn feeds(mut self, value: impl Into<Option<Vec<starterpack::FeedItem<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -670,10 +662,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Starterpack<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Starterpack<S> {
         Starterpack {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

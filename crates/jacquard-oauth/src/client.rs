@@ -34,7 +34,6 @@ use jacquard_common::{
 #[cfg(feature = "scope-check")]
 use jacquard_identity::lexicon_resolver::LexiconSchemaResolver;
 
-
 #[cfg(feature = "scope-check")]
 use jacquard_common::deps::fluent_uri::pct_enc::{EStr, encoder::Query};
 
@@ -411,11 +410,13 @@ fn decode_audience(aud: &str) -> Result<String> {
             let decoded = estr.decode();
             match decoded.to_string() {
                 Ok(cow) => Ok(cow.into_owned()),
-                Err(bytes) => {
-                    Err(crate::error::CallbackError::ScopeResolution {
-                        detail: format!("percent-decoded audience contains invalid UTF-8: {:?}", bytes),
-                    }.into())
+                Err(bytes) => Err(crate::error::CallbackError::ScopeResolution {
+                    detail: format!(
+                        "percent-decoded audience contains invalid UTF-8: {:?}",
+                        bytes
+                    ),
                 }
+                .into()),
             }
         }
         None => {
@@ -959,14 +960,10 @@ where
                 // specific aud (e.g., did:web:api.bsky.app) still permits
                 // calling the method from the client's perspective.
                 let rpc_ok = scopes.iter().any(|s| match s {
-                    Scope::Rpc(rpc) => {
-                        rpc.lxm.iter().any(|l| match l {
-                            RpcLexicon::All => true,
-                            RpcLexicon::Nsid(granted_nsid) => {
-                                granted_nsid.as_ref() == nsid.as_ref()
-                            }
-                        })
-                    }
+                    Scope::Rpc(rpc) => rpc.lxm.iter().any(|l| match l {
+                        RpcLexicon::All => true,
+                        RpcLexicon::Nsid(granted_nsid) => granted_nsid.as_ref() == nsid.as_ref(),
+                    }),
                     _ => false,
                 });
 

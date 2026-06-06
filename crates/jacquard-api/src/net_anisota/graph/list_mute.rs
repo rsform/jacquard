@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_anisota::graph::list_mute;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_anisota::graph::list_mute;
+use serde::{Deserialize, Serialize};
 /// Configuration for which types of content to mute
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ContentTypes<S: BosStr = DefaultStr> {
     ///Mute regular posts from accounts on this list  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -206,10 +209,10 @@ impl Default for ContentTypes {
 }
 
 fn lexicon_doc_net_anisota_graph_listMute() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.graph.listMute"),
@@ -218,11 +221,9 @@ fn lexicon_doc_net_anisota_graph_listMute() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("contentTypes"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Configuration for which types of content to mute",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Configuration for which types of content to mute",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -356,7 +357,7 @@ fn lexicon_doc_net_anisota_graph_listMute() -> LexiconDoc<'static> {
 
 pub mod list_mute_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -450,18 +451,12 @@ impl<S: BosStr> ListMuteBuilder<list_mute_state::Empty, S> {
 
 impl<St: list_mute_state::State, S: BosStr> ListMuteBuilder<St, S> {
     /// Set the `contentTypes` field (optional)
-    pub fn content_types(
-        mut self,
-        value: impl Into<Option<list_mute::ContentTypes<S>>>,
-    ) -> Self {
+    pub fn content_types(mut self, value: impl Into<Option<list_mute::ContentTypes<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `contentTypes` field to an Option value (optional)
-    pub fn maybe_content_types(
-        mut self,
-        value: Option<list_mute::ContentTypes<S>>,
-    ) -> Self {
+    pub fn maybe_content_types(mut self, value: Option<list_mute::ContentTypes<S>>) -> Self {
         self._fields.0 = value;
         self
     }

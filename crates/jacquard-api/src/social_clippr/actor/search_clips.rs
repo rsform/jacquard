@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::social_clippr::feed::ClipView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::social_clippr::feed::ClipView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchClips<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<AtIdentifier<S>>,
@@ -32,9 +35,11 @@ pub struct SearchClips<S: BosStr = DefaultStr> {
     pub q: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SearchClipsOutput<S: BosStr = DefaultStr> {
     ///A list of clips and their associated details
     pub clips: Vec<ClipView<S>>,
@@ -75,7 +80,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_clips_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -193,10 +198,7 @@ where
     St::Q: search_clips_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(
-        mut self,
-        value: impl Into<S>,
-    ) -> SearchClipsBuilder<search_clips_state::SetQ<St>, S> {
+    pub fn q(mut self, value: impl Into<S>) -> SearchClipsBuilder<search_clips_state::SetQ<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SearchClipsBuilder {
             _state: PhantomData,

@@ -9,10 +9,9 @@ pub mod event;
 pub mod measurement;
 pub mod occurrence;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,7 +23,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// The specific nature of the data record. Controlled vocabulary per Darwin Core.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -110,9 +109,7 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             BasisOfRecordEnum::HumanObservation => BasisOfRecordEnum::HumanObservation,
-            BasisOfRecordEnum::MachineObservation => {
-                BasisOfRecordEnum::MachineObservation
-            }
+            BasisOfRecordEnum::MachineObservation => BasisOfRecordEnum::MachineObservation,
             BasisOfRecordEnum::PreservedSpecimen => BasisOfRecordEnum::PreservedSpecimen,
             BasisOfRecordEnum::LivingSpecimen => BasisOfRecordEnum::LivingSpecimen,
             BasisOfRecordEnum::FossilSpecimen => BasisOfRecordEnum::FossilSpecimen,
@@ -220,7 +217,10 @@ where
 /// A geographic point with uncertainty, following Darwin Core Location class
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Geolocation<S: BosStr = DefaultStr> {
     ///Horizontal distance from the coordinates describing the smallest circle containing the whole location. Zero is not valid.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -316,9 +316,7 @@ where
             NomenclaturalCodeEnum::Icnp => NomenclaturalCodeEnum::Icnp,
             NomenclaturalCodeEnum::Ictv => NomenclaturalCodeEnum::Ictv,
             NomenclaturalCodeEnum::BioCode => NomenclaturalCodeEnum::BioCode,
-            NomenclaturalCodeEnum::Other(v) => {
-                NomenclaturalCodeEnum::Other(v.into_static())
-            }
+            NomenclaturalCodeEnum::Other(v) => NomenclaturalCodeEnum::Other(v.into_static()),
         }
     }
 }
@@ -391,9 +389,7 @@ where
         match self {
             OccurrenceStatusEnum::Present => OccurrenceStatusEnum::Present,
             OccurrenceStatusEnum::Absent => OccurrenceStatusEnum::Absent,
-            OccurrenceStatusEnum::Other(v) => {
-                OccurrenceStatusEnum::Other(v.into_static())
-            }
+            OccurrenceStatusEnum::Other(v) => OccurrenceStatusEnum::Other(v.into_static()),
         }
     }
 }
@@ -478,7 +474,10 @@ where
 /// A taxonomic identification with provenance metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TaxonIdentification<S: BosStr = DefaultStr> {
     ///Date the identification was made (ISO 8601)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -780,10 +779,10 @@ impl<S: BosStr> LexiconSchema for TaxonIdentification<S> {
 }
 
 fn lexicon_doc_app_gainforest_dwc_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.dwc.defs"),
@@ -804,11 +803,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dublinCoreTypeEnum"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static(
-                            "Dublin Core type vocabulary for the nature of the resource.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Dublin Core type vocabulary for the nature of the resource.",
+                    )),
                     max_graphemes: Some(64usize),
                     ..Default::default()
                 }),
@@ -881,11 +878,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("nomenclaturalCodeEnum"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static(
-                            "The nomenclatural code under which the scientific name is constructed.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "The nomenclatural code under which the scientific name is constructed.",
+                    )),
                     max_graphemes: Some(64usize),
                     ..Default::default()
                 }),
@@ -893,11 +888,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("occurrenceStatusEnum"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static(
-                            "Statement about the presence or absence of a taxon at a location.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Statement about the presence or absence of a taxon at a location.",
+                    )),
                     max_graphemes: Some(64usize),
                     ..Default::default()
                 }),
@@ -905,11 +898,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sexEnum"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static(
-                            "The sex of the biological individual(s) represented in the occurrence.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "The sex of the biological individual(s) represented in the occurrence.",
+                    )),
                     max_graphemes: Some(64usize),
                     ..Default::default()
                 }),
@@ -1018,11 +1009,9 @@ fn lexicon_doc_app_gainforest_dwc_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("taxonRankEnum"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static(
-                            "The taxonomic rank of the most specific name in the scientificName.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "The taxonomic rank of the most specific name in the scientificName.",
+                    )),
                     max_graphemes: Some(64usize),
                     ..Default::default()
                 }),

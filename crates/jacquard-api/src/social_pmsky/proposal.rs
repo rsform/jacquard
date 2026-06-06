@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -142,7 +142,7 @@ impl<S: BosStr> LexiconSchema for Proposal<S> {
 
 pub mod proposal_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -270,7 +270,9 @@ impl ProposalBuilder<proposal_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ProposalBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -281,7 +283,9 @@ impl<S: BosStr> ProposalBuilder<proposal_state::Empty, S> {
     pub fn builder() -> Self {
         ProposalBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -396,10 +400,7 @@ where
     St::Typ: proposal_state::IsUnset,
 {
     /// Set the `typ` field (required)
-    pub fn typ(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProposalBuilder<proposal_state::SetTyp<St>, S> {
+    pub fn typ(mut self, value: impl Into<S>) -> ProposalBuilder<proposal_state::SetTyp<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -434,10 +435,7 @@ where
     St::Val: proposal_state::IsUnset,
 {
     /// Set the `val` field (required)
-    pub fn val(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProposalBuilder<proposal_state::SetVal<St>, S> {
+    pub fn val(mut self, value: impl Into<S>) -> ProposalBuilder<proposal_state::SetVal<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ProposalBuilder {
             _state: PhantomData,
@@ -506,10 +504,10 @@ where
 }
 
 fn lexicon_doc_social_pmsky_proposal() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pmsky.proposal"),

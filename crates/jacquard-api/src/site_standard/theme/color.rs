@@ -22,10 +22,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Rgb<S: BosStr = DefaultStr> {
     pub b: i64,
     pub g: i64,
@@ -34,9 +37,11 @@ pub struct Rgb<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Rgba<S: BosStr = DefaultStr> {
     pub a: i64,
     pub b: i64,
@@ -218,7 +223,7 @@ impl<S: BosStr> LexiconSchema for Rgba<S> {
 
 pub mod rgb_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -393,10 +398,10 @@ where
 }
 
 fn lexicon_doc_site_standard_theme_color() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("site.standard.theme.color"),
@@ -405,12 +410,11 @@ fn lexicon_doc_site_standard_theme_color() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rgb"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("r"), SmolStr::new_static("g"),
-                            SmolStr::new_static("b")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("r"),
+                        SmolStr::new_static("g"),
+                        SmolStr::new_static("b"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -446,12 +450,12 @@ fn lexicon_doc_site_standard_theme_color() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rgba"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("r"), SmolStr::new_static("g"),
-                            SmolStr::new_static("b"), SmolStr::new_static("a")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("r"),
+                        SmolStr::new_static("g"),
+                        SmolStr::new_static("b"),
+                        SmolStr::new_static("a"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -500,7 +504,7 @@ fn lexicon_doc_site_standard_theme_color() -> LexiconDoc<'static> {
 
 pub mod rgba_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

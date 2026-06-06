@@ -7,13 +7,12 @@
 
 pub mod favorite;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,7 +29,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A specific episode or VOD of a show.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -215,19 +214,16 @@ impl<S: BosStr> LexiconSchema for Episode<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("cover_art"),
@@ -264,7 +260,7 @@ impl<S: BosStr> LexiconSchema for Episode<S> {
 
 pub mod episode_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -468,10 +464,7 @@ where
     St::Title: episode_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> EpisodeBuilder<episode_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> EpisodeBuilder<episode_state::SetTitle<St>, S> {
         self._fields.6 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -532,10 +525,10 @@ where
 }
 
 fn lexicon_doc_haus_opn_mic_show_episode() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("haus.opn.mic.show.episode"),
@@ -544,36 +537,32 @@ fn lexicon_doc_haus_opn_mic_show_episode() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A specific episode or VOD of a show."),
-                    ),
+                    description: Some(CowStr::new_static("A specific episode or VOD of a show.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("showUri"),
-                                SmolStr::new_static("title"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("showUri"),
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("airingDate"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Scheduled or actual date/time when this episode airs.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Scheduled or actual date/time when this episode airs.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("coverArt"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
@@ -592,11 +581,9 @@ fn lexicon_doc_haus_opn_mic_show_episode() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("showUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Reference to the haus.opn.mic.show record.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Reference to the haus.opn.mic.show record.",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -604,9 +591,9 @@ fn lexicon_doc_haus_opn_mic_show_episode() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("status"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Current episode lifecycle status."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Current episode lifecycle status.",
+                                    )),
                                     ..Default::default()
                                 }),
                             );

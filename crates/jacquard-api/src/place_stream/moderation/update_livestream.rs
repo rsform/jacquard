@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateLivestream<S: BosStr = DefaultStr> {
     ///The AT-URI of the livestream record to update.
     pub livestream_uri: AtUri<S>,
@@ -31,9 +34,11 @@ pub struct UpdateLivestream<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateLivestreamOutput<S: BosStr = DefaultStr> {
     ///The CID of the updated livestream record.
     pub cid: Cid<S>,
@@ -43,18 +48,9 @@ pub struct UpdateLivestreamOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum UpdateLivestreamError {
     /// The request lacks valid authentication credentials.
@@ -71,7 +67,10 @@ pub enum UpdateLivestreamError {
     RecordNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for UpdateLivestreamError {
@@ -127,9 +126,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateLivestreamResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<S> {
     const NSID: &'static str = "place.stream.moderation.updateLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateLivestreamResponse;
 }
 
@@ -137,16 +135,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<S> {
 pub struct UpdateLivestreamRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateLivestreamRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.updateLivestream";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateLivestream<S>;
     type Response = UpdateLivestreamResponse;
 }
 
 pub mod update_livestream_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -189,10 +186,7 @@ pub mod update_livestream_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateLivestreamBuilder<
-    St: update_livestream_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct UpdateLivestreamBuilder<St: update_livestream_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -301,10 +295,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> UpdateLivestream<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateLivestream<S> {
         UpdateLivestream {
             livestream_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

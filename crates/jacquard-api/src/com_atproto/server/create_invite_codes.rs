@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,13 +21,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::server::create_invite_codes;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::server::create_invite_codes;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AccountCodes<S: BosStr = DefaultStr> {
     pub account: S,
     pub codes: Vec<S>,
@@ -35,9 +38,11 @@ pub struct AccountCodes<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateInviteCodes<S: BosStr = DefaultStr> {
     /// Defaults to `1`.
     #[serde(default = "_default_create_invite_codes_code_count")]
@@ -49,9 +54,11 @@ pub struct CreateInviteCodes<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateInviteCodesOutput<S: BosStr = DefaultStr> {
     pub codes: Vec<create_invite_codes::AccountCodes<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -84,9 +91,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateInviteCodesResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<S> {
     const NSID: &'static str = "com.atproto.server.createInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateInviteCodesResponse;
 }
 
@@ -94,16 +100,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateInviteCodes<S> {
 pub struct CreateInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createInviteCodes";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateInviteCodes<S>;
     type Response = CreateInviteCodesResponse;
 }
 
 pub mod account_codes_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -241,10 +246,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AccountCodes<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AccountCodes<S> {
         AccountCodes {
             account: self._fields.0.unwrap(),
             codes: self._fields.1.unwrap(),
@@ -254,10 +256,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_server_createInviteCodes() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.server.createInviteCodes"),
@@ -266,17 +268,18 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("accountCodes"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("account"), SmolStr::new_static("codes")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("account"),
+                        SmolStr::new_static("codes"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("account"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("codes"),
@@ -297,44 +300,40 @@ fn lexicon_doc_com_atproto_server_createInviteCodes() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(
-                                    vec![
-                                        SmolStr::new_static("codeCount"),
-                                        SmolStr::new_static("useCount")
-                                    ],
-                                ),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("codeCount"),
-                                        LexObjectProperty::Integer(LexInteger {
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![
+                                SmolStr::new_static("codeCount"),
+                                SmolStr::new_static("useCount"),
+                            ]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("codeCount"),
+                                    LexObjectProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("forAccounts"),
+                                    LexObjectProperty::Array(LexArray {
+                                        items: LexArrayItem::String(LexString {
+                                            format: Some(LexStringFormat::Did),
                                             ..Default::default()
                                         }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("forAccounts"),
-                                        LexObjectProperty::Array(LexArray {
-                                            items: LexArrayItem::String(LexString {
-                                                format: Some(LexStringFormat::Did),
-                                                ..Default::default()
-                                            }),
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map.insert(
-                                        SmolStr::new_static("useCount"),
-                                        LexObjectProperty::Integer(LexInteger {
-                                            ..Default::default()
-                                        }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("useCount"),
+                                    LexObjectProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -352,7 +351,7 @@ fn _default_create_invite_codes_code_count() -> i64 {
 
 pub mod create_invite_codes_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -395,10 +394,7 @@ pub mod create_invite_codes_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateInviteCodesBuilder<
-    St: create_invite_codes_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CreateInviteCodesBuilder<St: create_invite_codes_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Vec<Did<S>>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -406,10 +402,7 @@ pub struct CreateInviteCodesBuilder<
 
 impl CreateInviteCodes<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CreateInviteCodesBuilder<
-        create_invite_codes_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CreateInviteCodesBuilder<create_invite_codes_state::Empty, DefaultStr> {
         CreateInviteCodesBuilder::new()
     }
 }
@@ -510,10 +503,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateInviteCodes<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateInviteCodes<S> {
         CreateInviteCodes {
             code_count: self._fields.0.unwrap(),
             for_accounts: self._fields.1,

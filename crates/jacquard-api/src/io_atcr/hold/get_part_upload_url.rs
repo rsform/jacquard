@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetPartUploadUrl<S: BosStr = DefaultStr> {
     ///Part sequence number (1-indexed)
     pub part_number: i64,
@@ -28,9 +31,11 @@ pub struct GetPartUploadUrl<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetPartUploadUrlOutput<S: BosStr = DefaultStr> {
     ///Additional headers required for the request (e.g., content-type)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,18 +50,9 @@ pub struct GetPartUploadUrlOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetPartUploadUrlError {
     #[serde(rename = "InvalidUploadId")]
@@ -65,7 +61,10 @@ pub enum GetPartUploadUrlError {
     InvalidPartNumber(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetPartUploadUrlError {
@@ -107,9 +106,8 @@ impl jacquard_common::xrpc::XrpcResp for GetPartUploadUrlResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPartUploadUrl<S> {
     const NSID: &'static str = "io.atcr.hold.getPartUploadUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GetPartUploadUrlResponse;
 }
 
@@ -117,16 +115,15 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPartUploadUrl<S> {
 pub struct GetPartUploadUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPartUploadUrlRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.getPartUploadUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = GetPartUploadUrl<S>;
     type Response = GetPartUploadUrlResponse;
 }
 
 pub mod get_part_upload_url_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -169,10 +166,7 @@ pub mod get_part_upload_url_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPartUploadUrlBuilder<
-    St: get_part_upload_url_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetPartUploadUrlBuilder<St: get_part_upload_url_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -180,10 +174,7 @@ pub struct GetPartUploadUrlBuilder<
 
 impl GetPartUploadUrl<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetPartUploadUrlBuilder<
-        get_part_upload_url_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetPartUploadUrlBuilder<get_part_upload_url_state::Empty, DefaultStr> {
         GetPartUploadUrlBuilder::new()
     }
 }
@@ -270,10 +261,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GetPartUploadUrl<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GetPartUploadUrl<S> {
         GetPartUploadUrl {
             part_number: self._fields.0.unwrap(),
             upload_id: self._fields.1.unwrap(),
@@ -282,8 +270,6 @@ where
     }
 }
 
-fn _default_get_part_upload_url_output_method<S: FromStaticStr>() -> ::core::option::Option<
-    S,
-> {
+fn _default_get_part_upload_url_output_method<S: FromStaticStr>() -> ::core::option::Option<S> {
     Some(S::from_static("PUT"))
 }

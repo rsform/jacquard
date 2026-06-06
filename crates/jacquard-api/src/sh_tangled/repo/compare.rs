@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Compare<S: BosStr = DefaultStr> {
     pub repo: S,
     pub rev1: S,
@@ -33,18 +36,9 @@ pub struct CompareOutput {
     pub body: Bytes,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum CompareError {
     /// Repository not found or access denied
@@ -61,7 +55,10 @@ pub enum CompareError {
     CompareError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for CompareError {
@@ -151,7 +148,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CompareRequest {
 
 pub mod compare_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -256,10 +253,7 @@ where
     St::Repo: compare_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(
-        mut self,
-        value: impl Into<S>,
-    ) -> CompareBuilder<compare_state::SetRepo<St>, S> {
+    pub fn repo(mut self, value: impl Into<S>) -> CompareBuilder<compare_state::SetRepo<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CompareBuilder {
             _state: PhantomData,
@@ -275,10 +269,7 @@ where
     St::Rev1: compare_state::IsUnset,
 {
     /// Set the `rev1` field (required)
-    pub fn rev1(
-        mut self,
-        value: impl Into<S>,
-    ) -> CompareBuilder<compare_state::SetRev1<St>, S> {
+    pub fn rev1(mut self, value: impl Into<S>) -> CompareBuilder<compare_state::SetRev1<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CompareBuilder {
             _state: PhantomData,
@@ -294,10 +285,7 @@ where
     St::Rev2: compare_state::IsUnset,
 {
     /// Set the `rev2` field (required)
-    pub fn rev2(
-        mut self,
-        value: impl Into<S>,
-    ) -> CompareBuilder<compare_state::SetRev2<St>, S> {
+    pub fn rev2(mut self, value: impl Into<S>) -> CompareBuilder<compare_state::SetRev2<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CompareBuilder {
             _state: PhantomData,

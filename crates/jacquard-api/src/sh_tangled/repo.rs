@@ -46,19 +46,18 @@ pub mod tag;
 pub mod tags;
 pub mod tree;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -68,7 +67,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -203,7 +202,7 @@ impl<S: BosStr> LexiconSchema for Repo<S> {
 
 pub mod repo_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -337,10 +336,7 @@ where
     St::Knot: repo_state::IsUnset,
 {
     /// Set the `knot` field (required)
-    pub fn knot(
-        mut self,
-        value: impl Into<S>,
-    ) -> RepoBuilder<repo_state::SetKnot<St>, S> {
+    pub fn knot(mut self, value: impl Into<S>) -> RepoBuilder<repo_state::SetKnot<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
@@ -482,10 +478,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo"),
@@ -496,12 +492,10 @@ fn lexicon_doc_sh_tangled_repo() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("knot"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("knot"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -523,20 +517,18 @@ fn lexicon_doc_sh_tangled_repo() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("knot"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("knot where the repo was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "knot where the repo was created",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("labels"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "List of labels that this repo subscribes to",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "List of labels that this repo subscribes to",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::AtUri),
                                         ..Default::default()
@@ -547,18 +539,18 @@ fn lexicon_doc_sh_tangled_repo() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Cosmetic name of the repo."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Cosmetic name of the repo.",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("repoDid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("DID of the repo itself, if assigned"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "DID of the repo itself, if assigned",
+                                    )),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -574,20 +566,18 @@ fn lexicon_doc_sh_tangled_repo() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("spindle"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "CI runner to send jobs to and receive results from",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "CI runner to send jobs to and receive results from",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("topics"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Topics related to the repo"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Topics related to the repo",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         min_length: Some(1usize),
                                         max_length: Some(50usize),
@@ -600,9 +590,9 @@ fn lexicon_doc_sh_tangled_repo() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("website"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Any URI related to the repo"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Any URI related to the repo",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

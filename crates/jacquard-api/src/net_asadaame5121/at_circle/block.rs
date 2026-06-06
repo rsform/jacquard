@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::net_asadaame5121::at_circle::RingRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::net_asadaame5121::at_circle::RingRef;
+use serde::{Deserialize, Serialize};
 /// Block/Kick a member from the circle
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -143,7 +143,7 @@ impl<S: BosStr> LexiconSchema for Block<S> {
 
 pub mod block_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -202,7 +202,12 @@ pub mod block_state {
 /// Builder for constructing an instance of this type.
 pub struct BlockBuilder<St: block_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<RingRef<S>>, Option<Did<S>>),
+    _fields: (
+        Option<Datetime>,
+        Option<S>,
+        Option<RingRef<S>>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -342,10 +347,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_block() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.block"),
@@ -354,17 +359,14 @@ fn lexicon_doc_net_asadaame5121_at_circle_block() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("Block/Kick a member from the circle"),
-                    ),
+                    description: Some(CowStr::new_static("Block/Kick a member from the circle")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("subject"), SmolStr::new_static("ring"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("subject"),
+                            SmolStr::new_static("ring"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -378,9 +380,7 @@ fn lexicon_doc_net_asadaame5121_at_circle_block() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("reason"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Reason for blocking"),
-                                    ),
+                                    description: Some(CowStr::new_static("Reason for blocking")),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()
@@ -398,9 +398,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_block() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("DID of the member to block"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "DID of the member to block",
+                                    )),
                                     format: Some(LexStringFormat::Did),
                                     max_length: Some(2000usize),
                                     ..Default::default()

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,13 +25,16 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_openmkt::marketplace::listing;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_openmkt::marketplace::listing;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LocationObj<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub county: Option<S>,
@@ -44,7 +47,6 @@ pub struct LocationObj<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -88,9 +90,11 @@ pub struct ListingGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Listing<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MetadataObj<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subcategory: Option<S>,
@@ -208,10 +212,10 @@ impl<S: BosStr> LexiconSchema for MetadataObj<S> {
 }
 
 fn lexicon_doc_app_openmkt_marketplace_listing() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.openmkt.marketplace.listing"),
@@ -225,19 +229,27 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("county"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("locality"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("state"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("zipPrefix"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -356,7 +368,9 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("subcategory"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -371,7 +385,7 @@ fn lexicon_doc_app_openmkt_marketplace_listing() -> LexiconDoc<'static> {
 
 pub mod listing_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -499,7 +513,9 @@ impl ListingBuilder<listing_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ListingBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -510,7 +526,9 @@ impl<S: BosStr> ListingBuilder<listing_state::Empty, S> {
     pub fn builder() -> Self {
         ListingBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -640,10 +658,7 @@ where
 
 impl<St: listing_state::State, S: BosStr> ListingBuilder<St, S> {
     /// Set the `metadata` field (optional)
-    pub fn metadata(
-        mut self,
-        value: impl Into<Option<listing::MetadataObj<S>>>,
-    ) -> Self {
+    pub fn metadata(mut self, value: impl Into<Option<listing::MetadataObj<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -660,10 +675,7 @@ where
     St::Price: listing_state::IsUnset,
 {
     /// Set the `price` field (required)
-    pub fn price(
-        mut self,
-        value: impl Into<S>,
-    ) -> ListingBuilder<listing_state::SetPrice<St>, S> {
+    pub fn price(mut self, value: impl Into<S>) -> ListingBuilder<listing_state::SetPrice<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
@@ -679,10 +691,7 @@ where
     St::Title: listing_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> ListingBuilder<listing_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> ListingBuilder<listing_state::SetTitle<St>, S> {
         self._fields.10 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,

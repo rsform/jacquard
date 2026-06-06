@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// An initial post that starts a discussion
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -168,7 +168,7 @@ impl<S: BosStr> LexiconSchema for Post<S> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -355,10 +355,7 @@ where
     St::Content: post_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostBuilder<post_state::SetContent<St>, S> {
+    pub fn content(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -425,10 +422,7 @@ where
     St::Tags: post_state::IsUnset,
 {
     /// Set the `tags` field (required)
-    pub fn tags(
-        mut self,
-        value: impl Into<Vec<S>>,
-    ) -> PostBuilder<post_state::SetTags<St>, S> {
+    pub fn tags(mut self, value: impl Into<Vec<S>>) -> PostBuilder<post_state::SetTags<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -444,10 +438,7 @@ where
     St::Title: post_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostBuilder<post_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetTitle<St>, S> {
         self._fields.6 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -511,10 +502,10 @@ where
 }
 
 fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_post() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.fudgeu.experimental.atforumv1.feed.post"),
@@ -523,20 +514,19 @@ fn lexicon_doc_dev_fudgeu_experimental_atforumv1_feed_post() -> LexiconDoc<'stat
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("An initial post that starts a discussion"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "An initial post that starts a discussion",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("title"),
-                                SmolStr::new_static("content"),
-                                SmolStr::new_static("createdAt"),
-                                SmolStr::new_static("category"),
-                                SmolStr::new_static("forum"), SmolStr::new_static("tags")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("title"),
+                            SmolStr::new_static("content"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("category"),
+                            SmolStr::new_static("forum"),
+                            SmolStr::new_static("tags"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

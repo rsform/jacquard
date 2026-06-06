@@ -233,8 +233,11 @@ where
 /// Used by validate_mime_pattern() to return the discriminant.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MimePatternKind {
+    /// Matches any MIME type.
     All,
+    /// Matches any subtype of a given type (e.g., `image/*`).
     TypeWildcard,
+    /// Matches an exact MIME type (e.g., `image/png`).
     Exact,
 }
 

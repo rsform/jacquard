@@ -8,27 +8,32 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::place_stream::badge::BadgeSlot;
+use crate::place_stream::badge::BadgeView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::place_stream::badge::BadgeSlot;
-use crate::place_stream::badge::BadgeView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetIssuedBadges<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub streamer: Option<Did<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetIssuedBadgesOutput<S: BosStr = DefaultStr> {
     ///Computed server badge (streamer, mod, or bot) for the given streamer context. Absent if the user has no server role.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetIssuedBadgesRequest {
 
 pub mod get_issued_badges_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -85,10 +90,7 @@ pub mod get_issued_badges_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetIssuedBadgesBuilder<
-    St: get_issued_badges_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetIssuedBadgesBuilder<St: get_issued_badges_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,

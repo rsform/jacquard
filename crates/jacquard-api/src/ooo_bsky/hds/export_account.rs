@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -57,9 +57,8 @@ impl jacquard_common::xrpc::XrpcResp for ExportAccountResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for ExportAccount {
     const NSID: &'static str = "ooo.bsky.hds.exportAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ExportAccountResponse;
 }
 
@@ -67,9 +66,8 @@ impl jacquard_common::xrpc::XrpcRequest for ExportAccount {
 pub struct ExportAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportAccountRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.exportAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ExportAccount;
     type Response = ExportAccountResponse;
 }

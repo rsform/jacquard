@@ -3,11 +3,11 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{HeaderValue, Method, Response as HttpResponse, StatusCode};
+use jacquard::BosStr;
 use jacquard::client::Agent;
 use jacquard::deps::fluent_uri::Uri;
 use jacquard::types::did::Did;
 use jacquard::xrpc::XrpcClient;
-use jacquard::{BosStr, IntoStatic};
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::client::OAuthSession;

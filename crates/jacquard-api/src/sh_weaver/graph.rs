@@ -31,13 +31,12 @@ pub mod subscribe;
 pub mod subscribe_accept;
 pub mod tag;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -48,18 +47,21 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::actor::ProfileViewBasic;
+use crate::sh_weaver::graph;
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
-use crate::sh_weaver::graph;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A community tag with how many people applied it.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommunityTagCount<S: BosStr = DefaultStr> {
     pub count: i64,
     pub tag: S,
@@ -80,7 +82,10 @@ impl core::fmt::Display for Curatelist {
 /// An item in a list with hydrated subject.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListItemView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added_at: Option<Datetime>,
@@ -89,7 +94,6 @@ pub struct ListItemView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -100,7 +104,6 @@ pub enum ListItemViewSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.notebook.defs#entryView")]
     EntryView(Box<EntryView<S>>),
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ListPurpose<S: BosStr = DefaultStr> {
@@ -169,15 +172,9 @@ where
     type Output = ListPurpose<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ListPurpose::ShWeaverGraphDefsCuratelist => {
-                ListPurpose::ShWeaverGraphDefsCuratelist
-            }
-            ListPurpose::ShWeaverGraphDefsReadinglist => {
-                ListPurpose::ShWeaverGraphDefsReadinglist
-            }
-            ListPurpose::ShWeaverGraphDefsSerieslist => {
-                ListPurpose::ShWeaverGraphDefsSerieslist
-            }
+            ListPurpose::ShWeaverGraphDefsCuratelist => ListPurpose::ShWeaverGraphDefsCuratelist,
+            ListPurpose::ShWeaverGraphDefsReadinglist => ListPurpose::ShWeaverGraphDefsReadinglist,
+            ListPurpose::ShWeaverGraphDefsSerieslist => ListPurpose::ShWeaverGraphDefsSerieslist,
             ListPurpose::Other(v) => ListPurpose::Other(v.into_static()),
         }
     }
@@ -186,7 +183,10 @@ where
 /// Hydrated view of a list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -218,7 +218,10 @@ impl core::fmt::Display for Readinglist {
 /// All tags for a resource, grouped by source.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ResourceTagsView<S: BosStr = DefaultStr> {
     ///Tags from the record itself (author-applied).
     pub author_tags: Vec<S>,
@@ -245,7 +248,10 @@ impl core::fmt::Display for Serieslist {
 /// A single tag application with who applied it.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TagApplicationView<S: BosStr = DefaultStr> {
     pub applied_by: ProfileViewBasic<S>,
     pub created_at: Datetime,
@@ -258,7 +264,10 @@ pub struct TagApplicationView<S: BosStr = DefaultStr> {
 /// Aggregated view of a tag with usage statistics.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TagView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry_count: Option<i64>,
@@ -369,7 +378,7 @@ impl<S: BosStr> LexiconSchema for TagView<S> {
 
 pub mod community_tag_count_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -412,10 +421,7 @@ pub mod community_tag_count_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommunityTagCountBuilder<
-    St: community_tag_count_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CommunityTagCountBuilder<St: community_tag_count_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -423,10 +429,7 @@ pub struct CommunityTagCountBuilder<
 
 impl CommunityTagCount<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CommunityTagCountBuilder<
-        community_tag_count_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CommunityTagCountBuilder<community_tag_count_state::Empty, DefaultStr> {
         CommunityTagCountBuilder::new()
     }
 }
@@ -513,10 +516,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CommunityTagCount<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommunityTagCount<S> {
         CommunityTagCount {
             count: self._fields.0.unwrap(),
             tag: self._fields.1.unwrap(),
@@ -526,10 +526,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.graph.defs"),
@@ -538,14 +538,13 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communityTagCount"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A community tag with how many people applied it.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("tag"), SmolStr::new_static("count")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A community tag with how many people applied it.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("tag"),
+                        SmolStr::new_static("count"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -557,7 +556,9 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("tag"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -566,17 +567,20 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("curatelist"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("listItemView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("An item in a list with hydrated subject."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("subject")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "An item in a list with hydrated subject.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("subject"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -592,7 +596,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("sh.weaver.notebook.defs#notebookView"),
-                                    CowStr::new_static("sh.weaver.notebook.defs#entryView")
+                                    CowStr::new_static("sh.weaver.notebook.defs#entryView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -611,21 +615,23 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("listPurpose"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("listView"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Hydrated view of a list.")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("creator"), SmolStr::new_static("name"),
-                            SmolStr::new_static("purpose"),
-                            SmolStr::new_static("itemCount"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("creator"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("purpose"),
+                        SmolStr::new_static("itemCount"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -646,15 +652,15 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("indexedAt"),
@@ -671,7 +677,9 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("purpose"),
@@ -701,32 +709,30 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("readinglist"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("resourceTagsView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("All tags for a resource, grouped by source."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("resource"),
-                            SmolStr::new_static("authorTags"),
-                            SmolStr::new_static("communityTags")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "All tags for a resource, grouped by source.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("resource"),
+                        SmolStr::new_static("authorTags"),
+                        SmolStr::new_static("communityTags"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("authorTags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Tags from the record itself (author-applied).",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Tags from the record itself (author-applied).",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -736,11 +742,9 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("communityTags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Aggregated community-applied tags with counts.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Aggregated community-applied tags with counts.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#communityTagCount"),
                                     ..Default::default()
@@ -758,9 +762,9 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("viewerAppliedTags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Tags the current viewer has applied."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Tags the current viewer has applied.",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -774,32 +778,29 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("serieslist"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("tagApplicationView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A single tag application with who applied it.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("tag"),
-                            SmolStr::new_static("appliedBy"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A single tag application with who applied it.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("tag"),
+                        SmolStr::new_static("appliedBy"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("appliedBy"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -812,7 +813,9 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("tag"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -829,14 +832,13 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tagView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Aggregated view of a tag with usage statistics.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("tag"), SmolStr::new_static("useCount")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Aggregated view of a tag with usage statistics.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("tag"),
+                        SmolStr::new_static("useCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -860,7 +862,9 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("tag"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("trendingScore"),
@@ -887,7 +891,7 @@ fn lexicon_doc_sh_weaver_graph_defs() -> LexiconDoc<'static> {
 
 pub mod list_item_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -932,7 +936,11 @@ pub mod list_item_view_state {
 /// Builder for constructing an instance of this type.
 pub struct ListItemViewBuilder<St: list_item_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<ListItemViewSubject<S>>, Option<AtUri<S>>),
+    _fields: (
+        Option<Datetime>,
+        Option<ListItemViewSubject<S>>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1039,10 +1047,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ListItemView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListItemView<S> {
         ListItemView {
             added_at: self._fields.0,
             subject: self._fields.1.unwrap(),
@@ -1054,7 +1059,7 @@ where
 
 pub mod list_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1348,10 +1353,7 @@ where
     St::Name: list_view_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ListViewBuilder<list_view_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ListViewBuilder<list_view_state::SetName<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
@@ -1459,7 +1461,7 @@ where
 
 pub mod resource_tags_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1516,10 +1518,7 @@ pub mod resource_tags_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResourceTagsViewBuilder<
-    St: resource_tags_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ResourceTagsViewBuilder<St: resource_tags_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
@@ -1532,10 +1531,7 @@ pub struct ResourceTagsViewBuilder<
 
 impl ResourceTagsView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ResourceTagsViewBuilder<
-        resource_tags_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ResourceTagsViewBuilder<resource_tags_view_state::Empty, DefaultStr> {
         ResourceTagsViewBuilder::new()
     }
 }
@@ -1657,10 +1653,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ResourceTagsView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ResourceTagsView<S> {
         ResourceTagsView {
             author_tags: self._fields.0.unwrap(),
             community_tags: self._fields.1.unwrap(),
@@ -1673,7 +1666,7 @@ where
 
 pub mod tag_application_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1746,10 +1739,8 @@ pub mod tag_application_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TagApplicationViewBuilder<
-    St: tag_application_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct TagApplicationViewBuilder<St: tag_application_view_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
@@ -1762,10 +1753,7 @@ pub struct TagApplicationViewBuilder<
 
 impl TagApplicationView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> TagApplicationViewBuilder<
-        tag_application_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> TagApplicationViewBuilder<tag_application_view_state::Empty, DefaultStr> {
         TagApplicationViewBuilder::new()
     }
 }
@@ -1894,10 +1882,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TagApplicationView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TagApplicationView<S> {
         TagApplicationView {
             applied_by: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -1910,7 +1895,7 @@ where
 
 pub mod tag_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2047,10 +2032,7 @@ where
     St::Tag: tag_view_state::IsUnset,
 {
     /// Set the `tag` field (required)
-    pub fn tag(
-        mut self,
-        value: impl Into<S>,
-    ) -> TagViewBuilder<tag_view_state::SetTag<St>, S> {
+    pub fn tag(mut self, value: impl Into<S>) -> TagViewBuilder<tag_view_state::SetTag<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TagViewBuilder {
             _state: PhantomData,

@@ -8,14 +8,14 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_bsky::actor::ProfileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::actor::ProfileView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -26,9 +26,11 @@ pub struct GetSuggestedUsersForDiscover {
     pub limit: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSuggestedUsersForDiscoverOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileView<S>>,
     ///Snowflake for this recommendation, use when submitting recommendation events.
@@ -68,7 +70,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_suggested_users_for_discover_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -86,18 +88,15 @@ pub mod get_suggested_users_for_discover_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSuggestedUsersForDiscoverBuilder<
-    St: get_suggested_users_for_discover_state::State,
-> {
+pub struct GetSuggestedUsersForDiscoverBuilder<St: get_suggested_users_for_discover_state::State> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetSuggestedUsersForDiscover {
     /// Create a new builder for this type.
-    pub fn new() -> GetSuggestedUsersForDiscoverBuilder<
-        get_suggested_users_for_discover_state::Empty,
-    > {
+    pub fn new()
+    -> GetSuggestedUsersForDiscoverBuilder<get_suggested_users_for_discover_state::Empty> {
         GetSuggestedUsersForDiscoverBuilder::new()
     }
 }
@@ -122,9 +121,7 @@ impl GetSuggestedUsersForDiscoverBuilder<get_suggested_users_for_discover_state:
     }
 }
 
-impl<
-    St: get_suggested_users_for_discover_state::State,
-> GetSuggestedUsersForDiscoverBuilder<St> {
+impl<St: get_suggested_users_for_discover_state::State> GetSuggestedUsersForDiscoverBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();

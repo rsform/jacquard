@@ -10,14 +10,17 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeletePageRelationship<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relation: Option<S>,
@@ -38,9 +41,8 @@ impl jacquard_common::xrpc::XrpcResp for DeletePageRelationshipResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeletePageRelationship<S> {
     const NSID: &'static str = "app.blebbit.authr.page.deletePageRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DeletePageRelationshipResponse;
 }
 
@@ -48,9 +50,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeletePageRelationship<S>
 pub struct DeletePageRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePageRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.page.deletePageRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DeletePageRelationship<S>;
     type Response = DeletePageRelationshipResponse;
 }

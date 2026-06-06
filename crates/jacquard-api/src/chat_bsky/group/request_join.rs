@@ -8,26 +8,31 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::chat_bsky::convo::ConvoView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RequestJoin<S: BosStr = DefaultStr> {
     pub code: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RequestJoinOutput<S: BosStr = DefaultStr> {
     ///The group convo joined. This is only present in the case of status=joined
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -36,7 +41,6 @@ pub struct RequestJoinOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RequestJoinOutputStatus<S: BosStr = DefaultStr> {
@@ -110,25 +114,14 @@ where
         match self {
             RequestJoinOutputStatus::Joined => RequestJoinOutputStatus::Joined,
             RequestJoinOutputStatus::Pending => RequestJoinOutputStatus::Pending,
-            RequestJoinOutputStatus::Other(v) => {
-                RequestJoinOutputStatus::Other(v.into_static())
-            }
+            RequestJoinOutputStatus::Other(v) => RequestJoinOutputStatus::Other(v.into_static()),
         }
     }
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RequestJoinError {
     #[serde(rename = "ConvoLocked")]
@@ -145,7 +138,10 @@ pub enum RequestJoinError {
     UserKicked(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RequestJoinError {
@@ -215,9 +211,8 @@ impl jacquard_common::xrpc::XrpcResp for RequestJoinResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RequestJoin<S> {
     const NSID: &'static str = "chat.bsky.group.requestJoin";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RequestJoinResponse;
 }
 
@@ -225,9 +220,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RequestJoin<S> {
 pub struct RequestJoinRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestJoinRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.group.requestJoin";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RequestJoin<S>;
     type Response = RequestJoinResponse;
 }

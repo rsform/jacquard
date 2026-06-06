@@ -13,27 +13,26 @@ pub mod search_clips;
 pub mod search_profiles;
 pub mod search_tags;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, Datetime, UriValue};
+use jacquard_common::types::string::{Datetime, Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::social_clippr::actor;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::social_clippr::actor;
+use serde::{Deserialize, Serialize};
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -48,7 +47,10 @@ pub type Preferences<S = DefaultStr> = Vec<PreferencesItem<S>>;
 /// A view of an actor's profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileView<S: BosStr = DefaultStr> {
     ///A link to the profile's avatar
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -72,7 +74,10 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
 /// Preferences for an user's publishing scopes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PublishingScopesPref<S: BosStr = DefaultStr> {
     ///What publishing scope to mark a clip as by default
     pub default_scope: PublishingScopesPrefDefaultScope<S>,
@@ -128,8 +133,7 @@ impl<S: BosStr> Serialize for PublishingScopesPrefDefaultScope<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for PublishingScopesPrefDefaultScope<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PublishingScopesPrefDefaultScope<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -153,9 +157,7 @@ where
     type Output = PublishingScopesPrefDefaultScope<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            PublishingScopesPrefDefaultScope::Public => {
-                PublishingScopesPrefDefaultScope::Public
-            }
+            PublishingScopesPrefDefaultScope::Public => PublishingScopesPrefDefaultScope::Public,
             PublishingScopesPrefDefaultScope::Unlisted => {
                 PublishingScopesPrefDefaultScope::Unlisted
             }
@@ -244,7 +246,7 @@ impl<S: BosStr> LexiconSchema for PublishingScopesPref<S> {
 
 pub mod profile_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -466,10 +468,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ProfileView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileView<S> {
         ProfileView {
             avatar: self._fields.0,
             created_at: self._fields.1,
@@ -483,10 +482,10 @@ where
 }
 
 fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.clippr.actor.defs"),
@@ -505,24 +504,21 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A view of an actor's profile."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"), SmolStr::new_static("handle"),
-                            SmolStr::new_static("displayName")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("A view of an actor's profile.")),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                        SmolStr::new_static("displayName"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("A link to the profile's avatar"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A link to the profile's avatar",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -530,11 +526,9 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "When the profile record was first created",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "When the profile record was first created",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -542,11 +536,9 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The biography associated to the profile",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The biography associated to the profile",
+                                )),
                                 max_length: Some(5000usize),
                                 max_graphemes: Some(500usize),
                                 ..Default::default()
@@ -555,9 +547,7 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The DID of the profile"),
-                                ),
+                                description: Some(CowStr::new_static("The DID of the profile")),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -565,11 +555,9 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The display name associated to the profile",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The display name associated to the profile",
+                                )),
                                 max_length: Some(640usize),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
@@ -578,9 +566,7 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The handle of the profile"),
-                                ),
+                                description: Some(CowStr::new_static("The handle of the profile")),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),
@@ -593,11 +579,9 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("publishingScopesPref"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Preferences for an user's publishing scopes.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Preferences for an user's publishing scopes.",
+                    )),
                     required: Some(vec![SmolStr::new_static("defaultScope")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -605,11 +589,9 @@ fn lexicon_doc_social_clippr_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("defaultScope"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "What publishing scope to mark a clip as by default",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "What publishing scope to mark a clip as by default",
+                                )),
                                 ..Default::default()
                             }),
                         );

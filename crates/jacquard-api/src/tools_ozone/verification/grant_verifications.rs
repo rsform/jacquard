@@ -10,26 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, Datetime};
+use jacquard_common::types::string::{Datetime, Did, Handle};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::tools_ozone::verification::VerificationView;
 use crate::tools_ozone::verification::grant_verifications;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Error object for failed verifications.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GrantError<S: BosStr = DefaultStr> {
     ///Error message describing the reason for failure.
     pub error: S,
@@ -39,9 +42,11 @@ pub struct GrantError<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GrantVerifications<S: BosStr = DefaultStr> {
     ///Array of verification requests to process
     pub verifications: Vec<grant_verifications::VerificationInput<S>>,
@@ -49,9 +54,11 @@ pub struct GrantVerifications<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GrantVerificationsOutput<S: BosStr = DefaultStr> {
     pub failed_verifications: Vec<grant_verifications::GrantError<S>>,
     pub verifications: Vec<VerificationView<S>>,
@@ -59,9 +66,11 @@ pub struct GrantVerificationsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct VerificationInput<S: BosStr = DefaultStr> {
     ///Timestamp for verification record. Defaults to current time when not specified.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -102,9 +111,8 @@ impl jacquard_common::xrpc::XrpcResp for GrantVerificationsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GrantVerifications<S> {
     const NSID: &'static str = "tools.ozone.verification.grantVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = GrantVerificationsResponse;
 }
 
@@ -112,9 +120,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GrantVerifications<S> {
 pub struct GrantVerificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GrantVerificationsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.verification.grantVerifications";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = GrantVerifications<S>;
     type Response = GrantVerificationsResponse;
 }
@@ -136,7 +143,7 @@ impl<S: BosStr> LexiconSchema for VerificationInput<S> {
 
 pub mod grant_error_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -274,10 +281,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GrantError<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GrantError<S> {
         GrantError {
             error: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -287,10 +291,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_verification_grantVerifications() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.verification.grantVerifications"),
@@ -299,34 +303,29 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> LexiconDoc<'stat
             map.insert(
                 SmolStr::new_static("grantError"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Error object for failed verifications."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("error"), SmolStr::new_static("subject")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Error object for failed verifications.")),
+                    required: Some(vec![
+                        SmolStr::new_static("error"),
+                        SmolStr::new_static("subject"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("error"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Error message describing the reason for failure.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Error message describing the reason for failure.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("subject"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The did of the subject being verified"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The did of the subject being verified",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -341,33 +340,29 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> LexiconDoc<'stat
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(
-                            LexXrpcBodySchema::Object(LexObject {
-                                required: Some(vec![SmolStr::new_static("verifications")]),
-                                properties: {
-                                    #[allow(unused_mut)]
-                                    let mut map = BTreeMap::new();
-                                    map.insert(
-                                        SmolStr::new_static("verifications"),
-                                        LexObjectProperty::Array(LexArray {
-                                            description: Some(
-                                                CowStr::new_static(
-                                                    "Array of verification requests to process",
-                                                ),
-                                            ),
-                                            items: LexArrayItem::Ref(LexRef {
-                                                r#ref: CowStr::new_static("#verificationInput"),
-                                                ..Default::default()
-                                            }),
-                                            max_length: Some(100usize),
+                        schema: Some(LexXrpcBodySchema::Object(LexObject {
+                            required: Some(vec![SmolStr::new_static("verifications")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("verifications"),
+                                    LexObjectProperty::Array(LexArray {
+                                        description: Some(CowStr::new_static(
+                                            "Array of verification requests to process",
+                                        )),
+                                        items: LexArrayItem::Ref(LexRef {
+                                            r#ref: CowStr::new_static("#verificationInput"),
                                             ..Default::default()
                                         }),
-                                    );
-                                    map
-                                },
-                                ..Default::default()
-                            }),
-                        ),
+                                        max_length: Some(100usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        })),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -444,7 +439,7 @@ fn lexicon_doc_tools_ozone_verification_grantVerifications() -> LexiconDoc<'stat
 
 pub mod grant_verifications_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -475,10 +470,7 @@ pub mod grant_verifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GrantVerificationsBuilder<
-    St: grant_verifications_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GrantVerificationsBuilder<St: grant_verifications_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<grant_verifications::VerificationInput<S>>>,),
     _type: PhantomData<fn() -> S>,
@@ -486,10 +478,7 @@ pub struct GrantVerificationsBuilder<
 
 impl GrantVerifications<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GrantVerificationsBuilder<
-        grant_verifications_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GrantVerificationsBuilder<grant_verifications_state::Empty, DefaultStr> {
         GrantVerificationsBuilder::new()
     }
 }
@@ -555,10 +544,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> GrantVerifications<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GrantVerifications<S> {
         GrantVerifications {
             verifications: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -568,7 +554,7 @@ where
 
 pub mod verification_input_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -625,21 +611,20 @@ pub mod verification_input_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VerificationInputBuilder<
-    St: verification_input_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct VerificationInputBuilder<St: verification_input_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<Handle<S>>, Option<Did<S>>),
+    _fields: (
+        Option<Datetime>,
+        Option<S>,
+        Option<Handle<S>>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl VerificationInput<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> VerificationInputBuilder<
-        verification_input_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> VerificationInputBuilder<verification_input_state::Empty, DefaultStr> {
         VerificationInputBuilder::new()
     }
 }
@@ -761,10 +746,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> VerificationInput<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VerificationInput<S> {
         VerificationInput {
             created_at: self._fields.0,
             display_name: self._fields.1.unwrap(),

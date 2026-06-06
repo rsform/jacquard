@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// XRPC request marker type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
@@ -30,9 +30,8 @@ impl jacquard_common::xrpc::XrpcResp for NextResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Next {
     const NSID: &'static str = "app.rocksky.spotify.next";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = NextResponse;
 }
 
@@ -40,9 +39,8 @@ impl jacquard_common::xrpc::XrpcRequest for Next {
 pub struct NextRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NextRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.next";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Next;
     type Response = NextResponse;
 }

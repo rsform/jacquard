@@ -44,7 +44,6 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use jacquard::deps::smol_str::SmolStr;
 use jacquard_common::{
     CowStr, IntoStatic,
     service_auth::{self, PublicKey},

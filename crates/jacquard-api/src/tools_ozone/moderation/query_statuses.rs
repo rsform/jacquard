@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::tools_ozone::moderation::SubjectStatusView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
+use jacquard_common::types::string::{Datetime, Did, Nsid, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::moderation::SubjectStatusView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryStatuses<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_assurance_state: Option<S>,
@@ -103,9 +106,11 @@ pub struct QueryStatuses<S: BosStr = DefaultStr> {
     pub takendown: Option<bool>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct QueryStatusesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -152,7 +157,7 @@ fn _default_sort_field<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod query_statuses_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -170,10 +175,7 @@ pub mod query_statuses_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct QueryStatusesBuilder<
-    St: query_statuses_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct QueryStatusesBuilder<St: query_statuses_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -236,42 +238,9 @@ impl QueryStatusesBuilder<query_statuses_state::Empty, DefaultStr> {
         QueryStatusesBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -284,42 +253,9 @@ impl<S: BosStr> QueryStatusesBuilder<query_statuses_state::Empty, S> {
         QueryStatusesBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -471,10 +407,7 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `ignoreSubjects` field (optional)
-    pub fn ignore_subjects(
-        mut self,
-        value: impl Into<Option<Vec<UriValue<S>>>>,
-    ) -> Self {
+    pub fn ignore_subjects(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.11 = value.into();
         self
     }

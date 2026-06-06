@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateList<S: BosStr = DefaultStr> {
     ///Optional description of the list.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -29,9 +32,11 @@ pub struct CreateList<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateListOutput<S: BosStr = DefaultStr> {
     pub cid: S,
     pub uri: AtUri<S>,
@@ -50,9 +55,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateListResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateList<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.createList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateListResponse;
 }
 
@@ -60,9 +64,8 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateList<S> {
 pub struct CreateListRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateListRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.createList";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateList<S>;
     type Response = CreateListResponse;
 }

@@ -10,13 +10,12 @@ pub mod log;
 pub mod programme;
 pub mod service;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,16 +26,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::media_ionosphere;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::media_ionosphere;
+use serde::{Deserialize, Serialize};
 /// BearerURI as specified in ETSI TS 103 270
 pub type Bearer<S = DefaultStr> = UriValue<S>;
 /// Represents the method of accessing a broadcast; i.e. live
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Broadcast<S: BosStr = DefaultStr> {
     pub bearer: media_ionosphere::Bearer<S>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods  Defaults to `0`.
@@ -57,9 +59,11 @@ pub struct Broadcast<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Credit<S: BosStr = DefaultStr> {
     pub entity: media_ionosphere::Entity<S>,
     ///Self-explanatory, but beware that the expected values may change in future (possibly to match TV-Anytime role classification schema)
@@ -151,9 +155,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Entity<S: BosStr = DefaultStr> {
     pub name: S,
     pub r#type: S,
@@ -165,7 +171,10 @@ pub struct Entity<S: BosStr = DefaultStr> {
 pub type Genre<S = DefaultStr> = UriValue<S>;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Geocoordinates<S: BosStr = DefaultStr> {
     pub latitude: S,
     pub longitude: S,
@@ -176,7 +185,10 @@ pub struct Geocoordinates<S: BosStr = DefaultStr> {
 /// Represents membership to a group, optionally with an index
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Membership<S: BosStr = DefaultStr> {
     pub group: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -188,7 +200,10 @@ pub struct Membership<S: BosStr = DefaultStr> {
 /// Represents the method of accessing a recording
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Recording<S: BosStr = DefaultStr> {
     pub bearer: media_ionosphere::Bearer<S>,
     ///When used in a list, this can be used to sort the attempted connections or preferred methods  Defaults to `0`.
@@ -205,9 +220,11 @@ pub struct Recording<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Track<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
@@ -411,7 +428,7 @@ fn _default_broadcast_offset() -> Option<i64> {
 
 pub mod broadcast_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -578,10 +595,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Broadcast<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Broadcast<S> {
         Broadcast {
             bearer: self._fields.0.unwrap(),
             cost: self._fields.1.or_else(|| Some(0i64)),
@@ -594,10 +608,10 @@ where
 }
 
 fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("media.ionosphere.defs"),
@@ -606,9 +620,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bearer"),
                 LexUserType::String(LexString {
-                    description: Some(
-                        CowStr::new_static("BearerURI as specified in ETSI TS 103 270"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "BearerURI as specified in ETSI TS 103 270",
+                    )),
                     format: Some(LexStringFormat::Uri),
                     ..Default::default()
                 }),
@@ -616,11 +630,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("broadcast"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Represents the method of accessing a broadcast; i.e. live",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Represents the method of accessing a broadcast; i.e. live",
+                    )),
                     required: Some(vec![SmolStr::new_static("bearer")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -641,11 +653,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("from"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The datetime from which this method is available",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The datetime from which this method is available",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -659,11 +669,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("until"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The datetime where this method is no longer available",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The datetime where this method is no longer available",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -709,9 +717,10 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("entity"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("type"), SmolStr::new_static("name")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("name"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -749,12 +758,10 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("geocoordinates"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("latitude"),
-                            SmolStr::new_static("longitude")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("latitude"),
+                        SmolStr::new_static("longitude"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -780,11 +787,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("membership"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Represents membership to a group, optionally with an index",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Represents membership to a group, optionally with an index",
+                    )),
                     required: Some(vec![SmolStr::new_static("group")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -810,11 +815,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recording"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Represents the method of accessing a recording",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Represents the method of accessing a recording",
+                    )),
                     required: Some(vec![SmolStr::new_static("bearer")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -835,11 +838,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("from"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The datetime from which this method is available",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The datetime from which this method is available",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -847,11 +848,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("until"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The datetime where this method is no longer available",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The datetime where this method is no longer available",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -864,11 +863,10 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("track"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("title"), SmolStr::new_static("artists")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("title"),
+                        SmolStr::new_static("artists"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -882,11 +880,9 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artists"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Artists in order of importance to the track",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Artists in order of importance to the track",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(256usize),
                                     ..Default::default()
@@ -914,7 +910,7 @@ fn lexicon_doc_media_ionosphere_defs() -> LexiconDoc<'static> {
 
 pub mod credit_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1063,7 +1059,7 @@ where
 
 pub mod membership_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1182,10 +1178,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Membership<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Membership<S> {
         Membership {
             group: self._fields.0.unwrap(),
             index: self._fields.1,
@@ -1200,7 +1193,7 @@ fn _default_recording_cost() -> Option<i64> {
 
 pub mod recording_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1352,10 +1345,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Recording<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Recording<S> {
         Recording {
             bearer: self._fields.0.unwrap(),
             cost: self._fields.1.or_else(|| Some(0i64)),
@@ -1368,7 +1358,7 @@ where
 
 pub mod track_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1491,10 +1481,7 @@ where
     St::Title: track_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> TrackBuilder<track_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> TrackBuilder<track_state::SetTitle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TrackBuilder {
             _state: PhantomData,

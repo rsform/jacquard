@@ -13,13 +13,12 @@ pub mod get_resource_sessions;
 pub mod invite;
 pub mod session;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,13 +29,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::actor::ProfileViewBasic;
-use crate::sh_weaver::notebook::PublishedVersionView;
 use crate::sh_weaver::collab;
+use crate::sh_weaver::notebook::PublishedVersionView;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Collaboration scoped to a chapter.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -50,7 +49,10 @@ impl core::fmt::Display for Chapter {
 /// Full state of a collaboration relationship including version reconciliation. Tracks both current and former collaborators.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CollaborationStateView<S: BosStr = DefaultStr> {
     ///The 'canonical' version URI (usually owner's)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -136,8 +138,7 @@ impl<S: BosStr> Serialize for CollaborationStateViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for CollaborationStateViewStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CollaborationStateViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -163,12 +164,8 @@ where
         match self {
             CollaborationStateViewStatus::Active => CollaborationStateViewStatus::Active,
             CollaborationStateViewStatus::Broken => CollaborationStateViewStatus::Broken,
-            CollaborationStateViewStatus::Diverged => {
-                CollaborationStateViewStatus::Diverged
-            }
-            CollaborationStateViewStatus::Reconciled => {
-                CollaborationStateViewStatus::Reconciled
-            }
+            CollaborationStateViewStatus::Diverged => CollaborationStateViewStatus::Diverged,
+            CollaborationStateViewStatus::Reconciled => CollaborationStateViewStatus::Reconciled,
             CollaborationStateViewStatus::Other(v) => {
                 CollaborationStateViewStatus::Other(v.into_static())
             }
@@ -189,7 +186,10 @@ impl core::fmt::Display for Entry {
 /// Lightweight view for 'this person used to collaborate but doesn't anymore'.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct FormerCollaboratorView<S: BosStr = DefaultStr> {
     ///Number of diffs they created while active
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -205,7 +205,6 @@ pub struct FormerCollaboratorView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum FormerCollaboratorViewEndReason<S: BosStr = DefaultStr> {
@@ -259,8 +258,7 @@ impl<S: BosStr> Serialize for FormerCollaboratorViewEndReason<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for FormerCollaboratorViewEndReason<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for FormerCollaboratorViewEndReason<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -306,7 +304,10 @@ where
 /// Hydrated view of a collaboration invite with status.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct InviteView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accept_uri: Option<AtUri<S>>,
@@ -330,7 +331,6 @@ pub struct InviteView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InviteViewScope<S: BosStr = DefaultStr> {
@@ -412,7 +412,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InviteViewStatus<S: BosStr = DefaultStr> {
@@ -512,7 +511,10 @@ impl core::fmt::Display for Notebook {
 /// Individual participant's state in a collaboration. Distinguishes 'was collaborator' vs 'never was'.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ParticipantStateView<S: BosStr = DefaultStr> {
     ///If they accepted (even if later broken)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -598,8 +600,7 @@ impl<S: BosStr> Serialize for ParticipantStateViewEndReason<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ParticipantStateViewEndReason<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ParticipantStateViewEndReason<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -641,7 +642,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ParticipantStateViewRole<S: BosStr = DefaultStr> {
@@ -692,8 +692,7 @@ impl<S: BosStr> Serialize for ParticipantStateViewRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ParticipantStateViewRole<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ParticipantStateViewRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -718,15 +717,11 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             ParticipantStateViewRole::Owner => ParticipantStateViewRole::Owner,
-            ParticipantStateViewRole::Collaborator => {
-                ParticipantStateViewRole::Collaborator
-            }
+            ParticipantStateViewRole::Collaborator => ParticipantStateViewRole::Collaborator,
             ParticipantStateViewRole::FormerCollaborator => {
                 ParticipantStateViewRole::FormerCollaborator
             }
-            ParticipantStateViewRole::Other(v) => {
-                ParticipantStateViewRole::Other(v.into_static())
-            }
+            ParticipantStateViewRole::Other(v) => ParticipantStateViewRole::Other(v.into_static()),
         }
     }
 }
@@ -788,8 +783,7 @@ impl<S: BosStr> Serialize for ParticipantStateViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ParticipantStateViewStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ParticipantStateViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -828,7 +822,10 @@ where
 /// Active real-time collaboration session.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SessionView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -920,7 +917,7 @@ impl<S: BosStr> LexiconSchema for SessionView<S> {
 
 pub mod collaboration_state_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1001,20 +998,15 @@ pub struct CollaborationStateViewBuilder<
 
 impl CollaborationStateView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CollaborationStateViewBuilder<
-        collaboration_state_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CollaborationStateViewBuilder<collaboration_state_view_state::Empty, DefaultStr>
+    {
         CollaborationStateViewBuilder::new()
     }
 }
 
 impl<S: BosStr> CollaborationStateView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> CollaborationStateViewBuilder<
-        collaboration_state_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> CollaborationStateViewBuilder<collaboration_state_view_state::Empty, S> {
         CollaborationStateViewBuilder::builder()
     }
 }
@@ -1025,18 +1017,7 @@ impl CollaborationStateViewBuilder<collaboration_state_view_state::Empty, Defaul
         CollaborationStateViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1049,28 +1030,14 @@ impl<S: BosStr> CollaborationStateViewBuilder<collaboration_state_view_state::Em
         CollaborationStateViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `canonicalUri` field (optional)
     pub fn canonical_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1083,10 +1050,7 @@ impl<
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -1099,15 +1063,9 @@ impl<
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `firstCollaboratorAddedAt` field (optional)
-    pub fn first_collaborator_added_at(
-        mut self,
-        value: impl Into<Option<Datetime>>,
-    ) -> Self {
+    pub fn first_collaborator_added_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -1118,10 +1076,7 @@ impl<
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `formerParticipants` field (optional)
     pub fn former_participants(
         mut self,
@@ -1140,10 +1095,7 @@ impl<
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `hasDivergence` field (optional)
     pub fn has_divergence(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.4 = value.into();
@@ -1156,10 +1108,7 @@ impl<
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `hasFormerCollaborators` field (optional)
     pub fn has_former_collaborators(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -1172,10 +1121,7 @@ impl<
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `hasOrphanedVersions` field (optional)
     pub fn has_orphaned_versions(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.6 = value.into();
@@ -1188,10 +1134,7 @@ impl<
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -1213,10 +1156,7 @@ where
     pub fn participants(
         mut self,
         value: impl Into<Vec<collab::ParticipantStateView<S>>>,
-    ) -> CollaborationStateViewBuilder<
-        collaboration_state_view_state::SetParticipants<St>,
-        S,
-    > {
+    ) -> CollaborationStateViewBuilder<collaboration_state_view_state::SetParticipants<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CollaborationStateViewBuilder {
             _state: PhantomData,
@@ -1226,10 +1166,7 @@ where
     }
 }
 
-impl<
-    St: collaboration_state_view_state::State,
-    S: BosStr,
-> CollaborationStateViewBuilder<St, S> {
+impl<St: collaboration_state_view_state::State, S: BosStr> CollaborationStateViewBuilder<St, S> {
     /// Set the `publishedVersions` field (optional)
     pub fn published_versions(
         mut self,
@@ -1239,10 +1176,7 @@ impl<
         self
     }
     /// Set the `publishedVersions` field to an Option value (optional)
-    pub fn maybe_published_versions(
-        mut self,
-        value: Option<Vec<PublishedVersionView<S>>>,
-    ) -> Self {
+    pub fn maybe_published_versions(mut self, value: Option<Vec<PublishedVersionView<S>>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -1257,10 +1191,7 @@ where
     pub fn resource(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollaborationStateViewBuilder<
-        collaboration_state_view_state::SetResource<St>,
-        S,
-    > {
+    ) -> CollaborationStateViewBuilder<collaboration_state_view_state::SetResource<St>, S> {
         self._fields.10 = Option::Some(value.into());
         CollaborationStateViewBuilder {
             _state: PhantomData,
@@ -1279,10 +1210,7 @@ where
     pub fn status(
         mut self,
         value: impl Into<CollaborationStateViewStatus<S>>,
-    ) -> CollaborationStateViewBuilder<
-        collaboration_state_view_state::SetStatus<St>,
-        S,
-    > {
+    ) -> CollaborationStateViewBuilder<collaboration_state_view_state::SetStatus<St>, S> {
         self._fields.11 = Option::Some(value.into());
         CollaborationStateViewBuilder {
             _state: PhantomData,
@@ -1341,10 +1269,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.collab.defs"),
@@ -1352,7 +1280,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("chapter"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("collaborationStateView"),
@@ -1488,7 +1418,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("entry"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("formerCollaboratorView"),
@@ -1563,21 +1495,18 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("inviteView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Hydrated view of a collaboration invite with status.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("inviter"),
-                            SmolStr::new_static("invitee"),
-                            SmolStr::new_static("resource"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("status")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Hydrated view of a collaboration invite with status.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("inviter"),
+                        SmolStr::new_static("invitee"),
+                        SmolStr::new_static("resource"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("status"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1619,24 +1548,22 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("invitee"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("inviter"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("resource"),
@@ -1647,15 +1574,21 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("resourceTitle"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("scope"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -1671,7 +1604,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("notebook"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("participantStateView"),
@@ -1792,17 +1727,16 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sessionView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Active real-time collaboration session."),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("user"),
-                            SmolStr::new_static("resource"),
-                            SmolStr::new_static("nodeId"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Active real-time collaboration session.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("user"),
+                        SmolStr::new_static("resource"),
+                        SmolStr::new_static("nodeId"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1822,7 +1756,9 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("nodeId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("relayUrl"),
@@ -1848,9 +1784,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("user"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "sh.weaver.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -1867,7 +1801,7 @@ fn lexicon_doc_sh_weaver_collab_defs() -> LexiconDoc<'static> {
 
 pub mod former_collaborator_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1959,20 +1893,15 @@ pub struct FormerCollaboratorViewBuilder<
 
 impl FormerCollaboratorView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> FormerCollaboratorViewBuilder<
-        former_collaborator_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> FormerCollaboratorViewBuilder<former_collaborator_view_state::Empty, DefaultStr>
+    {
         FormerCollaboratorViewBuilder::new()
     }
 }
 
 impl<S: BosStr> FormerCollaboratorView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> FormerCollaboratorViewBuilder<
-        former_collaborator_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> FormerCollaboratorViewBuilder<former_collaborator_view_state::Empty, S> {
         FormerCollaboratorViewBuilder::builder()
     }
 }
@@ -1999,10 +1928,7 @@ impl<S: BosStr> FormerCollaboratorViewBuilder<former_collaborator_view_state::Em
     }
 }
 
-impl<
-    St: former_collaborator_view_state::State,
-    S: BosStr,
-> FormerCollaboratorViewBuilder<St, S> {
+impl<St: former_collaborator_view_state::State, S: BosStr> FormerCollaboratorViewBuilder<St, S> {
     /// Set the `contributionCount` field (optional)
     pub fn contribution_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -2024,10 +1950,7 @@ where
     pub fn end_reason(
         mut self,
         value: impl Into<FormerCollaboratorViewEndReason<S>>,
-    ) -> FormerCollaboratorViewBuilder<
-        former_collaborator_view_state::SetEndReason<St>,
-        S,
-    > {
+    ) -> FormerCollaboratorViewBuilder<former_collaborator_view_state::SetEndReason<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
             _state: PhantomData,
@@ -2037,10 +1960,7 @@ where
     }
 }
 
-impl<
-    St: former_collaborator_view_state::State,
-    S: BosStr,
-> FormerCollaboratorViewBuilder<St, S> {
+impl<St: former_collaborator_view_state::State, S: BosStr> FormerCollaboratorViewBuilder<St, S> {
     /// Set the `hasPublishedVersion` field (optional)
     pub fn has_published_version(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -2053,10 +1973,7 @@ impl<
     }
 }
 
-impl<
-    St: former_collaborator_view_state::State,
-    S: BosStr,
-> FormerCollaboratorViewBuilder<St, S> {
+impl<St: former_collaborator_view_state::State, S: BosStr> FormerCollaboratorViewBuilder<St, S> {
     /// Set the `publishedVersionUri` field (optional)
     pub fn published_version_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -2097,10 +2014,8 @@ where
     pub fn was_active_from(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FormerCollaboratorViewBuilder<
-        former_collaborator_view_state::SetWasActiveFrom<St>,
-        S,
-    > {
+    ) -> FormerCollaboratorViewBuilder<former_collaborator_view_state::SetWasActiveFrom<St>, S>
+    {
         self._fields.5 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
             _state: PhantomData,
@@ -2119,10 +2034,8 @@ where
     pub fn was_active_until(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FormerCollaboratorViewBuilder<
-        former_collaborator_view_state::SetWasActiveUntil<St>,
-        S,
-    > {
+    ) -> FormerCollaboratorViewBuilder<former_collaborator_view_state::SetWasActiveUntil<St>, S>
+    {
         self._fields.6 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
             _state: PhantomData,
@@ -2173,7 +2086,7 @@ where
 
 pub mod invite_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2346,19 +2259,7 @@ impl InviteViewBuilder<invite_view_state::Empty, DefaultStr> {
         InviteViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2371,19 +2272,7 @@ impl<S: BosStr> InviteViewBuilder<invite_view_state::Empty, S> {
         InviteViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2632,10 +2521,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> InviteView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> InviteView<S> {
         InviteView {
             accept_uri: self._fields.0,
             accepted_at: self._fields.1,
@@ -2657,7 +2543,7 @@ where
 
 pub mod participant_state_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2737,20 +2623,14 @@ pub struct ParticipantStateViewBuilder<
 
 impl ParticipantStateView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ParticipantStateViewBuilder<
-        participant_state_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ParticipantStateViewBuilder<participant_state_view_state::Empty, DefaultStr> {
         ParticipantStateViewBuilder::new()
     }
 }
 
 impl<S: BosStr> ParticipantStateView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ParticipantStateViewBuilder<
-        participant_state_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ParticipantStateViewBuilder<participant_state_view_state::Empty, S> {
         ParticipantStateViewBuilder::builder()
     }
 }
@@ -2760,7 +2640,9 @@ impl ParticipantStateViewBuilder<participant_state_view_state::Empty, DefaultStr
     pub fn new() -> Self {
         ParticipantStateViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -2771,16 +2653,15 @@ impl<S: BosStr> ParticipantStateViewBuilder<participant_state_view_state::Empty,
     pub fn builder() -> Self {
         ParticipantStateViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
 }
 
-impl<
-    St: participant_state_view_state::State,
-    S: BosStr,
-> ParticipantStateViewBuilder<St, S> {
+impl<St: participant_state_view_state::State, S: BosStr> ParticipantStateViewBuilder<St, S> {
     /// Set the `acceptUri` field (optional)
     pub fn accept_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -2793,10 +2674,7 @@ impl<
     }
 }
 
-impl<
-    St: participant_state_view_state::State,
-    S: BosStr,
-> ParticipantStateViewBuilder<St, S> {
+impl<St: participant_state_view_state::State, S: BosStr> ParticipantStateViewBuilder<St, S> {
     /// Set the `endReason` field (optional)
     pub fn end_reason(
         mut self,
@@ -2806,19 +2684,13 @@ impl<
         self
     }
     /// Set the `endReason` field to an Option value (optional)
-    pub fn maybe_end_reason(
-        mut self,
-        value: Option<ParticipantStateViewEndReason<S>>,
-    ) -> Self {
+    pub fn maybe_end_reason(mut self, value: Option<ParticipantStateViewEndReason<S>>) -> Self {
         self._fields.1 = value;
         self
     }
 }
 
-impl<
-    St: participant_state_view_state::State,
-    S: BosStr,
-> ParticipantStateViewBuilder<St, S> {
+impl<St: participant_state_view_state::State, S: BosStr> ParticipantStateViewBuilder<St, S> {
     /// Set the `firstEditAt` field (optional)
     pub fn first_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -2831,10 +2703,7 @@ impl<
     }
 }
 
-impl<
-    St: participant_state_view_state::State,
-    S: BosStr,
-> ParticipantStateViewBuilder<St, S> {
+impl<St: participant_state_view_state::State, S: BosStr> ParticipantStateViewBuilder<St, S> {
     /// Set the `inviteUri` field (optional)
     pub fn invite_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -2847,10 +2716,7 @@ impl<
     }
 }
 
-impl<
-    St: participant_state_view_state::State,
-    S: BosStr,
-> ParticipantStateViewBuilder<St, S> {
+impl<St: participant_state_view_state::State, S: BosStr> ParticipantStateViewBuilder<St, S> {
     /// Set the `lastEditAt` field (optional)
     pub fn last_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -2863,10 +2729,7 @@ impl<
     }
 }
 
-impl<
-    St: participant_state_view_state::State,
-    S: BosStr,
-> ParticipantStateViewBuilder<St, S> {
+impl<St: participant_state_view_state::State, S: BosStr> ParticipantStateViewBuilder<St, S> {
     /// Set the `publishedVersion` field (optional)
     pub fn published_version(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -2879,10 +2742,7 @@ impl<
     }
 }
 
-impl<
-    St: participant_state_view_state::State,
-    S: BosStr,
-> ParticipantStateViewBuilder<St, S> {
+impl<St: participant_state_view_state::State, S: BosStr> ParticipantStateViewBuilder<St, S> {
     /// Set the `relationshipEndedAt` field (optional)
     pub fn relationship_ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -2952,10 +2812,7 @@ where
     }
 }
 
-impl<
-    St: participant_state_view_state::State,
-    S: BosStr,
-> ParticipantStateViewBuilder<St, S> {
+impl<St: participant_state_view_state::State, S: BosStr> ParticipantStateViewBuilder<St, S> {
     /// Set the `wasCollaborator` field (optional)
     pub fn was_collaborator(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.10 = value.into();
@@ -3016,7 +2873,7 @@ where
 
 pub mod session_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3301,10 +3158,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SessionView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SessionView<S> {
         SessionView {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,

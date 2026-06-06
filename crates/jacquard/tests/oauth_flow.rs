@@ -3,9 +3,9 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{Response as HttpResponse, StatusCode};
+use jacquard::BosStr;
 use jacquard::client::Agent;
 use jacquard::xrpc::XrpcClient;
-use jacquard::{BosStr, IntoStatic};
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::authstore::ClientAuthStore;
@@ -161,10 +161,12 @@ impl jacquard_identity::lexicon_resolver::LexiconSchemaResolver for MockClient {
     > {
         // Return an error for this mock - tests that need include scope resolution
         // should provide their own mock or use real resolver
+
+        use jacquard::IntoStatic;
         Err(
             jacquard_identity::lexicon_resolver::LexiconResolutionError::new(
                 jacquard_identity::lexicon_resolver::LexiconResolutionErrorKind::FetchFailed {
-                    nsid: nsid.clone().into_static(),
+                    nsid: nsid.into_static(),
                 },
                 None,
             ),

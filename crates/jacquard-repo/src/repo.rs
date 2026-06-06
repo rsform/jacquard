@@ -1412,8 +1412,7 @@ mod tests {
 
         // Verify we can deserialize the record data
         for (rkey, _cid, data) in &entries {
-            let record: BTreeMap<SmolStr, RawData> =
-                serde_ipld_dagcbor::from_slice(data).unwrap();
+            let record: BTreeMap<SmolStr, RawData> = serde_ipld_dagcbor::from_slice(data).unwrap();
             assert_eq!(
                 record.get(&SmolStr::new("$type")).unwrap(),
                 &RawData::String("app.bsky.feed.post".into())

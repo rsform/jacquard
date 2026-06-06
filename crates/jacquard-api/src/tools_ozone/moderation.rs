@@ -21,26 +21,22 @@ pub mod query_statuses;
 pub mod schedule_action;
 pub mod search_repos;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Handle, AtUri, Cid, Datetime, UriValue};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Handle, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::ageassurance::Access;
 use crate::chat_bsky::convo::ConvoRef;
 use crate::chat_bsky::convo::MessageRef;
@@ -52,10 +48,16 @@ use crate::com_atproto::moderation::SubjectType;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_atproto::server::InviteCode;
 use crate::tools_ozone::moderation;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// Logs account status related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AccountEvent<S: BosStr = DefaultStr> {
     ///Indicates that the account has a repository which can be fetched from the host that emitted this event.
     pub active: bool,
@@ -67,7 +69,6 @@ pub struct AccountEvent<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AccountEventStatus<S: BosStr = DefaultStr> {
@@ -162,9 +163,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AccountHosting<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -180,7 +183,6 @@ pub struct AccountHosting<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AccountHostingStatus<S: BosStr = DefaultStr> {
@@ -266,9 +268,7 @@ where
             AccountHostingStatus::Deleted => AccountHostingStatus::Deleted,
             AccountHostingStatus::Deactivated => AccountHostingStatus::Deactivated,
             AccountHostingStatus::Unknown => AccountHostingStatus::Unknown,
-            AccountHostingStatus::Other(v) => {
-                AccountHostingStatus::Other(v.into_static())
-            }
+            AccountHostingStatus::Other(v) => AccountHostingStatus::Other(v.into_static()),
         }
     }
 }
@@ -276,7 +276,10 @@ where
 /// Statistics about a particular account subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AccountStats<S: BosStr = DefaultStr> {
     ///Total number of appeals against a moderation action on the account
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -300,7 +303,10 @@ pub struct AccountStats<S: BosStr = DefaultStr> {
 /// Strike information for an account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AccountStrike<S: BosStr = DefaultStr> {
     ///Current number of active strikes (excluding expired strikes)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -321,7 +327,10 @@ pub struct AccountStrike<S: BosStr = DefaultStr> {
 /// Age assurance info coming directly from users. Only works on DID subjects.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AgeAssuranceEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access: Option<Access<S>>,
@@ -431,9 +440,7 @@ where
             AgeAssuranceEventStatus::Unknown => AgeAssuranceEventStatus::Unknown,
             AgeAssuranceEventStatus::Pending => AgeAssuranceEventStatus::Pending,
             AgeAssuranceEventStatus::Assured => AgeAssuranceEventStatus::Assured,
-            AgeAssuranceEventStatus::Other(v) => {
-                AgeAssuranceEventStatus::Other(v.into_static())
-            }
+            AgeAssuranceEventStatus::Other(v) => AgeAssuranceEventStatus::Other(v.into_static()),
         }
     }
 }
@@ -441,7 +448,10 @@ where
 /// Age assurance status override by moderators. Only works on DID subjects.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AgeAssuranceOverrideEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access: Option<Access<S>>,
@@ -504,8 +514,7 @@ impl<S: BosStr> Serialize for AgeAssuranceOverrideEventStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for AgeAssuranceOverrideEventStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AgeAssuranceOverrideEventStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -529,15 +538,9 @@ where
     type Output = AgeAssuranceOverrideEventStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            AgeAssuranceOverrideEventStatus::Assured => {
-                AgeAssuranceOverrideEventStatus::Assured
-            }
-            AgeAssuranceOverrideEventStatus::Reset => {
-                AgeAssuranceOverrideEventStatus::Reset
-            }
-            AgeAssuranceOverrideEventStatus::Blocked => {
-                AgeAssuranceOverrideEventStatus::Blocked
-            }
+            AgeAssuranceOverrideEventStatus::Assured => AgeAssuranceOverrideEventStatus::Assured,
+            AgeAssuranceOverrideEventStatus::Reset => AgeAssuranceOverrideEventStatus::Reset,
+            AgeAssuranceOverrideEventStatus::Blocked => AgeAssuranceOverrideEventStatus::Blocked,
             AgeAssuranceOverrideEventStatus::Other(v) => {
                 AgeAssuranceOverrideEventStatus::Other(v.into_static())
             }
@@ -548,7 +551,10 @@ where
 /// Purges all age assurance events for the subject. Only works on DID subjects. Moderator-only.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AgeAssurancePurgeEvent<S: BosStr = DefaultStr> {
     ///Comment describing the reason for the purge.
     pub comment: S,
@@ -556,9 +562,11 @@ pub struct AgeAssurancePurgeEvent<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BlobView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub created_at: Datetime,
@@ -571,7 +579,6 @@ pub struct BlobView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -586,7 +593,10 @@ pub enum BlobViewDetails<S: BosStr = DefaultStr> {
 /// Logs cancellation of a scheduled takedown action for an account.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CancelScheduledTakedownEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -594,9 +604,11 @@ pub struct CancelScheduledTakedownEvent<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ConvoView<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub did: Did<S>,
@@ -607,7 +619,10 @@ pub struct ConvoView<S: BosStr = DefaultStr> {
 /// Logs identity related events on a repo subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct IdentityEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -622,9 +637,11 @@ pub struct IdentityEvent<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ImageDetails<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -632,9 +649,11 @@ pub struct ImageDetails<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventAcknowledge<S: BosStr = DefaultStr> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -648,7 +667,10 @@ pub struct ModEventAcknowledge<S: BosStr = DefaultStr> {
 /// Add a comment to a subject. An empty comment will clear any previously set sticky comment.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventComment<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -662,7 +684,10 @@ pub struct ModEventComment<S: BosStr = DefaultStr> {
 /// Divert a record's blobs to a 3rd party service for further scanning/tagging
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventDivert<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -673,7 +698,10 @@ pub struct ModEventDivert<S: BosStr = DefaultStr> {
 /// Keep a log of outgoing email to a user
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventEmail<S: BosStr = DefaultStr> {
     ///Additional comment about the outgoing comm.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -702,9 +730,11 @@ pub struct ModEventEmail<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventEscalate<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -715,7 +745,10 @@ pub struct ModEventEscalate<S: BosStr = DefaultStr> {
 /// Apply/Negate labels on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventLabel<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -731,7 +764,10 @@ pub struct ModEventLabel<S: BosStr = DefaultStr> {
 /// Mute incoming reports on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventMute<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -744,7 +780,10 @@ pub struct ModEventMute<S: BosStr = DefaultStr> {
 /// Mute incoming reports from an account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventMuteReporter<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -758,7 +797,10 @@ pub struct ModEventMuteReporter<S: BosStr = DefaultStr> {
 /// Set priority score of the subject. Higher score means higher priority.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventPriorityScore<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -770,7 +812,10 @@ pub struct ModEventPriorityScore<S: BosStr = DefaultStr> {
 /// Report a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventReport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -785,7 +830,10 @@ pub struct ModEventReport<S: BosStr = DefaultStr> {
 /// Resolve appeal on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventResolveAppeal<S: BosStr = DefaultStr> {
     ///Describe resolution.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -797,7 +845,10 @@ pub struct ModEventResolveAppeal<S: BosStr = DefaultStr> {
 /// Revert take down action on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventReverseTakedown<S: BosStr = DefaultStr> {
     ///Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -818,7 +869,10 @@ pub struct ModEventReverseTakedown<S: BosStr = DefaultStr> {
 /// Add/Remove a tag on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventTag<S: BosStr = DefaultStr> {
     ///Tags to be added to the subject. If already exists, won't be duplicated.
     pub add: Vec<S>,
@@ -837,7 +891,10 @@ pub struct ModEventTag<S: BosStr = DefaultStr> {
 /// Take down a subject permanently or temporarily
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventTakedown<S: BosStr = DefaultStr> {
     ///If true, all other reports on content authored by this account will be resolved (acknowledged).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -869,7 +926,10 @@ pub struct ModEventTakedown<S: BosStr = DefaultStr> {
 /// Unmute action on a subject
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventUnmute<S: BosStr = DefaultStr> {
     ///Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -881,7 +941,10 @@ pub struct ModEventUnmute<S: BosStr = DefaultStr> {
 /// Unmute incoming reports from an account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventUnmuteReporter<S: BosStr = DefaultStr> {
     ///Describe reasoning behind the reversal.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -890,9 +953,11 @@ pub struct ModEventUnmuteReporter<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub created_by: Did<S>,
@@ -909,7 +974,6 @@ pub struct ModEventView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -967,7 +1031,6 @@ pub enum ModEventViewEvent<S: BosStr = DefaultStr> {
     CancelScheduledTakedownEvent(Box<moderation::CancelScheduledTakedownEvent<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -982,9 +1045,11 @@ pub enum ModEventViewSubject<S: BosStr = DefaultStr> {
     ConvoRef(Box<ConvoRef<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModEventViewDetail<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub created_by: Did<S>,
@@ -997,7 +1062,6 @@ pub struct ModEventViewDetail<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1055,7 +1119,6 @@ pub enum ModEventViewDetailEvent<S: BosStr = DefaultStr> {
     CancelScheduledTakedownEvent(Box<moderation::CancelScheduledTakedownEvent<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1075,7 +1138,10 @@ pub enum ModEventViewDetailSubject<S: BosStr = DefaultStr> {
 /// Moderation tool information for tracing the source of the action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModTool<S: BosStr = DefaultStr> {
     ///Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1086,9 +1152,11 @@ pub struct ModTool<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Moderation<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_status: Option<moderation::SubjectStatusView<S>>,
@@ -1096,9 +1164,11 @@ pub struct Moderation<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ModerationDetail<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject_status: Option<moderation::SubjectStatusView<S>>,
@@ -1109,7 +1179,10 @@ pub struct ModerationDetail<S: BosStr = DefaultStr> {
 /// Logs lifecycle event on a record subject. Normally captured by automod from the firehose and emitted to ozone for historical tracking.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -1120,7 +1193,6 @@ pub struct RecordEvent<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RecordEventOp<S: BosStr = DefaultStr> {
@@ -1203,9 +1275,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordHosting<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -1217,7 +1291,6 @@ pub struct RecordHosting<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RecordHostingStatus<S: BosStr = DefaultStr> {
@@ -1296,9 +1369,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordView<S: BosStr = DefaultStr> {
     pub blob_cids: Vec<Cid<S>>,
     pub cid: Cid<S>,
@@ -1311,9 +1386,11 @@ pub struct RecordView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordViewDetail<S: BosStr = DefaultStr> {
     pub blobs: Vec<moderation::BlobView<S>>,
     pub cid: Cid<S>,
@@ -1328,9 +1405,11 @@ pub struct RecordViewDetail<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordViewNotFound<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -1340,7 +1419,10 @@ pub struct RecordViewNotFound<S: BosStr = DefaultStr> {
 /// Statistics about a set of record subject items
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordsStats<S: BosStr = DefaultStr> {
     ///Number of items that were appealed at least once
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1370,9 +1452,11 @@ pub struct RecordsStats<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RepoView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deactivated_at: Option<Datetime>,
@@ -1395,9 +1479,11 @@ pub struct RepoView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RepoViewDetail<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deactivated_at: Option<Datetime>,
@@ -1426,18 +1512,22 @@ pub struct RepoViewDetail<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RepoViewNotFound<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReporterStats<S: BosStr = DefaultStr> {
     ///The total number of reports made by the user on accounts.
     pub account_report_count: i64,
@@ -1503,7 +1593,10 @@ impl core::fmt::Display for ReviewOpen {
 /// Account credentials revocation by moderators. Only works on DID subjects.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RevokeAccountCredentialsEvent<S: BosStr = DefaultStr> {
     ///Comment describing the reason for the revocation.
     pub comment: S,
@@ -1514,7 +1607,10 @@ pub struct RevokeAccountCredentialsEvent<S: BosStr = DefaultStr> {
 /// Logs a scheduled takedown action for an account.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ScheduleTakedownEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -1531,7 +1627,10 @@ pub struct ScheduleTakedownEvent<S: BosStr = DefaultStr> {
 /// View of a scheduled moderation action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ScheduledActionView<S: BosStr = DefaultStr> {
     ///Type of action to be executed
     pub action: ScheduledActionViewAction<S>,
@@ -1621,8 +1720,7 @@ impl<S: BosStr> Serialize for ScheduledActionViewAction<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ScheduledActionViewAction<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ScheduledActionViewAction<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1708,8 +1806,7 @@ impl<S: BosStr> Serialize for ScheduledActionViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ScheduledActionViewStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ScheduledActionViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1744,7 +1841,6 @@ where
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SubjectReviewState<S: BosStr = DefaultStr> {
     ToolsOzoneModerationDefsReviewOpen,
@@ -1757,36 +1853,28 @@ pub enum SubjectReviewState<S: BosStr = DefaultStr> {
 impl<S: BosStr> SubjectReviewState<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::ToolsOzoneModerationDefsReviewOpen => {
-                "tools.ozone.moderation.defs#reviewOpen"
-            }
+            Self::ToolsOzoneModerationDefsReviewOpen => "tools.ozone.moderation.defs#reviewOpen",
             Self::ToolsOzoneModerationDefsReviewEscalated => {
                 "tools.ozone.moderation.defs#reviewEscalated"
             }
             Self::ToolsOzoneModerationDefsReviewClosed => {
                 "tools.ozone.moderation.defs#reviewClosed"
             }
-            Self::ToolsOzoneModerationDefsReviewNone => {
-                "tools.ozone.moderation.defs#reviewNone"
-            }
+            Self::ToolsOzoneModerationDefsReviewNone => "tools.ozone.moderation.defs#reviewNone",
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "tools.ozone.moderation.defs#reviewOpen" => {
-                Self::ToolsOzoneModerationDefsReviewOpen
-            }
+            "tools.ozone.moderation.defs#reviewOpen" => Self::ToolsOzoneModerationDefsReviewOpen,
             "tools.ozone.moderation.defs#reviewEscalated" => {
                 Self::ToolsOzoneModerationDefsReviewEscalated
             }
             "tools.ozone.moderation.defs#reviewClosed" => {
                 Self::ToolsOzoneModerationDefsReviewClosed
             }
-            "tools.ozone.moderation.defs#reviewNone" => {
-                Self::ToolsOzoneModerationDefsReviewNone
-            }
+            "tools.ozone.moderation.defs#reviewNone" => Self::ToolsOzoneModerationDefsReviewNone,
             _ => Self::Other(s),
         }
     }
@@ -1848,9 +1936,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SubjectStatusView<S: BosStr = DefaultStr> {
     ///Statistics related to the account subject
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1969,8 +2059,7 @@ impl<S: BosStr> Serialize for SubjectStatusViewAgeAssuranceState<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for SubjectStatusViewAgeAssuranceState<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SubjectStatusViewAgeAssuranceState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -2003,9 +2092,7 @@ where
             SubjectStatusViewAgeAssuranceState::Unknown => {
                 SubjectStatusViewAgeAssuranceState::Unknown
             }
-            SubjectStatusViewAgeAssuranceState::Reset => {
-                SubjectStatusViewAgeAssuranceState::Reset
-            }
+            SubjectStatusViewAgeAssuranceState::Reset => SubjectStatusViewAgeAssuranceState::Reset,
             SubjectStatusViewAgeAssuranceState::Blocked => {
                 SubjectStatusViewAgeAssuranceState::Blocked
             }
@@ -2065,7 +2152,8 @@ impl<S: BosStr> Serialize for SubjectStatusViewAgeAssuranceUpdatedBy<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for SubjectStatusViewAgeAssuranceUpdatedBy<S> {
+    for SubjectStatusViewAgeAssuranceUpdatedBy<S>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -2102,7 +2190,6 @@ where
     }
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2112,7 +2199,6 @@ pub enum SubjectStatusViewHosting<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.moderation.defs#recordHosting")]
     RecordHosting(Box<moderation::RecordHosting<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2131,7 +2217,10 @@ pub enum SubjectStatusViewSubject<S: BosStr = DefaultStr> {
 /// Detailed view of a subject. For record subjects, the author's repo and profile will be returned.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SubjectView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile: Option<Data<S>>,
@@ -2177,9 +2266,11 @@ impl core::fmt::Display for TimelineEventPlcTombstone {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct VideoDetails<S: BosStr = DefaultStr> {
     pub height: i64,
     pub length: i64,
@@ -3026,7 +3117,7 @@ impl<S: BosStr> LexiconSchema for VideoDetails<S> {
 
 pub mod account_event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3071,7 +3162,12 @@ pub mod account_event_state {
 /// Builder for constructing an instance of this type.
 pub struct AccountEventBuilder<St: account_event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<bool>, Option<S>, Option<AccountEventStatus<S>>, Option<Datetime>),
+    _fields: (
+        Option<bool>,
+        Option<S>,
+        Option<AccountEventStatus<S>>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -3192,10 +3288,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AccountEvent<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AccountEvent<S> {
         AccountEvent {
             active: self._fields.0.unwrap(),
             comment: self._fields.1,
@@ -3207,10 +3300,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.moderation.defs"),
@@ -3296,7 +3389,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),
@@ -3313,11 +3408,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("accountStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Statistics about a particular account subject",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Statistics about a particular account subject",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3359,9 +3452,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("accountStrike"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Strike information for an account"),
-                    ),
+                    description: Some(CowStr::new_static("Strike information for an account")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3374,9 +3465,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("firstStrikeAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Timestamp of the first strike received"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp of the first strike received",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -3384,11 +3475,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lastStrikeAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Timestamp of the most recent strike received",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp of the most recent strike received",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -3621,12 +3710,12 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blobView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("cid"), SmolStr::new_static("mimeType"),
-                            SmolStr::new_static("size"), SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("mimeType"),
+                        SmolStr::new_static("size"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3649,14 +3738,16 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#imageDetails"),
-                                    CowStr::new_static("#videoDetails")
+                                    CowStr::new_static("#videoDetails"),
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("mimeType"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("moderation"),
@@ -3679,17 +3770,17 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cancelScheduledTakedownEvent"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Logs cancellation of a scheduled takedown action for an account.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Logs cancellation of a scheduled takedown action for an account.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3699,15 +3790,18 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("convoView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("convoId")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("convoId"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -3772,9 +3866,10 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("imageDetails"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3809,7 +3904,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3968,7 +4065,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3978,21 +4077,19 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("modEventLabel"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Apply/Negate labels on a subject"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("createLabelVals"),
-                            SmolStr::new_static("negateLabelVals")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Apply/Negate labels on a subject")),
+                    required: Some(vec![
+                        SmolStr::new_static("createLabelVals"),
+                        SmolStr::new_static("negateLabelVals"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("createLabelVals"),
@@ -4026,16 +4123,16 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("modEventMute"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Mute incoming reports on a subject"),
-                    ),
+                    description: Some(CowStr::new_static("Mute incoming reports on a subject")),
                     required: Some(vec![SmolStr::new_static("durationInHours")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("durationInHours"),
@@ -4051,15 +4148,15 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("modEventMuteReporter"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Mute incoming reports from an account"),
-                    ),
+                    description: Some(CowStr::new_static("Mute incoming reports from an account")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("durationInHours"),
@@ -4075,18 +4172,18 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("modEventPriorityScore"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Set priority score of the subject. Higher score means higher priority.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Set priority score of the subject. Higher score means higher priority.",
+                    )),
                     required: Some(vec![SmolStr::new_static("score")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("score"),
@@ -4111,7 +4208,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("isReporterMuted"),
@@ -4122,9 +4221,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("reportType"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "com.atproto.moderation.defs#reasonType",
-                                ),
+                                r#ref: CowStr::new_static("com.atproto.moderation.defs#reasonType"),
                                 ..Default::default()
                             }),
                         );
@@ -4143,9 +4240,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("comment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Describe resolution."),
-                                ),
+                                description: Some(CowStr::new_static("Describe resolution.")),
                                 ..Default::default()
                             }),
                         );
@@ -4373,11 +4468,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("comment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Describe reasoning behind the reversal.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Describe reasoning behind the reversal.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -4389,20 +4482,18 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("modEventUnmuteReporter"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Unmute incoming reports from an account"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Unmute incoming reports from an account",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Describe reasoning behind the reversal.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Describe reasoning behind the reversal.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -4414,15 +4505,14 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("modEventView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("event"),
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("subjectBlobCids"),
-                            SmolStr::new_static("createdBy"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("event"),
+                        SmolStr::new_static("subject"),
+                        SmolStr::new_static("subjectBlobCids"),
+                        SmolStr::new_static("createdBy"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4442,7 +4532,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("creatorHandle"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("event"),
@@ -4472,7 +4564,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                                     CowStr::new_static("#ageAssurancePurgeEvent"),
                                     CowStr::new_static("#revokeAccountCredentialsEvent"),
                                     CowStr::new_static("#scheduleTakedownEvent"),
-                                    CowStr::new_static("#cancelScheduledTakedownEvent")
+                                    CowStr::new_static("#cancelScheduledTakedownEvent"),
                                 ],
                                 ..Default::default()
                             }),
@@ -4497,7 +4589,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                                     CowStr::new_static("com.atproto.admin.defs#repoRef"),
                                     CowStr::new_static("com.atproto.repo.strongRef"),
                                     CowStr::new_static("chat.bsky.convo.defs#messageRef"),
-                                    CowStr::new_static("chat.bsky.convo.defs#convoRef")
+                                    CowStr::new_static("chat.bsky.convo.defs#convoRef"),
                                 ],
                                 ..Default::default()
                             }),
@@ -4513,7 +4605,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("subjectHandle"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -4523,15 +4617,14 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("modEventViewDetail"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("event"),
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("subjectBlobs"),
-                            SmolStr::new_static("createdBy"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("event"),
+                        SmolStr::new_static("subject"),
+                        SmolStr::new_static("subjectBlobs"),
+                        SmolStr::new_static("createdBy"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4577,7 +4670,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                                     CowStr::new_static("#ageAssurancePurgeEvent"),
                                     CowStr::new_static("#revokeAccountCredentialsEvent"),
                                     CowStr::new_static("#scheduleTakedownEvent"),
-                                    CowStr::new_static("#cancelScheduledTakedownEvent")
+                                    CowStr::new_static("#cancelScheduledTakedownEvent"),
                                 ],
                                 ..Default::default()
                             }),
@@ -4603,7 +4696,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                                     CowStr::new_static("#repoViewNotFound"),
                                     CowStr::new_static("#recordView"),
                                     CowStr::new_static("#recordViewNotFound"),
-                                    CowStr::new_static("#convoView")
+                                    CowStr::new_static("#convoView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -4757,7 +4850,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),
@@ -4774,16 +4869,15 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("value"),
-                            SmolStr::new_static("blobCids"),
-                            SmolStr::new_static("indexedAt"),
-                            SmolStr::new_static("moderation"),
-                            SmolStr::new_static("repo")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("blobCids"),
+                        SmolStr::new_static("indexedAt"),
+                        SmolStr::new_static("moderation"),
+                        SmolStr::new_static("repo"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4846,15 +4940,15 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordViewDetail"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("value"), SmolStr::new_static("blobs"),
-                            SmolStr::new_static("indexedAt"),
-                            SmolStr::new_static("moderation"),
-                            SmolStr::new_static("repo")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("blobs"),
+                        SmolStr::new_static("indexedAt"),
+                        SmolStr::new_static("moderation"),
+                        SmolStr::new_static("repo"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4946,11 +5040,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordsStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Statistics about a set of record subject items",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Statistics about a set of record subject items",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5010,14 +5102,13 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("repoView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"), SmolStr::new_static("handle"),
-                            SmolStr::new_static("relatedRecords"),
-                            SmolStr::new_static("indexedAt"),
-                            SmolStr::new_static("moderation")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                        SmolStr::new_static("relatedRecords"),
+                        SmolStr::new_static("indexedAt"),
+                        SmolStr::new_static("moderation"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5037,7 +5128,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("email"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
@@ -5055,14 +5148,14 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("inviteNote"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("invitedBy"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "com.atproto.server.defs#inviteCode",
-                                ),
+                                r#ref: CowStr::new_static("com.atproto.server.defs#inviteCode"),
                                 ..Default::default()
                             }),
                         );
@@ -5108,14 +5201,13 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("repoViewDetail"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"), SmolStr::new_static("handle"),
-                            SmolStr::new_static("relatedRecords"),
-                            SmolStr::new_static("indexedAt"),
-                            SmolStr::new_static("moderation")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                        SmolStr::new_static("relatedRecords"),
+                        SmolStr::new_static("indexedAt"),
+                        SmolStr::new_static("moderation"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5135,7 +5227,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("email"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("emailConfirmedAt"),
@@ -5160,14 +5254,14 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("inviteNote"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("invitedBy"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "com.atproto.server.defs#inviteCode",
-                                ),
+                                r#ref: CowStr::new_static("com.atproto.server.defs#inviteCode"),
                                 ..Default::default()
                             }),
                         );
@@ -5175,9 +5269,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                             SmolStr::new_static("invites"),
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "com.atproto.server.defs#inviteCode",
-                                    ),
+                                    r#ref: CowStr::new_static("com.atproto.server.defs#inviteCode"),
                                     ..Default::default()
                                 }),
                                 ..Default::default()
@@ -5254,19 +5346,17 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reporterStats"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("did"),
-                            SmolStr::new_static("accountReportCount"),
-                            SmolStr::new_static("recordReportCount"),
-                            SmolStr::new_static("reportedAccountCount"),
-                            SmolStr::new_static("reportedRecordCount"),
-                            SmolStr::new_static("takendownAccountCount"),
-                            SmolStr::new_static("takendownRecordCount"),
-                            SmolStr::new_static("labeledAccountCount"),
-                            SmolStr::new_static("labeledRecordCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("accountReportCount"),
+                        SmolStr::new_static("recordReportCount"),
+                        SmolStr::new_static("reportedAccountCount"),
+                        SmolStr::new_static("reportedRecordCount"),
+                        SmolStr::new_static("takendownAccountCount"),
+                        SmolStr::new_static("takendownRecordCount"),
+                        SmolStr::new_static("labeledAccountCount"),
+                        SmolStr::new_static("labeledRecordCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5332,28 +5422,34 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("reviewClosed"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("reviewEscalated"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("reviewNone"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("reviewOpen"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("revokeAccountCredentialsEvent"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Account credentials revocation by moderators. Only works on DID subjects.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Account credentials revocation by moderators. Only works on DID subjects.",
+                    )),
                     required: Some(vec![SmolStr::new_static("comment")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -5361,11 +5457,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("comment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Comment describing the reason for the revocation.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Comment describing the reason for the revocation.",
+                                )),
                                 min_length: Some(1usize),
                                 ..Default::default()
                             }),
@@ -5378,17 +5472,17 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("scheduleTakedownEvent"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Logs a scheduled takedown action for an account.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Logs a scheduled takedown action for an account.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("executeAfter"),
@@ -5581,7 +5675,9 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("subjectReviewState"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("subjectStatusView"),
@@ -5872,25 +5968,30 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("timelineEventPlcCreate"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("timelineEventPlcOperation"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("timelineEventPlcTombstone"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("videoDetails"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("width"), SmolStr::new_static("height"),
-                            SmolStr::new_static("length")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("width"),
+                        SmolStr::new_static("height"),
+                        SmolStr::new_static("length"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5925,7 +6026,7 @@ fn lexicon_doc_tools_ozone_moderation_defs() -> LexiconDoc<'static> {
 
 pub mod age_assurance_event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5982,10 +6083,7 @@ pub mod age_assurance_event_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AgeAssuranceEventBuilder<
-    St: age_assurance_event_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AgeAssuranceEventBuilder<St: age_assurance_event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Access<S>>,
@@ -6004,10 +6102,7 @@ pub struct AgeAssuranceEventBuilder<
 
 impl AgeAssuranceEvent<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> AgeAssuranceEventBuilder<
-        age_assurance_event_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> AgeAssuranceEventBuilder<age_assurance_event_state::Empty, DefaultStr> {
         AgeAssuranceEventBuilder::new()
     }
 }
@@ -6213,10 +6308,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AgeAssuranceEvent<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AgeAssuranceEvent<S> {
         AgeAssuranceEvent {
             access: self._fields.0,
             attempt_id: self._fields.1.unwrap(),
@@ -6235,7 +6327,7 @@ where
 
 pub mod blob_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6429,10 +6521,7 @@ where
 
 impl<St: blob_view_state::State, S: BosStr> BlobViewBuilder<St, S> {
     /// Set the `moderation` field (optional)
-    pub fn moderation(
-        mut self,
-        value: impl Into<Option<moderation::Moderation<S>>>,
-    ) -> Self {
+    pub fn moderation(mut self, value: impl Into<Option<moderation::Moderation<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -6498,7 +6587,7 @@ where
 
 pub mod convo_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6636,10 +6725,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ConvoView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ConvoView<S> {
         ConvoView {
             convo_id: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -6650,7 +6736,7 @@ where
 
 pub mod identity_event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6681,10 +6767,7 @@ pub mod identity_event_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IdentityEventBuilder<
-    St: identity_event_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct IdentityEventBuilder<St: identity_event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -6820,10 +6903,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> IdentityEvent<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IdentityEvent<S> {
         IdentityEvent {
             comment: self._fields.0,
             handle: self._fields.1,
@@ -6837,7 +6917,7 @@ where
 
 pub mod image_details_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6975,10 +7055,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ImageDetails<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageDetails<S> {
         ImageDetails {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -6989,7 +7066,7 @@ where
 
 pub mod mod_event_label_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7032,10 +7109,7 @@ pub mod mod_event_label_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ModEventLabelBuilder<
-    St: mod_event_label_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ModEventLabelBuilder<St: mod_event_label_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<S>>, Option<i64>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
@@ -7158,10 +7232,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ModEventLabel<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ModEventLabel<S> {
         ModEventLabel {
             comment: self._fields.0,
             create_label_vals: self._fields.1.unwrap(),
@@ -7174,7 +7245,7 @@ where
 
 pub mod mod_event_mute_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7293,10 +7364,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ModEventMute<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ModEventMute<S> {
         ModEventMute {
             comment: self._fields.0,
             duration_in_hours: self._fields.1.unwrap(),
@@ -7307,7 +7375,7 @@ where
 
 pub mod mod_event_priority_score_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7349,20 +7417,15 @@ pub struct ModEventPriorityScoreBuilder<
 
 impl ModEventPriorityScore<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ModEventPriorityScoreBuilder<
-        mod_event_priority_score_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ModEventPriorityScoreBuilder<mod_event_priority_score_state::Empty, DefaultStr>
+    {
         ModEventPriorityScoreBuilder::new()
     }
 }
 
 impl<S: BosStr> ModEventPriorityScore<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ModEventPriorityScoreBuilder<
-        mod_event_priority_score_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ModEventPriorityScoreBuilder<mod_event_priority_score_state::Empty, S> {
         ModEventPriorityScoreBuilder::builder()
     }
 }
@@ -7389,10 +7452,7 @@ impl<S: BosStr> ModEventPriorityScoreBuilder<mod_event_priority_score_state::Emp
     }
 }
 
-impl<
-    St: mod_event_priority_score_state::State,
-    S: BosStr,
-> ModEventPriorityScoreBuilder<St, S> {
+impl<St: mod_event_priority_score_state::State, S: BosStr> ModEventPriorityScoreBuilder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -7452,7 +7512,7 @@ where
 
 pub mod mod_event_report_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7483,10 +7543,7 @@ pub mod mod_event_report_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ModEventReportBuilder<
-    St: mod_event_report_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ModEventReportBuilder<St: mod_event_report_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<bool>, Option<ReasonType<S>>),
     _type: PhantomData<fn() -> S>,
@@ -7588,10 +7645,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ModEventReport<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ModEventReport<S> {
         ModEventReport {
             comment: self._fields.0,
             is_reporter_muted: self._fields.1,
@@ -7603,7 +7657,7 @@ where
 
 pub mod mod_event_tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7769,10 +7823,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ModEventTag<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ModEventTag<S> {
         ModEventTag {
             add: self._fields.0.unwrap(),
             comment: self._fields.1,
@@ -7785,7 +7836,7 @@ where
 
 pub mod mod_event_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8127,10 +8178,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ModEventView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ModEventView<S> {
         ModEventView {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1.unwrap(),
@@ -8148,7 +8196,7 @@ where
 
 pub mod mod_event_view_detail_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8259,10 +8307,8 @@ pub mod mod_event_view_detail_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ModEventViewDetailBuilder<
-    St: mod_event_view_detail_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ModEventViewDetailBuilder<St: mod_event_view_detail_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -8278,20 +8324,14 @@ pub struct ModEventViewDetailBuilder<
 
 impl ModEventViewDetail<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ModEventViewDetailBuilder<
-        mod_event_view_detail_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ModEventViewDetailBuilder<mod_event_view_detail_state::Empty, DefaultStr> {
         ModEventViewDetailBuilder::new()
     }
 }
 
 impl<S: BosStr> ModEventViewDetail<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ModEventViewDetailBuilder<
-        mod_event_view_detail_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ModEventViewDetailBuilder<mod_event_view_detail_state::Empty, S> {
         ModEventViewDetailBuilder::builder()
     }
 }
@@ -8394,10 +8434,7 @@ where
     }
 }
 
-impl<
-    St: mod_event_view_detail_state::State,
-    S: BosStr,
-> ModEventViewDetailBuilder<St, S> {
+impl<St: mod_event_view_detail_state::State, S: BosStr> ModEventViewDetailBuilder<St, S> {
     /// Set the `modTool` field (optional)
     pub fn mod_tool(mut self, value: impl Into<Option<moderation::ModTool<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -8472,10 +8509,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ModEventViewDetail<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ModEventViewDetail<S> {
         ModEventViewDetail {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1.unwrap(),
@@ -8491,7 +8525,7 @@ where
 
 pub mod record_event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8536,7 +8570,12 @@ pub mod record_event_state {
 /// Builder for constructing an instance of this type.
 pub struct RecordEventBuilder<St: record_event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Cid<S>>, Option<S>, Option<RecordEventOp<S>>, Option<Datetime>),
+    _fields: (
+        Option<Cid<S>>,
+        Option<S>,
+        Option<RecordEventOp<S>>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -8657,10 +8696,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecordEvent<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordEvent<S> {
         RecordEvent {
             cid: self._fields.0,
             comment: self._fields.1,
@@ -8673,7 +8709,7 @@ where
 
 pub mod record_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9014,10 +9050,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecordView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordView<S> {
         RecordView {
             blob_cids: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -9033,7 +9066,7 @@ where
 
 pub mod record_view_detail_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9166,10 +9199,7 @@ pub mod record_view_detail_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordViewDetailBuilder<
-    St: record_view_detail_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RecordViewDetailBuilder<St: record_view_detail_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<moderation::BlobView<S>>>,
@@ -9186,10 +9216,7 @@ pub struct RecordViewDetailBuilder<
 
 impl RecordViewDetail<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RecordViewDetailBuilder<
-        record_view_detail_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> RecordViewDetailBuilder<record_view_detail_state::Empty, DefaultStr> {
         RecordViewDetailBuilder::new()
     }
 }
@@ -9395,10 +9422,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecordViewDetail<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordViewDetail<S> {
         RecordViewDetail {
             blobs: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -9415,7 +9439,7 @@ where
 
 pub mod record_view_not_found_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9446,10 +9470,8 @@ pub mod record_view_not_found_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordViewNotFoundBuilder<
-    St: record_view_not_found_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RecordViewNotFoundBuilder<St: record_view_not_found_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -9457,20 +9479,14 @@ pub struct RecordViewNotFoundBuilder<
 
 impl RecordViewNotFound<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RecordViewNotFoundBuilder<
-        record_view_not_found_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> RecordViewNotFoundBuilder<record_view_not_found_state::Empty, DefaultStr> {
         RecordViewNotFoundBuilder::new()
     }
 }
 
 impl<S: BosStr> RecordViewNotFound<S> {
     /// Create a new builder for this type
-    pub fn builder() -> RecordViewNotFoundBuilder<
-        record_view_not_found_state::Empty,
-        S,
-    > {
+    pub fn builder() -> RecordViewNotFoundBuilder<record_view_not_found_state::Empty, S> {
         RecordViewNotFoundBuilder::builder()
     }
 }
@@ -9529,10 +9545,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecordViewNotFound<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordViewNotFound<S> {
         RecordViewNotFound {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -9542,7 +9555,7 @@ where
 
 pub mod repo_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9670,7 +9683,9 @@ impl RepoViewBuilder<repo_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         RepoViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -9681,7 +9696,9 @@ impl<S: BosStr> RepoViewBuilder<repo_view_state::Empty, S> {
     pub fn builder() -> Self {
         RepoViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -9849,18 +9866,12 @@ where
 
 impl<St: repo_view_state::State, S: BosStr> RepoViewBuilder<St, S> {
     /// Set the `threatSignatures` field (optional)
-    pub fn threat_signatures(
-        mut self,
-        value: impl Into<Option<Vec<ThreatSignature<S>>>>,
-    ) -> Self {
+    pub fn threat_signatures(mut self, value: impl Into<Option<Vec<ThreatSignature<S>>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `threatSignatures` field to an Option value (optional)
-    pub fn maybe_threat_signatures(
-        mut self,
-        value: Option<Vec<ThreatSignature<S>>>,
-    ) -> Self {
+    pub fn maybe_threat_signatures(mut self, value: Option<Vec<ThreatSignature<S>>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -9913,7 +9924,7 @@ where
 
 pub mod repo_view_detail_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10004,10 +10015,7 @@ pub mod repo_view_detail_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RepoViewDetailBuilder<
-    St: repo_view_detail_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RepoViewDetailBuilder<St: repo_view_detail_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -10048,20 +10056,7 @@ impl RepoViewDetailBuilder<repo_view_detail_state::Empty, DefaultStr> {
         RepoViewDetailBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -10074,20 +10069,7 @@ impl<S: BosStr> RepoViewDetailBuilder<repo_view_detail_state::Empty, S> {
         RepoViewDetailBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -10295,18 +10277,12 @@ where
 
 impl<St: repo_view_detail_state::State, S: BosStr> RepoViewDetailBuilder<St, S> {
     /// Set the `threatSignatures` field (optional)
-    pub fn threat_signatures(
-        mut self,
-        value: impl Into<Option<Vec<ThreatSignature<S>>>>,
-    ) -> Self {
+    pub fn threat_signatures(mut self, value: impl Into<Option<Vec<ThreatSignature<S>>>>) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `threatSignatures` field to an Option value (optional)
-    pub fn maybe_threat_signatures(
-        mut self,
-        value: Option<Vec<ThreatSignature<S>>>,
-    ) -> Self {
+    pub fn maybe_threat_signatures(mut self, value: Option<Vec<ThreatSignature<S>>>) -> Self {
         self._fields.13 = value;
         self
     }
@@ -10342,10 +10318,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RepoViewDetail<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RepoViewDetail<S> {
         RepoViewDetail {
             deactivated_at: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -10368,7 +10341,7 @@ where
 
 pub mod repo_view_not_found_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10399,10 +10372,7 @@ pub mod repo_view_not_found_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RepoViewNotFoundBuilder<
-    St: repo_view_not_found_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RepoViewNotFoundBuilder<St: repo_view_not_found_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -10410,10 +10380,7 @@ pub struct RepoViewNotFoundBuilder<
 
 impl RepoViewNotFound<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RepoViewNotFoundBuilder<
-        repo_view_not_found_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> RepoViewNotFoundBuilder<repo_view_not_found_state::Empty, DefaultStr> {
         RepoViewNotFoundBuilder::new()
     }
 }
@@ -10479,10 +10446,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RepoViewNotFound<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RepoViewNotFound<S> {
         RepoViewNotFound {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -10492,7 +10456,7 @@ where
 
 pub mod reporter_stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10675,10 +10639,7 @@ pub mod reporter_stats_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReporterStatsBuilder<
-    St: reporter_stats_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ReporterStatsBuilder<St: reporter_stats_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -10930,10 +10891,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReporterStats<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReporterStats<S> {
         ReporterStats {
             account_report_count: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -10951,7 +10909,7 @@ where
 
 pub mod scheduled_action_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11089,20 +11047,14 @@ pub struct ScheduledActionViewBuilder<
 
 impl ScheduledActionView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ScheduledActionViewBuilder<
-        scheduled_action_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ScheduledActionViewBuilder<scheduled_action_view_state::Empty, DefaultStr> {
         ScheduledActionViewBuilder::new()
     }
 }
 
 impl<S: BosStr> ScheduledActionView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ScheduledActionViewBuilder<
-        scheduled_action_view_state::Empty,
-        S,
-    > {
+    pub fn builder() -> ScheduledActionViewBuilder<scheduled_action_view_state::Empty, S> {
         ScheduledActionViewBuilder::builder()
     }
 }
@@ -11113,20 +11065,7 @@ impl ScheduledActionViewBuilder<scheduled_action_view_state::Empty, DefaultStr> 
         ScheduledActionViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -11140,20 +11079,7 @@ impl<S: BosStr> ScheduledActionViewBuilder<scheduled_action_view_state::Empty, S
         ScheduledActionViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
                 None,
             ),
             _type: PhantomData,
@@ -11237,10 +11163,7 @@ where
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `eventData` field (optional)
     pub fn event_data(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -11253,10 +11176,7 @@ impl<
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `executeAfter` field (optional)
     pub fn execute_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -11269,10 +11189,7 @@ impl<
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `executeAt` field (optional)
     pub fn execute_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -11285,10 +11202,7 @@ impl<
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `executeUntil` field (optional)
     pub fn execute_until(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -11301,10 +11215,7 @@ impl<
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `executionEventId` field (optional)
     pub fn execution_event_id(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -11336,10 +11247,7 @@ where
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `lastExecutedAt` field (optional)
     pub fn last_executed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.10 = value.into();
@@ -11352,10 +11260,7 @@ impl<
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `lastFailureReason` field (optional)
     pub fn last_failure_reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -11368,10 +11273,7 @@ impl<
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `randomizeExecution` field (optional)
     pub fn randomize_execution(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.12 = value.into();
@@ -11403,10 +11305,7 @@ where
     }
 }
 
-impl<
-    St: scheduled_action_view_state::State,
-    S: BosStr,
-> ScheduledActionViewBuilder<St, S> {
+impl<St: scheduled_action_view_state::State, S: BosStr> ScheduledActionViewBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.14 = value.into();
@@ -11451,10 +11350,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ScheduledActionView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ScheduledActionView<S> {
         ScheduledActionView {
             action: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -11478,7 +11374,7 @@ where
 
 pub mod subject_status_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11569,10 +11465,7 @@ pub mod subject_status_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubjectStatusViewBuilder<
-    St: subject_status_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct SubjectStatusViewBuilder<St: subject_status_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<moderation::AccountStats<S>>,
@@ -11606,10 +11499,7 @@ pub struct SubjectStatusViewBuilder<
 
 impl SubjectStatusView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SubjectStatusViewBuilder<
-        subject_status_view_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> SubjectStatusViewBuilder<subject_status_view_state::Empty, DefaultStr> {
         SubjectStatusViewBuilder::new()
     }
 }
@@ -11627,31 +11517,8 @@ impl SubjectStatusViewBuilder<subject_status_view_state::Empty, DefaultStr> {
         SubjectStatusViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -11664,31 +11531,8 @@ impl<S: BosStr> SubjectStatusViewBuilder<subject_status_view_state::Empty, S> {
         SubjectStatusViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -11697,18 +11541,12 @@ impl<S: BosStr> SubjectStatusViewBuilder<subject_status_view_state::Empty, S> {
 
 impl<St: subject_status_view_state::State, S: BosStr> SubjectStatusViewBuilder<St, S> {
     /// Set the `accountStats` field (optional)
-    pub fn account_stats(
-        mut self,
-        value: impl Into<Option<moderation::AccountStats<S>>>,
-    ) -> Self {
+    pub fn account_stats(mut self, value: impl Into<Option<moderation::AccountStats<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `accountStats` field to an Option value (optional)
-    pub fn maybe_account_stats(
-        mut self,
-        value: Option<moderation::AccountStats<S>>,
-    ) -> Self {
+    pub fn maybe_account_stats(mut self, value: Option<moderation::AccountStats<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -11724,10 +11562,7 @@ impl<St: subject_status_view_state::State, S: BosStr> SubjectStatusViewBuilder<S
         self
     }
     /// Set the `accountStrike` field to an Option value (optional)
-    pub fn maybe_account_strike(
-        mut self,
-        value: Option<moderation::AccountStrike<S>>,
-    ) -> Self {
+    pub fn maybe_account_strike(mut self, value: Option<moderation::AccountStrike<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -11818,10 +11653,7 @@ where
 
 impl<St: subject_status_view_state::State, S: BosStr> SubjectStatusViewBuilder<St, S> {
     /// Set the `hosting` field (optional)
-    pub fn hosting(
-        mut self,
-        value: impl Into<Option<SubjectStatusViewHosting<S>>>,
-    ) -> Self {
+    pub fn hosting(mut self, value: impl Into<Option<SubjectStatusViewHosting<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -11944,18 +11776,12 @@ impl<St: subject_status_view_state::State, S: BosStr> SubjectStatusViewBuilder<S
 
 impl<St: subject_status_view_state::State, S: BosStr> SubjectStatusViewBuilder<St, S> {
     /// Set the `recordsStats` field (optional)
-    pub fn records_stats(
-        mut self,
-        value: impl Into<Option<moderation::RecordsStats<S>>>,
-    ) -> Self {
+    pub fn records_stats(mut self, value: impl Into<Option<moderation::RecordsStats<S>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `recordsStats` field to an Option value (optional)
-    pub fn maybe_records_stats(
-        mut self,
-        value: Option<moderation::RecordsStats<S>>,
-    ) -> Self {
+    pub fn maybe_records_stats(mut self, value: Option<moderation::RecordsStats<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -12124,10 +11950,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SubjectStatusView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubjectStatusView<S> {
         SubjectStatusView {
             account_stats: self._fields.0,
             account_strike: self._fields.1,
@@ -12161,7 +11984,7 @@ where
 
 pub mod subject_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -12268,18 +12091,12 @@ impl<St: subject_view_state::State, S: BosStr> SubjectViewBuilder<St, S> {
 
 impl<St: subject_view_state::State, S: BosStr> SubjectViewBuilder<St, S> {
     /// Set the `record` field (optional)
-    pub fn record(
-        mut self,
-        value: impl Into<Option<moderation::RecordViewDetail<S>>>,
-    ) -> Self {
+    pub fn record(mut self, value: impl Into<Option<moderation::RecordViewDetail<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `record` field to an Option value (optional)
-    pub fn maybe_record(
-        mut self,
-        value: Option<moderation::RecordViewDetail<S>>,
-    ) -> Self {
+    pub fn maybe_record(mut self, value: Option<moderation::RecordViewDetail<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -12287,10 +12104,7 @@ impl<St: subject_view_state::State, S: BosStr> SubjectViewBuilder<St, S> {
 
 impl<St: subject_view_state::State, S: BosStr> SubjectViewBuilder<St, S> {
     /// Set the `repo` field (optional)
-    pub fn repo(
-        mut self,
-        value: impl Into<Option<moderation::RepoViewDetail<S>>>,
-    ) -> Self {
+    pub fn repo(mut self, value: impl Into<Option<moderation::RepoViewDetail<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -12303,18 +12117,12 @@ impl<St: subject_view_state::State, S: BosStr> SubjectViewBuilder<St, S> {
 
 impl<St: subject_view_state::State, S: BosStr> SubjectViewBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<moderation::SubjectStatusView<S>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<moderation::SubjectStatusView<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(
-        mut self,
-        value: Option<moderation::SubjectStatusView<S>>,
-    ) -> Self {
+    pub fn maybe_status(mut self, value: Option<moderation::SubjectStatusView<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -12377,10 +12185,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> SubjectView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubjectView<S> {
         SubjectView {
             profile: self._fields.0,
             record: self._fields.1,
@@ -12395,7 +12200,7 @@ where
 
 pub mod video_details_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -12568,10 +12373,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> VideoDetails<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VideoDetails<S> {
         VideoDetails {
             height: self._fields.0.unwrap(),
             length: self._fields.1.unwrap(),
