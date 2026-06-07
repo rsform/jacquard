@@ -331,7 +331,6 @@ mod tests {
                 token_type: OAuthTokenType::DPoP,
                 expires_at: None,
             },
-            #[cfg(feature = "scope-check")]
             resolved_scopes: None,
         }
     }

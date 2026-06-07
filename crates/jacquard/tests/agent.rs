@@ -58,11 +58,13 @@ impl IdentityResolver for MockClient {
         _did: &Did<S>,
     ) -> std::result::Result<DidDocResponse, jacquard::identity::resolver::IdentityError> {
         let doc = serde_json::json!({
+            "@context": ["https://www.w3.org/ns/did/v1"],
             "id": "did:plc:alice",
+            "alsoKnownAs": ["at://alice.bsky.social"],
             "service": [{
-                "id": "#pds",
+                "id": "#atproto_pds",
                 "type": "AtprotoPersonalDataServer",
-                "serviceEndpoint": "https://pds"
+                "serviceEndpoint": "https://pds.example.com"
             }]
         });
         Ok(DidDocResponse {
@@ -113,7 +115,7 @@ async fn agent_delegates_to_session_and_refreshes() {
     let info = agent.info().await.expect("session info");
     assert_eq!(info.0.as_str(), "did:plc:alice");
     assert_eq!(info.1.as_ref().unwrap().as_str(), "session");
-    assert_eq!(agent.endpoint().await.as_str(), "https://pds");
+    assert_eq!(agent.endpoint().await.as_str(), "https://pds.example.com");
 
     // Queue a refresh response and call agent.refresh(); Authorization header must use refresh token
     client

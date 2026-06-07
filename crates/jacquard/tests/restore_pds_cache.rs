@@ -57,11 +57,13 @@ impl IdentityResolver for MockResolver {
     ) -> std::result::Result<DidDocResponse, jacquard::identity::resolver::IdentityError> {
         *self.did_doc_calls.write().await += 1;
         let doc = serde_json::json!({
+            "@context": ["https://www.w3.org/ns/did/v1"],
             "id": "did:plc:alice",
+            "alsoKnownAs": ["at://alice.bsky.social"],
             "service": [{
-                "id": "#pds",
+                "id": "#atproto_pds",
                 "type": "AtprotoPersonalDataServer",
-                "serviceEndpoint": "https://pds-resolved"
+                "serviceEndpoint": "https://pds-resolved.example.com"
             }]
         });
         Ok(DidDocResponse {

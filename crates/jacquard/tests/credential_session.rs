@@ -83,11 +83,13 @@ impl IdentityResolver for MockClient {
         *self.did_doc_calls.write().await += 1;
         assert_eq!(did.as_str(), "did:plc:alice");
         let doc = serde_json::json!({
+            "@context": ["https://www.w3.org/ns/did/v1"],
             "id": "did:plc:alice",
+            "alsoKnownAs": ["at://alice.bsky.social"],
             "service": [{
-                "id": "#pds",
+                "id": "#atproto_pds",
                 "type": "AtprotoPersonalDataServer",
-                "serviceEndpoint": "https://pds"
+                "serviceEndpoint": "https://pds.example.com"
             }]
         });
         Ok(DidDocResponse {
@@ -374,7 +376,7 @@ async fn credential_login_and_auto_refresh() {
         .expect("login ok");
 
     // Endpoint switches to PDS
-    assert_eq!(session.endpoint().await.as_str(), "https://pds");
+    assert_eq!(session.endpoint().await.as_str(), "https://pds.example.com");
 
     // Send a request that will first 401 (ExpiredToken), then refresh, then succeed
     let resp = session

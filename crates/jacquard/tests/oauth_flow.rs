@@ -40,6 +40,19 @@ impl HttpClient for MockClient {
     }
 }
 
+fn alice_did_document_json() -> serde_json::Value {
+    serde_json::json!({
+        "@context": ["https://www.w3.org/ns/did/v1"],
+        "id": "did:plc:alice",
+        "alsoKnownAs": ["at://alice.bsky.social"],
+        "service": [{
+            "id": "#atproto_pds",
+            "type": "AtprotoPersonalDataServer",
+            "serviceEndpoint": "https://pds.example.com"
+        }]
+    })
+}
+
 impl jacquard::identity::resolver::IdentityResolver for MockClient {
     fn options(&self) -> &jacquard::identity::resolver::ResolverOptions {
         use std::sync::LazyLock;
@@ -61,14 +74,7 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
         jacquard::identity::resolver::DidDocResponse,
         jacquard::identity::resolver::IdentityError,
     > {
-        let doc = serde_json::json!({
-            "id": "did:plc:alice",
-            "service": [{
-                "id": "#pds",
-                "type": "AtprotoPersonalDataServer",
-                "serviceEndpoint": "https://pds"
-            }]
-        });
+        let doc = alice_did_document_json();
         Ok(jacquard::identity::resolver::DidDocResponse {
             buffer: Bytes::from(serde_json::to_vec(&doc).unwrap()),
             status: StatusCode::OK,
@@ -97,15 +103,7 @@ impl OAuthResolver for MockClient {
         md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
         md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
 
-        // Simple DID doc pointing to https://pds
-        let doc = serde_json::json!({
-            "id": "did:plc:alice",
-            "service": [{
-                "id": "#pds",
-                "type": "AtprotoPersonalDataServer",
-                "serviceEndpoint": "https://pds"
-            }]
-        });
+        let doc = alice_did_document_json();
         let buf = Bytes::from(serde_json::to_vec(&doc).unwrap());
         let did_doc: jacquard_common::types::did_doc::DidDocument =
             serde_json::from_slice(&buf).unwrap();
@@ -207,7 +205,7 @@ async fn oauth_end_to_end_mock_flow() {
                         "refresh_token": "rt1",
                         "sub": "did:plc:alice",
                         "iss": "https://issuer",
-                        "aud": "https://pds",
+                        "aud": "https://pds.example.com",
                         "scope": "atproto rpc:*",
                         "expires_in": 3600
                     }))

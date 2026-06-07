@@ -68,11 +68,13 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
         jacquard::identity::resolver::IdentityError,
     > {
         let doc = serde_json::json!({
+            "@context": ["https://www.w3.org/ns/did/v1"],
             "id": "did:plc:alice",
+            "alsoKnownAs": ["at://alice.bsky.social"],
             "service": [{
-                "id": "#pds",
+                "id": "#atproto_pds",
                 "type": "AtprotoPersonalDataServer",
-                "serviceEndpoint": "https://pds"
+                "serviceEndpoint": "https://pds.example.com"
             }]
         });
         Ok(jacquard::identity::resolver::DidDocResponse {
@@ -122,7 +124,7 @@ impl OAuthResolver for MockClient {
         _sub: &Did<S>,
     ) -> Result<jacquard::deps::fluent_uri::Uri<String>, jacquard_oauth::resolver::ResolverError>
     {
-        Ok(jacquard::deps::fluent_uri::Uri::parse("https://pds")
+        Ok(jacquard::deps::fluent_uri::Uri::parse("https://pds.example.com")
             .unwrap()
             .to_owned())
     }
@@ -220,7 +222,7 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: SmolStr::from("state"),
-        host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
+        host_url: Uri::parse("https://pds.example.com").expect("valid uri").to_owned(),
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
@@ -233,14 +235,13 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
         token_set: TokenSet {
             iss: SmolStr::from("https://issuer"),
             sub: Did::new_static("did:plc:alice").unwrap(),
-            aud: SmolStr::from("https://pds"),
+            aud: SmolStr::from("https://pds.example.com"),
             scope: None,
             refresh_token: Some(SmolStr::from("rt1")),
             access_token: SmolStr::from("atk1"),
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },
-        #[cfg(feature = "scope-check")]
         resolved_scopes: None,
     }
     .into_static();
@@ -250,7 +251,7 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     let data_store = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: SmolStr::from("state"),
-        host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
+        host_url: Uri::parse("https://pds.example.com").expect("valid uri").to_owned(),
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
@@ -263,14 +264,13 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
         token_set: TokenSet {
             iss: SmolStr::from("https://issuer"),
             sub: Did::new_static("did:plc:alice").unwrap(),
-            aud: SmolStr::from("https://pds"),
+            aud: SmolStr::from("https://pds.example.com"),
             scope: None,
             refresh_token: Some(SmolStr::from("rt1")),
             access_token: SmolStr::from("atk1"),
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },
-        #[cfg(feature = "scope-check")]
         resolved_scopes: None,
     }
     .into_static();
@@ -356,7 +356,7 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: SmolStr::new_static("state"),
-        host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
+        host_url: Uri::parse("https://pds.example.com").expect("valid uri").to_owned(),
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
@@ -369,14 +369,13 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
         token_set: TokenSet {
             iss: SmolStr::from("https://issuer"),
             sub: Did::new_static("did:plc:alice").unwrap(),
-            aud: SmolStr::from("https://pds"),
+            aud: SmolStr::from("https://pds.example.com"),
             scope: None,
             refresh_token: Some(SmolStr::from("rt1")),
             access_token: SmolStr::from("atk1"),
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },
-        #[cfg(feature = "scope-check")]
         resolved_scopes: None,
     }
     .into_static();

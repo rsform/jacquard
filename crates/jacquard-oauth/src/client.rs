@@ -366,7 +366,6 @@ where
                             .unwrap_or_default(),
                     },
                     token_set,
-                    #[cfg(feature = "scope-check")]
                     resolved_scopes: None,
                 })
             }

@@ -19,8 +19,14 @@ path = "src/lib.rs"
 name = "axum_server"
 path = "../../examples/axum_server.rs"
 
+[[example]]
+name = "axum_oauth_sesssion"
+path = "../../examples/axum_oauth_session.rs"
+
 [dependencies]
 axum = "0.8.6"
+axum-extra = { version = "0.10.3", features = ["cookie", "cookie-private"] }
+base64.workspace = true
 bytes.workspace = true
 chrono.workspace = true
 jacquard = { version = "0.12.0-beta.1", path = "../jacquard", default-features = false, features = ["api"] }
@@ -46,9 +52,11 @@ tracing = []
 
 [dev-dependencies]
 axum-macros = "0.5.0"
+jacquard = { version = "0.12.0-beta.1", path = "../jacquard", default-features = false, features = ["api_bluesky"] }
 axum-test = "18.1.0"
-base64.workspace = true
+clap.workspace = true
 chrono.workspace = true
+html-escape = "0.2"
 k256 = { version = "0.13", features = ["ecdsa"] }
 miette = { workspace = true, features = ["fancy"] }
 rand = "0.8"

@@ -56,6 +56,7 @@
 //! [`XrpcEndpoint`].
 
 pub mod did_web;
+pub mod oauth;
 #[cfg(feature = "service-auth")]
 pub mod service_auth;
 

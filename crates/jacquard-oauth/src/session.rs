@@ -88,10 +88,11 @@ pub struct ClientSessionData<S: BosStr = DefaultStr> {
     pub token_set: TokenSet<S>,
 
     /// Fully expanded scopes with include scopes resolved.
-    /// Populated eagerly at session creation when `scope-check` is enabled.
-    /// `None` when `scope-check` is disabled or no include scopes are present.
-    #[cfg(feature = "scope-check")]
-    #[serde(skip)]
+    ///
+    /// This is populated eagerly at session creation when `scope-check` is enabled.
+    /// It is `None` when scope checking is not enabled, when no eager resolution was
+    /// performed, or when reading older persisted sessions that predate this field.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
     pub resolved_scopes: Option<Vec<crate::scopes::Scope<smol_str::SmolStr>>>,
 }
 
@@ -102,7 +103,6 @@ where
     type Output = ClientSessionData<S::Output>;
 
     fn into_static(self) -> Self::Output {
-        #[cfg(feature = "scope-check")]
         let resolved_scopes = self.resolved_scopes;
 
         ClientSessionData {
@@ -117,7 +117,6 @@ where
             account_did: self.account_did.into_static(),
             session_id: self.session_id.into_static(),
             host_url: self.host_url.clone(),
-            #[cfg(feature = "scope-check")]
             resolved_scopes,
         }
     }
@@ -464,7 +463,7 @@ where
     pub fn new(store: S, client: Arc<T>, client_data: ClientData<Str>) -> Self {
         let store = Arc::new(store);
         Self {
-            store: Arc::clone(&store),
+            store,
             client,
             client_data,
             pending: DashMap::new(),

@@ -2,8 +2,9 @@ use crate::jose::jws::RegisteredHeader;
 use crate::jose::jwt::Claims;
 use crate::jose::signing;
 use jose_jwa::{Algorithm, Signing};
-use jose_jwk::{Class, EcCurves, OkpCurves, crypto};
+use jose_jwk::{Class, EcCurves, OkpCurves, Parameters, crypto};
 use jose_jwk::{Jwk, JwkSet, Key};
+use serde::{Deserialize, Serialize};
 use smol_str::{SmolStr, ToSmolStr};
 use std::collections::HashSet;
 use thiserror::Error;
@@ -62,10 +63,34 @@ const PREFERRED_SIGNING_ALGORITHMS: [Signing; 4] = [
 ///
 /// Key selection follows [`PREFERRED_SIGNING_ALGORITHMS`] when multiple keys match.
 /// Supported algorithms: EdDSA (Ed25519), ES256K (secp256k1), ES256 (P-256), ES384 (P-384).
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(try_from = "Vec<Jwk>", into = "Vec<Jwk>")]
 pub struct Keyset(Vec<Jwk>);
 
 impl Keyset {
+    /// Generate a single-key confidential-client keyset for the first supported algorithm.
+    ///
+    /// The generated key includes the supplied `kid` and is validated through the
+    /// same constructor used for externally supplied keys. This is intended for
+    /// server-side OAuth clients that authenticate with `private_key_jwt` and
+    /// serve the public half through their OAuth client metadata.
+    pub fn generate(kid: impl Into<String>, allowed_algos: &[impl AsRef<str>]) -> Result<Self> {
+        let key =
+            crate::utils::generate_key(allowed_algos).ok_or_else(|| Error::NotFound(Vec::new()))?;
+        Self::try_from(vec![Jwk {
+            key,
+            prm: Parameters {
+                kid: Some(kid.into()),
+                ..Default::default()
+            },
+        }])
+    }
+
+    /// Generate a single-key ES256 confidential-client keyset.
+    pub fn generate_es256(kid: impl Into<String>) -> Result<Self> {
+        Self::generate(kid, &["ES256"])
+    }
+
     /// Returns a [`JwkSet`] containing the public halves of all keys in this keyset.
     pub fn public_jwks(&self) -> JwkSet {
         let mut keys = Vec::with_capacity(self.0.len());
@@ -209,6 +234,12 @@ pub fn parse_signing_alg(s: &str) -> Option<Signing> {
         "ES256K" => Some(Signing::Es256K),
         "EdDSA" => Some(Signing::EdDsa),
         _ => None,
+    }
+}
+
+impl From<Keyset> for Vec<Jwk> {
+    fn from(value: Keyset) -> Self {
+        value.0
     }
 }
 
