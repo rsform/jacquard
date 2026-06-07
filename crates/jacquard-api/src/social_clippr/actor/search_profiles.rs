@@ -8,24 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::actor::ProfileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchProfiles<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `25`. Min: 1. Max: 100.
+    /// Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -33,11 +30,9 @@ pub struct SearchProfiles<S: BosStr = DefaultStr> {
     pub q: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchProfilesOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileView<S>>,
     ///A parameter used for pagination
@@ -47,7 +42,9 @@ pub struct SearchProfilesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for social.clippr.actor.searchProfiles
+/** Response marker for the `social.clippr.actor.searchProfiles` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SearchProfilesOutput<S>` for this endpoint.*/
 pub struct SearchProfilesResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchProfilesResponse {
     const NSID: &'static str = "social.clippr.actor.searchProfiles";
@@ -62,7 +59,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchProfiles<S> {
     type Response = SearchProfilesResponse;
 }
 
-/// Endpoint type for social.clippr.actor.searchProfiles
+/** Endpoint marker for the `social.clippr.actor.searchProfiles` query.
+
+Path: `/xrpc/social.clippr.actor.searchProfiles`. The request payload type is `SearchProfiles<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SearchProfilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchProfilesRequest {
     const PATH: &'static str = "/xrpc/social.clippr.actor.searchProfiles";
@@ -77,7 +76,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_profiles_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,7 +94,10 @@ pub mod search_profiles_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchProfilesBuilder<St: search_profiles_state::State, S: BosStr = DefaultStr> {
+pub struct SearchProfilesBuilder<
+    St: search_profiles_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,

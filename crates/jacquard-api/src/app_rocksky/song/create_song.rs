@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::song::SongViewDetailed;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateSong<S: BosStr = DefaultStr> {
     ///The album of the song, if applicable
     pub album: S,
@@ -60,11 +57,9 @@ pub struct CreateSong<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateSongOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: SongViewDetailed<S>,
@@ -72,7 +67,9 @@ pub struct CreateSongOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.song.createSong
+/** Response marker for the `app.rocksky.song.createSong` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CreateSongOutput<S>` for this endpoint.*/
 pub struct CreateSongResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateSongResponse {
     const NSID: &'static str = "app.rocksky.song.createSong";
@@ -83,17 +80,21 @@ impl jacquard_common::xrpc::XrpcResp for CreateSongResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateSong<S> {
     const NSID: &'static str = "app.rocksky.song.createSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateSongResponse;
 }
 
-/// Endpoint type for app.rocksky.song.createSong
+/** Endpoint marker for the `app.rocksky.song.createSong` procedure.
+
+Path: `/xrpc/app.rocksky.song.createSong`. The request payload type is `CreateSong<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CreateSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.createSong";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateSong<S>;
     type Response = CreateSongResponse;
 }

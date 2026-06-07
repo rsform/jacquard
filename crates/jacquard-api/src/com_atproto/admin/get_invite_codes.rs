@@ -8,38 +8,33 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_atproto::server::InviteCode;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::server::InviteCode;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetInviteCodes<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `100`. Min: 1. Max: 500.
+    /// Defaults to `100`. Min: 1. Max: 500.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///Defaults to `"recent"`.
+    /// Defaults to `"recent"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetInviteCodesOutput<S: BosStr = DefaultStr> {
     pub codes: Vec<InviteCode<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,7 +43,9 @@ pub struct GetInviteCodesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.atproto.admin.getInviteCodes
+/** Response marker for the `com.atproto.admin.getInviteCodes` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetInviteCodesOutput<S>` for this endpoint.*/
 pub struct GetInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetInviteCodesResponse {
     const NSID: &'static str = "com.atproto.admin.getInviteCodes";
@@ -63,7 +60,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetInviteCodes<S> {
     type Response = GetInviteCodesResponse;
 }
 
-/// Endpoint type for com.atproto.admin.getInviteCodes
+/** Endpoint marker for the `com.atproto.admin.getInviteCodes` query.
+
+Path: `/xrpc/com.atproto.admin.getInviteCodes`. The request payload type is `GetInviteCodes<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.getInviteCodes";
@@ -82,7 +81,7 @@ fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_invite_codes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,7 +99,10 @@ pub mod get_invite_codes_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetInviteCodesBuilder<St: get_invite_codes_state::State, S: BosStr = DefaultStr> {
+pub struct GetInviteCodesBuilder<
+    St: get_invite_codes_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,

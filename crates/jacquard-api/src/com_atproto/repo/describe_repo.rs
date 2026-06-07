@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Did, Handle, Nsid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DescribeRepo<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DescribeRepoOutput<S: BosStr = DefaultStr> {
     ///List of all the collections (NSIDs) for which this repo contains at least one record.
     pub collections: Vec<Nsid<S>>,
@@ -45,7 +40,9 @@ pub struct DescribeRepoOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.atproto.repo.describeRepo
+/** Response marker for the `com.atproto.repo.describeRepo` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DescribeRepoOutput<S>` for this endpoint.*/
 pub struct DescribeRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeRepoResponse {
     const NSID: &'static str = "com.atproto.repo.describeRepo";
@@ -60,7 +57,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DescribeRepo<S> {
     type Response = DescribeRepoResponse;
 }
 
-/// Endpoint type for com.atproto.repo.describeRepo
+/** Endpoint marker for the `com.atproto.repo.describeRepo` query.
+
+Path: `/xrpc/com.atproto.repo.describeRepo`. The request payload type is `DescribeRepo<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DescribeRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.describeRepo";
@@ -71,7 +70,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
 
 pub mod describe_repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

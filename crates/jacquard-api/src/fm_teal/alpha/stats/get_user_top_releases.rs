@@ -8,40 +8,35 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::fm_teal::alpha::stats::ReleaseView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::stats::ReleaseView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUserTopReleases<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///Defaults to `"30days"`.
+    /// Defaults to `"30days"`.
     #[serde(default = "_default_period")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub period: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUserTopReleasesOutput<S: BosStr = DefaultStr> {
     ///Next page cursor
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,7 +46,9 @@ pub struct GetUserTopReleasesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for fm.teal.alpha.stats.getUserTopReleases
+/** Response marker for the `fm.teal.alpha.stats.getUserTopReleases` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetUserTopReleasesOutput<S>` for this endpoint.*/
 pub struct GetUserTopReleasesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUserTopReleasesResponse {
     const NSID: &'static str = "fm.teal.alpha.stats.getUserTopReleases";
@@ -66,7 +63,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetUserTopReleases<S> {
     type Response = GetUserTopReleasesResponse;
 }
 
-/// Endpoint type for fm.teal.alpha.stats.getUserTopReleases
+/** Endpoint marker for the `fm.teal.alpha.stats.getUserTopReleases` query.
+
+Path: `/xrpc/fm.teal.alpha.stats.getUserTopReleases`. The request payload type is `GetUserTopReleases<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetUserTopReleasesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUserTopReleasesRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getUserTopReleases";
@@ -85,7 +84,7 @@ fn _default_period<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_user_top_releases_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,8 +115,10 @@ pub mod get_user_top_releases_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetUserTopReleasesBuilder<St: get_user_top_releases_state::State, S: BosStr = DefaultStr>
-{
+pub struct GetUserTopReleasesBuilder<
+    St: get_user_top_releases_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -125,14 +126,20 @@ pub struct GetUserTopReleasesBuilder<St: get_user_top_releases_state::State, S: 
 
 impl GetUserTopReleases<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetUserTopReleasesBuilder<get_user_top_releases_state::Empty, DefaultStr> {
+    pub fn new() -> GetUserTopReleasesBuilder<
+        get_user_top_releases_state::Empty,
+        DefaultStr,
+    > {
         GetUserTopReleasesBuilder::new()
     }
 }
 
 impl<S: BosStr> GetUserTopReleases<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetUserTopReleasesBuilder<get_user_top_releases_state::Empty, S> {
+    pub fn builder() -> GetUserTopReleasesBuilder<
+        get_user_top_releases_state::Empty,
+        S,
+    > {
         GetUserTopReleasesBuilder::builder()
     }
 }
@@ -178,7 +185,10 @@ where
     }
 }
 
-impl<St: get_user_top_releases_state::State, S: BosStr> GetUserTopReleasesBuilder<St, S> {
+impl<
+    St: get_user_top_releases_state::State,
+    S: BosStr,
+> GetUserTopReleasesBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -191,7 +201,10 @@ impl<St: get_user_top_releases_state::State, S: BosStr> GetUserTopReleasesBuilde
     }
 }
 
-impl<St: get_user_top_releases_state::State, S: BosStr> GetUserTopReleasesBuilder<St, S> {
+impl<
+    St: get_user_top_releases_state::State,
+    S: BosStr,
+> GetUserTopReleasesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -204,7 +217,10 @@ impl<St: get_user_top_releases_state::State, S: BosStr> GetUserTopReleasesBuilde
     }
 }
 
-impl<St: get_user_top_releases_state::State, S: BosStr> GetUserTopReleasesBuilder<St, S> {
+impl<
+    St: get_user_top_releases_state::State,
+    S: BosStr,
+> GetUserTopReleasesBuilder<St, S> {
     /// Set the `period` field (optional)
     pub fn period(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();

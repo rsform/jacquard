@@ -8,36 +8,31 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::feed::TagView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileTags<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileTagsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -46,7 +41,9 @@ pub struct GetProfileTagsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for social.clippr.feed.getProfileTags
+/** Response marker for the `social.clippr.feed.getProfileTags` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetProfileTagsOutput<S>` for this endpoint.*/
 pub struct GetProfileTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileTagsResponse {
     const NSID: &'static str = "social.clippr.feed.getProfileTags";
@@ -61,7 +58,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetProfileTags<S> {
     type Response = GetProfileTagsResponse;
 }
 
-/// Endpoint type for social.clippr.feed.getProfileTags
+/** Endpoint marker for the `social.clippr.feed.getProfileTags` query.
+
+Path: `/xrpc/social.clippr.feed.getProfileTags`. The request payload type is `GetProfileTags<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetProfileTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileTagsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.feed.getProfileTags";
@@ -76,7 +75,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_profile_tags_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -107,7 +106,10 @@ pub mod get_profile_tags_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetProfileTagsBuilder<St: get_profile_tags_state::State, S: BosStr = DefaultStr> {
+pub struct GetProfileTagsBuilder<
+    St: get_profile_tags_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,

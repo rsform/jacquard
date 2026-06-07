@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `pub.leaflet` Lexicon namespace/module.
 pub mod auth_full_permissions;
 pub mod blocks;
 pub mod comment;

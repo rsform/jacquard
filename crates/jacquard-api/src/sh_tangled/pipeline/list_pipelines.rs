@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::pipeline::list_pipelines;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::pipeline::list_pipelines;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -41,30 +38,26 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListPipelines<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 1000.
+    /// Defaults to `50`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///Defaults to `"desc"`.
+    /// Defaults to `"desc"`.
     #[serde(default = "_default_order")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<S>,
     pub subject: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListPipelinesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -88,7 +81,9 @@ impl<S: BosStr> LexiconSchema for ListItem<S> {
     }
 }
 
-/// Response type for sh.tangled.pipeline.listPipelines
+/** Response marker for the `sh.tangled.pipeline.listPipelines` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListPipelinesOutput<S>` for this endpoint.*/
 pub struct ListPipelinesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListPipelinesResponse {
     const NSID: &'static str = "sh.tangled.pipeline.listPipelines";
@@ -103,7 +98,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListPipelines<S> {
     type Response = ListPipelinesResponse;
 }
 
-/// Endpoint type for sh.tangled.pipeline.listPipelines
+/** Endpoint marker for the `sh.tangled.pipeline.listPipelines` query.
+
+Path: `/xrpc/sh.tangled.pipeline.listPipelines`. The request payload type is `ListPipelines<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListPipelinesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListPipelinesRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.pipeline.listPipelines";
@@ -114,7 +111,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListPipelinesRequest {
 
 pub mod list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -277,10 +274,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_pipeline_listPipelines() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.pipeline.listPipelines"),
@@ -289,10 +286,9 @@ fn lexicon_doc_sh_tangled_pipeline_listPipelines() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("listItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("value")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -387,7 +383,7 @@ fn _default_order<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod list_pipelines_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -418,7 +414,10 @@ pub mod list_pipelines_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListPipelinesBuilder<St: list_pipelines_state::State, S: BosStr = DefaultStr> {
+pub struct ListPipelinesBuilder<
+    St: list_pipelines_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,

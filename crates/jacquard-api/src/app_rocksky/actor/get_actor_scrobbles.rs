@@ -8,36 +8,31 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorScrobbles<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
-    ///(min: 1)
+    /// (min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///(min: 0)
+    /// (min: 0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorScrobblesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scrobbles: Option<Vec<ScrobbleViewBasic<S>>>,
@@ -45,7 +40,9 @@ pub struct GetActorScrobblesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.actor.getActorScrobbles
+/** Response marker for the `app.rocksky.actor.getActorScrobbles` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetActorScrobblesOutput<S>` for this endpoint.*/
 pub struct GetActorScrobblesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorScrobblesResponse {
     const NSID: &'static str = "app.rocksky.actor.getActorScrobbles";
@@ -60,7 +57,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorScrobbles<S> {
     type Response = GetActorScrobblesResponse;
 }
 
-/// Endpoint type for app.rocksky.actor.getActorScrobbles
+/** Endpoint marker for the `app.rocksky.actor.getActorScrobbles` query.
+
+Path: `/xrpc/app.rocksky.actor.getActorScrobbles`. The request payload type is `GetActorScrobbles<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetActorScrobblesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorScrobblesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorScrobbles";
@@ -71,7 +70,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorScrobblesRequest {
 
 pub mod get_actor_scrobbles_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,7 +101,10 @@ pub mod get_actor_scrobbles_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorScrobblesBuilder<St: get_actor_scrobbles_state::State, S: BosStr = DefaultStr> {
+pub struct GetActorScrobblesBuilder<
+    St: get_actor_scrobbles_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -110,7 +112,10 @@ pub struct GetActorScrobblesBuilder<St: get_actor_scrobbles_state::State, S: Bos
 
 impl GetActorScrobbles<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetActorScrobblesBuilder<get_actor_scrobbles_state::Empty, DefaultStr> {
+    pub fn new() -> GetActorScrobblesBuilder<
+        get_actor_scrobbles_state::Empty,
+        DefaultStr,
+    > {
         GetActorScrobblesBuilder::new()
     }
 }

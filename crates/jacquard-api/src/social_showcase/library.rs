@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `social.showcase.library` Lexicon namespace/module.
 pub mod create_item;
 pub mod delete_item;
 pub mod get_item;

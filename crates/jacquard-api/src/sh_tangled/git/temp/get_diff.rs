@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetDiff<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
     pub rev1: S,
@@ -37,9 +34,18 @@ pub struct GetDiffOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetDiffError {
     /// Repository not found or access denied
@@ -56,10 +62,7 @@ pub enum GetDiffError {
     CompareError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetDiffError {
@@ -104,7 +107,9 @@ impl core::fmt::Display for GetDiffError {
     }
 }
 
-/// Response type for sh.tangled.git.temp.getDiff
+/** Response marker for the `sh.tangled.git.temp.getDiff` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetDiffOutput` for this endpoint.*/
 pub struct GetDiffResponse;
 impl jacquard_common::xrpc::XrpcResp for GetDiffResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getDiff";
@@ -138,7 +143,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetDiff<S> {
     type Response = GetDiffResponse;
 }
 
-/// Endpoint type for sh.tangled.git.temp.getDiff
+/** Endpoint marker for the `sh.tangled.git.temp.getDiff` query.
+
+Path: `/xrpc/sh.tangled.git.temp.getDiff`. The request payload type is `GetDiff<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetDiffRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetDiffRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getDiff";
@@ -149,7 +156,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetDiffRequest {
 
 pub mod get_diff_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -273,7 +280,10 @@ where
     St::Rev1: get_diff_state::IsUnset,
 {
     /// Set the `rev1` field (required)
-    pub fn rev1(mut self, value: impl Into<S>) -> GetDiffBuilder<get_diff_state::SetRev1<St>, S> {
+    pub fn rev1(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetDiffBuilder<get_diff_state::SetRev1<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetDiffBuilder {
             _state: PhantomData,
@@ -289,7 +299,10 @@ where
     St::Rev2: get_diff_state::IsUnset,
 {
     /// Set the `rev2` field (required)
-    pub fn rev2(mut self, value: impl Into<S>) -> GetDiffBuilder<get_diff_state::SetRev2<St>, S> {
+    pub fn rev2(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetDiffBuilder<get_diff_state::SetRev2<St>, S> {
         self._fields.2 = Option::Some(value.into());
         GetDiffBuilder {
             _state: PhantomData,

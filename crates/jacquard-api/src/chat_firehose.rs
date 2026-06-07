@@ -3,5 +3,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `chat.firehose` Lexicon namespace/module.
 pub mod auth_full;
 pub mod get_user_channels;

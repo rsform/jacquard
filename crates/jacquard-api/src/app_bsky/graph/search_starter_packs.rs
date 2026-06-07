@@ -8,35 +8,30 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::graph::StarterPackViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::graph::StarterPackViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchStarterPacks<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `25`. Min: 1. Max: 100.
+    /// Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub q: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchStarterPacksOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -45,7 +40,9 @@ pub struct SearchStarterPacksOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.bsky.graph.searchStarterPacks
+/** Response marker for the `app.bsky.graph.searchStarterPacks` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SearchStarterPacksOutput<S>` for this endpoint.*/
 pub struct SearchStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchStarterPacksResponse {
     const NSID: &'static str = "app.bsky.graph.searchStarterPacks";
@@ -60,7 +57,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchStarterPacks<S> {
     type Response = SearchStarterPacksResponse;
 }
 
-/// Endpoint type for app.bsky.graph.searchStarterPacks
+/** Endpoint marker for the `app.bsky.graph.searchStarterPacks` query.
+
+Path: `/xrpc/app.bsky.graph.searchStarterPacks`. The request payload type is `SearchStarterPacks<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SearchStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchStarterPacksRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.searchStarterPacks";
@@ -75,7 +74,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_starter_packs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,8 +105,10 @@ pub mod search_starter_packs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchStarterPacksBuilder<St: search_starter_packs_state::State, S: BosStr = DefaultStr>
-{
+pub struct SearchStarterPacksBuilder<
+    St: search_starter_packs_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -115,7 +116,10 @@ pub struct SearchStarterPacksBuilder<St: search_starter_packs_state::State, S: B
 
 impl SearchStarterPacks<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SearchStarterPacksBuilder<search_starter_packs_state::Empty, DefaultStr> {
+    pub fn new() -> SearchStarterPacksBuilder<
+        search_starter_packs_state::Empty,
+        DefaultStr,
+    > {
         SearchStarterPacksBuilder::new()
     }
 }

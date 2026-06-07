@@ -8,26 +8,23 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::team::Member;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::team::Member;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListMembers<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -37,11 +34,9 @@ pub struct ListMembers<S: BosStr = DefaultStr> {
     pub roles: Option<Vec<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListMembersOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -50,7 +45,9 @@ pub struct ListMembersOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.team.listMembers
+/** Response marker for the `tools.ozone.team.listMembers` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListMembersOutput<S>` for this endpoint.*/
 pub struct ListMembersResponse;
 impl jacquard_common::xrpc::XrpcResp for ListMembersResponse {
     const NSID: &'static str = "tools.ozone.team.listMembers";
@@ -65,7 +62,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListMembers<S> {
     type Response = ListMembersResponse;
 }
 
-/// Endpoint type for tools.ozone.team.listMembers
+/** Endpoint marker for the `tools.ozone.team.listMembers` query.
+
+Path: `/xrpc/tools.ozone.team.listMembers`. The request payload type is `ListMembers<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListMembersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListMembersRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.team.listMembers";
@@ -80,7 +79,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_members_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,13 +99,7 @@ pub mod list_members_state {
 /// Builder for constructing an instance of this type.
 pub struct ListMembersBuilder<St: list_members_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<bool>,
-        Option<i64>,
-        Option<S>,
-        Option<Vec<S>>,
-    ),
+    _fields: (Option<S>, Option<bool>, Option<i64>, Option<S>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::buzz_bookhive::list_genres;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::buzz_bookhive::list_genres;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GenreWithCount<S: BosStr = DefaultStr> {
     ///Number of books in this genre
     pub count: i64,
@@ -39,14 +36,15 @@ pub struct GenreWithCount<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListGenres {
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///Defaults to `0`. Min: 0.
+    /// Defaults to `0`. Min: 0.
     #[serde(default = "_default_min_books")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_books: Option<i64>,
@@ -54,11 +52,9 @@ pub struct ListGenres {
     pub offset: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListGenresOutput<S: BosStr = DefaultStr> {
     pub genres: Vec<list_genres::GenreWithCount<S>>,
     ///Next offset for pagination
@@ -83,7 +79,9 @@ impl<S: BosStr> LexiconSchema for GenreWithCount<S> {
     }
 }
 
-/// Response type for buzz.bookhive.listGenres
+/** Response marker for the `buzz.bookhive.listGenres` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListGenresOutput<S>` for this endpoint.*/
 pub struct ListGenresResponse;
 impl jacquard_common::xrpc::XrpcResp for ListGenresResponse {
     const NSID: &'static str = "buzz.bookhive.listGenres";
@@ -98,7 +96,9 @@ impl jacquard_common::xrpc::XrpcRequest for ListGenres {
     type Response = ListGenresResponse;
 }
 
-/// Endpoint type for buzz.bookhive.listGenres
+/** Endpoint marker for the `buzz.bookhive.listGenres` query.
+
+Path: `/xrpc/buzz.bookhive.listGenres`. The request payload type is `ListGenres`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListGenresRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListGenresRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.listGenres";
@@ -109,7 +109,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListGenresRequest {
 
 pub mod genre_with_count_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,7 +152,10 @@ pub mod genre_with_count_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GenreWithCountBuilder<St: genre_with_count_state::State, S: BosStr = DefaultStr> {
+pub struct GenreWithCountBuilder<
+    St: genre_with_count_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -247,7 +250,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GenreWithCount<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GenreWithCount<S> {
         GenreWithCount {
             count: self._fields.0.unwrap(),
             genre: self._fields.1.unwrap(),
@@ -257,10 +263,10 @@ where
 }
 
 fn lexicon_doc_buzz_bookhive_listGenres() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("buzz.bookhive.listGenres"),
@@ -269,10 +275,9 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("genreWithCount"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("genre"),
-                        SmolStr::new_static("count"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("genre"), SmolStr::new_static("count")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -297,32 +302,34 @@ fn lexicon_doc_buzz_bookhive_listGenres() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("minBooks"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("offset"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("minBooks"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("offset"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -342,7 +349,7 @@ fn _default_min_books() -> Option<i64> {
 
 pub mod list_genres_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

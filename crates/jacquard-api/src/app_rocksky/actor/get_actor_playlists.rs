@@ -8,36 +8,31 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::playlist::PlaylistViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::playlist::PlaylistViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorPlaylists<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
-    ///(min: 1)
+    /// (min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///(min: 0)
+    /// (min: 0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorPlaylistsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub playlists: Option<Vec<PlaylistViewBasic<S>>>,
@@ -45,7 +40,9 @@ pub struct GetActorPlaylistsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.actor.getActorPlaylists
+/** Response marker for the `app.rocksky.actor.getActorPlaylists` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetActorPlaylistsOutput<S>` for this endpoint.*/
 pub struct GetActorPlaylistsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorPlaylistsResponse {
     const NSID: &'static str = "app.rocksky.actor.getActorPlaylists";
@@ -60,7 +57,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorPlaylists<S> {
     type Response = GetActorPlaylistsResponse;
 }
 
-/// Endpoint type for app.rocksky.actor.getActorPlaylists
+/** Endpoint marker for the `app.rocksky.actor.getActorPlaylists` query.
+
+Path: `/xrpc/app.rocksky.actor.getActorPlaylists`. The request payload type is `GetActorPlaylists<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetActorPlaylistsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorPlaylistsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorPlaylists";
@@ -71,7 +70,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorPlaylistsRequest {
 
 pub mod get_actor_playlists_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -102,7 +101,10 @@ pub mod get_actor_playlists_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorPlaylistsBuilder<St: get_actor_playlists_state::State, S: BosStr = DefaultStr> {
+pub struct GetActorPlaylistsBuilder<
+    St: get_actor_playlists_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -110,7 +112,10 @@ pub struct GetActorPlaylistsBuilder<St: get_actor_playlists_state::State, S: Bos
 
 impl GetActorPlaylists<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetActorPlaylistsBuilder<get_actor_playlists_state::Empty, DefaultStr> {
+    pub fn new() -> GetActorPlaylistsBuilder<
+        get_actor_playlists_state::Empty,
+        DefaultStr,
+    > {
         GetActorPlaylistsBuilder::new()
     }
 }

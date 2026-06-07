@@ -3,4 +3,5 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `com.germnetwork` Lexicon namespace/module.
 pub mod declaration;

@@ -10,36 +10,40 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveHandle<S: BosStr = DefaultStr> {
     pub handle: Handle<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveHandleOutput<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ResolveHandleError {
     /// The resolution process confirmed that the handle does not resolve to any DID.
@@ -47,10 +51,7 @@ pub enum ResolveHandleError {
     HandleNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ResolveHandleError {
@@ -74,7 +75,9 @@ impl core::fmt::Display for ResolveHandleError {
     }
 }
 
-/// Response type for com.atproto.identity.resolveHandle
+/** Response marker for the `com.atproto.identity.resolveHandle` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ResolveHandleOutput<S>` for this endpoint.*/
 pub struct ResolveHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveHandleResponse {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
@@ -89,7 +92,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ResolveHandle<S> {
     type Response = ResolveHandleResponse;
 }
 
-/// Endpoint type for com.atproto.identity.resolveHandle
+/** Endpoint marker for the `com.atproto.identity.resolveHandle` query.
+
+Path: `/xrpc/com.atproto.identity.resolveHandle`. The request payload type is `ResolveHandle<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ResolveHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveHandleRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.resolveHandle";
@@ -100,7 +105,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveHandleRequest {
 
 pub mod resolve_handle_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -131,7 +136,10 @@ pub mod resolve_handle_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveHandleBuilder<St: resolve_handle_state::State, S: BosStr = DefaultStr> {
+pub struct ResolveHandleBuilder<
+    St: resolve_handle_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Handle<S>>,),
     _type: PhantomData<fn() -> S>,

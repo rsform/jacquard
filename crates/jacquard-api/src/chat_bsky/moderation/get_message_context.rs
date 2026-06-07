@@ -8,49 +8,45 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::MessageView;
-use crate::chat_bsky::convo::SystemMessageView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::MessageView;
+use crate::chat_bsky::convo::SystemMessageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMessageContext<S: BosStr = DefaultStr> {
-    ///Defaults to `5`.
+    /// Defaults to `5`.
     #[serde(default = "_default_after")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub after: Option<i64>,
-    ///Defaults to `5`.
+    /// Defaults to `5`.
     #[serde(default = "_default_before")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub before: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub convo_id: Option<S>,
-    ///Defaults to `10`. Min: 0. Max: 1000.
+    /// Defaults to `10`. Min: 0. Max: 1000.
     #[serde(default = "_default_max_interleaved_system_messages")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub max_interleaved_system_messages: Option<i64>,
     pub message_id: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMessageContextOutput<S: BosStr = DefaultStr> {
     pub messages: Vec<GetMessageContextOutputMessagesItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,7 +58,9 @@ pub enum GetMessageContextOutputMessagesItem<S: BosStr = DefaultStr> {
     SystemMessageView(Box<SystemMessageView<S>>),
 }
 
-/// Response type for chat.bsky.moderation.getMessageContext
+/** Response marker for the `chat.bsky.moderation.getMessageContext` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetMessageContextOutput<S>` for this endpoint.*/
 pub struct GetMessageContextResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMessageContextResponse {
     const NSID: &'static str = "chat.bsky.moderation.getMessageContext";
@@ -77,7 +75,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetMessageContext<S> {
     type Response = GetMessageContextResponse;
 }
 
-/// Endpoint type for chat.bsky.moderation.getMessageContext
+/** Endpoint marker for the `chat.bsky.moderation.getMessageContext` query.
+
+Path: `/xrpc/chat.bsky.moderation.getMessageContext`. The request payload type is `GetMessageContext<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetMessageContextRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMessageContextRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.getMessageContext";
@@ -100,7 +100,7 @@ fn _default_max_interleaved_system_messages() -> Option<i64> {
 
 pub mod get_message_context_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -131,7 +131,10 @@ pub mod get_message_context_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetMessageContextBuilder<St: get_message_context_state::State, S: BosStr = DefaultStr> {
+pub struct GetMessageContextBuilder<
+    St: get_message_context_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -139,7 +142,10 @@ pub struct GetMessageContextBuilder<St: get_message_context_state::State, S: Bos
 
 impl GetMessageContext<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetMessageContextBuilder<get_message_context_state::Empty, DefaultStr> {
+    pub fn new() -> GetMessageContextBuilder<
+        get_message_context_state::Empty,
+        DefaultStr,
+    > {
         GetMessageContextBuilder::new()
     }
 }
@@ -214,7 +220,10 @@ impl<St: get_message_context_state::State, S: BosStr> GetMessageContextBuilder<S
 
 impl<St: get_message_context_state::State, S: BosStr> GetMessageContextBuilder<St, S> {
     /// Set the `maxInterleavedSystemMessages` field (optional)
-    pub fn max_interleaved_system_messages(mut self, value: impl Into<Option<i64>>) -> Self {
+    pub fn max_interleaved_system_messages(
+        mut self,
+        value: impl Into<Option<i64>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }

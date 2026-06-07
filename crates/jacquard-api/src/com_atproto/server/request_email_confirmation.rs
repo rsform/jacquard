@@ -10,16 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
-/// XRPC request marker type.
+use serde::{Serialize, Deserialize};
+/** Request marker for the `com.atproto.server.requestEmailConfirmation` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RequestEmailConfirmation;
-/// Response type for com.atproto.server.requestEmailConfirmation
+/** Response marker for the `com.atproto.server.requestEmailConfirmation` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct RequestEmailConfirmationResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestEmailConfirmationResponse {
     const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
@@ -30,17 +34,21 @@ impl jacquard_common::xrpc::XrpcResp for RequestEmailConfirmationResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RequestEmailConfirmation {
     const NSID: &'static str = "com.atproto.server.requestEmailConfirmation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestEmailConfirmationResponse;
 }
 
-/// Endpoint type for com.atproto.server.requestEmailConfirmation
+/** Endpoint marker for the `com.atproto.server.requestEmailConfirmation` procedure.
+
+Path: `/xrpc/com.atproto.server.requestEmailConfirmation`. The request payload type is `RequestEmailConfirmation`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct RequestEmailConfirmationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailConfirmationRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.requestEmailConfirmation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RequestEmailConfirmation;
     type Response = RequestEmailConfirmationResponse;
 }

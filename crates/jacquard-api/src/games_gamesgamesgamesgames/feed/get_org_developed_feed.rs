@@ -8,36 +8,31 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOrgDevelopedFeed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub org: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOrgDevelopedFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -49,7 +44,9 @@ pub struct GetOrgDevelopedFeedOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for games.gamesgamesgamesgames.feed.getOrgDevelopedFeed
+/** Response marker for the `games.gamesgamesgamesgames.feed.getOrgDevelopedFeed` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetOrgDevelopedFeedOutput<S>` for this endpoint.*/
 pub struct GetOrgDevelopedFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOrgDevelopedFeedResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getOrgDevelopedFeed";
@@ -64,7 +61,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetOrgDevelopedFeed<S> {
     type Response = GetOrgDevelopedFeedResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.feed.getOrgDevelopedFeed
+/** Endpoint marker for the `games.gamesgamesgamesgames.feed.getOrgDevelopedFeed` query.
+
+Path: `/xrpc/games.gamesgamesgamesgames.feed.getOrgDevelopedFeed`. The request payload type is `GetOrgDevelopedFeed<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetOrgDevelopedFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOrgDevelopedFeedRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getOrgDevelopedFeed";
@@ -79,7 +78,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_org_developed_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -121,14 +120,20 @@ pub struct GetOrgDevelopedFeedBuilder<
 
 impl GetOrgDevelopedFeed<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetOrgDevelopedFeedBuilder<get_org_developed_feed_state::Empty, DefaultStr> {
+    pub fn new() -> GetOrgDevelopedFeedBuilder<
+        get_org_developed_feed_state::Empty,
+        DefaultStr,
+    > {
         GetOrgDevelopedFeedBuilder::new()
     }
 }
 
 impl<S: BosStr> GetOrgDevelopedFeed<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetOrgDevelopedFeedBuilder<get_org_developed_feed_state::Empty, S> {
+    pub fn builder() -> GetOrgDevelopedFeedBuilder<
+        get_org_developed_feed_state::Empty,
+        S,
+    > {
         GetOrgDevelopedFeedBuilder::builder()
     }
 }
@@ -155,7 +160,10 @@ impl<S: BosStr> GetOrgDevelopedFeedBuilder<get_org_developed_feed_state::Empty, 
     }
 }
 
-impl<St: get_org_developed_feed_state::State, S: BosStr> GetOrgDevelopedFeedBuilder<St, S> {
+impl<
+    St: get_org_developed_feed_state::State,
+    S: BosStr,
+> GetOrgDevelopedFeedBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -168,7 +176,10 @@ impl<St: get_org_developed_feed_state::State, S: BosStr> GetOrgDevelopedFeedBuil
     }
 }
 
-impl<St: get_org_developed_feed_state::State, S: BosStr> GetOrgDevelopedFeedBuilder<St, S> {
+impl<
+    St: get_org_developed_feed_state::State,
+    S: BosStr,
+> GetOrgDevelopedFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();

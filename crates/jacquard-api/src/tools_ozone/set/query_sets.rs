@@ -8,44 +8,39 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::set::SetView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::set::SetView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QuerySets<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name_prefix: Option<S>,
-    ///Defaults to `"name"`.
+    /// Defaults to `"name"`.
     #[serde(default = "_default_sort_by")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_by: Option<S>,
-    ///Defaults to `"asc"`.
+    /// Defaults to `"asc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_direction: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QuerySetsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -54,7 +49,9 @@ pub struct QuerySetsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.set.querySets
+/** Response marker for the `tools.ozone.set.querySets` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `QuerySetsOutput<S>` for this endpoint.*/
 pub struct QuerySetsResponse;
 impl jacquard_common::xrpc::XrpcResp for QuerySetsResponse {
     const NSID: &'static str = "tools.ozone.set.querySets";
@@ -69,7 +66,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for QuerySets<S> {
     type Response = QuerySetsResponse;
 }
 
-/// Endpoint type for tools.ozone.set.querySets
+/** Endpoint marker for the `tools.ozone.set.querySets` query.
+
+Path: `/xrpc/tools.ozone.set.querySets`. The request payload type is `QuerySets<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct QuerySetsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QuerySetsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.querySets";
@@ -92,7 +91,7 @@ fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod query_sets_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

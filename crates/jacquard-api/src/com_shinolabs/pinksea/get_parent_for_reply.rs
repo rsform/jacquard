@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetParentForReply<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     pub rkey: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetParentForReplyOutput<S: BosStr = DefaultStr> {
     ///The DID of the author.
     pub did: AtIdentifier<S>,
@@ -41,7 +36,9 @@ pub struct GetParentForReplyOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.shinolabs.pinksea.getParentForReply
+/** Response marker for the `com.shinolabs.pinksea.getParentForReply` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetParentForReplyOutput<S>` for this endpoint.*/
 pub struct GetParentForReplyResponse;
 impl jacquard_common::xrpc::XrpcResp for GetParentForReplyResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getParentForReply";
@@ -56,7 +53,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetParentForReply<S> {
     type Response = GetParentForReplyResponse;
 }
 
-/// Endpoint type for com.shinolabs.pinksea.getParentForReply
+/** Endpoint marker for the `com.shinolabs.pinksea.getParentForReply` query.
+
+Path: `/xrpc/com.shinolabs.pinksea.getParentForReply`. The request payload type is `GetParentForReply<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetParentForReplyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetParentForReplyRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getParentForReply";
@@ -67,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetParentForReplyRequest {
 
 pub mod get_parent_for_reply_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -110,7 +109,10 @@ pub mod get_parent_for_reply_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetParentForReplyBuilder<St: get_parent_for_reply_state::State, S: BosStr = DefaultStr> {
+pub struct GetParentForReplyBuilder<
+    St: get_parent_for_reply_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -118,7 +120,10 @@ pub struct GetParentForReplyBuilder<St: get_parent_for_reply_state::State, S: Bo
 
 impl GetParentForReply<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetParentForReplyBuilder<get_parent_for_reply_state::Empty, DefaultStr> {
+    pub fn new() -> GetParentForReplyBuilder<
+        get_parent_for_reply_state::Empty,
+        DefaultStr,
+    > {
         GetParentForReplyBuilder::new()
     }
 }

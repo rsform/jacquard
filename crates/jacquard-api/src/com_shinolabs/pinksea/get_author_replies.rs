@@ -8,25 +8,22 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorReplies<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
-    ///Defaults to `50`. Min: 1. Max: 50.
+    /// Defaults to `50`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -34,18 +31,18 @@ pub struct GetAuthorReplies<S: BosStr = DefaultStr> {
     pub since: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorRepliesOutput<S: BosStr = DefaultStr> {
     pub oekaki: Vec<HydratedOekaki<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.shinolabs.pinksea.getAuthorReplies
+/** Response marker for the `com.shinolabs.pinksea.getAuthorReplies` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetAuthorRepliesOutput<S>` for this endpoint.*/
 pub struct GetAuthorRepliesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAuthorRepliesResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getAuthorReplies";
@@ -60,7 +57,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetAuthorReplies<S> {
     type Response = GetAuthorRepliesResponse;
 }
 
-/// Endpoint type for com.shinolabs.pinksea.getAuthorReplies
+/** Endpoint marker for the `com.shinolabs.pinksea.getAuthorReplies` query.
+
+Path: `/xrpc/com.shinolabs.pinksea.getAuthorReplies`. The request payload type is `GetAuthorReplies<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetAuthorRepliesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorRepliesRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getAuthorReplies";
@@ -75,7 +74,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_author_replies_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,7 +105,10 @@ pub mod get_author_replies_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAuthorRepliesBuilder<St: get_author_replies_state::State, S: BosStr = DefaultStr> {
+pub struct GetAuthorRepliesBuilder<
+    St: get_author_replies_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
@@ -114,7 +116,10 @@ pub struct GetAuthorRepliesBuilder<St: get_author_replies_state::State, S: BosSt
 
 impl GetAuthorReplies<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetAuthorRepliesBuilder<get_author_replies_state::Empty, DefaultStr> {
+    pub fn new() -> GetAuthorRepliesBuilder<
+        get_author_replies_state::Empty,
+        DefaultStr,
+    > {
         GetAuthorRepliesBuilder::new()
     }
 }

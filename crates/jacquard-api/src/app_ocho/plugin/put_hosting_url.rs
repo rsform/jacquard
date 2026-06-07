@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutHostingUrl<S: BosStr = DefaultStr> {
     ///The expo push token
     pub url: S,
@@ -28,18 +25,18 @@ pub struct PutHostingUrl<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutHostingUrlOutput<S: BosStr = DefaultStr> {
     pub success: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.ocho.plugin.putHostingUrl
+/** Response marker for the `app.ocho.plugin.putHostingUrl` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `PutHostingUrlOutput<S>` for this endpoint.*/
 pub struct PutHostingUrlResponse;
 impl jacquard_common::xrpc::XrpcResp for PutHostingUrlResponse {
     const NSID: &'static str = "app.ocho.plugin.putHostingUrl";
@@ -50,17 +47,21 @@ impl jacquard_common::xrpc::XrpcResp for PutHostingUrlResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutHostingUrl<S> {
     const NSID: &'static str = "app.ocho.plugin.putHostingUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutHostingUrlResponse;
 }
 
-/// Endpoint type for app.ocho.plugin.putHostingUrl
+/** Endpoint marker for the `app.ocho.plugin.putHostingUrl` procedure.
+
+Path: `/xrpc/app.ocho.plugin.putHostingUrl`. The request payload type is `PutHostingUrl<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct PutHostingUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutHostingUrlRequest {
     const PATH: &'static str = "/xrpc/app.ocho.plugin.putHostingUrl";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = PutHostingUrl<S>;
     type Response = PutHostingUrlResponse;
 }

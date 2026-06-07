@@ -8,36 +8,31 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::SkeletonGameFeedItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::SkeletonGameFeedItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeedSkeleton<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub feed: AtUri<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeedSkeletonOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -46,19 +41,25 @@ pub struct GetFeedSkeletonOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetFeedSkeletonError {
     #[serde(rename = "UnknownFeed")]
     UnknownFeed(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetFeedSkeletonError {
@@ -82,7 +83,9 @@ impl core::fmt::Display for GetFeedSkeletonError {
     }
 }
 
-/// Response type for games.gamesgamesgamesgames.feed.getFeedSkeleton
+/** Response marker for the `games.gamesgamesgamesgames.feed.getFeedSkeleton` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetFeedSkeletonOutput<S>` for this endpoint.*/
 pub struct GetFeedSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedSkeletonResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getFeedSkeleton";
@@ -97,7 +100,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetFeedSkeleton<S> {
     type Response = GetFeedSkeletonResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.feed.getFeedSkeleton
+/** Endpoint marker for the `games.gamesgamesgamesgames.feed.getFeedSkeleton` query.
+
+Path: `/xrpc/games.gamesgamesgamesgames.feed.getFeedSkeleton`. The request payload type is `GetFeedSkeleton<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetFeedSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedSkeletonRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getFeedSkeleton";
@@ -112,7 +117,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_feed_skeleton_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -143,7 +148,10 @@ pub mod get_feed_skeleton_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetFeedSkeletonBuilder<St: get_feed_skeleton_state::State, S: BosStr = DefaultStr> {
+pub struct GetFeedSkeletonBuilder<
+    St: get_feed_skeleton_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,

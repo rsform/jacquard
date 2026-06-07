@@ -10,24 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubmitPlcOperation<S: BosStr = DefaultStr> {
     pub operation: Data<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.atproto.identity.submitPlcOperation
+/** Response marker for the `com.atproto.identity.submitPlcOperation` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct SubmitPlcOperationResponse;
 impl jacquard_common::xrpc::XrpcResp for SubmitPlcOperationResponse {
     const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
@@ -38,24 +37,28 @@ impl jacquard_common::xrpc::XrpcResp for SubmitPlcOperationResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SubmitPlcOperation<S> {
     const NSID: &'static str = "com.atproto.identity.submitPlcOperation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SubmitPlcOperationResponse;
 }
 
-/// Endpoint type for com.atproto.identity.submitPlcOperation
+/** Endpoint marker for the `com.atproto.identity.submitPlcOperation` procedure.
+
+Path: `/xrpc/com.atproto.identity.submitPlcOperation`. The request payload type is `SubmitPlcOperation<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SubmitPlcOperationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SubmitPlcOperationRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.submitPlcOperation";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = SubmitPlcOperation<S>;
     type Response = SubmitPlcOperationResponse;
 }
 
 pub mod submit_plc_operation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -86,8 +89,10 @@ pub mod submit_plc_operation_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubmitPlcOperationBuilder<St: submit_plc_operation_state::State, S: BosStr = DefaultStr>
-{
+pub struct SubmitPlcOperationBuilder<
+    St: submit_plc_operation_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -95,7 +100,10 @@ pub struct SubmitPlcOperationBuilder<St: submit_plc_operation_state::State, S: B
 
 impl SubmitPlcOperation<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SubmitPlcOperationBuilder<submit_plc_operation_state::Empty, DefaultStr> {
+    pub fn new() -> SubmitPlcOperationBuilder<
+        submit_plc_operation_state::Empty,
+        DefaultStr,
+    > {
         SubmitPlcOperationBuilder::new()
     }
 }
@@ -161,7 +169,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubmitPlcOperation<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SubmitPlcOperation<S> {
         SubmitPlcOperation {
             operation: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

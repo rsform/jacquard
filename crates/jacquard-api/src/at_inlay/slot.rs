@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Slot<S: BosStr = DefaultStr> {
     ///Key into the host's stash map
     pub id: S,
@@ -29,11 +26,9 @@ pub struct Slot<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SlotOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -41,7 +36,9 @@ pub struct SlotOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for at.inlay.Slot
+/** Response marker for the `at.inlay.Slot` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SlotOutput<S>` for this endpoint.*/
 pub struct SlotResponse;
 impl jacquard_common::xrpc::XrpcResp for SlotResponse {
     const NSID: &'static str = "at.inlay.Slot";
@@ -52,17 +49,21 @@ impl jacquard_common::xrpc::XrpcResp for SlotResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Slot<S> {
     const NSID: &'static str = "at.inlay.Slot";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SlotResponse;
 }
 
-/// Endpoint type for at.inlay.Slot
+/** Endpoint marker for the `at.inlay.Slot` procedure.
+
+Path: `/xrpc/at.inlay.Slot`. The request payload type is `Slot<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SlotRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SlotRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Slot";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Slot<S>;
     type Response = SlotResponse;
 }

@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.greengale` Lexicon namespace/module.
 pub mod blog;
 pub mod document;
 pub mod publication;

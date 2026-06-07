@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Cid;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckAccountStatusOutput<S: BosStr = DefaultStr> {
     pub activated: bool,
     pub expected_blobs: i64,
@@ -36,11 +33,15 @@ pub struct CheckAccountStatusOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `com.atproto.server.checkAccountStatus` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct CheckAccountStatus;
-/// Response type for com.atproto.server.checkAccountStatus
+/** Response marker for the `com.atproto.server.checkAccountStatus` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CheckAccountStatusOutput<S>` for this endpoint.*/
 pub struct CheckAccountStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckAccountStatusResponse {
     const NSID: &'static str = "com.atproto.server.checkAccountStatus";
@@ -55,7 +56,9 @@ impl jacquard_common::xrpc::XrpcRequest for CheckAccountStatus {
     type Response = CheckAccountStatusResponse;
 }
 
-/// Endpoint type for com.atproto.server.checkAccountStatus
+/** Endpoint marker for the `com.atproto.server.checkAccountStatus` query.
+
+Path: `/xrpc/com.atproto.server.checkAccountStatus`. The request payload type is `CheckAccountStatus`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct CheckAccountStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckAccountStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.checkAccountStatus";

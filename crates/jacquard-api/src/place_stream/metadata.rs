@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `place.stream.metadata` Lexicon namespace/module.
 pub mod configuration;
 pub mod content_rights;
 pub mod content_warnings;

@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
-use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Status<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatusOutput<S: BosStr = DefaultStr> {
     ///Authoritative boundaries assigned. Only included when request is authenticated.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,7 +41,9 @@ pub struct StatusOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for zone.stratos.enrollment.status
+/** Response marker for the `zone.stratos.enrollment.status` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `StatusOutput<S>` for this endpoint.*/
 pub struct StatusResponse;
 impl jacquard_common::xrpc::XrpcResp for StatusResponse {
     const NSID: &'static str = "zone.stratos.enrollment.status";
@@ -61,7 +58,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Status<S> {
     type Response = StatusResponse;
 }
 
-/// Endpoint type for zone.stratos.enrollment.status
+/** Endpoint marker for the `zone.stratos.enrollment.status` query.
+
+Path: `/xrpc/zone.stratos.enrollment.status`. The request payload type is `Status<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct StatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StatusRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.enrollment.status";
@@ -72,7 +71,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StatusRequest {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,7 +150,10 @@ where
     St::Did: status_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> StatusBuilder<status_state::SetDid<St>, S> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> StatusBuilder<status_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,

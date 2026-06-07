@@ -10,34 +10,37 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VersionOutput<S: BosStr = DefaultStr> {
     pub version: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum VersionError {
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for VersionError {
@@ -54,11 +57,15 @@ impl core::fmt::Display for VersionError {
     }
 }
 
-/// XRPC request marker type.
+/** Request marker for the `sh.tangled.knot.version` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Version;
-/// Response type for sh.tangled.knot.version
+/** Response marker for the `sh.tangled.knot.version` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `VersionOutput<S>` for this endpoint.*/
 pub struct VersionResponse;
 impl jacquard_common::xrpc::XrpcResp for VersionResponse {
     const NSID: &'static str = "sh.tangled.knot.version";
@@ -73,7 +80,9 @@ impl jacquard_common::xrpc::XrpcRequest for Version {
     type Response = VersionResponse;
 }
 
-/// Endpoint type for sh.tangled.knot.version
+/** Endpoint marker for the `sh.tangled.knot.version` query.
+
+Path: `/xrpc/sh.tangled.knot.version`. The request payload type is `Version`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct VersionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for VersionRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.knot.version";

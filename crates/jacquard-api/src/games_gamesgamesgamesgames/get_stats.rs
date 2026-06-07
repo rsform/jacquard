@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStatsOutput<S: BosStr = DefaultStr> {
     pub total_games: i64,
     pub total_reviews: i64,
@@ -29,11 +26,15 @@ pub struct GetStatsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `games.gamesgamesgamesgames.getStats` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetStats;
-/// Response type for games.gamesgamesgamesgames.getStats
+/** Response marker for the `games.gamesgamesgamesgames.getStats` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetStatsOutput<S>` for this endpoint.*/
 pub struct GetStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStatsResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.getStats";
@@ -48,7 +49,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetStats {
     type Response = GetStatsResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.getStats
+/** Endpoint marker for the `games.gamesgamesgamesgames.getStats` query.
+
+Path: `/xrpc/games.gamesgamesgamesgames.getStats`. The request payload type is `GetStats`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct GetStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStatsRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getStats";

@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::server::Webhook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::server::Webhook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListWebhooks<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
@@ -29,17 +26,15 @@ pub struct ListWebhooks<S: BosStr = DefaultStr> {
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListWebhooksOutput<S: BosStr = DefaultStr> {
     ///A cursor for pagination, if there are more results.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,9 +44,18 @@ pub struct ListWebhooksOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListWebhooksError {
     /// The provided cursor is invalid or expired.
@@ -59,10 +63,7 @@ pub enum ListWebhooksError {
     InvalidCursor(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListWebhooksError {
@@ -86,7 +87,9 @@ impl core::fmt::Display for ListWebhooksError {
     }
 }
 
-/// Response type for place.stream.server.listWebhooks
+/** Response marker for the `place.stream.server.listWebhooks` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListWebhooksOutput<S>` for this endpoint.*/
 pub struct ListWebhooksResponse;
 impl jacquard_common::xrpc::XrpcResp for ListWebhooksResponse {
     const NSID: &'static str = "place.stream.server.listWebhooks";
@@ -101,7 +104,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListWebhooks<S> {
     type Response = ListWebhooksResponse;
 }
 
-/// Endpoint type for place.stream.server.listWebhooks
+/** Endpoint marker for the `place.stream.server.listWebhooks` query.
+
+Path: `/xrpc/place.stream.server.listWebhooks`. The request payload type is `ListWebhooks<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListWebhooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListWebhooksRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.listWebhooks";
@@ -116,7 +121,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_webhooks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

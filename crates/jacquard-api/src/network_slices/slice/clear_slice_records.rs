@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ClearSliceRecords<S: BosStr = DefaultStr> {
     ///AT-URI of the slice to clear
     pub slice: S,
@@ -28,11 +25,9 @@ pub struct ClearSliceRecords<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ClearSliceRecordsOutput<S: BosStr = DefaultStr> {
     ///Success message
     pub message: S,
@@ -40,7 +35,9 @@ pub struct ClearSliceRecordsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for network.slices.slice.clearSliceRecords
+/** Response marker for the `network.slices.slice.clearSliceRecords` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ClearSliceRecordsOutput<S>` for this endpoint.*/
 pub struct ClearSliceRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for ClearSliceRecordsResponse {
     const NSID: &'static str = "network.slices.slice.clearSliceRecords";
@@ -51,17 +48,21 @@ impl jacquard_common::xrpc::XrpcResp for ClearSliceRecordsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ClearSliceRecords<S> {
     const NSID: &'static str = "network.slices.slice.clearSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ClearSliceRecordsResponse;
 }
 
-/// Endpoint type for network.slices.slice.clearSliceRecords
+/** Endpoint marker for the `network.slices.slice.clearSliceRecords` procedure.
+
+Path: `/xrpc/network.slices.slice.clearSliceRecords`. The request payload type is `ClearSliceRecords<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ClearSliceRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ClearSliceRecordsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.clearSliceRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ClearSliceRecords<S>;
     type Response = ClearSliceRecordsResponse;
 }

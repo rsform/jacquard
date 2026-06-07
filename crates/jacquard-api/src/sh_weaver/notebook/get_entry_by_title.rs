@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::BookEntryView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::BookEntryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryByTitle<S: BosStr = DefaultStr> {
     pub notebook: AtUri<S>,
     pub title: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryByTitleOutput<S: BosStr = DefaultStr> {
     pub entry: BookEntryView<S>,
     ///The raw entry record data.
@@ -41,9 +36,18 @@ pub struct GetEntryByTitleOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetEntryByTitleError {
     #[serde(rename = "NotebookNotFound")]
@@ -52,10 +56,7 @@ pub enum GetEntryByTitleError {
     EntryNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEntryByTitleError {
@@ -86,7 +87,9 @@ impl core::fmt::Display for GetEntryByTitleError {
     }
 }
 
-/// Response type for sh.weaver.notebook.getEntryByTitle
+/** Response marker for the `sh.weaver.notebook.getEntryByTitle` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetEntryByTitleOutput<S>` for this endpoint.*/
 pub struct GetEntryByTitleResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryByTitleResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryByTitle";
@@ -101,7 +104,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntryByTitle<S> {
     type Response = GetEntryByTitleResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getEntryByTitle
+/** Endpoint marker for the `sh.weaver.notebook.getEntryByTitle` query.
+
+Path: `/xrpc/sh.weaver.notebook.getEntryByTitle`. The request payload type is `GetEntryByTitle<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetEntryByTitleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryByTitleRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryByTitle";
@@ -112,7 +117,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEntryByTitleRequest {
 
 pub mod get_entry_by_title_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -155,7 +160,10 @@ pub mod get_entry_by_title_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetEntryByTitleBuilder<St: get_entry_by_title_state::State, S: BosStr = DefaultStr> {
+pub struct GetEntryByTitleBuilder<
+    St: get_entry_by_title_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,

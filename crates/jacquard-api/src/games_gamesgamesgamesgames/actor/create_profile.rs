@@ -8,23 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::richtext::facet::Facet;
-use crate::games_gamesgamesgamesgames::Website;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{AtUri, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::games_gamesgamesgamesgames::Website;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateProfile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -45,11 +42,9 @@ pub struct CreateProfile<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateProfileOutput<S: BosStr = DefaultStr> {
     pub cid: S,
     pub uri: AtUri<S>,
@@ -57,7 +52,9 @@ pub struct CreateProfileOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for games.gamesgamesgamesgames.actor.createProfile
+/** Response marker for the `games.gamesgamesgamesgames.actor.createProfile` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CreateProfileOutput<S>` for this endpoint.*/
 pub struct CreateProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateProfileResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.createProfile";
@@ -68,17 +65,21 @@ impl jacquard_common::xrpc::XrpcResp for CreateProfileResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateProfile<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.createProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateProfileResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.actor.createProfile
+/** Endpoint marker for the `games.gamesgamesgamesgames.actor.createProfile` procedure.
+
+Path: `/xrpc/games.gamesgamesgamesgames.actor.createProfile`. The request payload type is `CreateProfile<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CreateProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateProfileRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.actor.createProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateProfile<S>;
     type Response = CreateProfileResponse;
 }

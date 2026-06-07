@@ -71,6 +71,7 @@ impl<'c> CodeGenerator<'c> {
         let xrpc_impl = self.generate_xrpc_request_impl(
             nsid,
             &type_base,
+            "query",
             quote! { jacquard_common::xrpc::XrpcMethod::Query },
             output_encoding,
             has_params,
@@ -166,6 +167,7 @@ impl<'c> CodeGenerator<'c> {
         let xrpc_impl = self.generate_xrpc_request_impl(
             nsid,
             &type_base,
+            "procedure",
             quote! { jacquard_common::xrpc::XrpcMethod::Procedure(#input_encoding) },
             output_encoding,
             has_input,
@@ -1085,7 +1087,10 @@ impl<'c> CodeGenerator<'c> {
             }
         };
 
-        let doc = doc_comment.as_ref().map(|d| quote! { #[doc = #d] });
+        let doc = doc_comment.as_ref().map(|d| {
+            let d = format!(" {d}");
+            quote! { #[doc = #d] }
+        });
         let field_with_attrs = match (doc, serde_attr) {
             (Some(doc), Some(attr)) => quote! {
                 #doc
@@ -1182,6 +1187,7 @@ impl<'c> CodeGenerator<'c> {
         &self,
         nsid: &str,
         type_base: &str,
+        endpoint_kind: &str,
         method: TokenStream,
         output_encoding: &str,
         has_params: bool,
@@ -1192,11 +1198,18 @@ impl<'c> CodeGenerator<'c> {
         is_binary_input: bool,
         resolved: &super::prettify::ResolvedImports,
     ) -> Result<TokenStream> {
+        let output_type_name = if has_output {
+            format!("{}Output", type_base)
+        } else {
+            "()".to_string()
+        };
+        let output_type_doc = if has_output && output_has_schema {
+            format!("{}<S>", output_type_name)
+        } else {
+            output_type_name.clone()
+        };
         let output_type = if has_output {
-            let output_ident = syn::Ident::new(
-                &format!("{}Output", type_base),
-                proc_macro2::Span::call_site(),
-            );
+            let output_ident = syn::Ident::new(&output_type_name, proc_macro2::Span::call_site());
             // Schema outputs get S param, binary outputs don't.
             if output_has_schema {
                 quote! { #output_ident<S> }
@@ -1271,9 +1284,12 @@ impl<'c> CodeGenerator<'c> {
             }
         };
 
-        let nsid_str = format!(" Response type for {}", nsid);
+        let response_doc = format!(
+            " Response marker for the `{}` {}.\n\nImplements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `{}` for this endpoint.",
+            nsid, endpoint_kind, output_type_doc
+        );
         let response_type = quote! {
-            #[doc = #nsid_str]
+            #[doc = #response_doc]
             pub struct #response_ident;
 
             impl jacquard_common::xrpc::XrpcResp for #response_ident {
@@ -1328,6 +1344,11 @@ impl<'c> CodeGenerator<'c> {
             // Implement on the params/input struct itself
             let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
 
+            let request_type_doc = if params_has_lifetime {
+                format!("{}<S>", type_base)
+            } else {
+                type_base.to_string()
+            };
             let (impl_generics, impl_target, endpoint_request_type) = if params_has_lifetime {
                 (
                     quote! { <S: #bosstr_path> },
@@ -1341,7 +1362,10 @@ impl<'c> CodeGenerator<'c> {
                     quote! { #request_ident },
                 )
             };
-            let nsid_str = format!(" Endpoint type for {}", nsid);
+            let request_doc = format!(
+                " Endpoint marker for the `{}` {}.\n\nPath: `{}`. The request payload type is `{}`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.",
+                nsid, endpoint_kind, endpoint_path, request_type_doc
+            );
 
             Ok(quote! {
                 #response_type
@@ -1357,7 +1381,7 @@ impl<'c> CodeGenerator<'c> {
                 }
 
 
-                #[doc = #nsid_str]
+                #[doc = #request_doc]
                 pub struct #endpoint_ident;
 
                 impl jacquard_common::xrpc::XrpcEndpoint for #endpoint_ident {
@@ -1372,9 +1396,16 @@ impl<'c> CodeGenerator<'c> {
             // No params - generate a marker struct
             let request_ident = syn::Ident::new(type_base, proc_macro2::Span::call_site());
 
-            let nsid_str = format!(" Endpoint type for {}", nsid);
+            let request_marker_doc = format!(
+                " Request marker for the `{}` {}.\n\nThis endpoint has no request parameters or input body; send this marker with `jacquard::Client`.",
+                nsid, endpoint_kind
+            );
+            let endpoint_doc = format!(
+                " Endpoint marker for the `{}` {}.\n\nPath: `{}`. The request payload type is `{}`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.",
+                nsid, endpoint_kind, endpoint_path, type_base
+            );
             Ok(quote! {
-                /// XRPC request marker type.
+                #[doc = #request_marker_doc]
                 #marker_derive
                 pub struct #request_ident;
 
@@ -1387,7 +1418,7 @@ impl<'c> CodeGenerator<'c> {
                     type Response = #response_ident;
                 }
 
-                #[doc = #nsid_str]
+                #[doc = #endpoint_doc]
                 pub struct #endpoint_ident;
 
                 impl jacquard_common::xrpc::XrpcEndpoint for #endpoint_ident {

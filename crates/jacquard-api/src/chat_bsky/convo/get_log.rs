@@ -8,6 +8,13 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::LogAcceptConvo;
 use crate::chat_bsky::convo::LogAddMember;
 use crate::chat_bsky::convo::LogAddReaction;
@@ -38,29 +45,17 @@ use crate::chat_bsky::convo::LogUnlockConvo;
 use crate::chat_bsky::convo::LogUnmuteConvo;
 use crate::chat_bsky::convo::LogWithdrawIncomingJoinRequest;
 use crate::chat_bsky::convo::LogWithdrawOutgoingJoinRequest;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLog<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLogOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -68,6 +63,7 @@ pub struct GetLogOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -135,7 +131,9 @@ pub enum GetLogOutputLogsItem<S: BosStr = DefaultStr> {
     LogReadJoinRequests(Box<LogReadJoinRequests<S>>),
 }
 
-/// Response type for chat.bsky.convo.getLog
+/** Response marker for the `chat.bsky.convo.getLog` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetLogOutput<S>` for this endpoint.*/
 pub struct GetLogResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLogResponse {
     const NSID: &'static str = "chat.bsky.convo.getLog";
@@ -150,7 +148,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetLog<S> {
     type Response = GetLogResponse;
 }
 
-/// Endpoint type for chat.bsky.convo.getLog
+/** Endpoint marker for the `chat.bsky.convo.getLog` query.
+
+Path: `/xrpc/chat.bsky.convo.getLog`. The request payload type is `GetLog<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetLogRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLogRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getLog";
@@ -161,7 +161,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLogRequest {
 
 pub mod get_log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -240,8 +240,6 @@ where
 {
     /// Build the final struct.
     pub fn build(self) -> GetLog<S> {
-        GetLog {
-            cursor: self._fields.0,
-        }
+        GetLog { cursor: self._fields.0 }
     }
 }

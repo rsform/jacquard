@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `mov.danabra` Lexicon namespace/module.
 pub mod avi_handle;
 pub mod greeting;
 pub mod post;

@@ -8,37 +8,32 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_showcase::CollectionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::CollectionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListCollections<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
-    ///(max length: 512)
+    /// (max length: 512)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListCollectionsOutput<S: BosStr = DefaultStr> {
     pub collections: Vec<CollectionView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -47,7 +42,9 @@ pub struct ListCollectionsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for social.showcase.collection.listCollections
+/** Response marker for the `social.showcase.collection.listCollections` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListCollectionsOutput<S>` for this endpoint.*/
 pub struct ListCollectionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListCollectionsResponse {
     const NSID: &'static str = "social.showcase.collection.listCollections";
@@ -62,7 +59,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListCollections<S> {
     type Response = ListCollectionsResponse;
 }
 
-/// Endpoint type for social.showcase.collection.listCollections
+/** Endpoint marker for the `social.showcase.collection.listCollections` query.
+
+Path: `/xrpc/social.showcase.collection.listCollections`. The request payload type is `ListCollections<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListCollectionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListCollectionsRequest {
     const PATH: &'static str = "/xrpc/social.showcase.collection.listCollections";
@@ -77,7 +76,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_collections_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -108,7 +107,10 @@ pub mod list_collections_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListCollectionsBuilder<St: list_collections_state::State, S: BosStr = DefaultStr> {
+pub struct ListCollectionsBuilder<
+    St: list_collections_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,

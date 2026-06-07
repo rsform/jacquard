@@ -8,24 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::media::get_video::VideoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::media::get_video::VideoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetVideoList<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `25`. Min: 1. Max: 100.
+    /// Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -33,11 +30,9 @@ pub struct GetVideoList<S: BosStr = DefaultStr> {
     pub repo: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetVideoListOutput<S: BosStr = DefaultStr> {
     ///Pagination cursor for the next page, if any.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -47,9 +42,18 @@ pub struct GetVideoListOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetVideoListError {
     /// No repo indexed at the supplied DID.
@@ -57,10 +61,7 @@ pub enum GetVideoListError {
     RepoNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetVideoListError {
@@ -84,7 +85,9 @@ impl core::fmt::Display for GetVideoListError {
     }
 }
 
-/// Response type for place.stream.media.getVideoList
+/** Response marker for the `place.stream.media.getVideoList` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetVideoListOutput<S>` for this endpoint.*/
 pub struct GetVideoListResponse;
 impl jacquard_common::xrpc::XrpcResp for GetVideoListResponse {
     const NSID: &'static str = "place.stream.media.getVideoList";
@@ -99,7 +102,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetVideoList<S> {
     type Response = GetVideoListResponse;
 }
 
-/// Endpoint type for place.stream.media.getVideoList
+/** Endpoint marker for the `place.stream.media.getVideoList` query.
+
+Path: `/xrpc/place.stream.media.getVideoList`. The request payload type is `GetVideoList<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetVideoListRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetVideoListRequest {
     const PATH: &'static str = "/xrpc/place.stream.media.getVideoList";
@@ -114,7 +119,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_video_list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

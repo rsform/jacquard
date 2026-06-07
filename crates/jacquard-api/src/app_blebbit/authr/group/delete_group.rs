@@ -10,27 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteGroupParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `app.blebbit.authr.group.deleteGroup` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct DeleteGroup;
-/// Response type for app.blebbit.authr.group.deleteGroup
+/** Response marker for the `app.blebbit.authr.group.deleteGroup` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct DeleteGroupResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteGroupResponse {
     const NSID: &'static str = "app.blebbit.authr.group.deleteGroup";
@@ -41,24 +42,28 @@ impl jacquard_common::xrpc::XrpcResp for DeleteGroupResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteGroup {
     const NSID: &'static str = "app.blebbit.authr.group.deleteGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteGroupResponse;
 }
 
-/// Endpoint type for app.blebbit.authr.group.deleteGroup
+/** Endpoint marker for the `app.blebbit.authr.group.deleteGroup` procedure.
+
+Path: `/xrpc/app.blebbit.authr.group.deleteGroup`. The request payload type is `DeleteGroup`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct DeleteGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteGroupRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.deleteGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteGroup;
     type Response = DeleteGroupResponse;
 }
 
 pub mod delete_group_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -76,7 +81,10 @@ pub mod delete_group_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteGroupParamsBuilder<St: delete_group_params_state::State, S: BosStr = DefaultStr> {
+pub struct DeleteGroupParamsBuilder<
+    St: delete_group_params_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -84,7 +92,10 @@ pub struct DeleteGroupParamsBuilder<St: delete_group_params_state::State, S: Bos
 
 impl DeleteGroupParams<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> DeleteGroupParamsBuilder<delete_group_params_state::Empty, DefaultStr> {
+    pub fn new() -> DeleteGroupParamsBuilder<
+        delete_group_params_state::Empty,
+        DefaultStr,
+    > {
         DeleteGroupParamsBuilder::new()
     }
 }
@@ -137,6 +148,8 @@ where
 {
     /// Build the final struct.
     pub fn build(self) -> DeleteGroupParams<S> {
-        DeleteGroupParams { id: self._fields.0 }
+        DeleteGroupParams {
+            id: self._fields.0,
+        }
     }
 }

@@ -8,31 +8,32 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::org_passingreads::actor::ProfileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListProfilesOutput<S: BosStr = DefaultStr> {
     pub profiles: Vec<ProfileView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `org.passingreads.actor.listProfiles` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ListProfiles;
-/// Response type for org.passingreads.actor.listProfiles
+/** Response marker for the `org.passingreads.actor.listProfiles` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListProfilesOutput<S>` for this endpoint.*/
 pub struct ListProfilesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListProfilesResponse {
     const NSID: &'static str = "org.passingreads.actor.listProfiles";
@@ -47,7 +48,9 @@ impl jacquard_common::xrpc::XrpcRequest for ListProfiles {
     type Response = ListProfilesResponse;
 }
 
-/// Endpoint type for org.passingreads.actor.listProfiles
+/** Endpoint marker for the `org.passingreads.actor.listProfiles` query.
+
+Path: `/xrpc/org.passingreads.actor.listProfiles`. The request payload type is `ListProfiles`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct ListProfilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListProfilesRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.actor.listProfiles";

@@ -8,39 +8,34 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::edit::EditBranchView;
-use crate::sh_weaver::edit::EditHistoryEntry;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::edit::EditBranchView;
+use crate::sh_weaver::edit::EditHistoryEntry;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBranch<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub after_rkey: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub head: AtUri<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBranchOutput<S: BosStr = DefaultStr> {
     pub branch: EditBranchView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,7 +45,9 @@ pub struct GetBranchOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.edit.getBranch
+/** Response marker for the `sh.weaver.edit.getBranch` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetBranchOutput<S>` for this endpoint.*/
 pub struct GetBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBranchResponse {
     const NSID: &'static str = "sh.weaver.edit.getBranch";
@@ -65,7 +62,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetBranch<S> {
     type Response = GetBranchResponse;
 }
 
-/// Endpoint type for sh.weaver.edit.getBranch
+/** Endpoint marker for the `sh.weaver.edit.getBranch` query.
+
+Path: `/xrpc/sh.weaver.edit.getBranch`. The request payload type is `GetBranch<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetBranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBranchRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.getBranch";
@@ -80,7 +79,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_branch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

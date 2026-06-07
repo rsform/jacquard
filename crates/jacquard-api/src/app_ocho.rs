@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.ocho` Lexicon namespace/module.
 pub mod auth;
 pub mod edu;
 pub mod message;

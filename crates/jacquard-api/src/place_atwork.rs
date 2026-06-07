@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `place.atwork` Lexicon namespace/module.
 pub mod endorsement;
 pub mod endorsement_proof;
 pub mod get_listing;

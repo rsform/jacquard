@@ -8,37 +8,34 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_atproto::admin::AccountView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::admin::AccountView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAccountInfos<S: BosStr = DefaultStr> {
     pub dids: Vec<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAccountInfosOutput<S: BosStr = DefaultStr> {
     pub infos: Vec<AccountView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.atproto.admin.getAccountInfos
+/** Response marker for the `com.atproto.admin.getAccountInfos` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetAccountInfosOutput<S>` for this endpoint.*/
 pub struct GetAccountInfosResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountInfosResponse {
     const NSID: &'static str = "com.atproto.admin.getAccountInfos";
@@ -53,7 +50,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetAccountInfos<S> {
     type Response = GetAccountInfosResponse;
 }
 
-/// Endpoint type for com.atproto.admin.getAccountInfos
+/** Endpoint marker for the `com.atproto.admin.getAccountInfos` query.
+
+Path: `/xrpc/com.atproto.admin.getAccountInfos`. The request payload type is `GetAccountInfos<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetAccountInfosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInfosRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.getAccountInfos";
@@ -64,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInfosRequest {
 
 pub mod get_account_infos_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,7 +94,10 @@ pub mod get_account_infos_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAccountInfosBuilder<St: get_account_infos_state::State, S: BosStr = DefaultStr> {
+pub struct GetAccountInfosBuilder<
+    St: get_account_infos_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Did<S>>>,),
     _type: PhantomData<fn() -> S>,

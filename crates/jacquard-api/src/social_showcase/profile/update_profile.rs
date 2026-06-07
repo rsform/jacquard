@@ -8,23 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_showcase::ProfileView;
-use crate::social_showcase::ShowcaseItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ProfileView;
+use crate::social_showcase::ShowcaseItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateProfile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -45,11 +42,9 @@ pub struct UpdateProfile<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateProfileOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ProfileView<S>,
@@ -57,7 +52,9 @@ pub struct UpdateProfileOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for social.showcase.profile.updateProfile
+/** Response marker for the `social.showcase.profile.updateProfile` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `UpdateProfileOutput<S>` for this endpoint.*/
 pub struct UpdateProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateProfileResponse {
     const NSID: &'static str = "social.showcase.profile.updateProfile";
@@ -68,17 +65,21 @@ impl jacquard_common::xrpc::XrpcResp for UpdateProfileResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateProfile<S> {
     const NSID: &'static str = "social.showcase.profile.updateProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateProfileResponse;
 }
 
-/// Endpoint type for social.showcase.profile.updateProfile
+/** Endpoint marker for the `social.showcase.profile.updateProfile` procedure.
+
+Path: `/xrpc/social.showcase.profile.updateProfile`. The request payload type is `UpdateProfile<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct UpdateProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateProfileRequest {
     const PATH: &'static str = "/xrpc/social.showcase.profile.updateProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateProfile<S>;
     type Response = UpdateProfileResponse;
 }

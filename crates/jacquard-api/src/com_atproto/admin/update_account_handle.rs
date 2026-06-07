@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateAccountHandle<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub handle: Handle<S>,
@@ -29,7 +26,9 @@ pub struct UpdateAccountHandle<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.atproto.admin.updateAccountHandle
+/** Response marker for the `com.atproto.admin.updateAccountHandle` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct UpdateAccountHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountHandleResponse {
     const NSID: &'static str = "com.atproto.admin.updateAccountHandle";
@@ -40,24 +39,28 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountHandleResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountHandle<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountHandleResponse;
 }
 
-/// Endpoint type for com.atproto.admin.updateAccountHandle
+/** Endpoint marker for the `com.atproto.admin.updateAccountHandle` procedure.
+
+Path: `/xrpc/com.atproto.admin.updateAccountHandle`. The request payload type is `UpdateAccountHandle<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct UpdateAccountHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountHandleRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateAccountHandle<S>;
     type Response = UpdateAccountHandleResponse;
 }
 
 pub mod update_account_handle_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -111,14 +114,20 @@ pub struct UpdateAccountHandleBuilder<
 
 impl UpdateAccountHandle<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UpdateAccountHandleBuilder<update_account_handle_state::Empty, DefaultStr> {
+    pub fn new() -> UpdateAccountHandleBuilder<
+        update_account_handle_state::Empty,
+        DefaultStr,
+    > {
         UpdateAccountHandleBuilder::new()
     }
 }
 
 impl<S: BosStr> UpdateAccountHandle<S> {
     /// Create a new builder for this type
-    pub fn builder() -> UpdateAccountHandleBuilder<update_account_handle_state::Empty, S> {
+    pub fn builder() -> UpdateAccountHandleBuilder<
+        update_account_handle_state::Empty,
+        S,
+    > {
         UpdateAccountHandleBuilder::builder()
     }
 }
@@ -198,7 +207,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateAccountHandle<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateAccountHandle<S> {
         UpdateAccountHandle {
             did: self._fields.0.unwrap(),
             handle: self._fields.1.unwrap(),

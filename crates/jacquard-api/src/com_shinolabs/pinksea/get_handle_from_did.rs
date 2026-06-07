@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Handle;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetHandleFromDid<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetHandleFromDidOutput<S: BosStr = DefaultStr> {
     ///The handle.
     pub handle: Handle<S>,
@@ -39,7 +34,9 @@ pub struct GetHandleFromDidOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.shinolabs.pinksea.getHandleFromDid
+/** Response marker for the `com.shinolabs.pinksea.getHandleFromDid` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetHandleFromDidOutput<S>` for this endpoint.*/
 pub struct GetHandleFromDidResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHandleFromDidResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
@@ -54,7 +51,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetHandleFromDid<S> {
     type Response = GetHandleFromDidResponse;
 }
 
-/// Endpoint type for com.shinolabs.pinksea.getHandleFromDid
+/** Endpoint marker for the `com.shinolabs.pinksea.getHandleFromDid` query.
+
+Path: `/xrpc/com.shinolabs.pinksea.getHandleFromDid`. The request payload type is `GetHandleFromDid<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetHandleFromDidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getHandleFromDid";
@@ -65,7 +64,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
 
 pub mod get_handle_from_did_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,7 +95,10 @@ pub mod get_handle_from_did_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetHandleFromDidBuilder<St: get_handle_from_did_state::State, S: BosStr = DefaultStr> {
+pub struct GetHandleFromDidBuilder<
+    St: get_handle_from_did_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -104,7 +106,10 @@ pub struct GetHandleFromDidBuilder<St: get_handle_from_did_state::State, S: BosS
 
 impl GetHandleFromDid<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetHandleFromDidBuilder<get_handle_from_did_state::Empty, DefaultStr> {
+    pub fn new() -> GetHandleFromDidBuilder<
+        get_handle_from_did_state::Empty,
+        DefaultStr,
+    > {
         GetHandleFromDidBuilder::new()
     }
 }

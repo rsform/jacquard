@@ -8,34 +8,29 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::fm_teal::alpha::actor::MiniProfileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::actor::MiniProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchActors<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///(min: 1, max: 25)
+    /// (min: 1, max: 25)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub q: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchActorsOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<MiniProfileView<S>>,
     ///Cursor for pagination
@@ -45,7 +40,9 @@ pub struct SearchActorsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for fm.teal.alpha.actor.searchActors
+/** Response marker for the `fm.teal.alpha.actor.searchActors` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SearchActorsOutput<S>` for this endpoint.*/
 pub struct SearchActorsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchActorsResponse {
     const NSID: &'static str = "fm.teal.alpha.actor.searchActors";
@@ -60,7 +57,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchActors<S> {
     type Response = SearchActorsResponse;
 }
 
-/// Endpoint type for fm.teal.alpha.actor.searchActors
+/** Endpoint marker for the `fm.teal.alpha.actor.searchActors` query.
+
+Path: `/xrpc/fm.teal.alpha.actor.searchActors`. The request payload type is `SearchActors<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SearchActorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.actor.searchActors";
@@ -71,7 +70,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsRequest {
 
 pub mod search_actors_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

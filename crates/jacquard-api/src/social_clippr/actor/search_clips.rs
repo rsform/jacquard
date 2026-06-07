@@ -8,38 +8,33 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::feed::ClipView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::ClipView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchClips<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `25`. Min: 1. Max: 100.
+    /// Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub q: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchClipsOutput<S: BosStr = DefaultStr> {
     ///A list of clips and their associated details
     pub clips: Vec<ClipView<S>>,
@@ -50,7 +45,9 @@ pub struct SearchClipsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for social.clippr.actor.searchClips
+/** Response marker for the `social.clippr.actor.searchClips` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SearchClipsOutput<S>` for this endpoint.*/
 pub struct SearchClipsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchClipsResponse {
     const NSID: &'static str = "social.clippr.actor.searchClips";
@@ -65,7 +62,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchClips<S> {
     type Response = SearchClipsResponse;
 }
 
-/// Endpoint type for social.clippr.actor.searchClips
+/** Endpoint marker for the `social.clippr.actor.searchClips` query.
+
+Path: `/xrpc/social.clippr.actor.searchClips`. The request payload type is `SearchClips<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SearchClipsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchClipsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.actor.searchClips";
@@ -80,7 +79,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_clips_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -198,7 +197,10 @@ where
     St::Q: search_clips_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(mut self, value: impl Into<S>) -> SearchClipsBuilder<search_clips_state::SetQ<St>, S> {
+    pub fn q(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchClipsBuilder<search_clips_state::SetQ<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SearchClipsBuilder {
             _state: PhantomData,

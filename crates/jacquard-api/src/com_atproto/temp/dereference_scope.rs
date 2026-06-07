@@ -10,26 +10,21 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DereferenceScope<S: BosStr = DefaultStr> {
     pub scope: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DereferenceScopeOutput<S: BosStr = DefaultStr> {
     ///The full oauth permission scope
     pub scope: S,
@@ -37,9 +32,18 @@ pub struct DereferenceScopeOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DereferenceScopeError {
     /// An invalid scope reference was provided.
@@ -47,10 +51,7 @@ pub enum DereferenceScopeError {
     InvalidScopeReference(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DereferenceScopeError {
@@ -74,7 +75,9 @@ impl core::fmt::Display for DereferenceScopeError {
     }
 }
 
-/// Response type for com.atproto.temp.dereferenceScope
+/** Response marker for the `com.atproto.temp.dereferenceScope` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DereferenceScopeOutput<S>` for this endpoint.*/
 pub struct DereferenceScopeResponse;
 impl jacquard_common::xrpc::XrpcResp for DereferenceScopeResponse {
     const NSID: &'static str = "com.atproto.temp.dereferenceScope";
@@ -89,7 +92,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DereferenceScope<S> {
     type Response = DereferenceScopeResponse;
 }
 
-/// Endpoint type for com.atproto.temp.dereferenceScope
+/** Endpoint marker for the `com.atproto.temp.dereferenceScope` query.
+
+Path: `/xrpc/com.atproto.temp.dereferenceScope`. The request payload type is `DereferenceScope<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DereferenceScopeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DereferenceScopeRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.dereferenceScope";
@@ -100,7 +105,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DereferenceScopeRequest {
 
 pub mod dereference_scope_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -131,7 +136,10 @@ pub mod dereference_scope_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DereferenceScopeBuilder<St: dereference_scope_state::State, S: BosStr = DefaultStr> {
+pub struct DereferenceScopeBuilder<
+    St: dereference_scope_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,

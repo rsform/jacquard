@@ -8,37 +8,32 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::blue_recipes::feed::RecipeView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue_recipes::feed::RecipeView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecipes<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecipesOutput<S: BosStr = DefaultStr> {
     pub next_cursor: S,
     pub recipes: Vec<RecipeView<S>>,
@@ -46,7 +41,9 @@ pub struct GetRecipesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for blue.recipes.feed.getRecipes
+/** Response marker for the `blue.recipes.feed.getRecipes` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetRecipesOutput<S>` for this endpoint.*/
 pub struct GetRecipesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecipesResponse {
     const NSID: &'static str = "blue.recipes.feed.getRecipes";
@@ -61,7 +58,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRecipes<S> {
     type Response = GetRecipesResponse;
 }
 
-/// Endpoint type for blue.recipes.feed.getRecipes
+/** Endpoint marker for the `blue.recipes.feed.getRecipes` query.
+
+Path: `/xrpc/blue.recipes.feed.getRecipes`. The request payload type is `GetRecipes<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetRecipesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecipesRequest {
     const PATH: &'static str = "/xrpc/blue.recipes.feed.getRecipes";
@@ -76,7 +75,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_recipes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

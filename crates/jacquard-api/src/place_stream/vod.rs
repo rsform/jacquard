@@ -5,9 +5,11 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `place.stream.vod` Lexicon namespace/module.
 pub mod comment;
 pub mod gate;
 pub mod get_comments;
+
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
@@ -25,17 +27,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor::ProfileViewBasic;
-use crate::place_stream::vod;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileViewBasic;
+use crate::place_stream::vod;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CommentView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -54,10 +53,7 @@ pub struct CommentView<S: BosStr = DefaultStr> {
 /// A comment view without its own `replyTo`, used to represent the parent of a reply without recursively nesting the whole thread.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CommentViewBasic<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -122,7 +118,7 @@ impl<S: BosStr> LexiconSchema for CommentViewBasic<S> {
 
 pub mod comment_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -380,7 +376,10 @@ where
 
 impl<St: comment_view_state::State, S: BosStr> CommentViewBuilder<St, S> {
     /// Set the `replyTo` field (optional)
-    pub fn reply_to(mut self, value: impl Into<Option<vod::CommentViewBasic<S>>>) -> Self {
+    pub fn reply_to(
+        mut self,
+        value: impl Into<Option<vod::CommentViewBasic<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -434,7 +433,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommentView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CommentView<S> {
         CommentView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -449,10 +451,10 @@ where
 }
 
 fn lexicon_doc_place_stream_vod_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.vod.defs"),
@@ -607,7 +609,7 @@ fn lexicon_doc_place_stream_vod_defs() -> LexiconDoc<'static> {
 
 pub mod comment_view_basic_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -718,7 +720,10 @@ pub mod comment_view_basic_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CommentViewBasicBuilder<St: comment_view_basic_state::State, S: BosStr = DefaultStr> {
+pub struct CommentViewBasicBuilder<
+    St: comment_view_basic_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
@@ -733,7 +738,10 @@ pub struct CommentViewBasicBuilder<St: comment_view_basic_state::State, S: BosSt
 
 impl CommentViewBasic<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CommentViewBasicBuilder<comment_view_basic_state::Empty, DefaultStr> {
+    pub fn new() -> CommentViewBasicBuilder<
+        comment_view_basic_state::Empty,
+        DefaultStr,
+    > {
         CommentViewBasicBuilder::new()
     }
 }
@@ -904,7 +912,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CommentViewBasic<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CommentViewBasic<S> {
         CommentViewBasic {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),

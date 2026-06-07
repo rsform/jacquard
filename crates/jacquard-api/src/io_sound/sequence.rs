@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,12 +25,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::io_sound::credit::Credit;
 use crate::io_sound::sequence;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A sequence of timed events. Full documentation at https://github.com/soundio/sequence/.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -180,7 +180,7 @@ impl<S: BosStr> LexiconSchema for Sequence<S> {
 
 pub mod sequence_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -248,9 +248,7 @@ impl SequenceBuilder<sequence_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         SequenceBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -261,9 +259,7 @@ impl<S: BosStr> SequenceBuilder<sequence_state::Empty, S> {
     pub fn builder() -> Self {
         SequenceBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -355,7 +351,10 @@ impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
 
 impl<St: sequence_state::State, S: BosStr> SequenceBuilder<St, S> {
     /// Set the `sequences` field (optional)
-    pub fn sequences(mut self, value: impl Into<Option<Vec<sequence::Sequence<S>>>>) -> Self {
+    pub fn sequences(
+        mut self,
+        value: impl Into<Option<Vec<sequence::Sequence<S>>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -460,10 +459,10 @@ where
 }
 
 fn lexicon_doc_io_sound_sequence() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.sound.sequence"),

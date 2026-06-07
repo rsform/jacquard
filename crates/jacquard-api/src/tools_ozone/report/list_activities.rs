@@ -8,35 +8,30 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::report::ReportActivityView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::report::ReportActivityView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListActivities<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub report_id: i64,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListActivitiesOutput<S: BosStr = DefaultStr> {
     pub activities: Vec<ReportActivityView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,7 +40,9 @@ pub struct ListActivitiesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.report.listActivities
+/** Response marker for the `tools.ozone.report.listActivities` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListActivitiesOutput<S>` for this endpoint.*/
 pub struct ListActivitiesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListActivitiesResponse {
     const NSID: &'static str = "tools.ozone.report.listActivities";
@@ -60,7 +57,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListActivities<S> {
     type Response = ListActivitiesResponse;
 }
 
-/// Endpoint type for tools.ozone.report.listActivities
+/** Endpoint marker for the `tools.ozone.report.listActivities` query.
+
+Path: `/xrpc/tools.ozone.report.listActivities`. The request payload type is `ListActivities<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListActivitiesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListActivitiesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.report.listActivities";
@@ -75,7 +74,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_activities_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,7 +105,10 @@ pub mod list_activities_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListActivitiesBuilder<St: list_activities_state::State, S: BosStr = DefaultStr> {
+pub struct ListActivitiesBuilder<
+    St: list_activities_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,

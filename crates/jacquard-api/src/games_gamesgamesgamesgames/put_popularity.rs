@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_gamesgamesgamesgames::put_popularity;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::put_popularity;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GamePopularity<S: BosStr = DefaultStr> {
     ///Concurrent player count.
     pub ccu: i64,
@@ -39,11 +36,9 @@ pub struct GamePopularity<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutPopularity<S: BosStr = DefaultStr> {
     ///List of games with popularity data to upsert.
     pub games: Vec<put_popularity::GamePopularity<S>>,
@@ -51,11 +46,9 @@ pub struct PutPopularity<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutPopularityOutput<S: BosStr = DefaultStr> {
     ///Number of records upserted.
     pub upserted: i64,
@@ -88,7 +81,9 @@ impl<S: BosStr> LexiconSchema for GamePopularity<S> {
     }
 }
 
-/// Response type for games.gamesgamesgamesgames.putPopularity
+/** Response marker for the `games.gamesgamesgamesgames.putPopularity` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `PutPopularityOutput<S>` for this endpoint.*/
 pub struct PutPopularityResponse;
 impl jacquard_common::xrpc::XrpcResp for PutPopularityResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.putPopularity";
@@ -99,24 +94,28 @@ impl jacquard_common::xrpc::XrpcResp for PutPopularityResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutPopularity<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.putPopularity";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutPopularityResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.putPopularity
+/** Endpoint marker for the `games.gamesgamesgamesgames.putPopularity` procedure.
+
+Path: `/xrpc/games.gamesgamesgamesgames.putPopularity`. The request payload type is `PutPopularity<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct PutPopularityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutPopularityRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.putPopularity";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = PutPopularity<S>;
     type Response = PutPopularityResponse;
 }
 
 pub mod game_popularity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -159,7 +158,10 @@ pub mod game_popularity_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GamePopularityBuilder<St: game_popularity_state::State, S: BosStr = DefaultStr> {
+pub struct GamePopularityBuilder<
+    St: game_popularity_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -254,7 +256,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GamePopularity<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GamePopularity<S> {
         GamePopularity {
             ccu: self._fields.0.unwrap(),
             steam_id: self._fields.1.unwrap(),
@@ -264,10 +269,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_putPopularity() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.putPopularity"),
@@ -276,10 +281,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_putPopularity() -> LexiconDoc<'static>
             map.insert(
                 SmolStr::new_static("gamePopularity"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("steamId"),
-                        SmolStr::new_static("ccu"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("steamId"), SmolStr::new_static("ccu")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -307,28 +311,32 @@ fn lexicon_doc_games_gamesgamesgamesgames_putPopularity() -> LexiconDoc<'static>
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("games")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("games"),
-                                    LexObjectProperty::Array(LexArray {
-                                        description: Some(CowStr::new_static(
-                                            "List of games with popularity data to upsert.",
-                                        )),
-                                        items: LexArrayItem::Ref(LexRef {
-                                            r#ref: CowStr::new_static("#gamePopularity"),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("games")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("games"),
+                                        LexObjectProperty::Array(LexArray {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "List of games with popularity data to upsert.",
+                                                ),
+                                            ),
+                                            items: LexArrayItem::Ref(LexRef {
+                                                r#ref: CowStr::new_static("#gamePopularity"),
+                                                ..Default::default()
+                                            }),
                                             ..Default::default()
                                         }),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -342,7 +350,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_putPopularity() -> LexiconDoc<'static>
 
 pub mod put_popularity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -373,7 +381,10 @@ pub mod put_popularity_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PutPopularityBuilder<St: put_popularity_state::State, S: BosStr = DefaultStr> {
+pub struct PutPopularityBuilder<
+    St: put_popularity_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<put_popularity::GamePopularity<S>>>,),
     _type: PhantomData<fn() -> S>,
@@ -447,7 +458,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PutPopularity<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PutPopularity<S> {
         PutPopularity {
             games: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteAccount<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub password: S,
@@ -30,9 +27,18 @@ pub struct DeleteAccount<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DeleteAccountError {
     #[serde(rename = "ExpiredToken")]
@@ -41,10 +47,7 @@ pub enum DeleteAccountError {
     InvalidToken(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DeleteAccountError {
@@ -75,7 +78,9 @@ impl core::fmt::Display for DeleteAccountError {
     }
 }
 
-/// Response type for com.atproto.server.deleteAccount
+/** Response marker for the `com.atproto.server.deleteAccount` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct DeleteAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
     const NSID: &'static str = "com.atproto.server.deleteAccount";
@@ -86,24 +91,28 @@ impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteAccount<S> {
     const NSID: &'static str = "com.atproto.server.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteAccountResponse;
 }
 
-/// Endpoint type for com.atproto.server.deleteAccount
+/** Endpoint marker for the `com.atproto.server.deleteAccount` procedure.
+
+Path: `/xrpc/com.atproto.server.deleteAccount`. The request payload type is `DeleteAccount<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DeleteAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteAccount<S>;
     type Response = DeleteAccountResponse;
 }
 
 pub mod delete_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,7 +169,10 @@ pub mod delete_account_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteAccountBuilder<St: delete_account_state::State, S: BosStr = DefaultStr> {
+pub struct DeleteAccountBuilder<
+    St: delete_account_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -276,7 +288,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteAccount<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteAccount<S> {
         DeleteAccount {
             did: self._fields.0.unwrap(),
             password: self._fields.1.unwrap(),

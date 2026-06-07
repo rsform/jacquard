@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -23,11 +23,15 @@ pub struct ExportRepoOutput {
     pub body: Bytes,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `ooo.bsky.authfetch.exportRepo` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ExportRepo;
-/// Response type for ooo.bsky.authfetch.exportRepo
+/** Response marker for the `ooo.bsky.authfetch.exportRepo` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ExportRepoOutput` for this endpoint.*/
 pub struct ExportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.exportRepo";
@@ -61,7 +65,9 @@ impl jacquard_common::xrpc::XrpcRequest for ExportRepo {
     type Response = ExportRepoResponse;
 }
 
-/// Endpoint type for ooo.bsky.authfetch.exportRepo
+/** Endpoint marker for the `ooo.bsky.authfetch.exportRepo` query.
+
+Path: `/xrpc/ooo.bsky.authfetch.exportRepo`. The request payload type is `ExportRepo`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct ExportRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.exportRepo";

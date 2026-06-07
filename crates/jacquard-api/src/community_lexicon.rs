@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `community.lexicon` Lexicon namespace/module.
 pub mod bookmarks;
 pub mod calendar;
 pub mod interaction;

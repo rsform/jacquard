@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IsVerified<S: BosStr = DefaultStr> {
     pub domain: S,
 }
@@ -28,17 +25,16 @@ pub struct IsVerified<S: BosStr = DefaultStr> {
 /// Whether the user is verified on that domain
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IsVerifiedOutput<S: BosStr = DefaultStr> {
     pub verified: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.ocho.edu.isVerified
+/** Response marker for the `app.ocho.edu.isVerified` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `IsVerifiedOutput<S>` for this endpoint.*/
 pub struct IsVerifiedResponse;
 impl jacquard_common::xrpc::XrpcResp for IsVerifiedResponse {
     const NSID: &'static str = "app.ocho.edu.isVerified";
@@ -53,7 +49,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for IsVerified<S> {
     type Response = IsVerifiedResponse;
 }
 
-/// Endpoint type for app.ocho.edu.isVerified
+/** Endpoint marker for the `app.ocho.edu.isVerified` query.
+
+Path: `/xrpc/app.ocho.edu.isVerified`. The request payload type is `IsVerified<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct IsVerifiedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for IsVerifiedRequest {
     const PATH: &'static str = "/xrpc/app.ocho.edu.isVerified";
@@ -64,7 +62,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for IsVerifiedRequest {
 
 pub mod is_verified_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -10,26 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Log<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///Defaults to `""`.
+    /// Defaults to `""`.
     #[serde(default = "_default_path")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub path: Option<S>,
@@ -37,15 +34,25 @@ pub struct Log<S: BosStr = DefaultStr> {
     pub repo: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct LogOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum LogError {
     /// Repository not found or access denied
@@ -62,10 +69,7 @@ pub enum LogError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for LogError {
@@ -110,7 +114,9 @@ impl core::fmt::Display for LogError {
     }
 }
 
-/// Response type for sh.tangled.repo.log
+/** Response marker for the `sh.tangled.repo.log` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `LogOutput` for this endpoint.*/
 pub struct LogResponse;
 impl jacquard_common::xrpc::XrpcResp for LogResponse {
     const NSID: &'static str = "sh.tangled.repo.log";
@@ -144,7 +150,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Log<S> {
     type Response = LogResponse;
 }
 
-/// Endpoint type for sh.tangled.repo.log
+/** Endpoint marker for the `sh.tangled.repo.log` query.
+
+Path: `/xrpc/sh.tangled.repo.log`. The request payload type is `Log<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct LogRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LogRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.log";
@@ -163,7 +171,7 @@ fn _default_path<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

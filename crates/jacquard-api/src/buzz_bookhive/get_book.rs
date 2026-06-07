@@ -8,26 +8,23 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::string::Datetime;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 use crate::buzz_bookhive::Activity;
 use crate::buzz_bookhive::BookProgress;
 use crate::buzz_bookhive::Comment;
 use crate::buzz_bookhive::Review;
 use crate::buzz_bookhive::hive_book::HiveBook;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::blob::BlobRef;
-use jacquard_common::types::string::Datetime;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBook<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goodreads_id: Option<S>,
@@ -39,11 +36,9 @@ pub struct GetBook<S: BosStr = DefaultStr> {
     pub isbn13: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookOutput<S: BosStr = DefaultStr> {
     ///Other users' activity on the book
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -79,6 +74,7 @@ pub struct GetBookOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GetBookOutputStatus<S: BosStr = DefaultStr> {
@@ -169,7 +165,9 @@ where
     }
 }
 
-/// Response type for buzz.bookhive.getBook
+/** Response marker for the `buzz.bookhive.getBook` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetBookOutput<S>` for this endpoint.*/
 pub struct GetBookResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookResponse {
     const NSID: &'static str = "buzz.bookhive.getBook";
@@ -184,7 +182,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetBook<S> {
     type Response = GetBookResponse;
 }
 
-/// Endpoint type for buzz.bookhive.getBook
+/** Endpoint marker for the `buzz.bookhive.getBook` query.
+
+Path: `/xrpc/buzz.bookhive.getBook`. The request payload type is `GetBook<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetBookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.getBook";
@@ -195,7 +195,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
 
 pub mod get_book_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

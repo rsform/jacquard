@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.chavatar` Lexicon namespace/module.
 pub mod auth_execute_rotation;
 pub mod auth_manage_avatar;
 pub mod auth_view_avatar;

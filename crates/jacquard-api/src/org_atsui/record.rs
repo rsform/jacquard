@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Record<S: BosStr = DefaultStr> {
     ///AT-URI of the record to display
     pub uri: AtUri<S>,
@@ -30,11 +27,9 @@ pub struct Record<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -42,7 +37,9 @@ pub struct RecordOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for org.atsui.Record
+/** Response marker for the `org.atsui.Record` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `RecordOutput<S>` for this endpoint.*/
 pub struct RecordResponse;
 impl jacquard_common::xrpc::XrpcResp for RecordResponse {
     const NSID: &'static str = "org.atsui.Record";
@@ -53,24 +50,28 @@ impl jacquard_common::xrpc::XrpcResp for RecordResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Record<S> {
     const NSID: &'static str = "org.atsui.Record";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RecordResponse;
 }
 
-/// Endpoint type for org.atsui.Record
+/** Endpoint marker for the `org.atsui.Record` procedure.
+
+Path: `/xrpc/org.atsui.Record`. The request payload type is `Record<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct RecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RecordRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Record";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Record<S>;
     type Response = RecordResponse;
 }
 
 pub mod record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,7 +150,10 @@ where
     St::Uri: record_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> RecordBuilder<record_state::SetUri<St>, S> {
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> RecordBuilder<record_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,

@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `blog.pckt.block` Lexicon namespace/module.
 pub mod blockquote;
 pub mod bluesky_embed;
 pub mod bullet_list;

@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `tools.ozone.queue` Lexicon namespace/module.
 pub mod assign_moderator;
 pub mod create_queue;
 pub mod delete_queue;
@@ -14,33 +15,31 @@ pub mod route_reports;
 pub mod unassign_moderator;
 pub mod update_queue;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, Nsid};
+use jacquard_common::types::string::{Did, Nsid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::tools_ozone::queue;
-use crate::tools_ozone::team::Member;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::team::Member;
+use crate::tools_ozone::queue;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AssignmentView<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,11 +54,9 @@ pub struct AssignmentView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueueStats<S: BosStr = DefaultStr> {
     ///Percentage of reports actioned (actionedCount / inboundCount * 100), rounded to nearest integer. Absent when inboundCount is 0.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -86,11 +83,9 @@ pub struct QueueStats<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueueView<S: BosStr = DefaultStr> {
     ///Collection name for record subjects (e.g., 'app.bsky.feed.post')
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -190,7 +185,7 @@ impl<S: BosStr> LexiconSchema for QueueView<S> {
 
 pub mod assignment_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -263,7 +258,10 @@ pub mod assignment_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AssignmentViewBuilder<St: assignment_view_state::State, S: BosStr = DefaultStr> {
+pub struct AssignmentViewBuilder<
+    St: assignment_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -435,7 +433,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AssignmentView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AssignmentView<S> {
         AssignmentView {
             did: self._fields.0.unwrap(),
             end_at: self._fields.1,
@@ -449,10 +450,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_queue_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.queue.defs"),
@@ -461,12 +462,12 @@ fn lexicon_doc_tools_ozone_queue_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("assignmentView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("queue"),
-                        SmolStr::new_static("startAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("did"),
+                            SmolStr::new_static("queue"), SmolStr::new_static("startAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -556,9 +557,11 @@ fn lexicon_doc_tools_ozone_queue_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lastUpdated"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When these statistics were last computed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When these statistics were last computed",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -719,7 +722,7 @@ fn lexicon_doc_tools_ozone_queue_defs() -> LexiconDoc<'static> {
 
 pub mod queue_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -941,7 +944,18 @@ impl QueueViewBuilder<queue_view_state::Empty, DefaultStr> {
         QueueViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -954,7 +968,18 @@ impl<S: BosStr> QueueViewBuilder<queue_view_state::Empty, S> {
         QueueViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1063,7 +1088,10 @@ where
     St::Id: queue_view_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<i64>) -> QueueViewBuilder<queue_view_state::SetId<St>, S> {
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> QueueViewBuilder<queue_view_state::SetId<St>, S> {
         self._fields.6 = Option::Some(value.into());
         QueueViewBuilder {
             _state: PhantomData,
@@ -1200,7 +1228,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> QueueView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> QueueView<S> {
         QueueView {
             collection: self._fields.0,
             created_at: self._fields.1.unwrap(),

@@ -10,21 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetJetstreamStatus;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJetstreamStatusOutput<S: BosStr = DefaultStr> {
     ///Whether Jetstream is currently connected and receiving events
     pub connected: bool,
@@ -32,7 +29,9 @@ pub struct GetJetstreamStatusOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for network.slices.slice.getJetstreamStatus
+/** Response marker for the `network.slices.slice.getJetstreamStatus` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetJetstreamStatusOutput<S>` for this endpoint.*/
 pub struct GetJetstreamStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJetstreamStatusResponse {
     const NSID: &'static str = "network.slices.slice.getJetstreamStatus";
@@ -47,7 +46,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetJetstreamStatus {
     type Response = GetJetstreamStatusResponse;
 }
 
-/// Endpoint type for network.slices.slice.getJetstreamStatus
+/** Endpoint marker for the `network.slices.slice.getJetstreamStatus` query.
+
+Path: `/xrpc/network.slices.slice.getJetstreamStatus`. The request payload type is `GetJetstreamStatus`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetJetstreamStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamStatusRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getJetstreamStatus";

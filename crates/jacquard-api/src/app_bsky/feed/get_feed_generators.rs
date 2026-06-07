@@ -8,37 +8,34 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::feed::GeneratorView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::GeneratorView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeedGenerators<S: BosStr = DefaultStr> {
     pub feeds: Vec<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeedGeneratorsOutput<S: BosStr = DefaultStr> {
     pub feeds: Vec<GeneratorView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.bsky.feed.getFeedGenerators
+/** Response marker for the `app.bsky.feed.getFeedGenerators` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetFeedGeneratorsOutput<S>` for this endpoint.*/
 pub struct GetFeedGeneratorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
     const NSID: &'static str = "app.bsky.feed.getFeedGenerators";
@@ -53,7 +50,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetFeedGenerators<S> {
     type Response = GetFeedGeneratorsResponse;
 }
 
-/// Endpoint type for app.bsky.feed.getFeedGenerators
+/** Endpoint marker for the `app.bsky.feed.getFeedGenerators` query.
+
+Path: `/xrpc/app.bsky.feed.getFeedGenerators`. The request payload type is `GetFeedGenerators<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetFeedGeneratorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getFeedGenerators";
@@ -64,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
 
 pub mod get_feed_generators_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,7 +94,10 @@ pub mod get_feed_generators_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetFeedGeneratorsBuilder<St: get_feed_generators_state::State, S: BosStr = DefaultStr> {
+pub struct GetFeedGeneratorsBuilder<
+    St: get_feed_generators_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
@@ -103,7 +105,10 @@ pub struct GetFeedGeneratorsBuilder<St: get_feed_generators_state::State, S: Bos
 
 impl GetFeedGenerators<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetFeedGeneratorsBuilder<get_feed_generators_state::Empty, DefaultStr> {
+    pub fn new() -> GetFeedGeneratorsBuilder<
+        get_feed_generators_state::Empty,
+        DefaultStr,
+    > {
         GetFeedGeneratorsBuilder::new()
     }
 }

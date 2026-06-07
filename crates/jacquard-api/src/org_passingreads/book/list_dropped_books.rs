@@ -8,31 +8,32 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::org_passingreads::book::StatefulBook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::book::StatefulBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListDroppedBooksOutput<S: BosStr = DefaultStr> {
     pub books: Vec<StatefulBook<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `org.passingreads.book.listDroppedBooks` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ListDroppedBooks;
-/// Response type for org.passingreads.book.listDroppedBooks
+/** Response marker for the `org.passingreads.book.listDroppedBooks` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListDroppedBooksOutput<S>` for this endpoint.*/
 pub struct ListDroppedBooksResponse;
 impl jacquard_common::xrpc::XrpcResp for ListDroppedBooksResponse {
     const NSID: &'static str = "org.passingreads.book.listDroppedBooks";
@@ -47,7 +48,9 @@ impl jacquard_common::xrpc::XrpcRequest for ListDroppedBooks {
     type Response = ListDroppedBooksResponse;
 }
 
-/// Endpoint type for org.passingreads.book.listDroppedBooks
+/** Endpoint marker for the `org.passingreads.book.listDroppedBooks` query.
+
+Path: `/xrpc/org.passingreads.book.listDroppedBooks`. The request payload type is `ListDroppedBooks`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct ListDroppedBooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListDroppedBooksRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.book.listDroppedBooks";

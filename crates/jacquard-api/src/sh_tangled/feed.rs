@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `sh.tangled.feed` Lexicon namespace/module.
 pub mod comment;
 pub mod list_comments;
 pub mod list_comments_by;

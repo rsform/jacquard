@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateClaim<S: BosStr = DefaultStr> {
     pub contact: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -35,18 +32,18 @@ pub struct CreateClaim<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateClaimOutput<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for games.gamesgamesgamesgames.createClaim
+/** Response marker for the `games.gamesgamesgamesgames.createClaim` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CreateClaimOutput<S>` for this endpoint.*/
 pub struct CreateClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.createClaim";
@@ -57,17 +54,21 @@ impl jacquard_common::xrpc::XrpcResp for CreateClaimResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateClaim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.createClaim";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateClaimResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.createClaim
+/** Endpoint marker for the `games.gamesgamesgamesgames.createClaim` procedure.
+
+Path: `/xrpc/games.gamesgamesgamesgames.createClaim`. The request payload type is `CreateClaim<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CreateClaimRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateClaimRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.createClaim";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateClaim<S>;
     type Response = CreateClaimResponse;
 }

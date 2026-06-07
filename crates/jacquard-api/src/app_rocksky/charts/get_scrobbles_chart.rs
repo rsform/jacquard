@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::charts::ChartsView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::charts::ChartsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetScrobblesChart<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub albumuri: Option<AtUri<S>>,
@@ -35,11 +32,9 @@ pub struct GetScrobblesChart<S: BosStr = DefaultStr> {
     pub songuri: Option<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetScrobblesChartOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ChartsView<S>,
@@ -47,7 +42,9 @@ pub struct GetScrobblesChartOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.charts.getScrobblesChart
+/** Response marker for the `app.rocksky.charts.getScrobblesChart` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetScrobblesChartOutput<S>` for this endpoint.*/
 pub struct GetScrobblesChartResponse;
 impl jacquard_common::xrpc::XrpcResp for GetScrobblesChartResponse {
     const NSID: &'static str = "app.rocksky.charts.getScrobblesChart";
@@ -62,7 +59,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetScrobblesChart<S> {
     type Response = GetScrobblesChartResponse;
 }
 
-/// Endpoint type for app.rocksky.charts.getScrobblesChart
+/** Endpoint marker for the `app.rocksky.charts.getScrobblesChart` query.
+
+Path: `/xrpc/app.rocksky.charts.getScrobblesChart`. The request payload type is `GetScrobblesChart<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetScrobblesChartRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.charts.getScrobblesChart";
@@ -73,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesChartRequest {
 
 pub mod get_scrobbles_chart_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -91,7 +90,10 @@ pub mod get_scrobbles_chart_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetScrobblesChartBuilder<St: get_scrobbles_chart_state::State, S: BosStr = DefaultStr> {
+pub struct GetScrobblesChartBuilder<
+    St: get_scrobbles_chart_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -104,7 +106,10 @@ pub struct GetScrobblesChartBuilder<St: get_scrobbles_chart_state::State, S: Bos
 
 impl GetScrobblesChart<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetScrobblesChartBuilder<get_scrobbles_chart_state::Empty, DefaultStr> {
+    pub fn new() -> GetScrobblesChartBuilder<
+        get_scrobbles_chart_state::Empty,
+        DefaultStr,
+    > {
         GetScrobblesChartBuilder::new()
     }
 }

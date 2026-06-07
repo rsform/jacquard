@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteOAuthClient<S: BosStr = DefaultStr> {
     ///OAuth client ID to delete
     pub client_id: S,
@@ -28,11 +25,9 @@ pub struct DeleteOAuthClient<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteOAuthClientOutput<S: BosStr = DefaultStr> {
     ///Success confirmation message
     pub message: S,
@@ -40,7 +35,9 @@ pub struct DeleteOAuthClientOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for network.slices.slice.deleteOAuthClient
+/** Response marker for the `network.slices.slice.deleteOAuthClient` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DeleteOAuthClientOutput<S>` for this endpoint.*/
 pub struct DeleteOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteOAuthClientResponse {
     const NSID: &'static str = "network.slices.slice.deleteOAuthClient";
@@ -51,17 +48,21 @@ impl jacquard_common::xrpc::XrpcResp for DeleteOAuthClientResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteOAuthClient<S> {
     const NSID: &'static str = "network.slices.slice.deleteOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteOAuthClientResponse;
 }
 
-/// Endpoint type for network.slices.slice.deleteOAuthClient
+/** Endpoint marker for the `network.slices.slice.deleteOAuthClient` procedure.
+
+Path: `/xrpc/network.slices.slice.deleteOAuthClient`. The request payload type is `DeleteOAuthClient<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DeleteOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.deleteOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteOAuthClient<S>;
     type Response = DeleteOAuthClientResponse;
 }

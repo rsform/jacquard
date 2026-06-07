@@ -8,36 +8,31 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::ConvoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListMutualGroups<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub subject: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListMutualGroupsOutput<S: BosStr = DefaultStr> {
     pub convos: Vec<ConvoView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,7 +41,9 @@ pub struct ListMutualGroupsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for chat.bsky.group.listMutualGroups
+/** Response marker for the `chat.bsky.group.listMutualGroups` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListMutualGroupsOutput<S>` for this endpoint.*/
 pub struct ListMutualGroupsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListMutualGroupsResponse {
     const NSID: &'static str = "chat.bsky.group.listMutualGroups";
@@ -61,7 +58,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListMutualGroups<S> {
     type Response = ListMutualGroupsResponse;
 }
 
-/// Endpoint type for chat.bsky.group.listMutualGroups
+/** Endpoint marker for the `chat.bsky.group.listMutualGroups` query.
+
+Path: `/xrpc/chat.bsky.group.listMutualGroups`. The request payload type is `ListMutualGroups<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListMutualGroupsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListMutualGroupsRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.group.listMutualGroups";
@@ -76,7 +75,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_mutual_groups_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -107,7 +106,10 @@ pub mod list_mutual_groups_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListMutualGroupsBuilder<St: list_mutual_groups_state::State, S: BosStr = DefaultStr> {
+pub struct ListMutualGroupsBuilder<
+    St: list_mutual_groups_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -115,7 +117,10 @@ pub struct ListMutualGroupsBuilder<St: list_mutual_groups_state::State, S: BosSt
 
 impl ListMutualGroups<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListMutualGroupsBuilder<list_mutual_groups_state::Empty, DefaultStr> {
+    pub fn new() -> ListMutualGroupsBuilder<
+        list_mutual_groups_state::Empty,
+        DefaultStr,
+    > {
         ListMutualGroupsBuilder::new()
     }
 }

@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Raw binary part data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -24,11 +24,9 @@ pub struct UploadPart {
     pub body: Bytes,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UploadPartOutput<S: BosStr = DefaultStr> {
     ///ETag of the uploaded part, required for completeUpload
     pub etag: S,
@@ -36,9 +34,18 @@ pub struct UploadPartOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum UploadPartError {
     #[serde(rename = "InvalidUploadId")]
@@ -49,10 +56,7 @@ pub enum UploadPartError {
     UploadFailed(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for UploadPartError {
@@ -90,7 +94,9 @@ impl core::fmt::Display for UploadPartError {
     }
 }
 
-/// Response type for io.atcr.hold.uploadPart
+/** Response marker for the `io.atcr.hold.uploadPart` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `UploadPartOutput<S>` for this endpoint.*/
 pub struct UploadPartResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadPartResponse {
     const NSID: &'static str = "io.atcr.hold.uploadPart";
@@ -101,16 +107,22 @@ impl jacquard_common::xrpc::XrpcResp for UploadPartResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for UploadPart {
     const NSID: &'static str = "io.atcr.hold.uploadPart";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Response = UploadPartResponse;
-    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
+    fn encode_body(
+        &self,
+        buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,
     {
         Ok(buffer.copy_from_slice(self.body.as_ref()))
     }
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Self, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
@@ -120,12 +132,15 @@ impl jacquard_common::xrpc::XrpcRequest for UploadPart {
     }
 }
 
-/// Endpoint type for io.atcr.hold.uploadPart
+/** Endpoint marker for the `io.atcr.hold.uploadPart` procedure.
+
+Path: `/xrpc/io.atcr.hold.uploadPart`. The request payload type is `UploadPart`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct UploadPartRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UploadPartRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.uploadPart";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Request<S: BosStr> = UploadPart;
     type Response = UploadPartResponse;
 }

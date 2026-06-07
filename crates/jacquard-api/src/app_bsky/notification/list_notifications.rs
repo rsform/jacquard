@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,22 +21,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor::ProfileView;
-use crate::app_bsky::notification::list_notifications;
-use crate::com_atproto::label::Label;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileView;
+use crate::com_atproto::label::Label;
+use crate::app_bsky::notification::list_notifications;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotifications<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -48,11 +45,9 @@ pub struct ListNotifications<S: BosStr = DefaultStr> {
     pub seen_at: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -65,11 +60,9 @@ pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Notification<S: BosStr = DefaultStr> {
     pub author: ProfileView<S>,
     pub cid: Cid<S>,
@@ -198,7 +191,9 @@ where
             NotificationReason::Mention => NotificationReason::Mention,
             NotificationReason::Reply => NotificationReason::Reply,
             NotificationReason::Quote => NotificationReason::Quote,
-            NotificationReason::StarterpackJoined => NotificationReason::StarterpackJoined,
+            NotificationReason::StarterpackJoined => {
+                NotificationReason::StarterpackJoined
+            }
             NotificationReason::Verified => NotificationReason::Verified,
             NotificationReason::Unverified => NotificationReason::Unverified,
             NotificationReason::LikeViaRepost => NotificationReason::LikeViaRepost,
@@ -210,7 +205,9 @@ where
     }
 }
 
-/// Response type for app.bsky.notification.listNotifications
+/** Response marker for the `app.bsky.notification.listNotifications` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListNotificationsOutput<S>` for this endpoint.*/
 pub struct ListNotificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListNotificationsResponse {
     const NSID: &'static str = "app.bsky.notification.listNotifications";
@@ -225,7 +222,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListNotifications<S> {
     type Response = ListNotificationsResponse;
 }
 
-/// Endpoint type for app.bsky.notification.listNotifications
+/** Endpoint marker for the `app.bsky.notification.listNotifications` query.
+
+Path: `/xrpc/app.bsky.notification.listNotifications`. The request payload type is `ListNotifications<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListNotificationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListNotificationsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.notification.listNotifications";
@@ -255,7 +254,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_notifications_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -273,21 +272,21 @@ pub mod list_notifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListNotificationsBuilder<St: list_notifications_state::State, S: BosStr = DefaultStr> {
+pub struct ListNotificationsBuilder<
+    St: list_notifications_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<i64>,
-        Option<bool>,
-        Option<Vec<S>>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<S>, Option<i64>, Option<bool>, Option<Vec<S>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ListNotifications<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListNotificationsBuilder<list_notifications_state::Empty, DefaultStr> {
+    pub fn new() -> ListNotificationsBuilder<
+        list_notifications_state::Empty,
+        DefaultStr,
+    > {
         ListNotificationsBuilder::new()
     }
 }
@@ -404,7 +403,7 @@ where
 
 pub mod notification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -775,7 +774,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Notification<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Notification<S> {
         Notification {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -792,10 +794,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_notification_listNotifications() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.notification.listNotifications"),

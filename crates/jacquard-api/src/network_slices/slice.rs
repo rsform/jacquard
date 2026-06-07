@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `network.slices.slice` Lexicon namespace/module.
 pub mod clear_slice_records;
 pub mod create_o_auth_client;
 pub mod delete_o_auth_client;
@@ -22,12 +23,13 @@ pub mod stats;
 pub mod sync_user_collections;
 pub mod update_o_auth_client;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,11 +43,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::actor::ProfileViewBasic;
-use crate::network_slices::slice;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::actor::ProfileViewBasic;
+use crate::network_slices::slice;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -76,11 +78,9 @@ pub struct SliceGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Slice<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SliceView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub created_at: Datetime,
@@ -113,11 +113,9 @@ pub struct SliceView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SparklinePoint<S: BosStr = DefaultStr> {
     pub count: i64,
     pub timestamp: Datetime,
@@ -237,7 +235,7 @@ impl<S: BosStr> LexiconSchema for SparklinePoint<S> {
 
 pub mod slice_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -361,7 +359,10 @@ where
     St::Domain: slice_state::IsUnset,
 {
     /// Set the `domain` field (required)
-    pub fn domain(mut self, value: impl Into<S>) -> SliceBuilder<slice_state::SetDomain<St>, S> {
+    pub fn domain(
+        mut self,
+        value: impl Into<S>,
+    ) -> SliceBuilder<slice_state::SetDomain<St>, S> {
         self._fields.1 = Option::Some(value.into());
         SliceBuilder {
             _state: PhantomData,
@@ -377,7 +378,10 @@ where
     St::Name: slice_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SliceBuilder<slice_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> SliceBuilder<slice_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SliceBuilder {
             _state: PhantomData,
@@ -415,10 +419,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice"),
@@ -483,7 +487,7 @@ fn lexicon_doc_network_slices_slice() -> LexiconDoc<'static> {
 
 pub mod slice_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -633,7 +637,18 @@ impl SliceViewBuilder<slice_view_state::Empty, DefaultStr> {
         SliceViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -646,7 +661,18 @@ impl<S: BosStr> SliceViewBuilder<slice_view_state::Empty, S> {
         SliceViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -789,12 +815,18 @@ where
 
 impl<St: slice_view_state::State, S: BosStr> SliceViewBuilder<St, S> {
     /// Set the `sparkline` field (optional)
-    pub fn sparkline(mut self, value: impl Into<Option<Vec<slice::SparklinePoint<S>>>>) -> Self {
+    pub fn sparkline(
+        mut self,
+        value: impl Into<Option<Vec<slice::SparklinePoint<S>>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `sparkline` field to an Option value (optional)
-    pub fn maybe_sparkline(mut self, value: Option<Vec<slice::SparklinePoint<S>>>) -> Self {
+    pub fn maybe_sparkline(
+        mut self,
+        value: Option<Vec<slice::SparklinePoint<S>>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -874,7 +906,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SliceView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SliceView<S> {
         SliceView {
             cid: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -894,10 +929,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.defs"),
@@ -906,14 +941,14 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sliceView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("domain"),
-                        SmolStr::new_static("creator"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("name"), SmolStr::new_static("domain"),
+                            SmolStr::new_static("creator"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -943,9 +978,11 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("domain"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Primary domain namespace for this slice (e.g. social.grain)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Primary domain namespace for this slice (e.g. social.grain)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -970,16 +1007,20 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Display name of the slice")),
+                                description: Some(
+                                    CowStr::new_static("Display name of the slice"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sparkline"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Recent activity sparkline data points for the last 24 hours",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Recent activity sparkline data points for the last 24 hours",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#sparklinePoint"),
                                     ..Default::default()
@@ -1014,10 +1055,12 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sparklinePoint"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("timestamp"),
-                        SmolStr::new_static("count"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("timestamp"),
+                            SmolStr::new_static("count")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1048,7 +1091,7 @@ fn lexicon_doc_network_slices_slice_defs() -> LexiconDoc<'static> {
 
 pub mod sparkline_point_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1091,7 +1134,10 @@ pub mod sparkline_point_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SparklinePointBuilder<St: sparkline_point_state::State, S: BosStr = DefaultStr> {
+pub struct SparklinePointBuilder<
+    St: sparkline_point_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
@@ -1186,7 +1232,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SparklinePoint<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SparklinePoint<S> {
         SparklinePoint {
             count: self._fields.0.unwrap(),
             timestamp: self._fields.1.unwrap(),

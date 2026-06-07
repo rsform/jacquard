@@ -5,16 +5,18 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `sh.tangled.repo.pull.status` Lexicon namespace/module.
 pub mod closed;
 pub mod merged;
 pub mod open;
+
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,7 +32,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -122,7 +124,9 @@ where
     type Output = StatusStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            StatusStatus::ShTangledRepoPullStatusOpen => StatusStatus::ShTangledRepoPullStatusOpen,
+            StatusStatus::ShTangledRepoPullStatusOpen => {
+                StatusStatus::ShTangledRepoPullStatusOpen
+            }
             StatusStatus::ShTangledRepoPullStatusClosed => {
                 StatusStatus::ShTangledRepoPullStatusClosed
             }
@@ -195,7 +199,7 @@ impl<S: BosStr> LexiconSchema for Status<S> {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -343,10 +347,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_pull_status() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.pull.status"),
@@ -357,10 +361,11 @@ fn lexicon_doc_sh_tangled_repo_pull_status() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("pull"),
-                            SmolStr::new_static("status"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("pull"), SmolStr::new_static("status")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -374,9 +379,9 @@ fn lexicon_doc_sh_tangled_repo_pull_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("status"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "status of the pull request",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("status of the pull request"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

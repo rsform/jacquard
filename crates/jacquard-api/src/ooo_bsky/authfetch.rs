@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `ooo.bsky.authfetch` Lexicon namespace/module.
 pub mod delete_records;
 pub mod describe_repo;
 pub mod destroy_repo;

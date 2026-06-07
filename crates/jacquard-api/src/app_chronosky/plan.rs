@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.chronosky.plan` Lexicon namespace/module.
 pub mod get_assignment;
 pub mod get_usage;
 pub mod list_assignments;

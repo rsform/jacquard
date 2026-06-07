@@ -5,15 +5,17 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `sh.tangled.repo.issue.state` Lexicon namespace/module.
 pub mod closed;
 pub mod open;
+
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,7 +31,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -118,8 +120,12 @@ where
     type Output = StateState<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            StateState::ShTangledRepoIssueStateOpen => StateState::ShTangledRepoIssueStateOpen,
-            StateState::ShTangledRepoIssueStateClosed => StateState::ShTangledRepoIssueStateClosed,
+            StateState::ShTangledRepoIssueStateOpen => {
+                StateState::ShTangledRepoIssueStateOpen
+            }
+            StateState::ShTangledRepoIssueStateClosed => {
+                StateState::ShTangledRepoIssueStateClosed
+            }
             StateState::Other(v) => StateState::Other(v.into_static()),
         }
     }
@@ -186,7 +192,7 @@ impl<S: BosStr> LexiconSchema for State<S> {
 
 pub mod state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -334,10 +340,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_issue_state() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.issue.state"),
@@ -348,10 +354,11 @@ fn lexicon_doc_sh_tangled_repo_issue_state() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("issue"),
-                            SmolStr::new_static("state"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("issue"), SmolStr::new_static("state")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

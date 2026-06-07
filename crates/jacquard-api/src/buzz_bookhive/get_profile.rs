@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 use crate::buzz_bookhive::Activity;
 use crate::buzz_bookhive::Profile;
 use crate::buzz_bookhive::UserBook;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<S>,
@@ -31,11 +28,9 @@ pub struct GetProfile<S: BosStr = DefaultStr> {
     pub handle: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileOutput<S: BosStr = DefaultStr> {
     ///The user's activity
     pub activity: Vec<Activity<S>>,
@@ -49,7 +44,9 @@ pub struct GetProfileOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for buzz.bookhive.getProfile
+/** Response marker for the `buzz.bookhive.getProfile` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetProfileOutput<S>` for this endpoint.*/
 pub struct GetProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
     const NSID: &'static str = "buzz.bookhive.getProfile";
@@ -64,7 +61,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetProfile<S> {
     type Response = GetProfileResponse;
 }
 
-/// Endpoint type for buzz.bookhive.getProfile
+/** Endpoint marker for the `buzz.bookhive.getProfile` query.
+
+Path: `/xrpc/buzz.bookhive.getProfile`. The request payload type is `GetProfile<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.getProfile";
@@ -75,7 +74,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
 
 pub mod get_profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

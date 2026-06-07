@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `games.gamesgamesgamesgames.feed` Lexicon namespace/module.
 pub mod describe_feed_generator;
 pub mod generator;
 pub mod get_activity_feed;

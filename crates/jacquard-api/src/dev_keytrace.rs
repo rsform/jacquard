@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `dev.keytrace` Lexicon namespace/module.
 pub mod claim;
 pub mod profile;
 pub mod server_public_key;

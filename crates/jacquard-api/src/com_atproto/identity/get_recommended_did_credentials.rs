@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecommendedDidCredentialsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub also_known_as: Option<Vec<S>>,
@@ -35,11 +32,15 @@ pub struct GetRecommendedDidCredentialsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `com.atproto.identity.getRecommendedDidCredentials` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetRecommendedDidCredentials;
-/// Response type for com.atproto.identity.getRecommendedDidCredentials
+/** Response marker for the `com.atproto.identity.getRecommendedDidCredentials` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetRecommendedDidCredentialsOutput<S>` for this endpoint.*/
 pub struct GetRecommendedDidCredentialsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecommendedDidCredentialsResponse {
     const NSID: &'static str = "com.atproto.identity.getRecommendedDidCredentials";
@@ -54,7 +55,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetRecommendedDidCredentials {
     type Response = GetRecommendedDidCredentialsResponse;
 }
 
-/// Endpoint type for com.atproto.identity.getRecommendedDidCredentials
+/** Endpoint marker for the `com.atproto.identity.getRecommendedDidCredentials` query.
+
+Path: `/xrpc/com.atproto.identity.getRecommendedDidCredentials`. The request payload type is `GetRecommendedDidCredentials`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct GetRecommendedDidCredentialsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendedDidCredentialsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.getRecommendedDidCredentials";

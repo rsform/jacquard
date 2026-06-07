@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `blue.zio.atfile` Lexicon namespace/module.
 pub mod finger;
 pub mod lock;
 pub mod meta;

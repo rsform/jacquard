@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteVodGate<S: BosStr = DefaultStr> {
     ///The AT-URI of the gate record to delete.
     pub gate_uri: AtUri<S>,
@@ -31,19 +28,26 @@ pub struct DeleteVodGate<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteVodGateOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DeleteVodGateError {
     /// The request lacks valid authentication credentials.
@@ -57,10 +61,7 @@ pub enum DeleteVodGateError {
     SessionNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DeleteVodGateError {
@@ -98,7 +99,9 @@ impl core::fmt::Display for DeleteVodGateError {
     }
 }
 
-/// Response type for place.stream.moderation.deleteVodGate
+/** Response marker for the `place.stream.moderation.deleteVodGate` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DeleteVodGateOutput<S>` for this endpoint.*/
 pub struct DeleteVodGateResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteVodGateResponse {
     const NSID: &'static str = "place.stream.moderation.deleteVodGate";
@@ -109,24 +112,28 @@ impl jacquard_common::xrpc::XrpcResp for DeleteVodGateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteVodGate<S> {
     const NSID: &'static str = "place.stream.moderation.deleteVodGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteVodGateResponse;
 }
 
-/// Endpoint type for place.stream.moderation.deleteVodGate
+/** Endpoint marker for the `place.stream.moderation.deleteVodGate` procedure.
+
+Path: `/xrpc/place.stream.moderation.deleteVodGate`. The request payload type is `DeleteVodGate<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DeleteVodGateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteVodGateRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.deleteVodGate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteVodGate<S>;
     type Response = DeleteVodGateResponse;
 }
 
 pub mod delete_vod_gate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -169,7 +176,10 @@ pub mod delete_vod_gate_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteVodGateBuilder<St: delete_vod_gate_state::State, S: BosStr = DefaultStr> {
+pub struct DeleteVodGateBuilder<
+    St: delete_vod_gate_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -264,7 +274,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteVodGate<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteVodGate<S> {
         DeleteVodGate {
             gate_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

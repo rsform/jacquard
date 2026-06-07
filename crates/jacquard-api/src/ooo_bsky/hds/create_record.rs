@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
-use jacquard_common::types::string::{Cid, Nsid, RecordKey, Rkey, UriValue};
+use jacquard_common::types::string::{Nsid, Cid, RecordKey, Rkey, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateRecord<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     pub gate_uri: UriValue<S>,
@@ -36,11 +33,9 @@ pub struct CreateRecord<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateRecordOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: UriValue<S>,
@@ -49,19 +44,25 @@ pub struct CreateRecordOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CreateRecordError {
     #[serde(rename = "AlreadyExists")]
     AlreadyExists(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CreateRecordError {
@@ -85,7 +86,9 @@ impl core::fmt::Display for CreateRecordError {
     }
 }
 
-/// Response type for ooo.bsky.hds.createRecord
+/** Response marker for the `ooo.bsky.hds.createRecord` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CreateRecordOutput<S>` for this endpoint.*/
 pub struct CreateRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateRecordResponse {
     const NSID: &'static str = "ooo.bsky.hds.createRecord";
@@ -96,24 +99,28 @@ impl jacquard_common::xrpc::XrpcResp for CreateRecordResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateRecord<S> {
     const NSID: &'static str = "ooo.bsky.hds.createRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateRecordResponse;
 }
 
-/// Endpoint type for ooo.bsky.hds.createRecord
+/** Endpoint marker for the `ooo.bsky.hds.createRecord` procedure.
+
+Path: `/xrpc/ooo.bsky.hds.createRecord`. The request payload type is `CreateRecord<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CreateRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRecordRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.createRecord";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateRecord<S>;
     type Response = CreateRecordResponse;
 }
 
 pub mod create_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -358,7 +365,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateRecord<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateRecord<S> {
         CreateRecord {
             collection: self._fields.0.unwrap(),
             gate_uri: self._fields.1.unwrap(),

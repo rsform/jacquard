@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::feed::SearchResultsView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::feed::SearchResultsView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Search<S: BosStr = DefaultStr> {
     pub query: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: SearchResultsView<S>,
@@ -38,7 +33,9 @@ pub struct SearchOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.feed.search
+/** Response marker for the `app.rocksky.feed.search` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SearchOutput<S>` for this endpoint.*/
 pub struct SearchResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchResponse {
     const NSID: &'static str = "app.rocksky.feed.search";
@@ -53,7 +50,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Search<S> {
     type Response = SearchResponse;
 }
 
-/// Endpoint type for app.rocksky.feed.search
+/** Endpoint marker for the `app.rocksky.feed.search` query.
+
+Path: `/xrpc/app.rocksky.feed.search`. The request payload type is `Search<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SearchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.search";
@@ -64,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
 
 pub mod search_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -143,7 +142,10 @@ where
     St::Query: search_state::IsUnset,
 {
     /// Set the `query` field (required)
-    pub fn query(mut self, value: impl Into<S>) -> SearchBuilder<search_state::SetQuery<St>, S> {
+    pub fn query(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchBuilder<search_state::SetQuery<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SearchBuilder {
             _state: PhantomData,

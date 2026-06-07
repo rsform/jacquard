@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Did, Nsid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DescribeAccount<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DescribeAccountOutput<S: BosStr = DefaultStr> {
     pub collections: Vec<Nsid<S>>,
     pub did: Did<S>,
@@ -39,7 +34,9 @@ pub struct DescribeAccountOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for ooo.bsky.hds.describeAccount
+/** Response marker for the `ooo.bsky.hds.describeAccount` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DescribeAccountOutput<S>` for this endpoint.*/
 pub struct DescribeAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeAccountResponse {
     const NSID: &'static str = "ooo.bsky.hds.describeAccount";
@@ -54,7 +51,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DescribeAccount<S> {
     type Response = DescribeAccountResponse;
 }
 
-/// Endpoint type for ooo.bsky.hds.describeAccount
+/** Endpoint marker for the `ooo.bsky.hds.describeAccount` query.
+
+Path: `/xrpc/ooo.bsky.hds.describeAccount`. The request payload type is `DescribeAccount<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DescribeAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeAccountRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.describeAccount";
@@ -65,7 +64,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DescribeAccountRequest {
 
 pub mod describe_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -96,7 +95,10 @@ pub mod describe_account_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DescribeAccountBuilder<St: describe_account_state::State, S: BosStr = DefaultStr> {
+pub struct DescribeAccountBuilder<
+    St: describe_account_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,

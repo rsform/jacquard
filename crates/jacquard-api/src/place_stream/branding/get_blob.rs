@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBlob<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub broadcaster: Option<Did<S>>,
@@ -37,9 +34,18 @@ pub struct GetBlobOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetBlobError {
     /// The requested branding asset does not exist
@@ -47,10 +53,7 @@ pub enum GetBlobError {
     BrandingNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetBlobError {
@@ -74,7 +77,9 @@ impl core::fmt::Display for GetBlobError {
     }
 }
 
-/// Response type for place.stream.branding.getBlob
+/** Response marker for the `place.stream.branding.getBlob` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetBlobOutput` for this endpoint.*/
 pub struct GetBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
     const NSID: &'static str = "place.stream.branding.getBlob";
@@ -108,7 +113,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetBlob<S> {
     type Response = GetBlobResponse;
 }
 
-/// Endpoint type for place.stream.branding.getBlob
+/** Endpoint marker for the `place.stream.branding.getBlob` query.
+
+Path: `/xrpc/place.stream.branding.getBlob`. The request payload type is `GetBlob<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
     const PATH: &'static str = "/xrpc/place.stream.branding.getBlob";
@@ -119,7 +126,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
 
 pub mod get_blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -211,7 +218,10 @@ where
     St::Key: get_blob_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> GetBlobBuilder<get_blob_state::SetKey<St>, S> {
+    pub fn key(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetBlobBuilder<get_blob_state::SetKey<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetBlobBuilder {
             _state: PhantomData,

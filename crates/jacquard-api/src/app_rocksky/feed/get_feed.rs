@@ -10,32 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub feed: AtUri<S>,
-    ///(min: 1)
+    /// (min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFeedOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -43,7 +38,9 @@ pub struct GetFeedOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.feed.getFeed
+/** Response marker for the `app.rocksky.feed.getFeed` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetFeedOutput<S>` for this endpoint.*/
 pub struct GetFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedResponse {
     const NSID: &'static str = "app.rocksky.feed.getFeed";
@@ -58,7 +55,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetFeed<S> {
     type Response = GetFeedResponse;
 }
 
-/// Endpoint type for app.rocksky.feed.getFeed
+/** Endpoint marker for the `app.rocksky.feed.getFeed` query.
+
+Path: `/xrpc/app.rocksky.feed.getFeed`. The request payload type is `GetFeed<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeed";
@@ -69,7 +68,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFeedRequest {
 
 pub mod get_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

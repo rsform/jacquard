@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Send<S: BosStr = DefaultStr> {
     ///The user to send the message to.
     pub did: S,
@@ -30,11 +27,9 @@ pub struct Send<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SendOutput<S: BosStr = DefaultStr> {
     ///Whether the token was successfully registered.
     pub success: bool,
@@ -42,7 +37,9 @@ pub struct SendOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.ocho.message.send
+/** Response marker for the `app.ocho.message.send` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SendOutput<S>` for this endpoint.*/
 pub struct SendResponse;
 impl jacquard_common::xrpc::XrpcResp for SendResponse {
     const NSID: &'static str = "app.ocho.message.send";
@@ -53,17 +50,21 @@ impl jacquard_common::xrpc::XrpcResp for SendResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Send<S> {
     const NSID: &'static str = "app.ocho.message.send";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SendResponse;
 }
 
-/// Endpoint type for app.ocho.message.send
+/** Endpoint marker for the `app.ocho.message.send` procedure.
+
+Path: `/xrpc/app.ocho.message.send`. The request payload type is `Send<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SendRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendRequest {
     const PATH: &'static str = "/xrpc/app.ocho.message.send";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Send<S>;
     type Response = SendResponse;
 }

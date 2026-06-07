@@ -10,34 +10,31 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetToken<S: BosStr = DefaultStr> {
     pub aud: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTokenOutput<S: BosStr = DefaultStr> {
     pub token: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.ocho.server.getToken
+/** Response marker for the `app.ocho.server.getToken` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetTokenOutput<S>` for this endpoint.*/
 pub struct GetTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTokenResponse {
     const NSID: &'static str = "app.ocho.server.getToken";
@@ -52,7 +49,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetToken<S> {
     type Response = GetTokenResponse;
 }
 
-/// Endpoint type for app.ocho.server.getToken
+/** Endpoint marker for the `app.ocho.server.getToken` query.
+
+Path: `/xrpc/app.ocho.server.getToken`. The request payload type is `GetToken<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTokenRequest {
     const PATH: &'static str = "/xrpc/app.ocho.server.getToken";
@@ -63,7 +62,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTokenRequest {
 
 pub mod get_token_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

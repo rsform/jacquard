@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.offprint.block` Lexicon namespace/module.
 pub mod blockquote;
 pub mod bullet_list;
 pub mod callout;

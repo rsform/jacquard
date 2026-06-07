@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `chat.bsky.group` Lexicon namespace/module.
 pub mod add_members;
 pub mod approve_join_request;
 pub mod create_group;
@@ -22,12 +23,13 @@ pub mod request_join;
 pub mod update_join_requests_read;
 pub mod withdraw_join_request;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,18 +40,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::chat_bsky::actor::ProfileViewBasic;
 use crate::chat_bsky::convo::ConvoView;
 use crate::chat_bsky::group;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinLinkPreviewView<S: BosStr = DefaultStr> {
     pub code: S,
     ///Present only if the request is authenticated and the user is a member of the group.
@@ -68,11 +67,9 @@ pub struct JoinLinkPreviewView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinLinkView<S: BosStr = DefaultStr> {
     pub code: S,
     pub created_at: Datetime,
@@ -83,11 +80,9 @@ pub struct JoinLinkView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinLinkViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requested_at: Option<Datetime>,
@@ -98,10 +93,7 @@ pub struct JoinLinkViewerState<S: BosStr = DefaultStr> {
 /// A join request from the perspective of the requester, including enough group context to render the request in a list (e.g. group name, owner, member count).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinRequestConvoView<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub member_count: i64,
@@ -113,11 +105,9 @@ pub struct JoinRequestConvoView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinRequestView<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub requested_at: Datetime,
@@ -125,6 +115,7 @@ pub struct JoinRequestView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoinRule<S: BosStr = DefaultStr> {
@@ -196,6 +187,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LinkEnabledStatus<S: BosStr = DefaultStr> {
@@ -345,7 +337,7 @@ impl<S: BosStr> LexiconSchema for JoinRequestView<S> {
 
 pub mod join_link_preview_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -524,14 +516,20 @@ pub struct JoinLinkPreviewViewBuilder<
 
 impl JoinLinkPreviewView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::Empty, DefaultStr> {
+    pub fn new() -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::Empty,
+        DefaultStr,
+    > {
         JoinLinkPreviewViewBuilder::new()
     }
 }
 
 impl<S: BosStr> JoinLinkPreviewView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::Empty, S> {
+    pub fn builder() -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::Empty,
+        S,
+    > {
         JoinLinkPreviewViewBuilder::builder()
     }
 }
@@ -577,7 +575,10 @@ where
     }
 }
 
-impl<St: join_link_preview_view_state::State, S: BosStr> JoinLinkPreviewViewBuilder<St, S> {
+impl<
+    St: join_link_preview_view_state::State,
+    S: BosStr,
+> JoinLinkPreviewViewBuilder<St, S> {
     /// Set the `convo` field (optional)
     pub fn convo(mut self, value: impl Into<Option<ConvoView<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -599,7 +600,10 @@ where
     pub fn enabled_status(
         mut self,
         value: impl Into<group::LinkEnabledStatus<S>>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetEnabledStatus<St>, S> {
+    ) -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::SetEnabledStatus<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         JoinLinkPreviewViewBuilder {
             _state: PhantomData,
@@ -637,7 +641,10 @@ where
     pub fn member_count(
         mut self,
         value: impl Into<i64>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetMemberCount<St>, S> {
+    ) -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::SetMemberCount<St>,
+        S,
+    > {
         self._fields.4 = Option::Some(value.into());
         JoinLinkPreviewViewBuilder {
             _state: PhantomData,
@@ -656,7 +663,10 @@ where
     pub fn member_limit(
         mut self,
         value: impl Into<i64>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetMemberLimit<St>, S> {
+    ) -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::SetMemberLimit<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         JoinLinkPreviewViewBuilder {
             _state: PhantomData,
@@ -713,7 +723,10 @@ where
     pub fn require_approval(
         mut self,
         value: impl Into<bool>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetRequireApproval<St>, S> {
+    ) -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::SetRequireApproval<St>,
+        S,
+    > {
         self._fields.8 = Option::Some(value.into());
         JoinLinkPreviewViewBuilder {
             _state: PhantomData,
@@ -723,9 +736,15 @@ where
     }
 }
 
-impl<St: join_link_preview_view_state::State, S: BosStr> JoinLinkPreviewViewBuilder<St, S> {
+impl<
+    St: join_link_preview_view_state::State,
+    S: BosStr,
+> JoinLinkPreviewViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<group::JoinLinkViewerState<S>>>) -> Self {
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<group::JoinLinkViewerState<S>>>,
+    ) -> Self {
         self._fields.9 = value.into();
         self
     }
@@ -765,7 +784,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JoinLinkPreviewView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JoinLinkPreviewView<S> {
         JoinLinkPreviewView {
             code: self._fields.0.unwrap(),
             convo: self._fields.1,
@@ -783,10 +805,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.group.defs"),
@@ -795,24 +817,23 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("joinLinkPreviewView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("code"),
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("owner"),
-                        SmolStr::new_static("memberCount"),
-                        SmolStr::new_static("memberLimit"),
-                        SmolStr::new_static("requireApproval"),
-                        SmolStr::new_static("joinRule"),
-                        SmolStr::new_static("enabledStatus"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("code"), SmolStr::new_static("name"),
+                            SmolStr::new_static("owner"),
+                            SmolStr::new_static("memberCount"),
+                            SmolStr::new_static("memberLimit"),
+                            SmolStr::new_static("requireApproval"),
+                            SmolStr::new_static("joinRule"),
+                            SmolStr::new_static("enabledStatus")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("code"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("convo"),
@@ -849,14 +870,14 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("owner"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("chat.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "chat.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -881,21 +902,21 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("joinLinkView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("code"),
-                        SmolStr::new_static("enabledStatus"),
-                        SmolStr::new_static("requireApproval"),
-                        SmolStr::new_static("joinRule"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("code"),
+                            SmolStr::new_static("enabledStatus"),
+                            SmolStr::new_static("requireApproval"),
+                            SmolStr::new_static("joinRule"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("code"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -1011,19 +1032,19 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("joinRequestView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("requestedBy"),
-                        SmolStr::new_static("requestedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("convoId"),
+                            SmolStr::new_static("requestedBy"),
+                            SmolStr::new_static("requestedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("requestedAt"),
@@ -1035,7 +1056,9 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("requestedBy"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("chat.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "chat.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1046,15 +1069,11 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("joinRule"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkEnabledStatus"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map
         },
@@ -1064,7 +1083,7 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
 
 pub mod join_link_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1319,7 +1338,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JoinLinkView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JoinLinkView<S> {
         JoinLinkView {
             code: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -1333,7 +1355,7 @@ where
 
 pub mod join_request_convo_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1462,14 +1484,20 @@ pub struct JoinRequestConvoViewBuilder<
 
 impl JoinRequestConvoView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> JoinRequestConvoViewBuilder<join_request_convo_view_state::Empty, DefaultStr> {
+    pub fn new() -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::Empty,
+        DefaultStr,
+    > {
         JoinRequestConvoViewBuilder::new()
     }
 }
 
 impl<S: BosStr> JoinRequestConvoView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> JoinRequestConvoViewBuilder<join_request_convo_view_state::Empty, S> {
+    pub fn builder() -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::Empty,
+        S,
+    > {
         JoinRequestConvoViewBuilder::builder()
     }
 }
@@ -1524,7 +1552,10 @@ where
     pub fn member_count(
         mut self,
         value: impl Into<i64>,
-    ) -> JoinRequestConvoViewBuilder<join_request_convo_view_state::SetMemberCount<St>, S> {
+    ) -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::SetMemberCount<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         JoinRequestConvoViewBuilder {
             _state: PhantomData,
@@ -1543,7 +1574,10 @@ where
     pub fn member_limit(
         mut self,
         value: impl Into<i64>,
-    ) -> JoinRequestConvoViewBuilder<join_request_convo_view_state::SetMemberLimit<St>, S> {
+    ) -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::SetMemberLimit<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         JoinRequestConvoViewBuilder {
             _state: PhantomData,
@@ -1600,7 +1634,10 @@ where
     pub fn requested_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> JoinRequestConvoViewBuilder<join_request_convo_view_state::SetRequestedAt<St>, S> {
+    ) -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::SetRequestedAt<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         JoinRequestConvoViewBuilder {
             _state: PhantomData,
@@ -1651,7 +1688,7 @@ where
 
 pub mod join_request_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1708,7 +1745,10 @@ pub mod join_request_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct JoinRequestViewBuilder<St: join_request_view_state::State, S: BosStr = DefaultStr> {
+pub struct JoinRequestViewBuilder<
+    St: join_request_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<ProfileViewBasic<S>>),
     _type: PhantomData<fn() -> S>,
@@ -1824,7 +1864,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JoinRequestView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JoinRequestView<S> {
         JoinRequestView {
             convo_id: self._fields.0.unwrap(),
             requested_at: self._fields.1.unwrap(),

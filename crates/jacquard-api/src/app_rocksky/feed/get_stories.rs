@@ -10,25 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetStories {
-    ///(min: 1)
+    /// (min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStoriesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -36,7 +34,9 @@ pub struct GetStoriesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.feed.getStories
+/** Response marker for the `app.rocksky.feed.getStories` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetStoriesOutput<S>` for this endpoint.*/
 pub struct GetStoriesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStoriesResponse {
     const NSID: &'static str = "app.rocksky.feed.getStories";
@@ -51,7 +51,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetStories {
     type Response = GetStoriesResponse;
 }
 
-/// Endpoint type for app.rocksky.feed.getStories
+/** Endpoint marker for the `app.rocksky.feed.getStories` query.
+
+Path: `/xrpc/app.rocksky.feed.getStories`. The request payload type is `GetStories`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetStoriesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStoriesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getStories";
@@ -62,7 +64,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStoriesRequest {
 
 pub mod get_stories_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -131,8 +133,6 @@ where
 {
     /// Build the final struct.
     pub fn build(self) -> GetStories {
-        GetStories {
-            size: self._fields.0,
-        }
+        GetStories { size: self._fields.0 }
     }
 }

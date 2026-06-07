@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStripeIntent<S: BosStr = DefaultStr> {
     pub amount: i64,
     pub id: S,
@@ -33,10 +30,7 @@ pub struct GetStripeIntent<S: BosStr = DefaultStr> {
 /// The intent data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStripeIntentOutput<S: BosStr = DefaultStr> {
     ///The customer ID for the payment intent
     pub customer: S,
@@ -52,7 +46,9 @@ pub struct GetStripeIntentOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.ocho.payment.getStripeIntent
+/** Response marker for the `app.ocho.payment.getStripeIntent` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetStripeIntentOutput<S>` for this endpoint.*/
 pub struct GetStripeIntentResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStripeIntentResponse {
     const NSID: &'static str = "app.ocho.payment.getStripeIntent";
@@ -67,7 +63,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetStripeIntent<S> {
     type Response = GetStripeIntentResponse;
 }
 
-/// Endpoint type for app.ocho.payment.getStripeIntent
+/** Endpoint marker for the `app.ocho.payment.getStripeIntent` query.
+
+Path: `/xrpc/app.ocho.payment.getStripeIntent`. The request payload type is `GetStripeIntent<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetStripeIntentRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStripeIntentRequest {
     const PATH: &'static str = "/xrpc/app.ocho.payment.getStripeIntent";
@@ -78,7 +76,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStripeIntentRequest {
 
 pub mod get_stripe_intent_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -135,7 +133,10 @@ pub mod get_stripe_intent_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetStripeIntentBuilder<St: get_stripe_intent_state::State, S: BosStr = DefaultStr> {
+pub struct GetStripeIntentBuilder<
+    St: get_stripe_intent_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>, Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,

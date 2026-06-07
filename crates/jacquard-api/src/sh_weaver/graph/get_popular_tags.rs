@@ -8,34 +8,29 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::graph::TagView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::graph::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPopularTags<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPopularTagsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -44,7 +39,9 @@ pub struct GetPopularTagsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.graph.getPopularTags
+/** Response marker for the `sh.weaver.graph.getPopularTags` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetPopularTagsOutput<S>` for this endpoint.*/
 pub struct GetPopularTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPopularTagsResponse {
     const NSID: &'static str = "sh.weaver.graph.getPopularTags";
@@ -59,7 +56,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPopularTags<S> {
     type Response = GetPopularTagsResponse;
 }
 
-/// Endpoint type for sh.weaver.graph.getPopularTags
+/** Endpoint marker for the `sh.weaver.graph.getPopularTags` query.
+
+Path: `/xrpc/sh.weaver.graph.getPopularTags`. The request payload type is `GetPopularTags<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetPopularTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPopularTagsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getPopularTags";
@@ -74,7 +73,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_popular_tags_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -92,7 +91,10 @@ pub mod get_popular_tags_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPopularTagsBuilder<St: get_popular_tags_state::State, S: BosStr = DefaultStr> {
+pub struct GetPopularTagsBuilder<
+    St: get_popular_tags_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,

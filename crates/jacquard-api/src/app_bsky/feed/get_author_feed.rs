@@ -8,44 +8,39 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::feed::FeedViewPost;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::FeedViewPost;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorFeed<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `"posts_with_replies"`.
+    /// Defaults to `"posts_with_replies"`.
     #[serde(default = "_default_filter")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub filter: Option<S>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(default = "_default_include_pins")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_pins: Option<bool>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -54,9 +49,18 @@ pub struct GetAuthorFeedOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetAuthorFeedError {
     #[serde(rename = "BlockedActor")]
@@ -65,10 +69,7 @@ pub enum GetAuthorFeedError {
     BlockedByActor(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetAuthorFeedError {
@@ -99,7 +100,9 @@ impl core::fmt::Display for GetAuthorFeedError {
     }
 }
 
-/// Response type for app.bsky.feed.getAuthorFeed
+/** Response marker for the `app.bsky.feed.getAuthorFeed` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetAuthorFeedOutput<S>` for this endpoint.*/
 pub struct GetAuthorFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAuthorFeedResponse {
     const NSID: &'static str = "app.bsky.feed.getAuthorFeed";
@@ -114,7 +117,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetAuthorFeed<S> {
     type Response = GetAuthorFeedResponse;
 }
 
-/// Endpoint type for app.bsky.feed.getAuthorFeed
+/** Endpoint marker for the `app.bsky.feed.getAuthorFeed` query.
+
+Path: `/xrpc/app.bsky.feed.getAuthorFeed`. The request payload type is `GetAuthorFeed<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetAuthorFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorFeedRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getAuthorFeed";
@@ -137,7 +142,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_author_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -168,15 +173,12 @@ pub mod get_author_feed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAuthorFeedBuilder<St: get_author_feed_state::State, S: BosStr = DefaultStr> {
+pub struct GetAuthorFeedBuilder<
+    St: get_author_feed_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<AtIdentifier<S>>,
-        Option<S>,
-        Option<S>,
-        Option<bool>,
-        Option<i64>,
-    ),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<S>, Option<bool>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 

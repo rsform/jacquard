@@ -8,36 +8,31 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::feed::FeedViewPost;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::FeedViewPost;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorLikes<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorLikesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -46,9 +41,18 @@ pub struct GetActorLikesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetActorLikesError {
     #[serde(rename = "BlockedActor")]
@@ -57,10 +61,7 @@ pub enum GetActorLikesError {
     BlockedByActor(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetActorLikesError {
@@ -91,7 +92,9 @@ impl core::fmt::Display for GetActorLikesError {
     }
 }
 
-/// Response type for app.bsky.feed.getActorLikes
+/** Response marker for the `app.bsky.feed.getActorLikes` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetActorLikesOutput<S>` for this endpoint.*/
 pub struct GetActorLikesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorLikesResponse {
     const NSID: &'static str = "app.bsky.feed.getActorLikes";
@@ -106,7 +109,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorLikes<S> {
     type Response = GetActorLikesResponse;
 }
 
-/// Endpoint type for app.bsky.feed.getActorLikes
+/** Endpoint marker for the `app.bsky.feed.getActorLikes` query.
+
+Path: `/xrpc/app.bsky.feed.getActorLikes`. The request payload type is `GetActorLikes<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetActorLikesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorLikesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getActorLikes";
@@ -121,7 +126,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_actor_likes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,7 +157,10 @@ pub mod get_actor_likes_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorLikesBuilder<St: get_actor_likes_state::State, S: BosStr = DefaultStr> {
+pub struct GetActorLikesBuilder<
+    St: get_actor_likes_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,

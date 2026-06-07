@@ -8,34 +8,29 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::PublishedVersionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::PublishedVersionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPublishedVersions<S: BosStr = DefaultStr> {
     pub entry: AtUri<S>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(default = "_default_include_content")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_content: Option<bool>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPublishedVersionsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical: Option<PublishedVersionView<S>>,
@@ -49,7 +44,9 @@ pub struct GetPublishedVersionsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.notebook.getPublishedVersions
+/** Response marker for the `sh.weaver.notebook.getPublishedVersions` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetPublishedVersionsOutput<S>` for this endpoint.*/
 pub struct GetPublishedVersionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPublishedVersionsResponse {
     const NSID: &'static str = "sh.weaver.notebook.getPublishedVersions";
@@ -64,7 +61,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPublishedVersions<S> {
     type Response = GetPublishedVersionsResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getPublishedVersions
+/** Endpoint marker for the `sh.weaver.notebook.getPublishedVersions` query.
+
+Path: `/xrpc/sh.weaver.notebook.getPublishedVersions`. The request payload type is `GetPublishedVersions<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetPublishedVersionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPublishedVersionsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPublishedVersions";
@@ -79,7 +78,7 @@ fn _default_include_content() -> Option<bool> {
 
 pub mod get_published_versions_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -121,14 +120,20 @@ pub struct GetPublishedVersionsBuilder<
 
 impl GetPublishedVersions<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetPublishedVersionsBuilder<get_published_versions_state::Empty, DefaultStr> {
+    pub fn new() -> GetPublishedVersionsBuilder<
+        get_published_versions_state::Empty,
+        DefaultStr,
+    > {
         GetPublishedVersionsBuilder::new()
     }
 }
 
 impl<S: BosStr> GetPublishedVersions<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetPublishedVersionsBuilder<get_published_versions_state::Empty, S> {
+    pub fn builder() -> GetPublishedVersionsBuilder<
+        get_published_versions_state::Empty,
+        S,
+    > {
         GetPublishedVersionsBuilder::builder()
     }
 }
@@ -174,7 +179,10 @@ where
     }
 }
 
-impl<St: get_published_versions_state::State, S: BosStr> GetPublishedVersionsBuilder<St, S> {
+impl<
+    St: get_published_versions_state::State,
+    S: BosStr,
+> GetPublishedVersionsBuilder<St, S> {
     /// Set the `includeContent` field (optional)
     pub fn include_content(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();

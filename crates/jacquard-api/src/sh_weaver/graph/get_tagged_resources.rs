@@ -8,53 +8,48 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::TagView;
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(default = "_default_include_author_tags")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_author_tags: Option<bool>,
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(default = "_default_include_community_tags")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_community_tags: Option<bool>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///Defaults to `"all"`.
+    /// Defaults to `"all"`.
     #[serde(default = "_default_resource_type")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub resource_type: Option<S>,
-    ///Defaults to `"recent"`.
+    /// Defaults to `"recent"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<S>,
     pub tag: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -64,6 +59,7 @@ pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -75,7 +71,9 @@ pub enum GetTaggedResourcesOutputResourcesItem<S: BosStr = DefaultStr> {
     EntryView(Box<EntryView<S>>),
 }
 
-/// Response type for sh.weaver.graph.getTaggedResources
+/** Response marker for the `sh.weaver.graph.getTaggedResources` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetTaggedResourcesOutput<S>` for this endpoint.*/
 pub struct GetTaggedResourcesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTaggedResourcesResponse {
     const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
@@ -90,7 +88,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTaggedResources<S> {
     type Response = GetTaggedResourcesResponse;
 }
 
-/// Endpoint type for sh.weaver.graph.getTaggedResources
+/** Endpoint marker for the `sh.weaver.graph.getTaggedResources` query.
+
+Path: `/xrpc/sh.weaver.graph.getTaggedResources`. The request payload type is `GetTaggedResources<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetTaggedResourcesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedResourcesRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getTaggedResources";
@@ -121,7 +121,7 @@ fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_tagged_resources_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,8 +152,10 @@ pub mod get_tagged_resources_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTaggedResourcesBuilder<St: get_tagged_resources_state::State, S: BosStr = DefaultStr>
-{
+pub struct GetTaggedResourcesBuilder<
+    St: get_tagged_resources_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -169,7 +171,10 @@ pub struct GetTaggedResourcesBuilder<St: get_tagged_resources_state::State, S: B
 
 impl GetTaggedResources<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetTaggedResourcesBuilder<get_tagged_resources_state::Empty, DefaultStr> {
+    pub fn new() -> GetTaggedResourcesBuilder<
+        get_tagged_resources_state::Empty,
+        DefaultStr,
+    > {
         GetTaggedResourcesBuilder::new()
     }
 }

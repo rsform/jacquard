@@ -10,22 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Diff<S: BosStr = DefaultStr> {
     pub r#ref: S,
     pub repo: S,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -33,9 +31,18 @@ pub struct DiffOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DiffError {
     /// Repository not found or access denied
@@ -49,10 +56,7 @@ pub enum DiffError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DiffError {
@@ -90,7 +94,9 @@ impl core::fmt::Display for DiffError {
     }
 }
 
-/// Response type for sh.tangled.repo.diff
+/** Response marker for the `sh.tangled.repo.diff` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DiffOutput` for this endpoint.*/
 pub struct DiffResponse;
 impl jacquard_common::xrpc::XrpcResp for DiffResponse {
     const NSID: &'static str = "sh.tangled.repo.diff";
@@ -124,7 +130,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Diff<S> {
     type Response = DiffResponse;
 }
 
-/// Endpoint type for sh.tangled.repo.diff
+/** Endpoint marker for the `sh.tangled.repo.diff` query.
+
+Path: `/xrpc/sh.tangled.repo.diff`. The request payload type is `Diff<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DiffRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DiffRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.diff";
@@ -135,7 +143,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DiffRequest {
 
 pub mod diff_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -226,7 +234,10 @@ where
     St::Ref: diff_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(mut self, value: impl Into<S>) -> DiffBuilder<diff_state::SetRef<St>, S> {
+    pub fn r#ref(
+        mut self,
+        value: impl Into<S>,
+    ) -> DiffBuilder<diff_state::SetRef<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DiffBuilder {
             _state: PhantomData,
@@ -242,7 +253,10 @@ where
     St::Repo: diff_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<S>) -> DiffBuilder<diff_state::SetRepo<St>, S> {
+    pub fn repo(
+        mut self,
+        value: impl Into<S>,
+    ) -> DiffBuilder<diff_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DiffBuilder {
             _state: PhantomData,

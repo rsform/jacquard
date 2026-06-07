@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `games.gamesgamesgamesgames.actor` Lexicon namespace/module.
 pub mod create_profile;
 pub mod credit;
 pub mod game;

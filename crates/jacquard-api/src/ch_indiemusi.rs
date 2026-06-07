@@ -3,5 +3,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `ch.indiemusi` Lexicon namespace/module.
 pub mod alpha;
 pub mod social;

@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::EntryView;
-use crate::sh_weaver::notebook::PageView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
+use crate::sh_weaver::notebook::PageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPage<S: BosStr = DefaultStr> {
     pub page: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPageOutput<S: BosStr = DefaultStr> {
     pub entries: Vec<EntryView<S>>,
     pub page: PageView<S>,
@@ -40,19 +35,25 @@ pub struct GetPageOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetPageError {
     #[serde(rename = "PageNotFound")]
     PageNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetPageError {
@@ -76,7 +77,9 @@ impl core::fmt::Display for GetPageError {
     }
 }
 
-/// Response type for sh.weaver.notebook.getPage
+/** Response marker for the `sh.weaver.notebook.getPage` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetPageOutput<S>` for this endpoint.*/
 pub struct GetPageResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
     const NSID: &'static str = "sh.weaver.notebook.getPage";
@@ -91,7 +94,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPage<S> {
     type Response = GetPageResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getPage
+/** Endpoint marker for the `sh.weaver.notebook.getPage` query.
+
+Path: `/xrpc/sh.weaver.notebook.getPage`. The request payload type is `GetPage<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetPageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPage";
@@ -102,7 +107,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
 
 pub mod get_page_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

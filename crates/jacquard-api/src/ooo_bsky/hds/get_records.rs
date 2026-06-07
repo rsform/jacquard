@@ -8,37 +8,34 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::ooo_bsky::hidden::r#box::HiddenBox;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ooo_bsky::hidden::r#box::HiddenBox;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecords<S: BosStr = DefaultStr> {
     pub uris: Vec<UriValue<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecordsOutput<S: BosStr = DefaultStr> {
     pub boxes: Vec<HiddenBox<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for ooo.bsky.hds.getRecords
+/** Response marker for the `ooo.bsky.hds.getRecords` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetRecordsOutput<S>` for this endpoint.*/
 pub struct GetRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordsResponse {
     const NSID: &'static str = "ooo.bsky.hds.getRecords";
@@ -53,7 +50,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRecords<S> {
     type Response = GetRecordsResponse;
 }
 
-/// Endpoint type for ooo.bsky.hds.getRecords
+/** Endpoint marker for the `ooo.bsky.hds.getRecords` query.
+
+Path: `/xrpc/ooo.bsky.hds.getRecords`. The request payload type is `GetRecords<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordsRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.getRecords";
@@ -64,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRecordsRequest {
 
 pub mod get_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::dropbox::FileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::dropbox::FileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMetadata<S: BosStr = DefaultStr> {
     pub path: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMetadataOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: FileView<S>,
@@ -38,7 +33,9 @@ pub struct GetMetadataOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.dropbox.getMetadata
+/** Response marker for the `app.rocksky.dropbox.getMetadata` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetMetadataOutput<S>` for this endpoint.*/
 pub struct GetMetadataResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMetadataResponse {
     const NSID: &'static str = "app.rocksky.dropbox.getMetadata";
@@ -53,7 +50,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetMetadata<S> {
     type Response = GetMetadataResponse;
 }
 
-/// Endpoint type for app.rocksky.dropbox.getMetadata
+/** Endpoint marker for the `app.rocksky.dropbox.getMetadata` query.
+
+Path: `/xrpc/app.rocksky.dropbox.getMetadata`. The request payload type is `GetMetadata<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetMetadataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMetadataRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.dropbox.getMetadata";
@@ -64,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetMetadataRequest {
 
 pub mod get_metadata_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

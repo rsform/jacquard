@@ -8,34 +8,29 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecentlyReleasedFeed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecentlyReleasedFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -44,7 +39,9 @@ pub struct GetRecentlyReleasedFeedOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for games.gamesgamesgamesgames.feed.getRecentlyReleasedFeed
+/** Response marker for the `games.gamesgamesgamesgames.feed.getRecentlyReleasedFeed` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetRecentlyReleasedFeedOutput<S>` for this endpoint.*/
 pub struct GetRecentlyReleasedFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecentlyReleasedFeedResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getRecentlyReleasedFeed";
@@ -59,7 +56,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRecentlyReleasedFeed<S
     type Response = GetRecentlyReleasedFeedResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.feed.getRecentlyReleasedFeed
+/** Endpoint marker for the `games.gamesgamesgamesgames.feed.getRecentlyReleasedFeed` query.
+
+Path: `/xrpc/games.gamesgamesgamesgames.feed.getRecentlyReleasedFeed`. The request payload type is `GetRecentlyReleasedFeed<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetRecentlyReleasedFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecentlyReleasedFeedRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getRecentlyReleasedFeed";
@@ -74,7 +73,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_recently_released_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -103,20 +102,28 @@ pub struct GetRecentlyReleasedFeedBuilder<
 
 impl GetRecentlyReleasedFeed<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> GetRecentlyReleasedFeedBuilder<get_recently_released_feed_state::Empty, DefaultStr> {
+    pub fn new() -> GetRecentlyReleasedFeedBuilder<
+        get_recently_released_feed_state::Empty,
+        DefaultStr,
+    > {
         GetRecentlyReleasedFeedBuilder::new()
     }
 }
 
 impl<S: BosStr> GetRecentlyReleasedFeed<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetRecentlyReleasedFeedBuilder<get_recently_released_feed_state::Empty, S> {
+    pub fn builder() -> GetRecentlyReleasedFeedBuilder<
+        get_recently_released_feed_state::Empty,
+        S,
+    > {
         GetRecentlyReleasedFeedBuilder::builder()
     }
 }
 
-impl GetRecentlyReleasedFeedBuilder<get_recently_released_feed_state::Empty, DefaultStr> {
+impl GetRecentlyReleasedFeedBuilder<
+    get_recently_released_feed_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetRecentlyReleasedFeedBuilder {
@@ -127,7 +134,9 @@ impl GetRecentlyReleasedFeedBuilder<get_recently_released_feed_state::Empty, Def
     }
 }
 
-impl<S: BosStr> GetRecentlyReleasedFeedBuilder<get_recently_released_feed_state::Empty, S> {
+impl<
+    S: BosStr,
+> GetRecentlyReleasedFeedBuilder<get_recently_released_feed_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         GetRecentlyReleasedFeedBuilder {
@@ -138,7 +147,10 @@ impl<S: BosStr> GetRecentlyReleasedFeedBuilder<get_recently_released_feed_state:
     }
 }
 
-impl<St: get_recently_released_feed_state::State, S: BosStr> GetRecentlyReleasedFeedBuilder<St, S> {
+impl<
+    St: get_recently_released_feed_state::State,
+    S: BosStr,
+> GetRecentlyReleasedFeedBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -151,7 +163,10 @@ impl<St: get_recently_released_feed_state::State, S: BosStr> GetRecentlyReleased
     }
 }
 
-impl<St: get_recently_released_feed_state::State, S: BosStr> GetRecentlyReleasedFeedBuilder<St, S> {
+impl<
+    St: get_recently_released_feed_state::State,
+    S: BosStr,
+> GetRecentlyReleasedFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();

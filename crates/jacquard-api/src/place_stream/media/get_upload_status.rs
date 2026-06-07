@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,25 +21,20 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::place_stream::media::get_upload_status;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::media::get_upload_status;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUploadStatus<S: BosStr = DefaultStr> {
     pub upload_id: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUploadStatusOutput<S: BosStr = DefaultStr> {
     ///Duration of the processed video in milliseconds. Present when status is 'done'.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -113,7 +108,8 @@ impl<S: BosStr> Serialize for GetUploadStatusOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetUploadStatusOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for GetUploadStatusOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -138,7 +134,9 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             GetUploadStatusOutputStatus::Pending => GetUploadStatusOutputStatus::Pending,
-            GetUploadStatusOutputStatus::Processing => GetUploadStatusOutputStatus::Processing,
+            GetUploadStatusOutputStatus::Processing => {
+                GetUploadStatusOutputStatus::Processing
+            }
             GetUploadStatusOutputStatus::Done => GetUploadStatusOutputStatus::Done,
             GetUploadStatusOutputStatus::Error => GetUploadStatusOutputStatus::Error,
             GetUploadStatusOutputStatus::Other(v) => {
@@ -148,9 +146,18 @@ where
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetUploadStatusError {
     /// No upload exists with the given ID for the authenticated user.
@@ -158,10 +165,7 @@ pub enum GetUploadStatusError {
     NotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetUploadStatusError {
@@ -185,11 +189,9 @@ impl core::fmt::Display for GetUploadStatusError {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TrackRef<S: BosStr = DefaultStr> {
     pub cid: S,
     pub uri: AtUri<S>,
@@ -197,7 +199,9 @@ pub struct TrackRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for place.stream.media.getUploadStatus
+/** Response marker for the `place.stream.media.getUploadStatus` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetUploadStatusOutput<S>` for this endpoint.*/
 pub struct GetUploadStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUploadStatusResponse {
     const NSID: &'static str = "place.stream.media.getUploadStatus";
@@ -212,7 +216,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetUploadStatus<S> {
     type Response = GetUploadStatusResponse;
 }
 
-/// Endpoint type for place.stream.media.getUploadStatus
+/** Endpoint marker for the `place.stream.media.getUploadStatus` query.
+
+Path: `/xrpc/place.stream.media.getUploadStatus`. The request payload type is `GetUploadStatus<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetUploadStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUploadStatusRequest {
     const PATH: &'static str = "/xrpc/place.stream.media.getUploadStatus";
@@ -238,7 +244,7 @@ impl<S: BosStr> LexiconSchema for TrackRef<S> {
 
 pub mod get_upload_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -269,7 +275,10 @@ pub mod get_upload_status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetUploadStatusBuilder<St: get_upload_status_state::State, S: BosStr = DefaultStr> {
+pub struct GetUploadStatusBuilder<
+    St: get_upload_status_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -345,7 +354,7 @@ where
 
 pub mod track_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -436,7 +445,10 @@ where
     St::Cid: track_ref_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(mut self, value: impl Into<S>) -> TrackRefBuilder<track_ref_state::SetCid<St>, S> {
+    pub fn cid(
+        mut self,
+        value: impl Into<S>,
+    ) -> TrackRefBuilder<track_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TrackRefBuilder {
             _state: PhantomData,
@@ -490,10 +502,10 @@ where
 }
 
 fn lexicon_doc_place_stream_media_getUploadStatus() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.media.getUploadStatus"),
@@ -530,15 +542,15 @@ fn lexicon_doc_place_stream_media_getUploadStatus() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("trackRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),

@@ -8,36 +8,36 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::graph::StarterPackView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::graph::StarterPackView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedStarterPacks {
-    ///Defaults to `10`. Min: 1. Max: 25.
+    /// Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedStarterPacksOutput<S: BosStr = DefaultStr> {
     pub starter_packs: Vec<StarterPackView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.bsky.unspecced.getSuggestedStarterPacks
+/** Response marker for the `app.bsky.unspecced.getSuggestedStarterPacks` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetSuggestedStarterPacksOutput<S>` for this endpoint.*/
 pub struct GetSuggestedStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedStarterPacksResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacks";
@@ -52,7 +52,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetSuggestedStarterPacks {
     type Response = GetSuggestedStarterPacksResponse;
 }
 
-/// Endpoint type for app.bsky.unspecced.getSuggestedStarterPacks
+/** Endpoint marker for the `app.bsky.unspecced.getSuggestedStarterPacks` query.
+
+Path: `/xrpc/app.bsky.unspecced.getSuggestedStarterPacks`. The request payload type is `GetSuggestedStarterPacks`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetSuggestedStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedStarterPacksRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedStarterPacks";
@@ -67,7 +69,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_suggested_starter_packs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -85,14 +87,18 @@ pub mod get_suggested_starter_packs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetSuggestedStarterPacksBuilder<St: get_suggested_starter_packs_state::State> {
+pub struct GetSuggestedStarterPacksBuilder<
+    St: get_suggested_starter_packs_state::State,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetSuggestedStarterPacks {
     /// Create a new builder for this type.
-    pub fn new() -> GetSuggestedStarterPacksBuilder<get_suggested_starter_packs_state::Empty> {
+    pub fn new() -> GetSuggestedStarterPacksBuilder<
+        get_suggested_starter_packs_state::Empty,
+    > {
         GetSuggestedStarterPacksBuilder::new()
     }
 }

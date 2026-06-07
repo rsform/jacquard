@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdatePageRelationship<S: BosStr = DefaultStr> {
     pub relation: S,
     pub resource: S,
@@ -29,7 +26,9 @@ pub struct UpdatePageRelationship<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.blebbit.authr.page.updatePageRelationship
+/** Response marker for the `app.blebbit.authr.page.updatePageRelationship` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct UpdatePageRelationshipResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdatePageRelationshipResponse {
     const NSID: &'static str = "app.blebbit.authr.page.updatePageRelationship";
@@ -40,17 +39,21 @@ impl jacquard_common::xrpc::XrpcResp for UpdatePageRelationshipResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdatePageRelationship<S> {
     const NSID: &'static str = "app.blebbit.authr.page.updatePageRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdatePageRelationshipResponse;
 }
 
-/// Endpoint type for app.blebbit.authr.page.updatePageRelationship
+/** Endpoint marker for the `app.blebbit.authr.page.updatePageRelationship` procedure.
+
+Path: `/xrpc/app.blebbit.authr.page.updatePageRelationship`. The request payload type is `UpdatePageRelationship<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct UpdatePageRelationshipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdatePageRelationshipRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.page.updatePageRelationship";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdatePageRelationship<S>;
     type Response = UpdatePageRelationshipResponse;
 }

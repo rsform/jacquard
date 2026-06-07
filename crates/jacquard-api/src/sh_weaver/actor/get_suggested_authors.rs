@@ -10,33 +10,33 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetSuggestedAuthors {
-    ///Defaults to `20`. Min: 1. Max: 50.
+    /// Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedAuthorsOutput<S: BosStr = DefaultStr> {
     pub authors: Vec<Data<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.actor.getSuggestedAuthors
+/** Response marker for the `sh.weaver.actor.getSuggestedAuthors` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetSuggestedAuthorsOutput<S>` for this endpoint.*/
 pub struct GetSuggestedAuthorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedAuthorsResponse {
     const NSID: &'static str = "sh.weaver.actor.getSuggestedAuthors";
@@ -51,7 +51,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetSuggestedAuthors {
     type Response = GetSuggestedAuthorsResponse;
 }
 
-/// Endpoint type for sh.weaver.actor.getSuggestedAuthors
+/** Endpoint marker for the `sh.weaver.actor.getSuggestedAuthors` query.
+
+Path: `/xrpc/sh.weaver.actor.getSuggestedAuthors`. The request payload type is `GetSuggestedAuthors`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetSuggestedAuthorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedAuthorsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.actor.getSuggestedAuthors";
@@ -66,7 +68,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_suggested_authors_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `com.alephcubed.starmark.review` Lexicon namespace/module.
 pub mod book;
 pub mod game;
 pub mod movie;

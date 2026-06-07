@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::shout::ShoutView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::shout::ShoutView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateShout<S: BosStr = DefaultStr> {
     ///The content of the shout
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,11 +27,9 @@ pub struct CreateShout<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateShoutOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ShoutView<S>,
@@ -42,7 +37,9 @@ pub struct CreateShoutOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.shout.createShout
+/** Response marker for the `app.rocksky.shout.createShout` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CreateShoutOutput<S>` for this endpoint.*/
 pub struct CreateShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateShoutResponse {
     const NSID: &'static str = "app.rocksky.shout.createShout";
@@ -53,17 +50,21 @@ impl jacquard_common::xrpc::XrpcResp for CreateShoutResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateShout<S> {
     const NSID: &'static str = "app.rocksky.shout.createShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateShoutResponse;
 }
 
-/// Endpoint type for app.rocksky.shout.createShout
+/** Endpoint marker for the `app.rocksky.shout.createShout` procedure.
+
+Path: `/xrpc/app.rocksky.shout.createShout`. The request payload type is `CreateShout<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CreateShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.createShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateShout<S>;
     type Response = CreateShoutResponse;
 }

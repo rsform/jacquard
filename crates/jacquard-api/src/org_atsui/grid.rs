@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Grid<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     ///Number of equal columns.  Defaults to `3`.
@@ -122,11 +119,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GridOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -134,7 +129,9 @@ pub struct GridOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for org.atsui.Grid
+/** Response marker for the `org.atsui.Grid` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GridOutput<S>` for this endpoint.*/
 pub struct GridResponse;
 impl jacquard_common::xrpc::XrpcResp for GridResponse {
     const NSID: &'static str = "org.atsui.Grid";
@@ -145,17 +142,21 @@ impl jacquard_common::xrpc::XrpcResp for GridResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Grid<S> {
     const NSID: &'static str = "org.atsui.Grid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GridResponse;
 }
 
-/// Endpoint type for org.atsui.Grid
+/** Endpoint marker for the `org.atsui.Grid` procedure.
+
+Path: `/xrpc/org.atsui.Grid`. The request payload type is `Grid<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GridRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Grid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Grid<S>;
     type Response = GridResponse;
 }
@@ -166,7 +167,7 @@ fn _default_grid_columns() -> Option<i64> {
 
 pub mod grid_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

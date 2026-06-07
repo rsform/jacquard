@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `community.lexicon.bookmarks` Lexicon namespace/module.
 pub mod auth_manage_bookmarks;
 pub mod auth_view_bookmarks;
 pub mod bookmark;

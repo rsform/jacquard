@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSessionOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
@@ -120,16 +117,22 @@ where
             GetSessionOutputStatus::Takendown => GetSessionOutputStatus::Takendown,
             GetSessionOutputStatus::Suspended => GetSessionOutputStatus::Suspended,
             GetSessionOutputStatus::Deactivated => GetSessionOutputStatus::Deactivated,
-            GetSessionOutputStatus::Other(v) => GetSessionOutputStatus::Other(v.into_static()),
+            GetSessionOutputStatus::Other(v) => {
+                GetSessionOutputStatus::Other(v.into_static())
+            }
         }
     }
 }
 
-/// XRPC request marker type.
+/** Request marker for the `com.atproto.server.getSession` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetSession;
-/// Response type for com.atproto.server.getSession
+/** Response marker for the `com.atproto.server.getSession` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetSessionOutput<S>` for this endpoint.*/
 pub struct GetSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSessionResponse {
     const NSID: &'static str = "com.atproto.server.getSession";
@@ -144,7 +147,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetSession {
     type Response = GetSessionResponse;
 }
 
-/// Endpoint type for com.atproto.server.getSession
+/** Endpoint marker for the `com.atproto.server.getSession` query.
+
+Path: `/xrpc/com.atproto.server.getSession`. The request payload type is `GetSession`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct GetSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.getSession";

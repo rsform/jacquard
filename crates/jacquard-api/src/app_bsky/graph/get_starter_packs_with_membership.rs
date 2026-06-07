@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,38 +21,34 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::graph::ListItemView;
 use crate::app_bsky::graph::StarterPackView;
 use crate::app_bsky::graph::get_starter_packs_with_membership;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStarterPacksWithMembership<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStarterPacksWithMembershipOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    pub starter_packs_with_membership:
-        Vec<get_starter_packs_with_membership::StarterPackWithMembership<S>>,
+    pub starter_packs_with_membership: Vec<
+        get_starter_packs_with_membership::StarterPackWithMembership<S>,
+    >,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -60,10 +56,7 @@ pub struct GetStarterPacksWithMembershipOutput<S: BosStr = DefaultStr> {
 /// A starter pack and an optional list item indicating membership of a target user to that starter pack.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StarterPackWithMembership<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list_item: Option<ListItemView<S>>,
@@ -72,7 +65,9 @@ pub struct StarterPackWithMembership<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.bsky.graph.getStarterPacksWithMembership
+/** Response marker for the `app.bsky.graph.getStarterPacksWithMembership` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetStarterPacksWithMembershipOutput<S>` for this endpoint.*/
 pub struct GetStarterPacksWithMembershipResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStarterPacksWithMembershipResponse {
     const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
@@ -87,7 +82,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetStarterPacksWithMember
     type Response = GetStarterPacksWithMembershipResponse;
 }
 
-/// Endpoint type for app.bsky.graph.getStarterPacksWithMembership
+/** Endpoint marker for the `app.bsky.graph.getStarterPacksWithMembership` query.
+
+Path: `/xrpc/app.bsky.graph.getStarterPacksWithMembership`. The request payload type is `GetStarterPacksWithMembership<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetStarterPacksWithMembershipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacksWithMembership";
@@ -117,7 +114,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_starter_packs_with_membership_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -169,15 +166,18 @@ impl GetStarterPacksWithMembership<DefaultStr> {
 
 impl<S: BosStr> GetStarterPacksWithMembership<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> GetStarterPacksWithMembershipBuilder<get_starter_packs_with_membership_state::Empty, S> {
+    pub fn builder() -> GetStarterPacksWithMembershipBuilder<
+        get_starter_packs_with_membership_state::Empty,
+        S,
+    > {
         GetStarterPacksWithMembershipBuilder::builder()
     }
 }
 
-impl
-    GetStarterPacksWithMembershipBuilder<get_starter_packs_with_membership_state::Empty, DefaultStr>
-{
+impl GetStarterPacksWithMembershipBuilder<
+    get_starter_packs_with_membership_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetStarterPacksWithMembershipBuilder {
@@ -188,9 +188,12 @@ impl
     }
 }
 
-impl<S: BosStr>
-    GetStarterPacksWithMembershipBuilder<get_starter_packs_with_membership_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> GetStarterPacksWithMembershipBuilder<
+    get_starter_packs_with_membership_state::Empty,
+    S,
+> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         GetStarterPacksWithMembershipBuilder {
@@ -223,9 +226,10 @@ where
     }
 }
 
-impl<St: get_starter_packs_with_membership_state::State, S: BosStr>
-    GetStarterPacksWithMembershipBuilder<St, S>
-{
+impl<
+    St: get_starter_packs_with_membership_state::State,
+    S: BosStr,
+> GetStarterPacksWithMembershipBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -238,9 +242,10 @@ impl<St: get_starter_packs_with_membership_state::State, S: BosStr>
     }
 }
 
-impl<St: get_starter_packs_with_membership_state::State, S: BosStr>
-    GetStarterPacksWithMembershipBuilder<St, S>
-{
+impl<
+    St: get_starter_packs_with_membership_state::State,
+    S: BosStr,
+> GetStarterPacksWithMembershipBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -270,7 +275,7 @@ where
 
 pub mod starter_pack_with_membership_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -312,21 +317,28 @@ pub struct StarterPackWithMembershipBuilder<
 
 impl StarterPackWithMembership<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> StarterPackWithMembershipBuilder<starter_pack_with_membership_state::Empty, DefaultStr> {
+    pub fn new() -> StarterPackWithMembershipBuilder<
+        starter_pack_with_membership_state::Empty,
+        DefaultStr,
+    > {
         StarterPackWithMembershipBuilder::new()
     }
 }
 
 impl<S: BosStr> StarterPackWithMembership<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> StarterPackWithMembershipBuilder<starter_pack_with_membership_state::Empty, S> {
+    pub fn builder() -> StarterPackWithMembershipBuilder<
+        starter_pack_with_membership_state::Empty,
+        S,
+    > {
         StarterPackWithMembershipBuilder::builder()
     }
 }
 
-impl StarterPackWithMembershipBuilder<starter_pack_with_membership_state::Empty, DefaultStr> {
+impl StarterPackWithMembershipBuilder<
+    starter_pack_with_membership_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         StarterPackWithMembershipBuilder {
@@ -337,7 +349,9 @@ impl StarterPackWithMembershipBuilder<starter_pack_with_membership_state::Empty,
     }
 }
 
-impl<S: BosStr> StarterPackWithMembershipBuilder<starter_pack_with_membership_state::Empty, S> {
+impl<
+    S: BosStr,
+> StarterPackWithMembershipBuilder<starter_pack_with_membership_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         StarterPackWithMembershipBuilder {
@@ -348,9 +362,10 @@ impl<S: BosStr> StarterPackWithMembershipBuilder<starter_pack_with_membership_st
     }
 }
 
-impl<St: starter_pack_with_membership_state::State, S: BosStr>
-    StarterPackWithMembershipBuilder<St, S>
-{
+impl<
+    St: starter_pack_with_membership_state::State,
+    S: BosStr,
+> StarterPackWithMembershipBuilder<St, S> {
     /// Set the `listItem` field (optional)
     pub fn list_item(mut self, value: impl Into<Option<ListItemView<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -372,8 +387,10 @@ where
     pub fn starter_pack(
         mut self,
         value: impl Into<StarterPackView<S>>,
-    ) -> StarterPackWithMembershipBuilder<starter_pack_with_membership_state::SetStarterPack<St>, S>
-    {
+    ) -> StarterPackWithMembershipBuilder<
+        starter_pack_with_membership_state::SetStarterPack<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         StarterPackWithMembershipBuilder {
             _state: PhantomData,
@@ -410,10 +427,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.graph.getStarterPacksWithMembership"),
@@ -422,37 +439,41 @@ fn lexicon_doc_app_bsky_graph_getStarterPacksWithMembership() -> LexiconDoc<'sta
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("actor")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("actor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The account (actor) to check for membership.",
-                                    )),
-                                    format: Some(LexStringFormat::AtIdentifier),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("actor")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("actor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "The account (actor) to check for membership.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::AtIdentifier),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );

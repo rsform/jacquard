@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::feed::ClipView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::ClipView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetClips<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetClipsOutput<S: BosStr = DefaultStr> {
     ///An array of hydrated clip views
     pub clips: Vec<ClipView<S>>,
@@ -39,7 +34,9 @@ pub struct GetClipsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for social.clippr.feed.getClips
+/** Response marker for the `social.clippr.feed.getClips` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetClipsOutput<S>` for this endpoint.*/
 pub struct GetClipsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetClipsResponse {
     const NSID: &'static str = "social.clippr.feed.getClips";
@@ -54,7 +51,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetClips<S> {
     type Response = GetClipsResponse;
 }
 
-/// Endpoint type for social.clippr.feed.getClips
+/** Endpoint marker for the `social.clippr.feed.getClips` query.
+
+Path: `/xrpc/social.clippr.feed.getClips`. The request payload type is `GetClips<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetClipsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetClipsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.feed.getClips";
@@ -65,7 +64,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetClipsRequest {
 
 pub mod get_clips_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_showcase::ItemImage;
-use crate::social_showcase::ItemView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_showcase::ItemImage;
+use crate::social_showcase::ItemView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -40,6 +37,7 @@ pub struct CreateItem<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CreateItemVisibility<S: BosStr = DefaultStr> {
@@ -117,16 +115,16 @@ where
             CreateItemVisibility::Public => CreateItemVisibility::Public,
             CreateItemVisibility::Unlisted => CreateItemVisibility::Unlisted,
             CreateItemVisibility::Private => CreateItemVisibility::Private,
-            CreateItemVisibility::Other(v) => CreateItemVisibility::Other(v.into_static()),
+            CreateItemVisibility::Other(v) => {
+                CreateItemVisibility::Other(v.into_static())
+            }
         }
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateItemOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ItemView<S>,
@@ -134,7 +132,9 @@ pub struct CreateItemOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for social.showcase.library.createItem
+/** Response marker for the `social.showcase.library.createItem` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CreateItemOutput<S>` for this endpoint.*/
 pub struct CreateItemResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateItemResponse {
     const NSID: &'static str = "social.showcase.library.createItem";
@@ -145,24 +145,28 @@ impl jacquard_common::xrpc::XrpcResp for CreateItemResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateItem<S> {
     const NSID: &'static str = "social.showcase.library.createItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateItemResponse;
 }
 
-/// Endpoint type for social.showcase.library.createItem
+/** Endpoint marker for the `social.showcase.library.createItem` procedure.
+
+Path: `/xrpc/social.showcase.library.createItem`. The request payload type is `CreateItem<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CreateItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateItemRequest {
     const PATH: &'static str = "/xrpc/social.showcase.library.createItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateItem<S>;
     type Response = CreateItemResponse;
 }
 
 pub mod create_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -437,7 +441,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateItem<S> {
         CreateItem {
             category: self._fields.0,
             description: self._fields.1,

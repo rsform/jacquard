@@ -10,28 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::chat_bsky::moderation::subscribe_mod_events;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::moderation::subscribe_mod_events;
 /// Fired when a user accepts a chat convo, either explicitly or by sending a message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventChatAccepted<S: BosStr = DefaultStr> {
     ///The DID of the person accepting the convo.
     pub actor_did: Did<S>,
@@ -129,7 +126,9 @@ where
         match self {
             EventChatAcceptedMethod::Explicit => EventChatAcceptedMethod::Explicit,
             EventChatAcceptedMethod::Message => EventChatAcceptedMethod::Message,
-            EventChatAcceptedMethod::Other(v) => EventChatAcceptedMethod::Other(v.into_static()),
+            EventChatAcceptedMethod::Other(v) => {
+                EventChatAcceptedMethod::Other(v.into_static())
+            }
         }
     }
 }
@@ -137,10 +136,7 @@ where
 /// Fired when the first message was sent on a convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventConvoFirstMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub created_at: Datetime,
@@ -158,10 +154,7 @@ pub struct EventConvoFirstMessage<S: BosStr = DefaultStr> {
 /// Fire when a group chat is created.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventGroupChatCreated<S: BosStr = DefaultStr> {
     ///The DID of the actor performing the action. For this event, same as ownerDid.
     pub actor_did: Did<S>,
@@ -185,10 +178,7 @@ pub struct EventGroupChatCreated<S: BosStr = DefaultStr> {
 /// Fired when a user requests to join a group chat via an join link that requires approval.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventGroupChatJoinRequest<S: BosStr = DefaultStr> {
     ///The DID of the person requesting to join.
     pub actor_did: Did<S>,
@@ -213,10 +203,7 @@ pub struct EventGroupChatJoinRequest<S: BosStr = DefaultStr> {
 /// Fired when a join request is approved by the group owner.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventGroupChatJoinRequestApproved<S: BosStr = DefaultStr> {
     ///The DID of the owner approving the request.
     pub actor_did: Did<S>,
@@ -239,10 +226,7 @@ pub struct EventGroupChatJoinRequestApproved<S: BosStr = DefaultStr> {
 /// Fired when a join request is rejected by the group owner.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventGroupChatJoinRequestRejected<S: BosStr = DefaultStr> {
     ///The DID of the owner rejecting the request.
     pub actor_did: Did<S>,
@@ -265,10 +249,7 @@ pub struct EventGroupChatJoinRequestRejected<S: BosStr = DefaultStr> {
 /// Fired when a member is added to a group chat. Note that members are added in the 'request' state.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventGroupChatMemberAdded<S: BosStr = DefaultStr> {
     ///The DID of the actor performing the action. For this event, same as ownerDid.
     pub actor_did: Did<S>,
@@ -295,10 +276,7 @@ pub struct EventGroupChatMemberAdded<S: BosStr = DefaultStr> {
 /// Fired when a member joins a group chat via an join link that does not require approval.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventGroupChatMemberJoined<S: BosStr = DefaultStr> {
     ///The DID of the person joining.
     pub actor_did: Did<S>,
@@ -323,10 +301,7 @@ pub struct EventGroupChatMemberJoined<S: BosStr = DefaultStr> {
 /// Fired when a member leaves or is removed from a group chat.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventGroupChatMemberLeft<S: BosStr = DefaultStr> {
     ///The DID of the actor. For voluntary: the person leaving. For kicked: the owner.
     pub actor_did: Did<S>,
@@ -397,8 +372,7 @@ impl<S: BosStr> Serialize for EventGroupChatMemberLeftLeaveMethod<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-    for EventGroupChatMemberLeftLeaveMethod<S>
-{
+for EventGroupChatMemberLeftLeaveMethod<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -438,10 +412,7 @@ where
 /// Fired when a group chat's metadata or status changes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventGroupChatUpdated<S: BosStr = DefaultStr> {
     ///The DID of the actor performing the action (the owner).
     pub actor_did: Did<S>,
@@ -543,7 +514,8 @@ impl<S: BosStr> Serialize for EventGroupChatUpdatedLockReason<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EventGroupChatUpdatedLockReason<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for EventGroupChatUpdatedLockReason<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -658,7 +630,8 @@ impl<S: BosStr> Serialize for EventGroupChatUpdatedUpdateType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EventGroupChatUpdatedUpdateType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for EventGroupChatUpdatedUpdateType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -685,11 +658,15 @@ where
             EventGroupChatUpdatedUpdateType::NameChanged => {
                 EventGroupChatUpdatedUpdateType::NameChanged
             }
-            EventGroupChatUpdatedUpdateType::Locked => EventGroupChatUpdatedUpdateType::Locked,
+            EventGroupChatUpdatedUpdateType::Locked => {
+                EventGroupChatUpdatedUpdateType::Locked
+            }
             EventGroupChatUpdatedUpdateType::LockedPermanently => {
                 EventGroupChatUpdatedUpdateType::LockedPermanently
             }
-            EventGroupChatUpdatedUpdateType::Unlocked => EventGroupChatUpdatedUpdateType::Unlocked,
+            EventGroupChatUpdatedUpdateType::Unlocked => {
+                EventGroupChatUpdatedUpdateType::Unlocked
+            }
             EventGroupChatUpdatedUpdateType::JoinLinkCreated => {
                 EventGroupChatUpdatedUpdateType::JoinLinkCreated
             }
@@ -709,10 +686,7 @@ where
 /// Fired when a user exceeds a rate limit.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventRateLimitExceeded<S: BosStr = DefaultStr> {
     ///The DID of the user who hit the rate limit.
     pub actor_did: Did<S>,
@@ -724,15 +698,14 @@ pub struct EventRateLimitExceeded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscribeModEvents<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -774,62 +747,97 @@ impl<S: BosStr> SubscribeModEventsMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#eventConvoFirstMessage" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventConvoFirstMessage(Box::new(variant)))
             }
             "#eventGroupChatCreated" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventGroupChatCreated(Box::new(variant)))
             }
             "#eventGroupChatMemberAdded" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventGroupChatMemberAdded(Box::new(variant)))
             }
             "#eventGroupChatMemberJoined" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventGroupChatMemberJoined(Box::new(variant)))
             }
             "#eventGroupChatJoinRequest" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventGroupChatJoinRequest(Box::new(variant)))
             }
             "#eventGroupChatJoinRequestApproved" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventGroupChatJoinRequestApproved(Box::new(variant)))
             }
             "#eventGroupChatJoinRequestRejected" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventGroupChatJoinRequestRejected(Box::new(variant)))
             }
             "#eventChatAccepted" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventChatAccepted(Box::new(variant)))
             }
             "#eventGroupChatMemberLeft" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventGroupChatMemberLeft(Box::new(variant)))
             }
             "#eventGroupChatUpdated" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventGroupChatUpdated(Box::new(variant)))
             }
             "#eventRateLimitExceeded" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::EventRateLimitExceeded(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeModEventsError {
     #[serde(rename = "FutureCursor")]
@@ -839,10 +847,7 @@ pub enum SubscribeModEventsError {
     ConsumerTooSlow(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SubscribeModEventsError {
@@ -1043,31 +1048,28 @@ impl<S: BosStr> LexiconSchema for EventRateLimitExceeded<S> {
 pub struct SubscribeModEventsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeModEventsStream {
     const NSID: &'static str = "chat.bsky.moderation.subscribeModEvents";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeModEventsMessage<S>;
     type Error = SubscribeModEventsError;
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcSubscription for SubscribeModEvents<S> {
     const NSID: &'static str = "chat.bsky.moderation.subscribeModEvents";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeModEventsStream;
 }
 
 pub struct SubscribeModEventsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeModEventsEndpoint {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.subscribeModEvents";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribeModEvents<S>;
     type Stream = SubscribeModEventsStream;
 }
 
 pub mod event_chat_accepted_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1178,7 +1180,10 @@ pub mod event_chat_accepted_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventChatAcceptedBuilder<St: event_chat_accepted_state::State, S: BosStr = DefaultStr> {
+pub struct EventChatAcceptedBuilder<
+    St: event_chat_accepted_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -1196,7 +1201,10 @@ pub struct EventChatAcceptedBuilder<St: event_chat_accepted_state::State, S: Bos
 
 impl EventChatAccepted<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> EventChatAcceptedBuilder<event_chat_accepted_state::Empty, DefaultStr> {
+    pub fn new() -> EventChatAcceptedBuilder<
+        event_chat_accepted_state::Empty,
+        DefaultStr,
+    > {
         EventChatAcceptedBuilder::new()
     }
 }
@@ -1409,7 +1417,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EventChatAccepted<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EventChatAccepted<S> {
         EventChatAccepted {
             actor_did: self._fields.0.unwrap(),
             convo_created_at: self._fields.1.unwrap(),
@@ -1426,10 +1437,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.moderation.subscribeModEvents"),
@@ -1811,29 +1822,34 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("eventGroupChatJoinRequestApproved"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Fired when a join request is approved by the group owner.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("actorDid"),
-                        SmolStr::new_static("convoCreatedAt"),
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("groupMemberCount"),
-                        SmolStr::new_static("groupName"),
-                        SmolStr::new_static("ownerDid"),
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("subjectDid"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Fired when a join request is approved by the group owner.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("actorDid"),
+                            SmolStr::new_static("convoCreatedAt"),
+                            SmolStr::new_static("convoId"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("groupMemberCount"),
+                            SmolStr::new_static("groupName"),
+                            SmolStr::new_static("ownerDid"), SmolStr::new_static("rev"),
+                            SmolStr::new_static("subjectDid")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("actorDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the owner approving the request.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The DID of the owner approving the request.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -1841,18 +1857,16 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
                         map.insert(
                             SmolStr::new_static("convoCreatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the group was originally created.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the group was originally created."),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -1869,32 +1883,30 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
                         );
                         map.insert(
                             SmolStr::new_static("groupName"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("ownerDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the group chat owner.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The DID of the group chat owner."),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("subjectDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the member whose request was approved.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The DID of the member whose request was approved.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -1907,29 +1919,34 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("eventGroupChatJoinRequestRejected"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Fired when a join request is rejected by the group owner.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("actorDid"),
-                        SmolStr::new_static("convoCreatedAt"),
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("groupMemberCount"),
-                        SmolStr::new_static("groupName"),
-                        SmolStr::new_static("ownerDid"),
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("subjectDid"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Fired when a join request is rejected by the group owner.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("actorDid"),
+                            SmolStr::new_static("convoCreatedAt"),
+                            SmolStr::new_static("convoId"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("groupMemberCount"),
+                            SmolStr::new_static("groupName"),
+                            SmolStr::new_static("ownerDid"), SmolStr::new_static("rev"),
+                            SmolStr::new_static("subjectDid")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("actorDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the owner rejecting the request.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The DID of the owner rejecting the request.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -1937,18 +1954,16 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
                         map.insert(
                             SmolStr::new_static("convoCreatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the group was originally created.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the group was originally created."),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -1965,32 +1980,30 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
                         );
                         map.insert(
                             SmolStr::new_static("groupName"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("ownerDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the group chat owner.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The DID of the group chat owner."),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("subjectDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the member whose request was rejected.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The DID of the member whose request was rejected.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -2474,24 +2487,27 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("eventRateLimitExceeded"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Fired when a user exceeds a rate limit.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("actorDid"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("endpoint"),
-                        SmolStr::new_static("rev"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Fired when a user exceeds a rate limit."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("actorDid"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("endpoint"), SmolStr::new_static("rev")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("actorDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the user who hit the rate limit.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The DID of the user who hit the rate limit.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -2506,17 +2522,17 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
                         map.insert(
                             SmolStr::new_static("endpoint"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The NSID of the endpoint that was rate limited.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The NSID of the endpoint that was rate limited.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -2558,7 +2574,7 @@ fn lexicon_doc_chat_bsky_moderation_subscribeModEvents() -> LexiconDoc<'static> 
 
 pub mod event_convo_first_message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2667,15 +2683,20 @@ pub struct EventConvoFirstMessageBuilder<
 
 impl EventConvoFirstMessage<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> EventConvoFirstMessageBuilder<event_convo_first_message_state::Empty, DefaultStr>
-    {
+    pub fn new() -> EventConvoFirstMessageBuilder<
+        event_convo_first_message_state::Empty,
+        DefaultStr,
+    > {
         EventConvoFirstMessageBuilder::new()
     }
 }
 
 impl<S: BosStr> EventConvoFirstMessage<S> {
     /// Create a new builder for this type
-    pub fn builder() -> EventConvoFirstMessageBuilder<event_convo_first_message_state::Empty, S> {
+    pub fn builder() -> EventConvoFirstMessageBuilder<
+        event_convo_first_message_state::Empty,
+        S,
+    > {
         EventConvoFirstMessageBuilder::builder()
     }
 }
@@ -2691,7 +2712,9 @@ impl EventConvoFirstMessageBuilder<event_convo_first_message_state::Empty, Defau
     }
 }
 
-impl<S: BosStr> EventConvoFirstMessageBuilder<event_convo_first_message_state::Empty, S> {
+impl<
+    S: BosStr,
+> EventConvoFirstMessageBuilder<event_convo_first_message_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         EventConvoFirstMessageBuilder {
@@ -2711,7 +2734,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> EventConvoFirstMessageBuilder<event_convo_first_message_state::SetConvoId<St>, S> {
+    ) -> EventConvoFirstMessageBuilder<
+        event_convo_first_message_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         EventConvoFirstMessageBuilder {
             _state: PhantomData,
@@ -2730,7 +2756,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventConvoFirstMessageBuilder<event_convo_first_message_state::SetCreatedAt<St>, S> {
+    ) -> EventConvoFirstMessageBuilder<
+        event_convo_first_message_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         EventConvoFirstMessageBuilder {
             _state: PhantomData,
@@ -2740,7 +2769,10 @@ where
     }
 }
 
-impl<St: event_convo_first_message_state::State, S: BosStr> EventConvoFirstMessageBuilder<St, S> {
+impl<
+    St: event_convo_first_message_state::State,
+    S: BosStr,
+> EventConvoFirstMessageBuilder<St, S> {
     /// Set the `messageId` field (optional)
     pub fn message_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -2762,7 +2794,10 @@ where
     pub fn recipients(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> EventConvoFirstMessageBuilder<event_convo_first_message_state::SetRecipients<St>, S> {
+    ) -> EventConvoFirstMessageBuilder<
+        event_convo_first_message_state::SetRecipients<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         EventConvoFirstMessageBuilder {
             _state: PhantomData,
@@ -2850,7 +2885,7 @@ where
 
 pub mod event_group_chat_created_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3054,15 +3089,20 @@ pub struct EventGroupChatCreatedBuilder<
 
 impl EventGroupChatCreated<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> EventGroupChatCreatedBuilder<event_group_chat_created_state::Empty, DefaultStr>
-    {
+    pub fn new() -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::Empty,
+        DefaultStr,
+    > {
         EventGroupChatCreatedBuilder::new()
     }
 }
 
 impl<S: BosStr> EventGroupChatCreated<S> {
     /// Create a new builder for this type
-    pub fn builder() -> EventGroupChatCreatedBuilder<event_group_chat_created_state::Empty, S> {
+    pub fn builder() -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::Empty,
+        S,
+    > {
         EventGroupChatCreatedBuilder::builder()
     }
 }
@@ -3098,7 +3138,10 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatCreatedBuilder<event_group_chat_created_state::SetActorDid<St>, S> {
+    ) -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::SetActorDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         EventGroupChatCreatedBuilder {
             _state: PhantomData,
@@ -3117,8 +3160,10 @@ where
     pub fn convo_created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatCreatedBuilder<event_group_chat_created_state::SetConvoCreatedAt<St>, S>
-    {
+    ) -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::SetConvoCreatedAt<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         EventGroupChatCreatedBuilder {
             _state: PhantomData,
@@ -3137,7 +3182,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatCreatedBuilder<event_group_chat_created_state::SetConvoId<St>, S> {
+    ) -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         EventGroupChatCreatedBuilder {
             _state: PhantomData,
@@ -3156,7 +3204,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatCreatedBuilder<event_group_chat_created_state::SetCreatedAt<St>, S> {
+    ) -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         EventGroupChatCreatedBuilder {
             _state: PhantomData,
@@ -3175,8 +3226,10 @@ where
     pub fn group_member_count(
         mut self,
         value: impl Into<i64>,
-    ) -> EventGroupChatCreatedBuilder<event_group_chat_created_state::SetGroupMemberCount<St>, S>
-    {
+    ) -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::SetGroupMemberCount<St>,
+        S,
+    > {
         self._fields.4 = Option::Some(value.into());
         EventGroupChatCreatedBuilder {
             _state: PhantomData,
@@ -3195,7 +3248,10 @@ where
     pub fn group_name(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatCreatedBuilder<event_group_chat_created_state::SetGroupName<St>, S> {
+    ) -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::SetGroupName<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         EventGroupChatCreatedBuilder {
             _state: PhantomData,
@@ -3214,8 +3270,10 @@ where
     pub fn initial_member_dids(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> EventGroupChatCreatedBuilder<event_group_chat_created_state::SetInitialMemberDids<St>, S>
-    {
+    ) -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::SetInitialMemberDids<St>,
+        S,
+    > {
         self._fields.6 = Option::Some(value.into());
         EventGroupChatCreatedBuilder {
             _state: PhantomData,
@@ -3234,7 +3292,10 @@ where
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatCreatedBuilder<event_group_chat_created_state::SetOwnerDid<St>, S> {
+    ) -> EventGroupChatCreatedBuilder<
+        event_group_chat_created_state::SetOwnerDid<St>,
+        S,
+    > {
         self._fields.7 = Option::Some(value.into());
         EventGroupChatCreatedBuilder {
             _state: PhantomData,
@@ -3313,7 +3374,7 @@ where
 
 pub mod event_group_chat_join_request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3546,22 +3607,28 @@ pub struct EventGroupChatJoinRequestBuilder<
 
 impl EventGroupChatJoinRequest<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::Empty, DefaultStr>
-    {
+    pub fn new() -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::Empty,
+        DefaultStr,
+    > {
         EventGroupChatJoinRequestBuilder::new()
     }
 }
 
 impl<S: BosStr> EventGroupChatJoinRequest<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::Empty, S> {
+    pub fn builder() -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::Empty,
+        S,
+    > {
         EventGroupChatJoinRequestBuilder::builder()
     }
 }
 
-impl EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::Empty, DefaultStr> {
+impl EventGroupChatJoinRequestBuilder<
+    event_group_chat_join_request_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventGroupChatJoinRequestBuilder {
@@ -3572,7 +3639,9 @@ impl EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::Empty
     }
 }
 
-impl<S: BosStr> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::Empty, S> {
+impl<
+    S: BosStr,
+> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         EventGroupChatJoinRequestBuilder {
@@ -3592,8 +3661,10 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::SetActorDid<St>, S>
-    {
+    ) -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::SetActorDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         EventGroupChatJoinRequestBuilder {
             _state: PhantomData,
@@ -3634,8 +3705,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::SetConvoId<St>, S>
-    {
+    ) -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         EventGroupChatJoinRequestBuilder {
             _state: PhantomData,
@@ -3654,8 +3727,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::SetCreatedAt<St>, S>
-    {
+    ) -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         EventGroupChatJoinRequestBuilder {
             _state: PhantomData,
@@ -3696,8 +3771,10 @@ where
     pub fn group_name(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::SetGroupName<St>, S>
-    {
+    ) -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::SetGroupName<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         EventGroupChatJoinRequestBuilder {
             _state: PhantomData,
@@ -3716,8 +3793,10 @@ where
     pub fn join_link_code(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::SetJoinLinkCode<St>, S>
-    {
+    ) -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::SetJoinLinkCode<St>,
+        S,
+    > {
         self._fields.6 = Option::Some(value.into());
         EventGroupChatJoinRequestBuilder {
             _state: PhantomData,
@@ -3736,8 +3815,10 @@ where
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::SetOwnerDid<St>, S>
-    {
+    ) -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::SetOwnerDid<St>,
+        S,
+    > {
         self._fields.7 = Option::Some(value.into());
         EventGroupChatJoinRequestBuilder {
             _state: PhantomData,
@@ -3756,7 +3837,10 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatJoinRequestBuilder<event_group_chat_join_request_state::SetRev<St>, S> {
+    ) -> EventGroupChatJoinRequestBuilder<
+        event_group_chat_join_request_state::SetRev<St>,
+        S,
+    > {
         self._fields.8 = Option::Some(value.into());
         EventGroupChatJoinRequestBuilder {
             _state: PhantomData,
@@ -3841,7 +3925,7 @@ where
 
 pub mod event_group_chat_join_request_approved_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4063,12 +4147,10 @@ impl<S: BosStr> EventGroupChatJoinRequestApproved<S> {
     }
 }
 
-impl
-    EventGroupChatJoinRequestApprovedBuilder<
-        event_group_chat_join_request_approved_state::Empty,
-        DefaultStr,
-    >
-{
+impl EventGroupChatJoinRequestApprovedBuilder<
+    event_group_chat_join_request_approved_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventGroupChatJoinRequestApprovedBuilder {
@@ -4079,9 +4161,12 @@ impl
     }
 }
 
-impl<S: BosStr>
-    EventGroupChatJoinRequestApprovedBuilder<event_group_chat_join_request_approved_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> EventGroupChatJoinRequestApprovedBuilder<
+    event_group_chat_join_request_approved_state::Empty,
+    S,
+> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         EventGroupChatJoinRequestApprovedBuilder {
@@ -4340,7 +4425,7 @@ where
 
 pub mod event_group_chat_join_request_rejected_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4562,12 +4647,10 @@ impl<S: BosStr> EventGroupChatJoinRequestRejected<S> {
     }
 }
 
-impl
-    EventGroupChatJoinRequestRejectedBuilder<
-        event_group_chat_join_request_rejected_state::Empty,
-        DefaultStr,
-    >
-{
+impl EventGroupChatJoinRequestRejectedBuilder<
+    event_group_chat_join_request_rejected_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventGroupChatJoinRequestRejectedBuilder {
@@ -4578,9 +4661,12 @@ impl
     }
 }
 
-impl<S: BosStr>
-    EventGroupChatJoinRequestRejectedBuilder<event_group_chat_join_request_rejected_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> EventGroupChatJoinRequestRejectedBuilder<
+    event_group_chat_join_request_rejected_state::Empty,
+    S,
+> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         EventGroupChatJoinRequestRejectedBuilder {
@@ -4839,7 +4925,7 @@ where
 
 pub mod event_group_chat_member_added_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5103,42 +5189,46 @@ pub struct EventGroupChatMemberAddedBuilder<
 
 impl EventGroupChatMemberAdded<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::Empty, DefaultStr>
-    {
+    pub fn new() -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::Empty,
+        DefaultStr,
+    > {
         EventGroupChatMemberAddedBuilder::new()
     }
 }
 
 impl<S: BosStr> EventGroupChatMemberAdded<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::Empty, S> {
+    pub fn builder() -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::Empty,
+        S,
+    > {
         EventGroupChatMemberAddedBuilder::builder()
     }
 }
 
-impl EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::Empty, DefaultStr> {
+impl EventGroupChatMemberAddedBuilder<
+    event_group_chat_member_added_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
-impl<S: BosStr> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::Empty, S> {
+impl<
+    S: BosStr,
+> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -5153,8 +5243,10 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::SetActorDid<St>, S>
-    {
+    ) -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::SetActorDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
@@ -5195,8 +5287,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::SetConvoId<St>, S>
-    {
+    ) -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
@@ -5215,8 +5309,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::SetCreatedAt<St>, S>
-    {
+    ) -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
@@ -5257,8 +5353,10 @@ where
     pub fn group_name(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::SetGroupName<St>, S>
-    {
+    ) -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::SetGroupName<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
@@ -5277,8 +5375,10 @@ where
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::SetOwnerDid<St>, S>
-    {
+    ) -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::SetOwnerDid<St>,
+        S,
+    > {
         self._fields.6 = Option::Some(value.into());
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
@@ -5319,7 +5419,10 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::SetRev<St>, S> {
+    ) -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::SetRev<St>,
+        S,
+    > {
         self._fields.8 = Option::Some(value.into());
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
@@ -5338,8 +5441,10 @@ where
     pub fn subject_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatMemberAddedBuilder<event_group_chat_member_added_state::SetSubjectDid<St>, S>
-    {
+    ) -> EventGroupChatMemberAddedBuilder<
+        event_group_chat_member_added_state::SetSubjectDid<St>,
+        S,
+    > {
         self._fields.9 = Option::Some(value.into());
         EventGroupChatMemberAddedBuilder {
             _state: PhantomData,
@@ -5427,7 +5532,7 @@ where
 
 pub mod event_group_chat_member_joined_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5660,22 +5765,28 @@ pub struct EventGroupChatMemberJoinedBuilder<
 
 impl EventGroupChatMemberJoined<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::Empty, DefaultStr>
-    {
+    pub fn new() -> EventGroupChatMemberJoinedBuilder<
+        event_group_chat_member_joined_state::Empty,
+        DefaultStr,
+    > {
         EventGroupChatMemberJoinedBuilder::new()
     }
 }
 
 impl<S: BosStr> EventGroupChatMemberJoined<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::Empty, S> {
+    pub fn builder() -> EventGroupChatMemberJoinedBuilder<
+        event_group_chat_member_joined_state::Empty,
+        S,
+    > {
         EventGroupChatMemberJoinedBuilder::builder()
     }
 }
 
-impl EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::Empty, DefaultStr> {
+impl EventGroupChatMemberJoinedBuilder<
+    event_group_chat_member_joined_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventGroupChatMemberJoinedBuilder {
@@ -5686,7 +5797,9 @@ impl EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::Emp
     }
 }
 
-impl<S: BosStr> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::Empty, S> {
+impl<
+    S: BosStr,
+> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         EventGroupChatMemberJoinedBuilder {
@@ -5706,8 +5819,10 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::SetActorDid<St>, S>
-    {
+    ) -> EventGroupChatMemberJoinedBuilder<
+        event_group_chat_member_joined_state::SetActorDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         EventGroupChatMemberJoinedBuilder {
             _state: PhantomData,
@@ -5748,8 +5863,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::SetConvoId<St>, S>
-    {
+    ) -> EventGroupChatMemberJoinedBuilder<
+        event_group_chat_member_joined_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         EventGroupChatMemberJoinedBuilder {
             _state: PhantomData,
@@ -5768,8 +5885,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::SetCreatedAt<St>, S>
-    {
+    ) -> EventGroupChatMemberJoinedBuilder<
+        event_group_chat_member_joined_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         EventGroupChatMemberJoinedBuilder {
             _state: PhantomData,
@@ -5810,8 +5929,10 @@ where
     pub fn group_name(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::SetGroupName<St>, S>
-    {
+    ) -> EventGroupChatMemberJoinedBuilder<
+        event_group_chat_member_joined_state::SetGroupName<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         EventGroupChatMemberJoinedBuilder {
             _state: PhantomData,
@@ -5852,8 +5973,10 @@ where
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::SetOwnerDid<St>, S>
-    {
+    ) -> EventGroupChatMemberJoinedBuilder<
+        event_group_chat_member_joined_state::SetOwnerDid<St>,
+        S,
+    > {
         self._fields.7 = Option::Some(value.into());
         EventGroupChatMemberJoinedBuilder {
             _state: PhantomData,
@@ -5872,8 +5995,10 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberJoinedBuilder<event_group_chat_member_joined_state::SetRev<St>, S>
-    {
+    ) -> EventGroupChatMemberJoinedBuilder<
+        event_group_chat_member_joined_state::SetRev<St>,
+        S,
+    > {
         self._fields.8 = Option::Some(value.into());
         EventGroupChatMemberJoinedBuilder {
             _state: PhantomData,
@@ -5958,7 +6083,7 @@ where
 
 pub mod event_group_chat_member_left_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6191,21 +6316,28 @@ pub struct EventGroupChatMemberLeftBuilder<
 
 impl EventGroupChatMemberLeft<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::Empty, DefaultStr> {
+    pub fn new() -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::Empty,
+        DefaultStr,
+    > {
         EventGroupChatMemberLeftBuilder::new()
     }
 }
 
 impl<S: BosStr> EventGroupChatMemberLeft<S> {
     /// Create a new builder for this type
-    pub fn builder() -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::Empty, S>
-    {
+    pub fn builder() -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::Empty,
+        S,
+    > {
         EventGroupChatMemberLeftBuilder::builder()
     }
 }
 
-impl EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::Empty, DefaultStr> {
+impl EventGroupChatMemberLeftBuilder<
+    event_group_chat_member_left_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         EventGroupChatMemberLeftBuilder {
@@ -6216,7 +6348,9 @@ impl EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::Empty, 
     }
 }
 
-impl<S: BosStr> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::Empty, S> {
+impl<
+    S: BosStr,
+> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         EventGroupChatMemberLeftBuilder {
@@ -6236,8 +6370,10 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetActorDid<St>, S>
-    {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetActorDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6256,8 +6392,10 @@ where
     pub fn convo_created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetConvoCreatedAt<St>, S>
-    {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetConvoCreatedAt<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6276,8 +6414,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetConvoId<St>, S>
-    {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6296,8 +6436,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetCreatedAt<St>, S>
-    {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6338,8 +6480,10 @@ where
     pub fn group_name(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetGroupName<St>, S>
-    {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetGroupName<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6358,8 +6502,10 @@ where
     pub fn leave_method(
         mut self,
         value: impl Into<EventGroupChatMemberLeftLeaveMethod<S>>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetLeaveMethod<St>, S>
-    {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetLeaveMethod<St>,
+        S,
+    > {
         self._fields.6 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6378,8 +6524,10 @@ where
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetOwnerDid<St>, S>
-    {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetOwnerDid<St>,
+        S,
+    > {
         self._fields.7 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6398,7 +6546,10 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetRev<St>, S> {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetRev<St>,
+        S,
+    > {
         self._fields.8 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6417,8 +6568,10 @@ where
     pub fn subject_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatMemberLeftBuilder<event_group_chat_member_left_state::SetSubjectDid<St>, S>
-    {
+    ) -> EventGroupChatMemberLeftBuilder<
+        event_group_chat_member_left_state::SetSubjectDid<St>,
+        S,
+    > {
         self._fields.9 = Option::Some(value.into());
         EventGroupChatMemberLeftBuilder {
             _state: PhantomData,
@@ -6481,7 +6634,7 @@ where
 
 pub mod event_group_chat_updated_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6691,15 +6844,20 @@ pub struct EventGroupChatUpdatedBuilder<
 
 impl EventGroupChatUpdated<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::Empty, DefaultStr>
-    {
+    pub fn new() -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::Empty,
+        DefaultStr,
+    > {
         EventGroupChatUpdatedBuilder::new()
     }
 }
 
 impl<S: BosStr> EventGroupChatUpdated<S> {
     /// Create a new builder for this type
-    pub fn builder() -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::Empty, S> {
+    pub fn builder() -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::Empty,
+        S,
+    > {
         EventGroupChatUpdatedBuilder::builder()
     }
 }
@@ -6710,7 +6868,20 @@ impl EventGroupChatUpdatedBuilder<event_group_chat_updated_state::Empty, Default
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -6724,7 +6895,20 @@ impl<S: BosStr> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::Emp
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -6741,7 +6925,10 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::SetActorDid<St>, S> {
+    ) -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::SetActorDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
@@ -6760,8 +6947,10 @@ where
     pub fn convo_created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::SetConvoCreatedAt<St>, S>
-    {
+    ) -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::SetConvoCreatedAt<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
@@ -6780,7 +6969,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::SetConvoId<St>, S> {
+    ) -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
@@ -6799,7 +6991,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::SetCreatedAt<St>, S> {
+    ) -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
@@ -6818,8 +7013,10 @@ where
     pub fn group_member_count(
         mut self,
         value: impl Into<i64>,
-    ) -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::SetGroupMemberCount<St>, S>
-    {
+    ) -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::SetGroupMemberCount<St>,
+        S,
+    > {
         self._fields.4 = Option::Some(value.into());
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
@@ -6838,7 +7035,10 @@ where
     pub fn group_name(
         mut self,
         value: impl Into<S>,
-    ) -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::SetGroupName<St>, S> {
+    ) -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::SetGroupName<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
@@ -6848,7 +7048,10 @@ where
     }
 }
 
-impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdatedBuilder<St, S> {
+impl<
+    St: event_group_chat_updated_state::State,
+    S: BosStr,
+> EventGroupChatUpdatedBuilder<St, S> {
     /// Set the `joinLinkCode` field (optional)
     pub fn join_link_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -6861,7 +7064,10 @@ impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdated
     }
 }
 
-impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdatedBuilder<St, S> {
+impl<
+    St: event_group_chat_updated_state::State,
+    S: BosStr,
+> EventGroupChatUpdatedBuilder<St, S> {
     /// Set the `joinLinkFollowersOnly` field (optional)
     pub fn join_link_followers_only(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.7 = value.into();
@@ -6874,9 +7080,15 @@ impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdated
     }
 }
 
-impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdatedBuilder<St, S> {
+impl<
+    St: event_group_chat_updated_state::State,
+    S: BosStr,
+> EventGroupChatUpdatedBuilder<St, S> {
     /// Set the `joinLinkRequiresApproval` field (optional)
-    pub fn join_link_requires_approval(mut self, value: impl Into<Option<bool>>) -> Self {
+    pub fn join_link_requires_approval(
+        mut self,
+        value: impl Into<Option<bool>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -6887,7 +7099,10 @@ impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdated
     }
 }
 
-impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdatedBuilder<St, S> {
+impl<
+    St: event_group_chat_updated_state::State,
+    S: BosStr,
+> EventGroupChatUpdatedBuilder<St, S> {
     /// Set the `lockReason` field (optional)
     pub fn lock_reason(
         mut self,
@@ -6897,13 +7112,19 @@ impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdated
         self
     }
     /// Set the `lockReason` field to an Option value (optional)
-    pub fn maybe_lock_reason(mut self, value: Option<EventGroupChatUpdatedLockReason<S>>) -> Self {
+    pub fn maybe_lock_reason(
+        mut self,
+        value: Option<EventGroupChatUpdatedLockReason<S>>,
+    ) -> Self {
         self._fields.9 = value;
         self
     }
 }
 
-impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdatedBuilder<St, S> {
+impl<
+    St: event_group_chat_updated_state::State,
+    S: BosStr,
+> EventGroupChatUpdatedBuilder<St, S> {
     /// Set the `newName` field (optional)
     pub fn new_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -6916,7 +7137,10 @@ impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdated
     }
 }
 
-impl<St: event_group_chat_updated_state::State, S: BosStr> EventGroupChatUpdatedBuilder<St, S> {
+impl<
+    St: event_group_chat_updated_state::State,
+    S: BosStr,
+> EventGroupChatUpdatedBuilder<St, S> {
     /// Set the `oldName` field (optional)
     pub fn old_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -6938,7 +7162,10 @@ where
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::SetOwnerDid<St>, S> {
+    ) -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::SetOwnerDid<St>,
+        S,
+    > {
         self._fields.12 = Option::Some(value.into());
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
@@ -6976,7 +7203,10 @@ where
     pub fn update_type(
         mut self,
         value: impl Into<EventGroupChatUpdatedUpdateType<S>>,
-    ) -> EventGroupChatUpdatedBuilder<event_group_chat_updated_state::SetUpdateType<St>, S> {
+    ) -> EventGroupChatUpdatedBuilder<
+        event_group_chat_updated_state::SetUpdateType<St>,
+        S,
+    > {
         self._fields.14 = Option::Some(value.into());
         EventGroupChatUpdatedBuilder {
             _state: PhantomData,
@@ -7048,7 +7278,7 @@ where
 
 pub mod event_rate_limit_exceeded_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7132,15 +7362,20 @@ pub struct EventRateLimitExceededBuilder<
 
 impl EventRateLimitExceeded<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> EventRateLimitExceededBuilder<event_rate_limit_exceeded_state::Empty, DefaultStr>
-    {
+    pub fn new() -> EventRateLimitExceededBuilder<
+        event_rate_limit_exceeded_state::Empty,
+        DefaultStr,
+    > {
         EventRateLimitExceededBuilder::new()
     }
 }
 
 impl<S: BosStr> EventRateLimitExceeded<S> {
     /// Create a new builder for this type
-    pub fn builder() -> EventRateLimitExceededBuilder<event_rate_limit_exceeded_state::Empty, S> {
+    pub fn builder() -> EventRateLimitExceededBuilder<
+        event_rate_limit_exceeded_state::Empty,
+        S,
+    > {
         EventRateLimitExceededBuilder::builder()
     }
 }
@@ -7156,7 +7391,9 @@ impl EventRateLimitExceededBuilder<event_rate_limit_exceeded_state::Empty, Defau
     }
 }
 
-impl<S: BosStr> EventRateLimitExceededBuilder<event_rate_limit_exceeded_state::Empty, S> {
+impl<
+    S: BosStr,
+> EventRateLimitExceededBuilder<event_rate_limit_exceeded_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         EventRateLimitExceededBuilder {
@@ -7176,7 +7413,10 @@ where
     pub fn actor_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EventRateLimitExceededBuilder<event_rate_limit_exceeded_state::SetActorDid<St>, S> {
+    ) -> EventRateLimitExceededBuilder<
+        event_rate_limit_exceeded_state::SetActorDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         EventRateLimitExceededBuilder {
             _state: PhantomData,
@@ -7195,7 +7435,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventRateLimitExceededBuilder<event_rate_limit_exceeded_state::SetCreatedAt<St>, S> {
+    ) -> EventRateLimitExceededBuilder<
+        event_rate_limit_exceeded_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         EventRateLimitExceededBuilder {
             _state: PhantomData,
@@ -7214,7 +7457,10 @@ where
     pub fn endpoint(
         mut self,
         value: impl Into<S>,
-    ) -> EventRateLimitExceededBuilder<event_rate_limit_exceeded_state::SetEndpoint<St>, S> {
+    ) -> EventRateLimitExceededBuilder<
+        event_rate_limit_exceeded_state::SetEndpoint<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         EventRateLimitExceededBuilder {
             _state: PhantomData,
@@ -7278,7 +7524,7 @@ where
 
 pub mod subscribe_mod_events_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7296,8 +7542,10 @@ pub mod subscribe_mod_events_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubscribeModEventsBuilder<St: subscribe_mod_events_state::State, S: BosStr = DefaultStr>
-{
+pub struct SubscribeModEventsBuilder<
+    St: subscribe_mod_events_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -7305,7 +7553,10 @@ pub struct SubscribeModEventsBuilder<St: subscribe_mod_events_state::State, S: B
 
 impl SubscribeModEvents<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SubscribeModEventsBuilder<subscribe_mod_events_state::Empty, DefaultStr> {
+    pub fn new() -> SubscribeModEventsBuilder<
+        subscribe_mod_events_state::Empty,
+        DefaultStr,
+    > {
         SubscribeModEventsBuilder::new()
     }
 }

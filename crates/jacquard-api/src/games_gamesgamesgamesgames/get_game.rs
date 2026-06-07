@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::GameDetailView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::GameDetailView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetGame<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apple_app_store_id: Option<S>,
@@ -54,18 +51,18 @@ pub struct GetGame<S: BosStr = DefaultStr> {
     pub xbox_id: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetGameOutput<S: BosStr = DefaultStr> {
     pub game: GameDetailView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for games.gamesgamesgamesgames.getGame
+/** Response marker for the `games.gamesgamesgamesgames.getGame` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetGameOutput<S>` for this endpoint.*/
 pub struct GetGameResponse;
 impl jacquard_common::xrpc::XrpcResp for GetGameResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
@@ -80,7 +77,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetGame<S> {
     type Response = GetGameResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.getGame
+/** Endpoint marker for the `games.gamesgamesgamesgames.getGame` query.
+
+Path: `/xrpc/games.gamesgamesgamesgames.getGame`. The request payload type is `GetGame<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetGameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetGameRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getGame";
@@ -91,7 +90,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetGameRequest {
 
 pub mod get_game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -150,7 +149,20 @@ impl GetGameBuilder<get_game_state::Empty, DefaultStr> {
         GetGameBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -163,7 +175,20 @@ impl<S: BosStr> GetGameBuilder<get_game_state::Empty, S> {
         GetGameBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }

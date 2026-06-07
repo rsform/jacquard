@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetVideoBlob<S: BosStr = DefaultStr> {
     pub cid: S,
     pub did: Did<S>,
@@ -30,15 +27,25 @@ pub struct GetVideoBlob<S: BosStr = DefaultStr> {
     pub sid: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetVideoBlobOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetVideoBlobError {
     /// This node doesn't have the requested CID. The caller should consult place.stream.media.origin records to find a node that does.
@@ -46,10 +53,7 @@ pub enum GetVideoBlobError {
     BlobNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetVideoBlobError {
@@ -73,7 +77,9 @@ impl core::fmt::Display for GetVideoBlobError {
     }
 }
 
-/// Response type for place.stream.playback.getVideoBlob
+/** Response marker for the `place.stream.playback.getVideoBlob` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetVideoBlobOutput` for this endpoint.*/
 pub struct GetVideoBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for GetVideoBlobResponse {
     const NSID: &'static str = "place.stream.playback.getVideoBlob";
@@ -107,7 +113,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetVideoBlob<S> {
     type Response = GetVideoBlobResponse;
 }
 
-/// Endpoint type for place.stream.playback.getVideoBlob
+/** Endpoint marker for the `place.stream.playback.getVideoBlob` query.
+
+Path: `/xrpc/place.stream.playback.getVideoBlob`. The request payload type is `GetVideoBlob<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetVideoBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetVideoBlobRequest {
     const PATH: &'static str = "/xrpc/place.stream.playback.getVideoBlob";
@@ -118,7 +126,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetVideoBlobRequest {
 
 pub mod get_video_blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

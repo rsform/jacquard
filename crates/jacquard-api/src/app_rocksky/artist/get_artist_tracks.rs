@@ -8,37 +8,32 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::song::SongViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::song::SongViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetArtistTracks<S: BosStr = DefaultStr> {
-    ///(min: 1)
+    /// (min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///(min: 0)
+    /// (min: 0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetArtistTracksOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracks: Option<Vec<SongViewBasic<S>>>,
@@ -46,7 +41,9 @@ pub struct GetArtistTracksOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.artist.getArtistTracks
+/** Response marker for the `app.rocksky.artist.getArtistTracks` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetArtistTracksOutput<S>` for this endpoint.*/
 pub struct GetArtistTracksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistTracksResponse {
     const NSID: &'static str = "app.rocksky.artist.getArtistTracks";
@@ -61,7 +58,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetArtistTracks<S> {
     type Response = GetArtistTracksResponse;
 }
 
-/// Endpoint type for app.rocksky.artist.getArtistTracks
+/** Endpoint marker for the `app.rocksky.artist.getArtistTracks` query.
+
+Path: `/xrpc/app.rocksky.artist.getArtistTracks`. The request payload type is `GetArtistTracks<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetArtistTracksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistTracksRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtistTracks";
@@ -72,7 +71,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetArtistTracksRequest {
 
 pub mod get_artist_tracks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -90,7 +89,10 @@ pub mod get_artist_tracks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetArtistTracksBuilder<St: get_artist_tracks_state::State, S: BosStr = DefaultStr> {
+pub struct GetArtistTracksBuilder<
+    St: get_artist_tracks_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,

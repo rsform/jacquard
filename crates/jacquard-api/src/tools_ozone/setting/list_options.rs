@@ -8,43 +8,38 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::setting::DefsOption;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::setting::DefsOption;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListOptions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub keys: Option<Vec<Nsid<S>>>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prefix: Option<S>,
-    ///Defaults to `"instance"`.
+    /// Defaults to `"instance"`.
     #[serde(default = "_default_scope")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scope: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListOptionsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -53,7 +48,9 @@ pub struct ListOptionsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.setting.listOptions
+/** Response marker for the `tools.ozone.setting.listOptions` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListOptionsOutput<S>` for this endpoint.*/
 pub struct ListOptionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListOptionsResponse {
     const NSID: &'static str = "tools.ozone.setting.listOptions";
@@ -68,7 +65,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListOptions<S> {
     type Response = ListOptionsResponse;
 }
 
-/// Endpoint type for tools.ozone.setting.listOptions
+/** Endpoint marker for the `tools.ozone.setting.listOptions` query.
+
+Path: `/xrpc/tools.ozone.setting.listOptions`. The request payload type is `ListOptions<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListOptionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListOptionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.setting.listOptions";
@@ -87,7 +86,7 @@ fn _default_scope<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod list_options_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -107,13 +106,7 @@ pub mod list_options_state {
 /// Builder for constructing an instance of this type.
 pub struct ListOptionsBuilder<St: list_options_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Vec<Nsid<S>>>,
-        Option<i64>,
-        Option<S>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<Vec<Nsid<S>>>, Option<i64>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 

@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Avatar<S: BosStr = DefaultStr> {
     ///DID of the blob owner. Used to resolve blob URLs.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -126,11 +123,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AvatarOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -138,7 +133,9 @@ pub struct AvatarOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for org.atsui.Avatar
+/** Response marker for the `org.atsui.Avatar` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `AvatarOutput<S>` for this endpoint.*/
 pub struct AvatarResponse;
 impl jacquard_common::xrpc::XrpcResp for AvatarResponse {
     const NSID: &'static str = "org.atsui.Avatar";
@@ -149,24 +146,28 @@ impl jacquard_common::xrpc::XrpcResp for AvatarResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Avatar<S> {
     const NSID: &'static str = "org.atsui.Avatar";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = AvatarResponse;
 }
 
-/// Endpoint type for org.atsui.Avatar
+/** Endpoint marker for the `org.atsui.Avatar` procedure.
+
+Path: `/xrpc/org.atsui.Avatar`. The request payload type is `Avatar<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct AvatarRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AvatarRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Avatar";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Avatar<S>;
     type Response = AvatarResponse;
 }
 
 pub mod avatar_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -199,12 +200,7 @@ pub mod avatar_state {
 /// Builder for constructing an instance of this type.
 pub struct AvatarBuilder<St: avatar_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Did<S>>,
-        Option<bool>,
-        Option<AvatarSize<S>>,
-        Option<Data<S>>,
-    ),
+    _fields: (Option<Did<S>>, Option<bool>, Option<AvatarSize<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -289,7 +285,10 @@ where
     St::Src: avatar_state::IsUnset,
 {
     /// Set the `src` field (required)
-    pub fn src(mut self, value: impl Into<Data<S>>) -> AvatarBuilder<avatar_state::SetSrc<St>, S> {
+    pub fn src(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> AvatarBuilder<avatar_state::SetSrc<St>, S> {
         self._fields.3 = Option::Some(value.into());
         AvatarBuilder {
             _state: PhantomData,

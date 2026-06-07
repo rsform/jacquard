@@ -8,37 +8,34 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::signature::SigDetail;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::signature::SigDetail;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FindCorrelation<S: BosStr = DefaultStr> {
     pub dids: Vec<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FindCorrelationOutput<S: BosStr = DefaultStr> {
     pub details: Vec<SigDetail<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.signature.findCorrelation
+/** Response marker for the `tools.ozone.signature.findCorrelation` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `FindCorrelationOutput<S>` for this endpoint.*/
 pub struct FindCorrelationResponse;
 impl jacquard_common::xrpc::XrpcResp for FindCorrelationResponse {
     const NSID: &'static str = "tools.ozone.signature.findCorrelation";
@@ -53,7 +50,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for FindCorrelation<S> {
     type Response = FindCorrelationResponse;
 }
 
-/// Endpoint type for tools.ozone.signature.findCorrelation
+/** Endpoint marker for the `tools.ozone.signature.findCorrelation` query.
+
+Path: `/xrpc/tools.ozone.signature.findCorrelation`. The request payload type is `FindCorrelation<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct FindCorrelationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FindCorrelationRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.signature.findCorrelation";
@@ -64,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for FindCorrelationRequest {
 
 pub mod find_correlation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,7 +94,10 @@ pub mod find_correlation_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FindCorrelationBuilder<St: find_correlation_state::State, S: BosStr = DefaultStr> {
+pub struct FindCorrelationBuilder<
+    St: find_correlation_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Did<S>>>,),
     _type: PhantomData<fn() -> S>,

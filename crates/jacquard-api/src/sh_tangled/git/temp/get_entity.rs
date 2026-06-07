@@ -8,35 +8,30 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_tangled::git::temp::Blob;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp::Blob;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntity<S: BosStr = DefaultStr> {
     pub path: S,
-    ///Defaults to `"HEAD"`.
+    /// Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<S>,
     pub repo: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntityOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Blob<S>,
@@ -44,9 +39,18 @@ pub struct GetEntityOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetEntityError {
     /// Repository not found or access denied
@@ -60,10 +64,7 @@ pub enum GetEntityError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEntityError {
@@ -101,7 +102,9 @@ impl core::fmt::Display for GetEntityError {
     }
 }
 
-/// Response type for sh.tangled.git.temp.getEntity
+/** Response marker for the `sh.tangled.git.temp.getEntity` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetEntityOutput<S>` for this endpoint.*/
 pub struct GetEntityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntityResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getEntity";
@@ -116,7 +119,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntity<S> {
     type Response = GetEntityResponse;
 }
 
-/// Endpoint type for sh.tangled.git.temp.getEntity
+/** Endpoint marker for the `sh.tangled.git.temp.getEntity` query.
+
+Path: `/xrpc/sh.tangled.git.temp.getEntity`. The request payload type is `GetEntity<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetEntityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntityRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getEntity";
@@ -131,7 +136,7 @@ fn _default_ref<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_entity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -10,29 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryMetadataByName<S: BosStr = DefaultStr> {
     pub author: AtIdentifier<S>,
     pub entry_title: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryMetadataByNameOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -43,9 +38,18 @@ pub struct GetEntryMetadataByNameOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetEntryMetadataByNameError {
     /// If the associated name isn't registered in the author's repo, this error is returned
@@ -53,10 +57,7 @@ pub enum GetEntryMetadataByNameError {
     NotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEntryMetadataByNameError {
@@ -80,7 +81,9 @@ impl core::fmt::Display for GetEntryMetadataByNameError {
     }
 }
 
-/// Response type for com.whtwnd.blog.getEntryMetadataByName
+/** Response marker for the `com.whtwnd.blog.getEntryMetadataByName` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetEntryMetadataByNameOutput<S>` for this endpoint.*/
 pub struct GetEntryMetadataByNameResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryMetadataByNameResponse {
     const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
@@ -95,7 +98,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntryMetadataByName<S>
     type Response = GetEntryMetadataByNameResponse;
 }
 
-/// Endpoint type for com.whtwnd.blog.getEntryMetadataByName
+/** Endpoint marker for the `com.whtwnd.blog.getEntryMetadataByName` query.
+
+Path: `/xrpc/com.whtwnd.blog.getEntryMetadataByName`. The request payload type is `GetEntryMetadataByName<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetEntryMetadataByNameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryMetadataByNameRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.getEntryMetadataByName";
@@ -106,7 +111,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEntryMetadataByNameRequest {
 
 pub mod get_entry_metadata_by_name_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,15 +165,20 @@ pub struct GetEntryMetadataByNameBuilder<
 
 impl GetEntryMetadataByName<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> GetEntryMetadataByNameBuilder<get_entry_metadata_by_name_state::Empty, DefaultStr> {
+    pub fn new() -> GetEntryMetadataByNameBuilder<
+        get_entry_metadata_by_name_state::Empty,
+        DefaultStr,
+    > {
         GetEntryMetadataByNameBuilder::new()
     }
 }
 
 impl<S: BosStr> GetEntryMetadataByName<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetEntryMetadataByNameBuilder<get_entry_metadata_by_name_state::Empty, S> {
+    pub fn builder() -> GetEntryMetadataByNameBuilder<
+        get_entry_metadata_by_name_state::Empty,
+        S,
+    > {
         GetEntryMetadataByNameBuilder::builder()
     }
 }
@@ -184,7 +194,9 @@ impl GetEntryMetadataByNameBuilder<get_entry_metadata_by_name_state::Empty, Defa
     }
 }
 
-impl<S: BosStr> GetEntryMetadataByNameBuilder<get_entry_metadata_by_name_state::Empty, S> {
+impl<
+    S: BosStr,
+> GetEntryMetadataByNameBuilder<get_entry_metadata_by_name_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         GetEntryMetadataByNameBuilder {
@@ -204,7 +216,10 @@ where
     pub fn author(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetEntryMetadataByNameBuilder<get_entry_metadata_by_name_state::SetAuthor<St>, S> {
+    ) -> GetEntryMetadataByNameBuilder<
+        get_entry_metadata_by_name_state::SetAuthor<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         GetEntryMetadataByNameBuilder {
             _state: PhantomData,
@@ -223,7 +238,10 @@ where
     pub fn entry_title(
         mut self,
         value: impl Into<S>,
-    ) -> GetEntryMetadataByNameBuilder<get_entry_metadata_by_name_state::SetEntryTitle<St>, S> {
+    ) -> GetEntryMetadataByNameBuilder<
+        get_entry_metadata_by_name_state::SetEntryTitle<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         GetEntryMetadataByNameBuilder {
             _state: PhantomData,

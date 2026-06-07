@@ -8,52 +8,56 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_atproto::server::InviteCode;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::server::InviteCode;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetAccountInviteCodes {
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(default = "_default_create_available")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub create_available: Option<bool>,
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(default = "_default_include_used")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_used: Option<bool>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAccountInviteCodesOutput<S: BosStr = DefaultStr> {
     pub codes: Vec<InviteCode<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetAccountInviteCodesError {
     #[serde(rename = "DuplicateCreate")]
     DuplicateCreate(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetAccountInviteCodesError {
@@ -77,7 +81,9 @@ impl core::fmt::Display for GetAccountInviteCodesError {
     }
 }
 
-/// Response type for com.atproto.server.getAccountInviteCodes
+/** Response marker for the `com.atproto.server.getAccountInviteCodes` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetAccountInviteCodesOutput<S>` for this endpoint.*/
 pub struct GetAccountInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountInviteCodesResponse {
     const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
@@ -92,7 +98,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetAccountInviteCodes {
     type Response = GetAccountInviteCodesResponse;
 }
 
-/// Endpoint type for com.atproto.server.getAccountInviteCodes
+/** Endpoint marker for the `com.atproto.server.getAccountInviteCodes` query.
+
+Path: `/xrpc/com.atproto.server.getAccountInviteCodes`. The request payload type is `GetAccountInviteCodes`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetAccountInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.getAccountInviteCodes";
@@ -111,7 +119,7 @@ fn _default_include_used() -> Option<bool> {
 
 pub mod get_account_invite_codes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

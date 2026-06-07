@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `diy.razorgirl.winter` Lexicon namespace/module.
 pub mod fact;
 pub mod job;
 pub mod note;

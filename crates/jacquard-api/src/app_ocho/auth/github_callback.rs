@@ -10,23 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GithubCallback<S: BosStr = DefaultStr> {
     pub code: S,
     pub state: S,
 }
 
-/// Response type for app.ocho.auth.githubCallback
+/** Response marker for the `app.ocho.auth.githubCallback` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct GithubCallbackResponse;
 impl jacquard_common::xrpc::XrpcResp for GithubCallbackResponse {
     const NSID: &'static str = "app.ocho.auth.githubCallback";
@@ -41,7 +40,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GithubCallback<S> {
     type Response = GithubCallbackResponse;
 }
 
-/// Endpoint type for app.ocho.auth.githubCallback
+/** Endpoint marker for the `app.ocho.auth.githubCallback` query.
+
+Path: `/xrpc/app.ocho.auth.githubCallback`. The request payload type is `GithubCallback<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GithubCallbackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GithubCallbackRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.githubCallback";
@@ -52,7 +53,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GithubCallbackRequest {
 
 pub mod github_callback_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,7 +96,10 @@ pub mod github_callback_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GithubCallbackBuilder<St: github_callback_state::State, S: BosStr = DefaultStr> {
+pub struct GithubCallbackBuilder<
+    St: github_callback_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,

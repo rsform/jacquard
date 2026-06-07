@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.ocho.server` Lexicon namespace/module.
 pub mod get_launch_token;
 pub mod get_token;
 pub mod swap_launch_token;

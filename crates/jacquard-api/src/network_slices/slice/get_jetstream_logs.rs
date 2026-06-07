@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::network_slices::slice::get_job_logs::LogEntry;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_job_logs::LogEntry;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJetstreamLogs<S: BosStr = DefaultStr> {
-    ///Defaults to `100`. Min: 1. Max: 1000.
+    /// Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -31,18 +28,18 @@ pub struct GetJetstreamLogs<S: BosStr = DefaultStr> {
     pub slice: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJetstreamLogsOutput<S: BosStr = DefaultStr> {
     pub logs: Vec<LogEntry<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for network.slices.slice.getJetstreamLogs
+/** Response marker for the `network.slices.slice.getJetstreamLogs` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetJetstreamLogsOutput<S>` for this endpoint.*/
 pub struct GetJetstreamLogsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJetstreamLogsResponse {
     const NSID: &'static str = "network.slices.slice.getJetstreamLogs";
@@ -57,7 +54,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetJetstreamLogs<S> {
     type Response = GetJetstreamLogsResponse;
 }
 
-/// Endpoint type for network.slices.slice.getJetstreamLogs
+/** Endpoint marker for the `network.slices.slice.getJetstreamLogs` query.
+
+Path: `/xrpc/network.slices.slice.getJetstreamLogs`. The request payload type is `GetJetstreamLogs<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetJetstreamLogsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamLogsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getJetstreamLogs";
@@ -72,7 +71,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_jetstream_logs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -90,7 +89,10 @@ pub mod get_jetstream_logs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetJetstreamLogsBuilder<St: get_jetstream_logs_state::State, S: BosStr = DefaultStr> {
+pub struct GetJetstreamLogsBuilder<
+    St: get_jetstream_logs_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -98,7 +100,10 @@ pub struct GetJetstreamLogsBuilder<St: get_jetstream_logs_state::State, S: BosSt
 
 impl GetJetstreamLogs<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetJetstreamLogsBuilder<get_jetstream_logs_state::Empty, DefaultStr> {
+    pub fn new() -> GetJetstreamLogsBuilder<
+        get_jetstream_logs_state::Empty,
+        DefaultStr,
+    > {
         GetJetstreamLogsBuilder::new()
     }
 }

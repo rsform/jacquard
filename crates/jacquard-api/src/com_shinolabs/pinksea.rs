@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `com.shinolabs.pinksea` Lexicon namespace/module.
 pub mod app_view_defs;
 pub mod get_author_feed;
 pub mod get_author_replies;

@@ -10,33 +10,33 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetContinueReading {
-    ///Defaults to `10`. Min: 1. Max: 20.
+    /// Defaults to `10`. Min: 1. Max: 20.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetContinueReadingOutput<S: BosStr = DefaultStr> {
     pub items: Vec<Data<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.notebook.getContinueReading
+/** Response marker for the `sh.weaver.notebook.getContinueReading` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetContinueReadingOutput<S>` for this endpoint.*/
 pub struct GetContinueReadingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetContinueReadingResponse {
     const NSID: &'static str = "sh.weaver.notebook.getContinueReading";
@@ -51,7 +51,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetContinueReading {
     type Response = GetContinueReadingResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getContinueReading
+/** Endpoint marker for the `sh.weaver.notebook.getContinueReading` query.
+
+Path: `/xrpc/sh.weaver.notebook.getContinueReading`. The request payload type is `GetContinueReading`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetContinueReadingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetContinueReadingRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getContinueReading";
@@ -66,7 +68,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_continue_reading_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

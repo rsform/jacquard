@@ -8,38 +8,34 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
-use crate::com_shinolabs::pinksea::app_view_defs::OekakiTombstone;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
+use crate::com_shinolabs::pinksea::app_view_defs::OekakiTombstone;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOekaki<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     pub rkey: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetOekakiOutput<S: BosStr = DefaultStr> {
     pub children: Vec<HydratedOekaki<S>>,
     pub parent: GetOekakiOutputParent<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -51,7 +47,9 @@ pub enum GetOekakiOutputParent<S: BosStr = DefaultStr> {
     AppViewDefsOekakiTombstone(Box<OekakiTombstone<S>>),
 }
 
-/// Response type for com.shinolabs.pinksea.getOekaki
+/** Response marker for the `com.shinolabs.pinksea.getOekaki` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetOekakiOutput<S>` for this endpoint.*/
 pub struct GetOekakiResponse;
 impl jacquard_common::xrpc::XrpcResp for GetOekakiResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getOekaki";
@@ -66,7 +64,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetOekaki<S> {
     type Response = GetOekakiResponse;
 }
 
-/// Endpoint type for com.shinolabs.pinksea.getOekaki
+/** Endpoint marker for the `com.shinolabs.pinksea.getOekaki` query.
+
+Path: `/xrpc/com.shinolabs.pinksea.getOekaki`. The request payload type is `GetOekaki<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetOekakiRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetOekakiRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getOekaki";
@@ -77,7 +77,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetOekakiRequest {
 
 pub mod get_oekaki_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

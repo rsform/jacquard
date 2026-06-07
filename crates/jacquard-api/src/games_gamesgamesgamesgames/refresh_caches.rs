@@ -10,28 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RefreshCachesOutput<S: BosStr = DefaultStr> {
     pub refreshed: Vec<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `games.gamesgamesgamesgames.refreshCaches` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RefreshCaches;
-/// Response type for games.gamesgamesgamesgames.refreshCaches
+/** Response marker for the `games.gamesgamesgamesgames.refreshCaches` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `RefreshCachesOutput<S>` for this endpoint.*/
 pub struct RefreshCachesResponse;
 impl jacquard_common::xrpc::XrpcResp for RefreshCachesResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.refreshCaches";
@@ -42,17 +43,21 @@ impl jacquard_common::xrpc::XrpcResp for RefreshCachesResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RefreshCaches {
     const NSID: &'static str = "games.gamesgamesgamesgames.refreshCaches";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RefreshCachesResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.refreshCaches
+/** Endpoint marker for the `games.gamesgamesgamesgames.refreshCaches` procedure.
+
+Path: `/xrpc/games.gamesgamesgamesgames.refreshCaches`. The request payload type is `RefreshCaches`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct RefreshCachesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RefreshCachesRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.refreshCaches";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RefreshCaches;
     type Response = RefreshCachesResponse;
 }

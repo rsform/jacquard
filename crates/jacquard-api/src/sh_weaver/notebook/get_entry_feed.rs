@@ -8,23 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::FeedEntryView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::FeedEntryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryFeed<S: BosStr = DefaultStr> {
-    ///Defaults to `"chronological"`.
+    /// Defaults to `"chronological"`.
     #[serde(default = "_default_algorithm")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub algorithm: Option<S>,
@@ -32,7 +29,7 @@ pub struct GetEntryFeed<S: BosStr = DefaultStr> {
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed: Option<AtUri<S>>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -40,11 +37,9 @@ pub struct GetEntryFeed<S: BosStr = DefaultStr> {
     pub tags: Option<Vec<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -53,7 +48,9 @@ pub struct GetEntryFeedOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.notebook.getEntryFeed
+/** Response marker for the `sh.weaver.notebook.getEntryFeed` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetEntryFeedOutput<S>` for this endpoint.*/
 pub struct GetEntryFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryFeedResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryFeed";
@@ -68,7 +65,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntryFeed<S> {
     type Response = GetEntryFeedResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getEntryFeed
+/** Endpoint marker for the `sh.weaver.notebook.getEntryFeed` query.
+
+Path: `/xrpc/sh.weaver.notebook.getEntryFeed`. The request payload type is `GetEntryFeed<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetEntryFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryFeedRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryFeed";
@@ -87,7 +86,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_entry_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -107,13 +106,7 @@ pub mod get_entry_feed_state {
 /// Builder for constructing an instance of this type.
 pub struct GetEntryFeedBuilder<St: get_entry_feed_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<AtUri<S>>,
-        Option<i64>,
-        Option<Vec<S>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<i64>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 

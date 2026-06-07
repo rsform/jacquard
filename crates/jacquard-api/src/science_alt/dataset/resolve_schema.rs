@@ -10,31 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveSchema<S: BosStr = DefaultStr> {
     pub handle: S,
     pub schema_id: S,
-    ///(max length: 20)
+    /// (max length: 20)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveSchemaOutput<S: BosStr = DefaultStr> {
     ///CID of the resolved schema record
     pub cid: S,
@@ -46,9 +41,18 @@ pub struct ResolveSchemaOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ResolveSchemaError {
     /// No schema found with the given NSID
@@ -56,10 +60,7 @@ pub enum ResolveSchemaError {
     SchemaNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ResolveSchemaError {
@@ -83,7 +84,9 @@ impl core::fmt::Display for ResolveSchemaError {
     }
 }
 
-/// Response type for science.alt.dataset.resolveSchema
+/** Response marker for the `science.alt.dataset.resolveSchema` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ResolveSchemaOutput<S>` for this endpoint.*/
 pub struct ResolveSchemaResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveSchemaResponse {
     const NSID: &'static str = "science.alt.dataset.resolveSchema";
@@ -98,7 +101,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ResolveSchema<S> {
     type Response = ResolveSchemaResponse;
 }
 
-/// Endpoint type for science.alt.dataset.resolveSchema
+/** Endpoint marker for the `science.alt.dataset.resolveSchema` query.
+
+Path: `/xrpc/science.alt.dataset.resolveSchema`. The request payload type is `ResolveSchema<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ResolveSchemaRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveSchemaRequest {
     const PATH: &'static str = "/xrpc/science.alt.dataset.resolveSchema";
@@ -109,7 +114,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveSchemaRequest {
 
 pub mod resolve_schema_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,7 +157,10 @@ pub mod resolve_schema_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveSchemaBuilder<St: resolve_schema_state::State, S: BosStr = DefaultStr> {
+pub struct ResolveSchemaBuilder<
+    St: resolve_schema_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,

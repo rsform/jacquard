@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::multistream::TargetView;
-use crate::place_stream::multistream::target::Target;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::multistream::TargetView;
+use crate::place_stream::multistream::target::Target;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutTarget<S: BosStr = DefaultStr> {
     pub multistream_target: Target<S>,
     ///The Record Key.
@@ -33,11 +30,9 @@ pub struct PutTarget<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutTargetOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: TargetView<S>,
@@ -45,9 +40,18 @@ pub struct PutTargetOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum PutTargetError {
     /// The provided target URL is invalid or unreachable.
@@ -55,10 +59,7 @@ pub enum PutTargetError {
     InvalidTargetUrl(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for PutTargetError {
@@ -82,7 +83,9 @@ impl core::fmt::Display for PutTargetError {
     }
 }
 
-/// Response type for place.stream.multistream.putTarget
+/** Response marker for the `place.stream.multistream.putTarget` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `PutTargetOutput<S>` for this endpoint.*/
 pub struct PutTargetResponse;
 impl jacquard_common::xrpc::XrpcResp for PutTargetResponse {
     const NSID: &'static str = "place.stream.multistream.putTarget";
@@ -93,24 +96,28 @@ impl jacquard_common::xrpc::XrpcResp for PutTargetResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutTarget<S> {
     const NSID: &'static str = "place.stream.multistream.putTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutTargetResponse;
 }
 
-/// Endpoint type for place.stream.multistream.putTarget
+/** Endpoint marker for the `place.stream.multistream.putTarget` procedure.
+
+Path: `/xrpc/place.stream.multistream.putTarget`. The request payload type is `PutTarget<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct PutTargetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutTargetRequest {
     const PATH: &'static str = "/xrpc/place.stream.multistream.putTarget";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = PutTarget<S>;
     type Response = PutTargetResponse;
 }
 
 pub mod put_target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -229,7 +236,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PutTarget<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PutTarget<S> {
         PutTarget {
             multistream_target: self._fields.0.unwrap(),
             rkey: self._fields.1,

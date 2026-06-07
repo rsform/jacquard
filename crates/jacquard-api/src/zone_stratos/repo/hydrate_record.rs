@@ -10,29 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydrateRecord<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydrateRecordOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -41,9 +36,18 @@ pub struct HydrateRecordOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum HydrateRecordError {
     /// The requested record does not exist
@@ -54,10 +58,7 @@ pub enum HydrateRecordError {
     RecordBlocked(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for HydrateRecordError {
@@ -88,7 +89,9 @@ impl core::fmt::Display for HydrateRecordError {
     }
 }
 
-/// Response type for zone.stratos.repo.hydrateRecord
+/** Response marker for the `zone.stratos.repo.hydrateRecord` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `HydrateRecordOutput<S>` for this endpoint.*/
 pub struct HydrateRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for HydrateRecordResponse {
     const NSID: &'static str = "zone.stratos.repo.hydrateRecord";
@@ -103,7 +106,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for HydrateRecord<S> {
     type Response = HydrateRecordResponse;
 }
 
-/// Endpoint type for zone.stratos.repo.hydrateRecord
+/** Endpoint marker for the `zone.stratos.repo.hydrateRecord` query.
+
+Path: `/xrpc/zone.stratos.repo.hydrateRecord`. The request payload type is `HydrateRecord<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct HydrateRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.repo.hydrateRecord";
@@ -114,7 +119,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordRequest {
 
 pub mod hydrate_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -145,7 +150,10 @@ pub mod hydrate_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HydrateRecordBuilder<St: hydrate_record_state::State, S: BosStr = DefaultStr> {
+pub struct HydrateRecordBuilder<
+    St: hydrate_record_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,

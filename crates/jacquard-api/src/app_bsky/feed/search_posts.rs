@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::feed::PostView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Language, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::PostView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchPosts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<AtIdentifier<S>>,
@@ -33,7 +30,7 @@ pub struct SearchPosts<S: BosStr = DefaultStr> {
     pub domain: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lang: Option<Language>,
-    ///Defaults to `25`. Min: 1. Max: 100.
+    /// Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -42,7 +39,7 @@ pub struct SearchPosts<S: BosStr = DefaultStr> {
     pub q: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub since: Option<S>,
-    ///Defaults to `"latest"`.
+    /// Defaults to `"latest"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<S>,
@@ -54,11 +51,9 @@ pub struct SearchPosts<S: BosStr = DefaultStr> {
     pub url: Option<UriValue<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -70,19 +65,25 @@ pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SearchPostsError {
     #[serde(rename = "BadQueryString")]
     BadQueryString(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SearchPostsError {
@@ -106,7 +107,9 @@ impl core::fmt::Display for SearchPostsError {
     }
 }
 
-/// Response type for app.bsky.feed.searchPosts
+/** Response marker for the `app.bsky.feed.searchPosts` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SearchPostsOutput<S>` for this endpoint.*/
 pub struct SearchPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchPostsResponse {
     const NSID: &'static str = "app.bsky.feed.searchPosts";
@@ -121,7 +124,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchPosts<S> {
     type Response = SearchPostsResponse;
 }
 
-/// Endpoint type for app.bsky.feed.searchPosts
+/** Endpoint marker for the `app.bsky.feed.searchPosts` query.
+
+Path: `/xrpc/app.bsky.feed.searchPosts`. The request payload type is `SearchPosts<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SearchPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchPostsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.searchPosts";
@@ -140,7 +145,7 @@ fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod search_posts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -210,7 +215,18 @@ impl SearchPostsBuilder<search_posts_state::Empty, DefaultStr> {
         SearchPostsBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -223,7 +239,18 @@ impl<S: BosStr> SearchPostsBuilder<search_posts_state::Empty, S> {
         SearchPostsBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -314,7 +341,10 @@ where
     St::Q: search_posts_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(mut self, value: impl Into<S>) -> SearchPostsBuilder<search_posts_state::SetQ<St>, S> {
+    pub fn q(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchPostsBuilder<search_posts_state::SetQ<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SearchPostsBuilder {
             _state: PhantomData,

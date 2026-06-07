@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::ConvoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetConvoAvailability<S: BosStr = DefaultStr> {
     pub members: Vec<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetConvoAvailabilityOutput<S: BosStr = DefaultStr> {
     pub can_chat: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,7 +35,9 @@ pub struct GetConvoAvailabilityOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for chat.bsky.convo.getConvoAvailability
+/** Response marker for the `chat.bsky.convo.getConvoAvailability` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetConvoAvailabilityOutput<S>` for this endpoint.*/
 pub struct GetConvoAvailabilityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConvoAvailabilityResponse {
     const NSID: &'static str = "chat.bsky.convo.getConvoAvailability";
@@ -55,7 +52,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetConvoAvailability<S> {
     type Response = GetConvoAvailabilityResponse;
 }
 
-/// Endpoint type for chat.bsky.convo.getConvoAvailability
+/** Endpoint marker for the `chat.bsky.convo.getConvoAvailability` query.
+
+Path: `/xrpc/chat.bsky.convo.getConvoAvailability`. The request payload type is `GetConvoAvailability<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetConvoAvailabilityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConvoAvailabilityRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getConvoAvailability";
@@ -66,7 +65,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetConvoAvailabilityRequest {
 
 pub mod get_convo_availability_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -108,14 +107,20 @@ pub struct GetConvoAvailabilityBuilder<
 
 impl GetConvoAvailability<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetConvoAvailabilityBuilder<get_convo_availability_state::Empty, DefaultStr> {
+    pub fn new() -> GetConvoAvailabilityBuilder<
+        get_convo_availability_state::Empty,
+        DefaultStr,
+    > {
         GetConvoAvailabilityBuilder::new()
     }
 }
 
 impl<S: BosStr> GetConvoAvailability<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetConvoAvailabilityBuilder<get_convo_availability_state::Empty, S> {
+    pub fn builder() -> GetConvoAvailabilityBuilder<
+        get_convo_availability_state::Empty,
+        S,
+    > {
         GetConvoAvailabilityBuilder::builder()
     }
 }

@@ -8,40 +8,36 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::labeler::LabelerView;
-use crate::app_bsky::labeler::LabelerViewDetailed;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::labeler::LabelerView;
+use crate::app_bsky::labeler::LabelerViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetServices<S: BosStr = DefaultStr> {
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(default = "_default_detailed")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub detailed: Option<bool>,
     pub dids: Vec<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetServicesOutput<S: BosStr = DefaultStr> {
     pub views: Vec<GetServicesOutputViewsItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -53,7 +49,9 @@ pub enum GetServicesOutputViewsItem<S: BosStr = DefaultStr> {
     LabelerViewDetailed(Box<LabelerViewDetailed<S>>),
 }
 
-/// Response type for app.bsky.labeler.getServices
+/** Response marker for the `app.bsky.labeler.getServices` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetServicesOutput<S>` for this endpoint.*/
 pub struct GetServicesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServicesResponse {
     const NSID: &'static str = "app.bsky.labeler.getServices";
@@ -68,7 +66,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetServices<S> {
     type Response = GetServicesResponse;
 }
 
-/// Endpoint type for app.bsky.labeler.getServices
+/** Endpoint marker for the `app.bsky.labeler.getServices` query.
+
+Path: `/xrpc/app.bsky.labeler.getServices`. The request payload type is `GetServices<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetServicesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServicesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.labeler.getServices";
@@ -83,7 +83,7 @@ fn _default_detailed() -> Option<bool> {
 
 pub mod get_services_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

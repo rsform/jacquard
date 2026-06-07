@@ -8,41 +8,44 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::ingest::Ingest;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::ingest::Ingest;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIngestUrls;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetIngestUrlsOutput<S: BosStr = DefaultStr> {
     pub ingests: Vec<Ingest<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetIngestUrlsError {
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetIngestUrlsError {
@@ -59,7 +62,9 @@ impl core::fmt::Display for GetIngestUrlsError {
     }
 }
 
-/// Response type for place.stream.ingest.getIngestUrls
+/** Response marker for the `place.stream.ingest.getIngestUrls` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetIngestUrlsOutput<S>` for this endpoint.*/
 pub struct GetIngestUrlsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetIngestUrlsResponse {
     const NSID: &'static str = "place.stream.ingest.getIngestUrls";
@@ -74,7 +79,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetIngestUrls {
     type Response = GetIngestUrlsResponse;
 }
 
-/// Endpoint type for place.stream.ingest.getIngestUrls
+/** Endpoint marker for the `place.stream.ingest.getIngestUrls` query.
+
+Path: `/xrpc/place.stream.ingest.getIngestUrls`. The request payload type is `GetIngestUrls`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetIngestUrlsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetIngestUrlsRequest {
     const PATH: &'static str = "/xrpc/place.stream.ingest.getIngestUrls";

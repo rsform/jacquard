@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,17 +20,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::sync::HostStatus;
-use crate::com_atproto::sync::list_hosts;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::sync::HostStatus;
+use crate::com_atproto::sync::list_hosts;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Host<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub account_count: Option<i64>,
@@ -45,25 +42,21 @@ pub struct Host<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListHosts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `200`. Min: 1. Max: 1000.
+    /// Defaults to `200`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListHostsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -88,7 +81,9 @@ impl<S: BosStr> LexiconSchema for Host<S> {
     }
 }
 
-/// Response type for com.atproto.sync.listHosts
+/** Response marker for the `com.atproto.sync.listHosts` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListHostsOutput<S>` for this endpoint.*/
 pub struct ListHostsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListHostsResponse {
     const NSID: &'static str = "com.atproto.sync.listHosts";
@@ -103,7 +98,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListHosts<S> {
     type Response = ListHostsResponse;
 }
 
-/// Endpoint type for com.atproto.sync.listHosts
+/** Endpoint marker for the `com.atproto.sync.listHosts` query.
+
+Path: `/xrpc/com.atproto.sync.listHosts`. The request payload type is `ListHosts<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListHostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListHostsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.listHosts";
@@ -113,10 +110,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListHostsRequest {
 }
 
 fn lexicon_doc_com_atproto_sync_listHosts() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.sync.listHosts"),
@@ -138,9 +135,11 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("hostname"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "hostname of server; not a URL (no scheme)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "hostname of server; not a URL (no scheme)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -153,7 +152,9 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("com.atproto.sync.defs#hostStatus"),
+                                r#ref: CowStr::new_static(
+                                    "com.atproto.sync.defs#hostStatus",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -165,26 +166,28 @@ fn lexicon_doc_com_atproto_sync_listHosts() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -200,7 +203,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_hosts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

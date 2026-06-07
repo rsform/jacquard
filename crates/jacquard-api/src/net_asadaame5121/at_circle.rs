@@ -5,11 +5,13 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `net.asadaame5121.at.circle` Lexicon namespace/module.
 pub mod banner;
 pub mod block;
 pub mod member;
 pub mod request;
 pub mod ring;
+
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
@@ -29,13 +31,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RingRef<S: BosStr = DefaultStr> {
     ///Optional CID for strong reference
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -84,7 +83,7 @@ impl<S: BosStr> LexiconSchema for RingRef<S> {
 
 pub mod ring_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -213,10 +212,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.defs"),
@@ -232,9 +231,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Optional CID for strong reference",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Optional CID for strong reference"),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 max_length: Some(100usize),
                                 ..Default::default()

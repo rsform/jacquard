@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateOAuthClient<S: BosStr = DefaultStr> {
     ///OAuth client ID to update
     pub client_id: S,
@@ -51,11 +48,9 @@ pub struct UpdateOAuthClient<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateOAuthClientOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: OauthClientDetails<S>,
@@ -63,7 +58,9 @@ pub struct UpdateOAuthClientOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for network.slices.slice.updateOAuthClient
+/** Response marker for the `network.slices.slice.updateOAuthClient` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `UpdateOAuthClientOutput<S>` for this endpoint.*/
 pub struct UpdateOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateOAuthClientResponse {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
@@ -74,17 +71,21 @@ impl jacquard_common::xrpc::XrpcResp for UpdateOAuthClientResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateOAuthClient<S> {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateOAuthClientResponse;
 }
 
-/// Endpoint type for network.slices.slice.updateOAuthClient
+/** Endpoint marker for the `network.slices.slice.updateOAuthClient` procedure.
+
+Path: `/xrpc/network.slices.slice.updateOAuthClient`. The request payload type is `UpdateOAuthClient<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct UpdateOAuthClientRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateOAuthClientRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.updateOAuthClient";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateOAuthClient<S>;
     type Response = UpdateOAuthClientResponse;
 }

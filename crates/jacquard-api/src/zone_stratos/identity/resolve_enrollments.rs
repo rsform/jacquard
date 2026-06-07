@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveEnrollments<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ResolveEnrollmentsOutput<S: BosStr = DefaultStr> {
     ///Boundary domains the user is enrolled in. Empty if not enrolled.
     pub boundaries: Vec<S>,
@@ -41,7 +36,9 @@ pub struct ResolveEnrollmentsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for zone.stratos.identity.resolveEnrollments
+/** Response marker for the `zone.stratos.identity.resolveEnrollments` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ResolveEnrollmentsOutput<S>` for this endpoint.*/
 pub struct ResolveEnrollmentsResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveEnrollmentsResponse {
     const NSID: &'static str = "zone.stratos.identity.resolveEnrollments";
@@ -56,7 +53,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ResolveEnrollments<S> {
     type Response = ResolveEnrollmentsResponse;
 }
 
-/// Endpoint type for zone.stratos.identity.resolveEnrollments
+/** Endpoint marker for the `zone.stratos.identity.resolveEnrollments` query.
+
+Path: `/xrpc/zone.stratos.identity.resolveEnrollments`. The request payload type is `ResolveEnrollments<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ResolveEnrollmentsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveEnrollmentsRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.identity.resolveEnrollments";
@@ -67,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ResolveEnrollmentsRequest {
 
 pub mod resolve_enrollments_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -98,7 +97,10 @@ pub mod resolve_enrollments_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ResolveEnrollmentsBuilder<St: resolve_enrollments_state::State, S: BosStr = DefaultStr> {
+pub struct ResolveEnrollmentsBuilder<
+    St: resolve_enrollments_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -106,7 +108,10 @@ pub struct ResolveEnrollmentsBuilder<St: resolve_enrollments_state::State, S: Bo
 
 impl ResolveEnrollments<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ResolveEnrollmentsBuilder<resolve_enrollments_state::Empty, DefaultStr> {
+    pub fn new() -> ResolveEnrollmentsBuilder<
+        resolve_enrollments_state::Empty,
+        DefaultStr,
+    > {
         ResolveEnrollmentsBuilder::new()
     }
 }

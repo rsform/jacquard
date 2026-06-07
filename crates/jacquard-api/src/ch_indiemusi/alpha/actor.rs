@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `ch.indiemusi.alpha.actor` Lexicon namespace/module.
 pub mod artist;
 pub mod master_owner;
 pub mod publishing_owner;

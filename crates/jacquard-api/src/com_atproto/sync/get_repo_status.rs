@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Tid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRepoStatus<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRepoStatusOutput<S: BosStr = DefaultStr> {
     pub active: bool,
     pub did: Did<S>,
@@ -104,7 +99,8 @@ impl<S: BosStr> Serialize for GetRepoStatusOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetRepoStatusOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for GetRepoStatusOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -131,8 +127,12 @@ where
             GetRepoStatusOutputStatus::Takendown => GetRepoStatusOutputStatus::Takendown,
             GetRepoStatusOutputStatus::Suspended => GetRepoStatusOutputStatus::Suspended,
             GetRepoStatusOutputStatus::Deleted => GetRepoStatusOutputStatus::Deleted,
-            GetRepoStatusOutputStatus::Deactivated => GetRepoStatusOutputStatus::Deactivated,
-            GetRepoStatusOutputStatus::Desynchronized => GetRepoStatusOutputStatus::Desynchronized,
+            GetRepoStatusOutputStatus::Deactivated => {
+                GetRepoStatusOutputStatus::Deactivated
+            }
+            GetRepoStatusOutputStatus::Desynchronized => {
+                GetRepoStatusOutputStatus::Desynchronized
+            }
             GetRepoStatusOutputStatus::Throttled => GetRepoStatusOutputStatus::Throttled,
             GetRepoStatusOutputStatus::Other(v) => {
                 GetRepoStatusOutputStatus::Other(v.into_static())
@@ -141,19 +141,25 @@ where
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetRepoStatusError {
     #[serde(rename = "RepoNotFound")]
     RepoNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetRepoStatusError {
@@ -177,7 +183,9 @@ impl core::fmt::Display for GetRepoStatusError {
     }
 }
 
-/// Response type for com.atproto.sync.getRepoStatus
+/** Response marker for the `com.atproto.sync.getRepoStatus` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetRepoStatusOutput<S>` for this endpoint.*/
 pub struct GetRepoStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRepoStatusResponse {
     const NSID: &'static str = "com.atproto.sync.getRepoStatus";
@@ -192,7 +200,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRepoStatus<S> {
     type Response = GetRepoStatusResponse;
 }
 
-/// Endpoint type for com.atproto.sync.getRepoStatus
+/** Endpoint marker for the `com.atproto.sync.getRepoStatus` query.
+
+Path: `/xrpc/com.atproto.sync.getRepoStatus`. The request payload type is `GetRepoStatus<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetRepoStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRepoStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getRepoStatus";
@@ -203,7 +213,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRepoStatusRequest {
 
 pub mod get_repo_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -234,7 +244,10 @@ pub mod get_repo_status_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetRepoStatusBuilder<St: get_repo_status_state::State, S: BosStr = DefaultStr> {
+pub struct GetRepoStatusBuilder<
+    St: get_repo_status_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,

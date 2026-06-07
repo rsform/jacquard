@@ -5,17 +5,19 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.ocho.plugin` Lexicon namespace/module.
 pub mod get_launch_asset;
 pub mod get_manifest;
 pub mod put_hosting_url;
 pub mod service;
+
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,16 +29,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_ocho::plugin;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_ocho::plugin;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AdaptiveIcon<S: BosStr = DefaultStr> {
     ///The background color of the adaptive icon.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,11 +49,9 @@ pub struct AdaptiveIcon<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Android<S: BosStr = DefaultStr> {
     ///Configuration for the adaptive icon on Android.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,10 +66,7 @@ pub struct Android<S: BosStr = DefaultStr> {
 /// Android status bar configuration.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AndroidStatusBar<S: BosStr = DefaultStr> {
     ///The background color of the Android status bar.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -81,11 +75,9 @@ pub struct AndroidStatusBar<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Asset<S: BosStr = DefaultStr> {
     ///The blob of the asset
     pub blob: BlobRef<S>,
@@ -100,11 +92,9 @@ pub struct Asset<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Db<S: BosStr = DefaultStr> {
     ///The ID of the database.
     pub id: S,
@@ -112,11 +102,9 @@ pub struct Db<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Developer<S: BosStr = DefaultStr> {
     ///The tool used for development, e.g., 'expo-cli'.
     pub tool: S,
@@ -124,11 +112,9 @@ pub struct Developer<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpoClient<S: BosStr = DefaultStr> {
     ///Android-specific configuration for the app.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -186,11 +172,9 @@ pub struct ExpoClient<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpoGo<S: BosStr = DefaultStr> {
     ///Developer-specific configuration for the Expo Go app.
     pub developer: plugin::Developer<S>,
@@ -198,11 +182,9 @@ pub struct ExpoGo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Ios<S: BosStr = DefaultStr> {
     ///Whether the app supports iPad.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -211,11 +193,9 @@ pub struct Ios<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LaunchAsset<S: BosStr = DefaultStr> {
     ///The MIME type of the asset, e.g., 'image/png'.
     pub content_type: S,
@@ -227,11 +207,9 @@ pub struct LaunchAsset<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Manifest<S: BosStr = DefaultStr> {
     ///The date and time when this plugin manifest was created.
     pub created_at: Datetime,
@@ -248,17 +226,16 @@ pub struct Manifest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ManifestExtra<S: BosStr = DefaultStr> {
     pub expo_client: plugin::ExpoClient<S>,
     pub expo_go: plugin::ExpoGo<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -276,10 +253,7 @@ pub type PluginConfig<S = DefaultStr> = Data<S>;
 pub type StringId<S = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Web<S: BosStr = DefaultStr> {
     ///The bundler used for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -492,10 +466,10 @@ impl<S: BosStr> LexiconSchema for Web<S> {
 }
 
 fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.ocho.plugin.defs"),
@@ -510,26 +484,28 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The background color of the adaptive icon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The background color of the adaptive icon.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("foregroundImage"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL to the foreground image of the adaptive icon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The URL to the foreground image of the adaptive icon.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("foregroundImageBlob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -563,16 +539,20 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("androidStatusBar"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Android status bar configuration.")),
+                    description: Some(
+                        CowStr::new_static("Android status bar configuration."),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("backgroundColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The background color of the Android status bar.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The background color of the Android status bar.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -642,7 +622,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The ID of the database.")),
+                                description: Some(
+                                    CowStr::new_static("The ID of the database."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -661,9 +643,11 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tool"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The tool used for development, e.g., 'expo-cli'.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The tool used for development, e.g., 'expo-cli'.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -675,10 +659,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("expoClient"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("slug"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("slug")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -711,7 +694,9 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("icon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URL to the app icon.")),
+                                description: Some(
+                                    CowStr::new_static("The URL to the app icon."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -731,9 +716,11 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The name of the Expo client application.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The name of the Expo client application.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -746,18 +733,18 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("orientation"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The default orientation of the app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The default orientation of the app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("platforms"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "The platforms supported by the app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The platforms supported by the app."),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -773,43 +760,47 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("scheme"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The custom URI scheme for deep linking.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The custom URI scheme for deep linking.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sdkVersion"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The SDK version of the Expo client.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The SDK version of the Expo client."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("slug"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "A URL-friendly identifier for the app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("A URL-friendly identifier for the app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userInterfaceStyle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The default user interface style.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The default user interface style."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("version"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The version of the app.")),
+                                description: Some(
+                                    CowStr::new_static("The version of the app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -993,10 +984,12 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("manifestExtra"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("expoClient"),
-                        SmolStr::new_static("expoGo"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("expoClient"),
+                            SmolStr::new_static("expoGo")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1025,7 +1018,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                     items: LexArrayItem::Union(LexRefUnion {
                         refs: vec![
                             CowStr::new_static("#stringId"),
-                            CowStr::new_static("#pluginConfig"),
+                            CowStr::new_static("#pluginConfig")
                         ],
                         ..Default::default()
                     }),
@@ -1034,16 +1027,16 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("pluginConfig"),
-                LexUserType::Unknown(LexUnknown {
-                    ..Default::default()
-                }),
+                LexUserType::Unknown(LexUnknown { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("stringId"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static(
-                        "A string identifier for a plugin, used to reference it in the app.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A string identifier for a plugin, used to reference it in the app.",
+                        ),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -1056,33 +1049,33 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("bundler"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The bundler used for the web app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The bundler used for the web app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("favicon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL to the favicon for the web app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The URL to the favicon for the web app.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("faviconBlob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("output"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The output directory for the web app.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The output directory for the web app."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1099,7 +1092,7 @@ fn lexicon_doc_app_ocho_plugin_defs() -> LexiconDoc<'static> {
 
 pub mod asset_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1223,7 +1216,10 @@ where
     St::Hash: asset_state::IsUnset,
 {
     /// Set the `hash` field (required)
-    pub fn hash(mut self, value: impl Into<S>) -> AssetBuilder<asset_state::SetHash<St>, S> {
+    pub fn hash(
+        mut self,
+        value: impl Into<S>,
+    ) -> AssetBuilder<asset_state::SetHash<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AssetBuilder {
             _state: PhantomData,
@@ -1239,7 +1235,10 @@ where
     St::Type: asset_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(mut self, value: impl Into<S>) -> AssetBuilder<asset_state::SetType<St>, S> {
+    pub fn r#type(
+        mut self,
+        value: impl Into<S>,
+    ) -> AssetBuilder<asset_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         AssetBuilder {
             _state: PhantomData,
@@ -1293,7 +1292,7 @@ where
 
 pub mod expo_go_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1408,7 +1407,7 @@ where
 
 pub mod launch_asset_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1581,7 +1580,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LaunchAsset<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LaunchAsset<S> {
         LaunchAsset {
             content_type: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),
@@ -1593,7 +1595,7 @@ where
 
 pub mod manifest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1797,7 +1799,10 @@ where
     St::Id: manifest_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> ManifestBuilder<manifest_state::SetId<St>, S> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> ManifestBuilder<manifest_state::SetId<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
@@ -1902,7 +1907,7 @@ where
 
 pub mod manifest_extra_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1945,7 +1950,10 @@ pub mod manifest_extra_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ManifestExtraBuilder<St: manifest_extra_state::State, S: BosStr = DefaultStr> {
+pub struct ManifestExtraBuilder<
+    St: manifest_extra_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<plugin::ExpoClient<S>>, Option<plugin::ExpoGo<S>>),
     _type: PhantomData<fn() -> S>,
@@ -2040,7 +2048,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ManifestExtra<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ManifestExtra<S> {
         ManifestExtra {
             expo_client: self._fields.0.unwrap(),
             expo_go: self._fields.1.unwrap(),

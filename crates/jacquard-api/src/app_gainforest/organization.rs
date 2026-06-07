@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.gainforest.organization` Lexicon namespace/module.
 pub mod default_site;
 pub mod get_indexed_organizations;
 pub mod info;

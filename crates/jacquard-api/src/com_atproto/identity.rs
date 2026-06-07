@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `com.atproto.identity` Lexicon namespace/module.
 pub mod get_recommended_did_credentials;
 pub mod refresh_identity;
 pub mod request_plc_operation_signature;
@@ -14,6 +15,7 @@ pub mod resolve_identity;
 pub mod sign_plc_operation;
 pub mod submit_plc_operation;
 pub mod update_handle;
+
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
@@ -33,13 +35,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct IdentityInfo<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///The complete DID document for the identity.
@@ -67,7 +66,7 @@ impl<S: BosStr> LexiconSchema for IdentityInfo<S> {
 
 pub mod identity_info_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -240,7 +239,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IdentityInfo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> IdentityInfo<S> {
         IdentityInfo {
             did: self._fields.0.unwrap(),
             did_doc: self._fields.1.unwrap(),
@@ -251,10 +253,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_identity_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.identity.defs"),

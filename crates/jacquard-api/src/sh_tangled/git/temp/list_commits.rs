@@ -10,23 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListCommits<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -35,15 +32,25 @@ pub struct ListCommits<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct ListCommitsOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListCommitsError {
     /// Repository not found or access denied
@@ -60,10 +67,7 @@ pub enum ListCommitsError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListCommitsError {
@@ -108,7 +112,9 @@ impl core::fmt::Display for ListCommitsError {
     }
 }
 
-/// Response type for sh.tangled.git.temp.listCommits
+/** Response marker for the `sh.tangled.git.temp.listCommits` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListCommitsOutput` for this endpoint.*/
 pub struct ListCommitsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListCommitsResponse {
     const NSID: &'static str = "sh.tangled.git.temp.listCommits";
@@ -142,7 +148,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListCommits<S> {
     type Response = ListCommitsResponse;
 }
 
-/// Endpoint type for sh.tangled.git.temp.listCommits
+/** Endpoint marker for the `sh.tangled.git.temp.listCommits` query.
+
+Path: `/xrpc/sh.tangled.git.temp.listCommits`. The request payload type is `ListCommits<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListCommitsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListCommitsRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.listCommits";
@@ -157,7 +165,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_commits_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

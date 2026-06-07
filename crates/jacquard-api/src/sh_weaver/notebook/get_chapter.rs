@@ -8,37 +8,32 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::ChapterEntryView;
-use crate::sh_weaver::notebook::ChapterView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::ChapterEntryView;
+use crate::sh_weaver::notebook::ChapterView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetChapter<S: BosStr = DefaultStr> {
     pub chapter: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry_cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry_limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetChapterOutput<S: BosStr = DefaultStr> {
     pub chapter: ChapterView<S>,
     pub entries: Vec<ChapterEntryView<S>>,
@@ -48,19 +43,25 @@ pub struct GetChapterOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetChapterError {
     #[serde(rename = "ChapterNotFound")]
     ChapterNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetChapterError {
@@ -84,7 +85,9 @@ impl core::fmt::Display for GetChapterError {
     }
 }
 
-/// Response type for sh.weaver.notebook.getChapter
+/** Response marker for the `sh.weaver.notebook.getChapter` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetChapterOutput<S>` for this endpoint.*/
 pub struct GetChapterResponse;
 impl jacquard_common::xrpc::XrpcResp for GetChapterResponse {
     const NSID: &'static str = "sh.weaver.notebook.getChapter";
@@ -99,7 +102,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetChapter<S> {
     type Response = GetChapterResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getChapter
+/** Endpoint marker for the `sh.weaver.notebook.getChapter` query.
+
+Path: `/xrpc/sh.weaver.notebook.getChapter`. The request payload type is `GetChapter<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetChapterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetChapterRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getChapter";
@@ -114,7 +119,7 @@ fn _default_entry_limit() -> Option<i64> {
 
 pub mod get_chapter_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::git::temp::list_languages;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp::list_languages;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Language<S: BosStr = DefaultStr> {
     ///Programming language name
     pub name: S,
@@ -40,24 +37,20 @@ pub struct Language<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListLanguages<S: BosStr = DefaultStr> {
-    ///Defaults to `"HEAD"`.
+    /// Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<S>,
     pub repo: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListLanguagesOutput<S: BosStr = DefaultStr> {
     pub languages: Vec<list_languages::Language<S>>,
     ///The git reference used
@@ -68,9 +61,18 @@ pub struct ListLanguagesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListLanguagesError {
     /// Repository not found or access denied
@@ -84,10 +86,7 @@ pub enum ListLanguagesError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListLanguagesError {
@@ -140,7 +139,9 @@ impl<S: BosStr> LexiconSchema for Language<S> {
     }
 }
 
-/// Response type for sh.tangled.git.temp.listLanguages
+/** Response marker for the `sh.tangled.git.temp.listLanguages` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListLanguagesOutput<S>` for this endpoint.*/
 pub struct ListLanguagesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListLanguagesResponse {
     const NSID: &'static str = "sh.tangled.git.temp.listLanguages";
@@ -155,7 +156,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListLanguages<S> {
     type Response = ListLanguagesResponse;
 }
 
-/// Endpoint type for sh.tangled.git.temp.listLanguages
+/** Endpoint marker for the `sh.tangled.git.temp.listLanguages` query.
+
+Path: `/xrpc/sh.tangled.git.temp.listLanguages`. The request payload type is `ListLanguages<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListLanguagesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListLanguagesRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.listLanguages";
@@ -166,7 +169,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListLanguagesRequest {
 
 pub mod language_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -257,7 +260,10 @@ where
     St::Name: language_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> LanguageBuilder<language_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> LanguageBuilder<language_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
@@ -311,10 +317,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_git_temp_listLanguages() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.git.temp.listLanguages"),
@@ -323,17 +329,18 @@ fn lexicon_doc_sh_tangled_git_temp_listLanguages() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("language"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("size"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("size")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Programming language name")),
+                                description: Some(
+                                    CowStr::new_static("Programming language name"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -351,32 +358,38 @@ fn lexicon_doc_sh_tangled_git_temp_listLanguages() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("repo")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("ref"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Git reference (branch, tag, or commit SHA)",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repo"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("DID of the repository")),
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("repo")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("ref"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Git reference (branch, tag, or commit SHA)",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repo"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("DID of the repository"),
+                                        ),
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -392,7 +405,7 @@ fn _default_ref<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod list_languages_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -423,7 +436,10 @@ pub mod list_languages_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListLanguagesBuilder<St: list_languages_state::State, S: BosStr = DefaultStr> {
+pub struct ListLanguagesBuilder<
+    St: list_languages_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,

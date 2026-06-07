@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::edit::EditTreeView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::edit::EditTreeView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEditTree<S: BosStr = DefaultStr> {
     pub resource: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEditTreeOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: EditTreeView<S>,
@@ -39,7 +34,9 @@ pub struct GetEditTreeOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.edit.getEditTree
+/** Response marker for the `sh.weaver.edit.getEditTree` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetEditTreeOutput<S>` for this endpoint.*/
 pub struct GetEditTreeResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEditTreeResponse {
     const NSID: &'static str = "sh.weaver.edit.getEditTree";
@@ -54,7 +51,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEditTree<S> {
     type Response = GetEditTreeResponse;
 }
 
-/// Endpoint type for sh.weaver.edit.getEditTree
+/** Endpoint marker for the `sh.weaver.edit.getEditTree` query.
+
+Path: `/xrpc/sh.weaver.edit.getEditTree`. The request payload type is `GetEditTree<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetEditTreeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEditTreeRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.getEditTree";
@@ -65,7 +64,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEditTreeRequest {
 
 pub mod get_edit_tree_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

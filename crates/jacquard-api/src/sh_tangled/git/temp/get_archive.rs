@@ -10,21 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetArchive<S: BosStr = DefaultStr> {
-    ///Defaults to `"tar.gz"`.
+    /// Defaults to `"tar.gz"`.
     #[serde(default = "_default_format")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<S>,
@@ -42,9 +39,18 @@ pub struct GetArchiveOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetArchiveError {
     /// Repository not found or access denied
@@ -61,10 +67,7 @@ pub enum GetArchiveError {
     ArchiveError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetArchiveError {
@@ -109,7 +112,9 @@ impl core::fmt::Display for GetArchiveError {
     }
 }
 
-/// Response type for sh.tangled.git.temp.getArchive
+/** Response marker for the `sh.tangled.git.temp.getArchive` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetArchiveOutput` for this endpoint.*/
 pub struct GetArchiveResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArchiveResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getArchive";
@@ -143,7 +148,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetArchive<S> {
     type Response = GetArchiveResponse;
 }
 
-/// Endpoint type for sh.tangled.git.temp.getArchive
+/** Endpoint marker for the `sh.tangled.git.temp.getArchive` query.
+
+Path: `/xrpc/sh.tangled.git.temp.getArchive`. The request payload type is `GetArchive<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetArchiveRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArchiveRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getArchive";
@@ -158,7 +165,7 @@ fn _default_format<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_archive_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

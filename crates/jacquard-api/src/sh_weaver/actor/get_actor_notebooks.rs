@@ -8,40 +8,35 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::NotebookView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorNotebooks<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(default = "_default_include_collaborations")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_collaborations: Option<bool>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorNotebooksOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -50,7 +45,9 @@ pub struct GetActorNotebooksOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.actor.getActorNotebooks
+/** Response marker for the `sh.weaver.actor.getActorNotebooks` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetActorNotebooksOutput<S>` for this endpoint.*/
 pub struct GetActorNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorNotebooksResponse {
     const NSID: &'static str = "sh.weaver.actor.getActorNotebooks";
@@ -65,7 +62,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorNotebooks<S> {
     type Response = GetActorNotebooksResponse;
 }
 
-/// Endpoint type for sh.weaver.actor.getActorNotebooks
+/** Endpoint marker for the `sh.weaver.actor.getActorNotebooks` query.
+
+Path: `/xrpc/sh.weaver.actor.getActorNotebooks`. The request payload type is `GetActorNotebooks<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetActorNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.actor.getActorNotebooks";
@@ -84,7 +83,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_actor_notebooks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,20 +114,21 @@ pub mod get_actor_notebooks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorNotebooksBuilder<St: get_actor_notebooks_state::State, S: BosStr = DefaultStr> {
+pub struct GetActorNotebooksBuilder<
+    St: get_actor_notebooks_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<AtIdentifier<S>>,
-        Option<S>,
-        Option<bool>,
-        Option<i64>,
-    ),
+    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<bool>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl GetActorNotebooks<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetActorNotebooksBuilder<get_actor_notebooks_state::Empty, DefaultStr> {
+    pub fn new() -> GetActorNotebooksBuilder<
+        get_actor_notebooks_state::Empty,
+        DefaultStr,
+    > {
         GetActorNotebooksBuilder::new()
     }
 }

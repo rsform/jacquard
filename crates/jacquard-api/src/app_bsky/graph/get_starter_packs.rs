@@ -8,37 +8,34 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::graph::StarterPackViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::graph::StarterPackViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStarterPacks<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStarterPacksOutput<S: BosStr = DefaultStr> {
     pub starter_packs: Vec<StarterPackViewBasic<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.bsky.graph.getStarterPacks
+/** Response marker for the `app.bsky.graph.getStarterPacks` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetStarterPacksOutput<S>` for this endpoint.*/
 pub struct GetStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStarterPacksResponse {
     const NSID: &'static str = "app.bsky.graph.getStarterPacks";
@@ -53,7 +50,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetStarterPacks<S> {
     type Response = GetStarterPacksResponse;
 }
 
-/// Endpoint type for app.bsky.graph.getStarterPacks
+/** Endpoint marker for the `app.bsky.graph.getStarterPacks` query.
+
+Path: `/xrpc/app.bsky.graph.getStarterPacks`. The request payload type is `GetStarterPacks<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacks";
@@ -64,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksRequest {
 
 pub mod get_starter_packs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,7 +94,10 @@ pub mod get_starter_packs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetStarterPacksBuilder<St: get_starter_packs_state::State, S: BosStr = DefaultStr> {
+pub struct GetStarterPacksBuilder<
+    St: get_starter_packs_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,

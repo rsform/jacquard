@@ -8,41 +8,36 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::BlockedPost;
 use crate::app_bsky::feed::NotFoundPost;
 use crate::app_bsky::feed::ThreadViewPost;
 use crate::app_bsky::feed::ThreadgateView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThread<S: BosStr = DefaultStr> {
-    ///Defaults to `6`. Min: 0. Max: 1000.
+    /// Defaults to `6`. Min: 0. Max: 1000.
     #[serde(default = "_default_depth")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub depth: Option<i64>,
-    ///Defaults to `80`. Min: 0. Max: 1000.
+    /// Defaults to `80`. Min: 0. Max: 1000.
     #[serde(default = "_default_parent_height")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_height: Option<i64>,
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThreadOutput<S: BosStr = DefaultStr> {
     pub thread: GetPostThreadOutputThread<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,6 +45,7 @@ pub struct GetPostThreadOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -63,19 +59,25 @@ pub enum GetPostThreadOutputThread<S: BosStr = DefaultStr> {
     BlockedPost(Box<BlockedPost<S>>),
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetPostThreadError {
     #[serde(rename = "NotFound")]
     NotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetPostThreadError {
@@ -99,7 +101,9 @@ impl core::fmt::Display for GetPostThreadError {
     }
 }
 
-/// Response type for app.bsky.feed.getPostThread
+/** Response marker for the `app.bsky.feed.getPostThread` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetPostThreadOutput<S>` for this endpoint.*/
 pub struct GetPostThreadResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostThreadResponse {
     const NSID: &'static str = "app.bsky.feed.getPostThread";
@@ -114,7 +118,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPostThread<S> {
     type Response = GetPostThreadResponse;
 }
 
-/// Endpoint type for app.bsky.feed.getPostThread
+/** Endpoint marker for the `app.bsky.feed.getPostThread` query.
+
+Path: `/xrpc/app.bsky.feed.getPostThread`. The request payload type is `GetPostThread<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetPostThreadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostThreadRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getPostThread";
@@ -133,7 +139,7 @@ fn _default_parent_height() -> Option<i64> {
 
 pub mod get_post_thread_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -164,7 +170,10 @@ pub mod get_post_thread_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPostThreadBuilder<St: get_post_thread_state::State, S: BosStr = DefaultStr> {
+pub struct GetPostThreadBuilder<
+    St: get_post_thread_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,

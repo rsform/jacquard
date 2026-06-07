@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A did-git ref stored in an AT Protocol repository. Each record maps a repository name and ref name (e.g. refs/heads/main) to the hex SHA-256 object ID it points to.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -141,7 +141,7 @@ impl<S: BosStr> LexiconSchema for Ref<S> {
 
 pub mod ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -246,7 +246,10 @@ where
     St::ObjectId: ref_state::IsUnset,
 {
     /// Set the `objectId` field (required)
-    pub fn object_id(mut self, value: impl Into<S>) -> RefBuilder<ref_state::SetObjectId<St>, S> {
+    pub fn object_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> RefBuilder<ref_state::SetObjectId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RefBuilder {
             _state: PhantomData,
@@ -262,7 +265,10 @@ where
     St::RefName: ref_state::IsUnset,
 {
     /// Set the `refName` field (required)
-    pub fn ref_name(mut self, value: impl Into<S>) -> RefBuilder<ref_state::SetRefName<St>, S> {
+    pub fn ref_name(
+        mut self,
+        value: impl Into<S>,
+    ) -> RefBuilder<ref_state::SetRefName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RefBuilder {
             _state: PhantomData,
@@ -316,10 +322,10 @@ where
 }
 
 fn lexicon_doc_tech_lenooby09_didgit_ref() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.lenooby09.didgit.ref"),

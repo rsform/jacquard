@@ -8,41 +8,38 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::actor::ProfileViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetContributors<S: BosStr = DefaultStr> {
-    /// Defaults to `true`.
+    ///  Defaults to `true`.
     #[serde(default = "_default_include_cascaded")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_cascaded: Option<bool>,
     pub resource: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetContributorsOutput<S: BosStr = DefaultStr> {
     pub contributors: Vec<ProfileViewBasic<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.edit.getContributors
+/** Response marker for the `sh.weaver.edit.getContributors` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetContributorsOutput<S>` for this endpoint.*/
 pub struct GetContributorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetContributorsResponse {
     const NSID: &'static str = "sh.weaver.edit.getContributors";
@@ -57,7 +54,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetContributors<S> {
     type Response = GetContributorsResponse;
 }
 
-/// Endpoint type for sh.weaver.edit.getContributors
+/** Endpoint marker for the `sh.weaver.edit.getContributors` query.
+
+Path: `/xrpc/sh.weaver.edit.getContributors`. The request payload type is `GetContributors<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetContributorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetContributorsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.getContributors";
@@ -72,7 +71,7 @@ fn _default_include_cascaded() -> Option<bool> {
 
 pub mod get_contributors_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -103,7 +102,10 @@ pub mod get_contributors_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetContributorsBuilder<St: get_contributors_state::State, S: BosStr = DefaultStr> {
+pub struct GetContributorsBuilder<
+    St: get_contributors_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,

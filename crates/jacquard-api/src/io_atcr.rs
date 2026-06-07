@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `io.atcr` Lexicon namespace/module.
 pub mod hold;
 pub mod manifest;
 pub mod repo;

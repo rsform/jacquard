@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `garden.lexicon.exultant.zebra` Lexicon namespace/module.
 pub mod app;
 pub mod distribution;
 pub mod masl;

@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `tools.ozone.report` Lexicon namespace/module.
 pub mod assign_moderator;
 pub mod create_activity;
 pub mod get_assignments;
@@ -18,39 +19,37 @@ pub mod reassign_queue;
 pub mod refresh_stats;
 pub mod unassign_moderator;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::moderation;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::ModEventView;
 use crate::tools_ozone::moderation::SubjectStatusView;
 use crate::tools_ozone::moderation::SubjectView;
 use crate::tools_ozone::queue::QueueView;
-use crate::tools_ozone::report;
 use crate::tools_ozone::team::Member;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::com_atproto::moderation;
+use crate::tools_ozone::report;
 /// Activity recording a moderator being assigned to a report.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AssignmentActivity<S: BosStr = DefaultStr> {
     ///The report's status before this activity. Populated automatically from the report row; not required in input.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -116,7 +115,8 @@ impl<S: BosStr> Serialize for AssignmentActivityPreviousStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AssignmentActivityPreviousStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for AssignmentActivityPreviousStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -140,12 +140,18 @@ where
     type Output = AssignmentActivityPreviousStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            AssignmentActivityPreviousStatus::Open => AssignmentActivityPreviousStatus::Open,
-            AssignmentActivityPreviousStatus::Closed => AssignmentActivityPreviousStatus::Closed,
+            AssignmentActivityPreviousStatus::Open => {
+                AssignmentActivityPreviousStatus::Open
+            }
+            AssignmentActivityPreviousStatus::Closed => {
+                AssignmentActivityPreviousStatus::Closed
+            }
             AssignmentActivityPreviousStatus::Escalated => {
                 AssignmentActivityPreviousStatus::Escalated
             }
-            AssignmentActivityPreviousStatus::Queued => AssignmentActivityPreviousStatus::Queued,
+            AssignmentActivityPreviousStatus::Queued => {
+                AssignmentActivityPreviousStatus::Queued
+            }
             AssignmentActivityPreviousStatus::Assigned => {
                 AssignmentActivityPreviousStatus::Assigned
             }
@@ -156,11 +162,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AssignmentView<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -180,10 +184,7 @@ pub struct AssignmentView<S: BosStr = DefaultStr> {
 /// Activity recording a report being closed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CloseActivity<S: BosStr = DefaultStr> {
     ///The report's status before this activity. Populated automatically from the report row; not required in input.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -249,7 +250,8 @@ impl<S: BosStr> Serialize for CloseActivityPreviousStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CloseActivityPreviousStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for CloseActivityPreviousStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -275,9 +277,13 @@ where
         match self {
             CloseActivityPreviousStatus::Open => CloseActivityPreviousStatus::Open,
             CloseActivityPreviousStatus::Closed => CloseActivityPreviousStatus::Closed,
-            CloseActivityPreviousStatus::Escalated => CloseActivityPreviousStatus::Escalated,
+            CloseActivityPreviousStatus::Escalated => {
+                CloseActivityPreviousStatus::Escalated
+            }
             CloseActivityPreviousStatus::Queued => CloseActivityPreviousStatus::Queued,
-            CloseActivityPreviousStatus::Assigned => CloseActivityPreviousStatus::Assigned,
+            CloseActivityPreviousStatus::Assigned => {
+                CloseActivityPreviousStatus::Assigned
+            }
             CloseActivityPreviousStatus::Other(v) => {
                 CloseActivityPreviousStatus::Other(v.into_static())
             }
@@ -288,10 +294,7 @@ where
 /// Activity recording a report being escalated.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EscalationActivity<S: BosStr = DefaultStr> {
     ///The report's status before this activity. Populated automatically from the report row; not required in input.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -357,7 +360,8 @@ impl<S: BosStr> Serialize for EscalationActivityPreviousStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EscalationActivityPreviousStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for EscalationActivityPreviousStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -381,12 +385,18 @@ where
     type Output = EscalationActivityPreviousStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            EscalationActivityPreviousStatus::Open => EscalationActivityPreviousStatus::Open,
-            EscalationActivityPreviousStatus::Closed => EscalationActivityPreviousStatus::Closed,
+            EscalationActivityPreviousStatus::Open => {
+                EscalationActivityPreviousStatus::Open
+            }
+            EscalationActivityPreviousStatus::Closed => {
+                EscalationActivityPreviousStatus::Closed
+            }
             EscalationActivityPreviousStatus::Escalated => {
                 EscalationActivityPreviousStatus::Escalated
             }
-            EscalationActivityPreviousStatus::Queued => EscalationActivityPreviousStatus::Queued,
+            EscalationActivityPreviousStatus::Queued => {
+                EscalationActivityPreviousStatus::Queued
+            }
             EscalationActivityPreviousStatus::Assigned => {
                 EscalationActivityPreviousStatus::Assigned
             }
@@ -400,10 +410,7 @@ where
 /// A single daily snapshot of report statistics for a calendar date.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HistoricalStats<S: BosStr = DefaultStr> {
     ///Percentage of reports actioned (actionedCount / inboundCount * 100), rounded to nearest integer.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -435,10 +442,7 @@ pub struct HistoricalStats<S: BosStr = DefaultStr> {
 /// Live statistics for reports for the current calendar day, filterable by queue, moderator, or report type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LiveStats<S: BosStr = DefaultStr> {
     ///Percentage of reports actioned (actionedCount / inboundCount * 100), rounded to nearest integer.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -468,10 +472,7 @@ pub struct LiveStats<S: BosStr = DefaultStr> {
 /// Activity recording a note on a report. Use internalNote for moderator-only notes or publicNote for reporter-visible notes (or both).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NoteActivity<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -480,10 +481,7 @@ pub struct NoteActivity<S: BosStr = DefaultStr> {
 /// Activity recording a report being routed to a queue.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueueActivity<S: BosStr = DefaultStr> {
     ///The report's status before this activity. Populated automatically from the report row; not required in input.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -549,7 +547,8 @@ impl<S: BosStr> Serialize for QueueActivityPreviousStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueueActivityPreviousStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for QueueActivityPreviousStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -575,9 +574,13 @@ where
         match self {
             QueueActivityPreviousStatus::Open => QueueActivityPreviousStatus::Open,
             QueueActivityPreviousStatus::Closed => QueueActivityPreviousStatus::Closed,
-            QueueActivityPreviousStatus::Escalated => QueueActivityPreviousStatus::Escalated,
+            QueueActivityPreviousStatus::Escalated => {
+                QueueActivityPreviousStatus::Escalated
+            }
             QueueActivityPreviousStatus::Queued => QueueActivityPreviousStatus::Queued,
-            QueueActivityPreviousStatus::Assigned => QueueActivityPreviousStatus::Assigned,
+            QueueActivityPreviousStatus::Assigned => {
+                QueueActivityPreviousStatus::Assigned
+            }
             QueueActivityPreviousStatus::Other(v) => {
                 QueueActivityPreviousStatus::Other(v.into_static())
             }
@@ -915,6 +918,7 @@ impl core::fmt::Display for ReasonSexualUnlabeled {
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReasonType<S: BosStr = DefaultStr> {
     ToolsOzoneReportDefsReasonAppeal,
@@ -963,8 +967,12 @@ pub enum ReasonType<S: BosStr = DefaultStr> {
 impl<S: BosStr> ReasonType<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::ToolsOzoneReportDefsReasonAppeal => "tools.ozone.report.defs#reasonAppeal",
-            Self::ToolsOzoneReportDefsReasonOther => "tools.ozone.report.defs#reasonOther",
+            Self::ToolsOzoneReportDefsReasonAppeal => {
+                "tools.ozone.report.defs#reasonAppeal"
+            }
+            Self::ToolsOzoneReportDefsReasonOther => {
+                "tools.ozone.report.defs#reasonOther"
+            }
             Self::ToolsOzoneReportDefsReasonViolenceAnimal => {
                 "tools.ozone.report.defs#reasonViolenceAnimal"
             }
@@ -1061,7 +1069,9 @@ impl<S: BosStr> ReasonType<S> {
             Self::ToolsOzoneReportDefsReasonRuleBanEvasion => {
                 "tools.ozone.report.defs#reasonRuleBanEvasion"
             }
-            Self::ToolsOzoneReportDefsReasonRuleOther => "tools.ozone.report.defs#reasonRuleOther",
+            Self::ToolsOzoneReportDefsReasonRuleOther => {
+                "tools.ozone.report.defs#reasonRuleOther"
+            }
             Self::ToolsOzoneReportDefsReasonSelfHarmContent => {
                 "tools.ozone.report.defs#reasonSelfHarmContent"
             }
@@ -1083,8 +1093,12 @@ impl<S: BosStr> ReasonType<S> {
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "tools.ozone.report.defs#reasonAppeal" => Self::ToolsOzoneReportDefsReasonAppeal,
-            "tools.ozone.report.defs#reasonOther" => Self::ToolsOzoneReportDefsReasonOther,
+            "tools.ozone.report.defs#reasonAppeal" => {
+                Self::ToolsOzoneReportDefsReasonAppeal
+            }
+            "tools.ozone.report.defs#reasonOther" => {
+                Self::ToolsOzoneReportDefsReasonOther
+            }
             "tools.ozone.report.defs#reasonViolenceAnimal" => {
                 Self::ToolsOzoneReportDefsReasonViolenceAnimal
             }
@@ -1181,7 +1195,9 @@ impl<S: BosStr> ReasonType<S> {
             "tools.ozone.report.defs#reasonRuleBanEvasion" => {
                 Self::ToolsOzoneReportDefsReasonRuleBanEvasion
             }
-            "tools.ozone.report.defs#reasonRuleOther" => Self::ToolsOzoneReportDefsReasonRuleOther,
+            "tools.ozone.report.defs#reasonRuleOther" => {
+                Self::ToolsOzoneReportDefsReasonRuleOther
+            }
             "tools.ozone.report.defs#reasonSelfHarmContent" => {
                 Self::ToolsOzoneReportDefsReasonSelfHarmContent
             }
@@ -1439,10 +1455,7 @@ impl core::fmt::Display for ReasonViolenceTrafficking {
 /// Activity recording a closed report being reopened. Only valid when the report is in 'closed' status.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReopenActivity<S: BosStr = DefaultStr> {
     ///The report's status before this activity. Populated automatically from the report row; not required in input.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1508,7 +1521,8 @@ impl<S: BosStr> Serialize for ReopenActivityPreviousStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReopenActivityPreviousStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ReopenActivityPreviousStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1534,9 +1548,13 @@ where
         match self {
             ReopenActivityPreviousStatus::Open => ReopenActivityPreviousStatus::Open,
             ReopenActivityPreviousStatus::Closed => ReopenActivityPreviousStatus::Closed,
-            ReopenActivityPreviousStatus::Escalated => ReopenActivityPreviousStatus::Escalated,
+            ReopenActivityPreviousStatus::Escalated => {
+                ReopenActivityPreviousStatus::Escalated
+            }
             ReopenActivityPreviousStatus::Queued => ReopenActivityPreviousStatus::Queued,
-            ReopenActivityPreviousStatus::Assigned => ReopenActivityPreviousStatus::Assigned,
+            ReopenActivityPreviousStatus::Assigned => {
+                ReopenActivityPreviousStatus::Assigned
+            }
             ReopenActivityPreviousStatus::Other(v) => {
                 ReopenActivityPreviousStatus::Other(v.into_static())
             }
@@ -1547,10 +1565,7 @@ where
 /// A single activity entry on a report.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReportActivityView<S: BosStr = DefaultStr> {
     ///The typed activity object describing what occurred.
     pub activity: ReportActivityViewActivity<S>,
@@ -1580,6 +1595,7 @@ pub struct ReportActivityView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1601,10 +1617,7 @@ pub enum ReportActivityViewActivity<S: BosStr = DefaultStr> {
 /// Information about the moderator currently assigned to a report.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReportAssignment<S: BosStr = DefaultStr> {
     ///When the report was assigned
     pub assigned_at: Datetime,
@@ -1617,11 +1630,9 @@ pub struct ReportAssignment<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReportView<S: BosStr = DefaultStr> {
     ///Array of moderation event IDs representing actions taken on this report (sorted DESC, most recent first)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1948,10 +1959,10 @@ impl<S: BosStr> LexiconSchema for ReportView<S> {
 }
 
 fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.report.defs"),
@@ -1987,12 +1998,13 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("assignmentView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("reportId"),
-                        SmolStr::new_static("startAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("did"),
+                            SmolStr::new_static("reportId"),
+                            SmolStr::new_static("startAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2026,7 +2038,9 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("queue"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("tools.ozone.queue.defs#queueView"),
+                                r#ref: CowStr::new_static(
+                                    "tools.ozone.queue.defs#queueView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2103,9 +2117,11 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("historicalStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single daily snapshot of report statistics for a calendar date.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A single daily snapshot of report statistics for a calendar date.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("date")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -2131,9 +2147,9 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("computedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When this snapshot was last computed.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When this snapshot was last computed."),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2141,9 +2157,11 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("date"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The calendar date this snapshot covers (YYYY-MM-DD).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The calendar date this snapshot covers (YYYY-MM-DD).",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -2279,249 +2297,167 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("reasonAppeal"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonChildSafetyCSAM"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonChildSafetyGroom"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonChildSafetyHarassment"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonChildSafetyOther"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonChildSafetyPrivacy"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonHarassmentDoxxing"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonHarassmentHateSpeech"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonHarassmentOther"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonHarassmentTargeted"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonHarassmentTroll"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonMisleadingBot"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonMisleadingElections"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonMisleadingImpersonation"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonMisleadingOther"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonMisleadingScam"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonMisleadingSpam"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonOther"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonRuleBanEvasion"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonRuleOther"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonRuleProhibitedSales"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonRuleSiteSecurity"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSelfHarmContent"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSelfHarmED"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSelfHarmOther"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSelfHarmStunts"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSelfHarmSubstances"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSexualAbuseContent"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSexualAnimal"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSexualDeepfake"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSexualNCII"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSexualOther"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonSexualUnlabeled"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonType"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonViolenceAnimal"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonViolenceExtremistContent"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonViolenceGlorification"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonViolenceGraphicContent"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonViolenceOther"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonViolenceThreats"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reasonViolenceTrafficking"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("reopenActivity"),
@@ -2670,22 +2606,25 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reportAssignment"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Information about the moderator currently assigned to a report.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("assignedAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Information about the moderator currently assigned to a report.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("did"), SmolStr::new_static("assignedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("assignedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the report was assigned",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the report was assigned"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -2693,9 +2632,9 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID of the assigned moderator",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("DID of the assigned moderator"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -2918,7 +2857,7 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
 
 pub mod assignment_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2991,7 +2930,10 @@ pub mod assignment_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AssignmentViewBuilder<St: assignment_view_state::State, S: BosStr = DefaultStr> {
+pub struct AssignmentViewBuilder<
+    St: assignment_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -3178,7 +3120,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AssignmentView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AssignmentView<S> {
         AssignmentView {
             did: self._fields.0.unwrap(),
             end_at: self._fields.1,
@@ -3194,7 +3139,7 @@ where
 
 pub mod report_activity_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3305,8 +3250,10 @@ pub mod report_activity_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReportActivityViewBuilder<St: report_activity_view_state::State, S: BosStr = DefaultStr>
-{
+pub struct ReportActivityViewBuilder<
+    St: report_activity_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ReportActivityViewActivity<S>>,
@@ -3325,7 +3272,10 @@ pub struct ReportActivityViewBuilder<St: report_activity_view_state::State, S: B
 
 impl ReportActivityView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ReportActivityViewBuilder<report_activity_view_state::Empty, DefaultStr> {
+    pub fn new() -> ReportActivityViewBuilder<
+        report_activity_view_state::Empty,
+        DefaultStr,
+    > {
         ReportActivityViewBuilder::new()
     }
 }
@@ -3552,7 +3502,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReportActivityView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReportActivityView<S> {
         ReportActivityView {
             activity: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -3571,7 +3524,7 @@ where
 
 pub mod report_assignment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3614,7 +3567,10 @@ pub mod report_assignment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReportAssignmentBuilder<St: report_assignment_state::State, S: BosStr = DefaultStr> {
+pub struct ReportAssignmentBuilder<
+    St: report_assignment_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>, Option<Member<S>>),
     _type: PhantomData<fn() -> S>,
@@ -3723,7 +3679,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReportAssignment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReportAssignment<S> {
         ReportAssignment {
             assigned_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -3735,7 +3694,7 @@ where
 
 pub mod report_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3938,8 +3897,25 @@ impl ReportViewBuilder<report_view_state::Empty, DefaultStr> {
         ReportViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -3952,8 +3928,25 @@ impl<S: BosStr> ReportViewBuilder<report_view_state::Empty, S> {
         ReportViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -4001,12 +3994,18 @@ impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
 
 impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
     /// Set the `assignment` field (optional)
-    pub fn assignment(mut self, value: impl Into<Option<report::ReportAssignment<S>>>) -> Self {
+    pub fn assignment(
+        mut self,
+        value: impl Into<Option<report::ReportAssignment<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `assignment` field to an Option value (optional)
-    pub fn maybe_assignment(mut self, value: Option<report::ReportAssignment<S>>) -> Self {
+    pub fn maybe_assignment(
+        mut self,
+        value: Option<report::ReportAssignment<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -4231,7 +4230,10 @@ where
 
 impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
     /// Set the `subjectStatus` field (optional)
-    pub fn subject_status(mut self, value: impl Into<Option<SubjectStatusView<S>>>) -> Self {
+    pub fn subject_status(
+        mut self,
+        value: impl Into<Option<SubjectStatusView<S>>>,
+    ) -> Self {
         self._fields.17 = value.into();
         self
     }
@@ -4293,7 +4295,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReportView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReportView<S> {
         ReportView {
             action_event_ids: self._fields.0,
             action_note: self._fields.1,

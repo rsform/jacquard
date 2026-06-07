@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `place.stream.branding` Lexicon namespace/module.
 pub mod delete_blob;
 pub mod get_blob;
 pub mod get_branding;

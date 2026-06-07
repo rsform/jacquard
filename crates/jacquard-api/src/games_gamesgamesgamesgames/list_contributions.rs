@@ -8,27 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::get_contribution::ContributionView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::get_contribution::ContributionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListContributions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contributor: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `25`. Min: 1. Max: 100.
+    /// Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -38,11 +35,9 @@ pub struct ListContributions<S: BosStr = DefaultStr> {
     pub subject: Option<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListContributionsOutput<S: BosStr = DefaultStr> {
     pub contributions: Vec<ContributionView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,7 +46,9 @@ pub struct ListContributionsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for games.gamesgamesgamesgames.listContributions
+/** Response marker for the `games.gamesgamesgamesgames.listContributions` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListContributionsOutput<S>` for this endpoint.*/
 pub struct ListContributionsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListContributionsResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.listContributions";
@@ -66,7 +63,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListContributions<S> {
     type Response = ListContributionsResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.listContributions
+/** Endpoint marker for the `games.gamesgamesgamesgames.listContributions` query.
+
+Path: `/xrpc/games.gamesgamesgamesgames.listContributions`. The request payload type is `ListContributions<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListContributionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListContributionsRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.listContributions";
@@ -81,7 +80,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_contributions_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,21 +98,21 @@ pub mod list_contributions_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListContributionsBuilder<St: list_contributions_state::State, S: BosStr = DefaultStr> {
+pub struct ListContributionsBuilder<
+    St: list_contributions_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Did<S>>,
-        Option<S>,
-        Option<i64>,
-        Option<S>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<Did<S>>, Option<S>, Option<i64>, Option<S>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ListContributions<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListContributionsBuilder<list_contributions_state::Empty, DefaultStr> {
+    pub fn new() -> ListContributionsBuilder<
+        list_contributions_state::Empty,
+        DefaultStr,
+    > {
         ListContributionsBuilder::new()
     }
 }

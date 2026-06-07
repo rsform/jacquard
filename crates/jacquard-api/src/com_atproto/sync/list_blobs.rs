@@ -10,23 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Cid, Did, Tid};
+use jacquard_common::types::string::{Did, Tid, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListBlobs<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub did: Did<S>,
-    ///Defaults to `500`. Min: 1. Max: 1000.
+    /// Defaults to `500`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -34,11 +31,9 @@ pub struct ListBlobs<S: BosStr = DefaultStr> {
     pub since: Option<Tid>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListBlobsOutput<S: BosStr = DefaultStr> {
     pub cids: Vec<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -47,9 +42,18 @@ pub struct ListBlobsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListBlobsError {
     #[serde(rename = "RepoNotFound")]
@@ -62,10 +66,7 @@ pub enum ListBlobsError {
     RepoDeactivated(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListBlobsError {
@@ -110,7 +111,9 @@ impl core::fmt::Display for ListBlobsError {
     }
 }
 
-/// Response type for com.atproto.sync.listBlobs
+/** Response marker for the `com.atproto.sync.listBlobs` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListBlobsOutput<S>` for this endpoint.*/
 pub struct ListBlobsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListBlobsResponse {
     const NSID: &'static str = "com.atproto.sync.listBlobs";
@@ -125,7 +128,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListBlobs<S> {
     type Response = ListBlobsResponse;
 }
 
-/// Endpoint type for com.atproto.sync.listBlobs
+/** Endpoint marker for the `com.atproto.sync.listBlobs` query.
+
+Path: `/xrpc/com.atproto.sync.listBlobs`. The request payload type is `ListBlobs<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListBlobsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.listBlobs";
@@ -140,7 +145,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_blobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

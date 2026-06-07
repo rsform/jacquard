@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `scot.comhairle` Lexicon namespace/module.
 pub mod testing_polis_poll_v1;
 pub mod testing_polis_statement_v1;
 pub mod testing_polis_vote_v1;

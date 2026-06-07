@@ -211,14 +211,68 @@ impl<'c> CodeGenerator<'c> {
                 })
                 .collect();
 
-            // If this file already exists in defs_only (e.g., from defs), merge the content
+            // If this file already exists in defs_only (e.g., from defs), merge the content.
+            // Module files are generated too, so put orienting rustdoc at the module root.
             let module_tokens = if is_root {
-                // lib.rs needs extern crate alloc for no_std compatibility
+                // lib.rs needs extern crate alloc for no_std compatibility.
                 quote! {
+                    //! Generated AT Protocol Lexicon bindings.
+                    //!
+                    //! This crate contains Rust bindings generated from Lexicon schemas. Most
+                    //! application code uses these types through the `jacquard::api` re-export,
+                    //! alongside `jacquard::Client` or one of the higher-level session helpers.
+                    //!
+                    //! ## Finding things
+                    //!
+                    //! Lexicon NSIDs map to Rust modules by replacing dots with module separators
+                    //! and using snake_case for Rust identifiers. For example,
+                    //! `app.bsky.feed.getTimeline` is generated under
+                    //! `app_bsky::feed::get_timeline`.
+                    //!
+                    //! Top-level namespace modules are feature-gated. Enable the feature matching
+                    //! the top-level namespace module, such as `app_bsky` or `com_atproto`, to use
+                    //! those bindings.
+                    //!
+                    //! ## String backing
+                    //!
+                    //! Many generated data types are generic over a string backing type,
+                    //! usually written as `S: BosStr = DefaultStr`. The generic is part of the
+                    //! public API: use the default owned backing when you do not need to choose,
+                    //! or select another backing such as `String`, `&str`, or `CowStr<'_>` when
+                    //! that is useful for your code.
+                    //!
+                    //! Common examples omit the generic because the default is inferred in the
+                    //! usual request/response paths.
+                    //!
+                    //! ## XRPC endpoints
+                    //!
+                    //! Endpoint modules contain request parameter/input structs, output structs,
+                    //! error enums, and marker types implementing
+                    //! `jacquard_common::xrpc::{XrpcRequest, XrpcResp, XrpcEndpoint}`. High-level
+                    //! client code normally constructs the request struct or marker type and sends
+                    //! it with `jacquard::Client`, then uses response helpers such as
+                    //! `into_output()` for default-backed output.
+                    #![doc = ""]
                     extern crate alloc; #(#mods)*
                 }
             } else {
-                quote! { #(#mods)* }
+                let module_path = if dir.components().count() == 0 {
+                    String::new()
+                } else {
+                    dir.components()
+                        .filter_map(|component| component.as_os_str().to_str())
+                        .collect::<Vec<_>>()
+                        .join("::")
+                };
+                let lexicon_namespace = module_path.replace("::", ".").replace('_', ".");
+                let module_doc = format!(
+                    " Generated bindings for the `{}` Lexicon namespace/module.",
+                    lexicon_namespace
+                );
+                quote! {
+                    #![doc = #module_doc]
+                    #(#mods)*
+                }
             };
             if let Some(existing_output) = defs_only.get(&mod_file_path) {
                 // Put module declarations FIRST, then existing defs content

@@ -8,40 +8,35 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_tangled::repo::list_collaborators::ListItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::repo::list_collaborators::ListItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListCollaboratorsBy<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 1000.
+    /// Defaults to `50`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///Defaults to `"desc"`.
+    /// Defaults to `"desc"`.
     #[serde(default = "_default_order")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<S>,
     pub subject: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListCollaboratorsByOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -50,7 +45,9 @@ pub struct ListCollaboratorsByOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.tangled.repo.listCollaboratorsBy
+/** Response marker for the `sh.tangled.repo.listCollaboratorsBy` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListCollaboratorsByOutput<S>` for this endpoint.*/
 pub struct ListCollaboratorsByResponse;
 impl jacquard_common::xrpc::XrpcResp for ListCollaboratorsByResponse {
     const NSID: &'static str = "sh.tangled.repo.listCollaboratorsBy";
@@ -65,7 +62,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListCollaboratorsBy<S> {
     type Response = ListCollaboratorsByResponse;
 }
 
-/// Endpoint type for sh.tangled.repo.listCollaboratorsBy
+/** Endpoint marker for the `sh.tangled.repo.listCollaboratorsBy` query.
+
+Path: `/xrpc/sh.tangled.repo.listCollaboratorsBy`. The request payload type is `ListCollaboratorsBy<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListCollaboratorsByRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListCollaboratorsByRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.listCollaboratorsBy";
@@ -84,7 +83,7 @@ fn _default_order<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod list_collaborators_by_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -126,14 +125,20 @@ pub struct ListCollaboratorsByBuilder<
 
 impl ListCollaboratorsBy<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListCollaboratorsByBuilder<list_collaborators_by_state::Empty, DefaultStr> {
+    pub fn new() -> ListCollaboratorsByBuilder<
+        list_collaborators_by_state::Empty,
+        DefaultStr,
+    > {
         ListCollaboratorsByBuilder::new()
     }
 }
 
 impl<S: BosStr> ListCollaboratorsBy<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ListCollaboratorsByBuilder<list_collaborators_by_state::Empty, S> {
+    pub fn builder() -> ListCollaboratorsByBuilder<
+        list_collaborators_by_state::Empty,
+        S,
+    > {
         ListCollaboratorsByBuilder::builder()
     }
 }
@@ -160,7 +165,10 @@ impl<S: BosStr> ListCollaboratorsByBuilder<list_collaborators_by_state::Empty, S
     }
 }
 
-impl<St: list_collaborators_by_state::State, S: BosStr> ListCollaboratorsByBuilder<St, S> {
+impl<
+    St: list_collaborators_by_state::State,
+    S: BosStr,
+> ListCollaboratorsByBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -173,7 +181,10 @@ impl<St: list_collaborators_by_state::State, S: BosStr> ListCollaboratorsByBuild
     }
 }
 
-impl<St: list_collaborators_by_state::State, S: BosStr> ListCollaboratorsByBuilder<St, S> {
+impl<
+    St: list_collaborators_by_state::State,
+    S: BosStr,
+> ListCollaboratorsByBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -186,7 +197,10 @@ impl<St: list_collaborators_by_state::State, S: BosStr> ListCollaboratorsByBuild
     }
 }
 
-impl<St: list_collaborators_by_state::State, S: BosStr> ListCollaboratorsByBuilder<St, S> {
+impl<
+    St: list_collaborators_by_state::State,
+    S: BosStr,
+> ListCollaboratorsByBuilder<St, S> {
     /// Set the `order` field (optional)
     pub fn order(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();

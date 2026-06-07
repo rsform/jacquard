@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_chronosky::plan::get_assignment::PlanAssignment;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::plan::get_assignment::PlanAssignment;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListAssignmentsOutput<S: BosStr = DefaultStr> {
     ///List of plan assignments
     pub assignments: Vec<PlanAssignment<S>>,
@@ -29,11 +26,15 @@ pub struct ListAssignmentsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `app.chronosky.plan.listAssignments` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ListAssignments;
-/// Response type for app.chronosky.plan.listAssignments
+/** Response marker for the `app.chronosky.plan.listAssignments` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListAssignmentsOutput<S>` for this endpoint.*/
 pub struct ListAssignmentsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListAssignmentsResponse {
     const NSID: &'static str = "app.chronosky.plan.listAssignments";
@@ -48,7 +49,9 @@ impl jacquard_common::xrpc::XrpcRequest for ListAssignments {
     type Response = ListAssignmentsResponse;
 }
 
-/// Endpoint type for app.chronosky.plan.listAssignments
+/** Endpoint marker for the `app.chronosky.plan.listAssignments` query.
+
+Path: `/xrpc/app.chronosky.plan.listAssignments`. The request payload type is `ListAssignments`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct ListAssignmentsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListAssignmentsRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.plan.listAssignments";

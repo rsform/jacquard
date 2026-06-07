@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveMember<S: BosStr = DefaultStr> {
     ///DID of the member to remove
     pub subject: Did<S>,
@@ -29,7 +26,9 @@ pub struct RemoveMember<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.tangled.knot.removeMember
+/** Response marker for the `sh.tangled.knot.removeMember` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct RemoveMemberResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveMemberResponse {
     const NSID: &'static str = "sh.tangled.knot.removeMember";
@@ -40,24 +39,28 @@ impl jacquard_common::xrpc::XrpcResp for RemoveMemberResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveMember<S> {
     const NSID: &'static str = "sh.tangled.knot.removeMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RemoveMemberResponse;
 }
 
-/// Endpoint type for sh.tangled.knot.removeMember
+/** Endpoint marker for the `sh.tangled.knot.removeMember` procedure.
+
+Path: `/xrpc/sh.tangled.knot.removeMember`. The request payload type is `RemoveMember<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct RemoveMemberRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveMemberRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.knot.removeMember";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RemoveMember<S>;
     type Response = RemoveMemberResponse;
 }
 
 pub mod remove_member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -162,7 +165,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RemoveMember<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RemoveMember<S> {
         RemoveMember {
             subject: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

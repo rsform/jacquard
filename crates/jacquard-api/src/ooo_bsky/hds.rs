@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `ooo.bsky.hds` Lexicon namespace/module.
 pub mod create_record;
 pub mod delete_account;
 pub mod delete_record;

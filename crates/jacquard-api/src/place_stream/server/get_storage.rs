@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::place_stream::server::Storage;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::server::Storage;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStorageOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub storage: Option<Storage<S>>,
@@ -29,11 +26,15 @@ pub struct GetStorageOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `place.stream.server.getStorage` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetStorage;
-/// Response type for place.stream.server.getStorage
+/** Response marker for the `place.stream.server.getStorage` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetStorageOutput<S>` for this endpoint.*/
 pub struct GetStorageResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStorageResponse {
     const NSID: &'static str = "place.stream.server.getStorage";
@@ -48,7 +49,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetStorage {
     type Response = GetStorageResponse;
 }
 
-/// Endpoint type for place.stream.server.getStorage
+/** Endpoint marker for the `place.stream.server.getStorage` query.
+
+Path: `/xrpc/place.stream.server.getStorage`. The request payload type is `GetStorage`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct GetStorageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStorageRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.getStorage";

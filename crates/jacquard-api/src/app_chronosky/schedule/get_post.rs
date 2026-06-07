@@ -8,48 +8,49 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_chronosky::schedule::list_posts::ScheduledPost;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::schedule::list_posts::ScheduledPost;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPost<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostOutput<S: BosStr = DefaultStr> {
     pub post: ScheduledPost<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetPostError {
     #[serde(rename = "PostNotFound")]
     PostNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetPostError {
@@ -73,7 +74,9 @@ impl core::fmt::Display for GetPostError {
     }
 }
 
-/// Response type for app.chronosky.schedule.getPost
+/** Response marker for the `app.chronosky.schedule.getPost` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetPostOutput<S>` for this endpoint.*/
 pub struct GetPostResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
     const NSID: &'static str = "app.chronosky.schedule.getPost";
@@ -88,7 +91,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPost<S> {
     type Response = GetPostResponse;
 }
 
-/// Endpoint type for app.chronosky.schedule.getPost
+/** Endpoint marker for the `app.chronosky.schedule.getPost` query.
+
+Path: `/xrpc/app.chronosky.schedule.getPost`. The request payload type is `GetPost<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.getPost";
@@ -99,7 +104,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
 
 pub mod get_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,7 +183,10 @@ where
     St::Id: get_post_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> GetPostBuilder<get_post_state::SetId<St>, S> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetPostBuilder<get_post_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetPostBuilder {
             _state: PhantomData,

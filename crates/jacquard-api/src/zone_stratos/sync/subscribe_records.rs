@@ -10,29 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::cid::CidLink;
-use jacquard_common::types::string::{Datetime, Did, Tid, UriValue};
+use jacquard_common::types::string::{Did, Tid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::zone_stratos::sync::subscribe_records;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::zone_stratos::sync::subscribe_records;
 /// A commit event containing record operations.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Commit<S: BosStr = DefaultStr> {
     ///The DID of the account.
     pub did: Did<S>,
@@ -51,10 +48,7 @@ pub struct Commit<S: BosStr = DefaultStr> {
 /// An enrollment event indicating a user has enrolled or unenrolled from the service.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Enrollment<S: BosStr = DefaultStr> {
     ///The enrollment action.
     pub action: EnrollmentAction<S>,
@@ -154,10 +148,7 @@ where
 /// An informational message about the subscription state.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Info<S: BosStr = DefaultStr> {
     ///Additional details about the info message.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -243,22 +234,21 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscribeRecords<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
-    ///(max length: 253)
+    /// (max length: 253)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub domain: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sync_token: Option<S>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -280,30 +270,49 @@ impl<S: BosStr> SubscribeRecordsMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#commit" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Commit(Box::new(variant)))
             }
             "#enrollment" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Enrollment(Box::new(variant)))
             }
             "#info" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Info(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeRecordsError {
     /// Cursor is in the future.
@@ -314,10 +323,7 @@ pub enum SubscribeRecordsError {
     AuthRequired(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SubscribeRecordsError {
@@ -351,10 +357,7 @@ impl core::fmt::Display for SubscribeRecordsError {
 /// A single record operation within a commit.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordOp<S: BosStr = DefaultStr> {
     ///The type of operation.
     pub action: RecordOpAction<S>,
@@ -535,24 +538,21 @@ impl<S: BosStr> LexiconSchema for Info<S> {
 pub struct SubscribeRecordsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeRecordsStream {
     const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeRecordsMessage<S>;
     type Error = SubscribeRecordsError;
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcSubscription for SubscribeRecords<S> {
     const NSID: &'static str = "zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeRecordsStream;
 }
 
 pub struct SubscribeRecordsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeRecordsEndpoint {
     const PATH: &'static str = "/xrpc/zone.stratos.sync.subscribeRecords";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribeRecords<S>;
     type Stream = SubscribeRecordsStream;
 }
@@ -596,7 +596,7 @@ impl<S: BosStr> LexiconSchema for RecordOp<S> {
 
 pub mod commit_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -741,7 +741,10 @@ where
     St::Did: commit_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> CommitBuilder<commit_state::SetDid<St>, S> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> CommitBuilder<commit_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -776,7 +779,10 @@ where
     St::Rev: commit_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(mut self, value: impl Into<Tid>) -> CommitBuilder<commit_state::SetRev<St>, S> {
+    pub fn rev(
+        mut self,
+        value: impl Into<Tid>,
+    ) -> CommitBuilder<commit_state::SetRev<St>, S> {
         self._fields.2 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -792,7 +798,10 @@ where
     St::Seq: commit_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(mut self, value: impl Into<i64>) -> CommitBuilder<commit_state::SetSeq<St>, S> {
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> CommitBuilder<commit_state::SetSeq<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CommitBuilder {
             _state: PhantomData,
@@ -855,10 +864,10 @@ where
 }
 
 fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.sync.subscribeRecords"),
@@ -867,23 +876,27 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("commit"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A commit event containing record operations.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("seq"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("time"),
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("ops"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A commit event containing record operations.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("seq"), SmolStr::new_static("did"),
+                            SmolStr::new_static("time"), SmolStr::new_static("rev"),
+                            SmolStr::new_static("ops")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The DID of the account.")),
+                                description: Some(
+                                    CowStr::new_static("The DID of the account."),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -891,9 +904,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("ops"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of record operations in this commit.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "List of record operations in this commit.",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#recordOp"),
                                     ..Default::default()
@@ -918,9 +933,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("time"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Timestamp of when the event was sequenced.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Timestamp of when the event was sequenced.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1007,9 +1024,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("info"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "An informational message about the subscription state.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "An informational message about the subscription state.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1017,9 +1036,11 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("message"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Additional details about the info message.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Additional details about the info message.",
+                                    ),
+                                ),
                                 max_length: Some(1024usize),
                                 ..Default::default()
                             }),
@@ -1027,7 +1048,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The type of info message.")),
+                                description: Some(
+                                    CowStr::new_static("The type of info message."),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1097,20 +1120,21 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordOp"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single record operation within a commit.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("action"),
-                        SmolStr::new_static("path"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A single record operation within a commit."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("action"), SmolStr::new_static("path")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("action"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The type of operation.")),
+                                description: Some(
+                                    CowStr::new_static("The type of operation."),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -1124,9 +1148,9 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("path"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The record path (collection/rkey).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The record path (collection/rkey)."),
+                                ),
                                 max_length: Some(512usize),
                                 ..Default::default()
                             }),
@@ -1150,7 +1174,7 @@ fn lexicon_doc_zone_stratos_sync_subscribeRecords() -> LexiconDoc<'static> {
 
 pub mod enrollment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1357,7 +1381,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Enrollment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Enrollment<S> {
         Enrollment {
             action: self._fields.0.unwrap(),
             boundaries: self._fields.1,
@@ -1371,7 +1398,7 @@ where
 
 pub mod subscribe_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1389,7 +1416,10 @@ pub mod subscribe_records_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubscribeRecordsBuilder<St: subscribe_records_state::State, S: BosStr = DefaultStr> {
+pub struct SubscribeRecordsBuilder<
+    St: subscribe_records_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,

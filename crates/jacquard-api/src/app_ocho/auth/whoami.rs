@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// The session data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WhoamiOutput<S: BosStr = DefaultStr> {
     ///The user's DID
     pub did: S,
@@ -31,11 +28,15 @@ pub struct WhoamiOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `app.ocho.auth.whoami` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Whoami;
-/// Response type for app.ocho.auth.whoami
+/** Response marker for the `app.ocho.auth.whoami` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `WhoamiOutput<S>` for this endpoint.*/
 pub struct WhoamiResponse;
 impl jacquard_common::xrpc::XrpcResp for WhoamiResponse {
     const NSID: &'static str = "app.ocho.auth.whoami";
@@ -50,7 +51,9 @@ impl jacquard_common::xrpc::XrpcRequest for Whoami {
     type Response = WhoamiResponse;
 }
 
-/// Endpoint type for app.ocho.auth.whoami
+/** Endpoint marker for the `app.ocho.auth.whoami` query.
+
+Path: `/xrpc/app.ocho.auth.whoami`. The request payload type is `Whoami`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct WhoamiRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for WhoamiRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.whoami";

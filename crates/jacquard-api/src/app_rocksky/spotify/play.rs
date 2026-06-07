@@ -10,16 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
-/// XRPC request marker type.
+use serde::{Serialize, Deserialize};
+/** Request marker for the `app.rocksky.spotify.play` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Play;
-/// Response type for app.rocksky.spotify.play
+/** Response marker for the `app.rocksky.spotify.play` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct PlayResponse;
 impl jacquard_common::xrpc::XrpcResp for PlayResponse {
     const NSID: &'static str = "app.rocksky.spotify.play";
@@ -30,17 +34,21 @@ impl jacquard_common::xrpc::XrpcResp for PlayResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Play {
     const NSID: &'static str = "app.rocksky.spotify.play";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PlayResponse;
 }
 
-/// Endpoint type for app.rocksky.spotify.play
+/** Endpoint marker for the `app.rocksky.spotify.play` procedure.
+
+Path: `/xrpc/app.rocksky.spotify.play`. The request payload type is `Play`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct PlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PlayRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.play";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Play;
     type Response = PlayResponse;
 }

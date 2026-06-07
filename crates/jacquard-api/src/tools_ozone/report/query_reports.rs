@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::report::ReportView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, Nsid, UriValue};
+use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::report::ReportView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryReports<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub assigned_to: Option<Did<S>>,
@@ -32,11 +29,11 @@ pub struct QueryReports<S: BosStr = DefaultStr> {
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(default = "_default_is_muted")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_muted: Option<bool>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -48,11 +45,11 @@ pub struct QueryReports<S: BosStr = DefaultStr> {
     pub reported_after: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reported_before: Option<Datetime>,
-    ///Defaults to `"desc"`.
+    /// Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_direction: Option<S>,
-    ///Defaults to `"createdAt"`.
+    /// Defaults to `"createdAt"`.
     #[serde(default = "_default_sort_field")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_field: Option<S>,
@@ -63,11 +60,9 @@ pub struct QueryReports<S: BosStr = DefaultStr> {
     pub subject_type: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryReportsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -76,7 +71,9 @@ pub struct QueryReportsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.report.queryReports
+/** Response marker for the `tools.ozone.report.queryReports` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `QueryReportsOutput<S>` for this endpoint.*/
 pub struct QueryReportsResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryReportsResponse {
     const NSID: &'static str = "tools.ozone.report.queryReports";
@@ -91,7 +88,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for QueryReports<S> {
     type Response = QueryReportsResponse;
 }
 
-/// Endpoint type for tools.ozone.report.queryReports
+/** Endpoint marker for the `tools.ozone.report.queryReports` query.
+
+Path: `/xrpc/tools.ozone.report.queryReports`. The request payload type is `QueryReports<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct QueryReportsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryReportsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.report.queryReports";
@@ -118,7 +117,7 @@ fn _default_sort_field<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod query_reports_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -191,7 +190,20 @@ impl QueryReportsBuilder<query_reports_state::Empty, DefaultStr> {
         QueryReportsBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -205,7 +217,20 @@ impl<S: BosStr> QueryReportsBuilder<query_reports_state::Empty, S> {
         QueryReportsBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,18 +24,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::dev_keytrace::claim;
-use crate::dev_keytrace::signature::Signature;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::dev_keytrace::signature::Signature;
+use crate::dev_keytrace::claim;
 /// Generic identity data for the claimed account
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Identity<S: BosStr = DefaultStr> {
     ///Avatar/profile image URL
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -396,10 +393,10 @@ impl<S: BosStr> LexiconSchema for Claim<S> {
 }
 
 fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.claim"),
@@ -408,9 +405,11 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("identity"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Generic identity data for the claimed account",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Generic identity data for the claimed account",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("subject")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -418,7 +417,9 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("avatarUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Avatar/profile image URL")),
+                                description: Some(
+                                    CowStr::new_static("Avatar/profile image URL"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -426,9 +427,9 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Display name if different from subject",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Display name if different from subject"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -443,9 +444,11 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("subject"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Primary identifier (username, domain, handle, etc.)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Primary identifier (username, domain, handle, etc.)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -622,7 +625,7 @@ fn lexicon_doc_dev_keytrace_claim() -> LexiconDoc<'static> {
 
 pub mod claim_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -752,7 +755,18 @@ impl ClaimBuilder<claim_state::Empty, DefaultStr> {
         ClaimBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -765,7 +779,18 @@ impl<S: BosStr> ClaimBuilder<claim_state::Empty, S> {
         ClaimBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }

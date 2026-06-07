@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,19 +24,16 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::science_alt::dataset::lens::CodeReference;
-use crate::science_alt::dataset::lens_verification;
-use crate::science_alt::dataset::verification_method::VerificationMethod;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::lens::CodeReference;
+use crate::science_alt::dataset::verification_method::VerificationMethod;
+use crate::science_alt::dataset::lens_verification;
 /// Content hash for code integrity verification
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CodeHash<S: BosStr = DefaultStr> {
     ///Hash algorithm identifier (e.g., 'sha256', 'blake3')
     pub algorithm: S,
@@ -206,10 +203,10 @@ impl<S: BosStr> LexiconSchema for LensVerification<S> {
 }
 
 fn lexicon_doc_science_alt_dataset_lensVerification() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.lensVerification"),
@@ -218,22 +215,28 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("codeHash"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Content hash for code integrity verification",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("algorithm"),
-                        SmolStr::new_static("digest"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Content hash for code integrity verification",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("algorithm"),
+                            SmolStr::new_static("digest")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("algorithm"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Hash algorithm identifier (e.g., 'sha256', 'blake3')",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Hash algorithm identifier (e.g., 'sha256', 'blake3')",
+                                    ),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -241,7 +244,9 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("digest"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Hex-encoded hash digest")),
+                                description: Some(
+                                    CowStr::new_static("Hex-encoded hash digest"),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -361,7 +366,7 @@ fn lexicon_doc_science_alt_dataset_lensVerification() -> LexiconDoc<'static> {
 
 pub mod lens_verification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -434,7 +439,10 @@ pub mod lens_verification_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LensVerificationBuilder<St: lens_verification_state::State, S: BosStr = DefaultStr> {
+pub struct LensVerificationBuilder<
+    St: lens_verification_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<lens_verification::CodeHash<S>>,
@@ -486,12 +494,18 @@ impl<S: BosStr> LensVerificationBuilder<lens_verification_state::Empty, S> {
 
 impl<St: lens_verification_state::State, S: BosStr> LensVerificationBuilder<St, S> {
     /// Set the `codeHash` field (optional)
-    pub fn code_hash(mut self, value: impl Into<Option<lens_verification::CodeHash<S>>>) -> Self {
+    pub fn code_hash(
+        mut self,
+        value: impl Into<Option<lens_verification::CodeHash<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `codeHash` field to an Option value (optional)
-    pub fn maybe_code_hash(mut self, value: Option<lens_verification::CodeHash<S>>) -> Self {
+    pub fn maybe_code_hash(
+        mut self,
+        value: Option<lens_verification::CodeHash<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -621,7 +635,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LensVerification<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LensVerification<S> {
         LensVerification {
             code_hash: self._fields.0,
             created_at: self._fields.1.unwrap(),

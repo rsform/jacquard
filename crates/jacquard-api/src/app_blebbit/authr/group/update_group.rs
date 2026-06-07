@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateGroupParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateGroup<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -43,11 +38,9 @@ pub struct UpdateGroup<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateGroupOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cuid: Option<S>,
@@ -63,7 +56,9 @@ pub struct UpdateGroupOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.blebbit.authr.group.updateGroup
+/** Response marker for the `app.blebbit.authr.group.updateGroup` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `UpdateGroupOutput<S>` for this endpoint.*/
 pub struct UpdateGroupResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateGroupResponse {
     const NSID: &'static str = "app.blebbit.authr.group.updateGroup";
@@ -74,24 +69,28 @@ impl jacquard_common::xrpc::XrpcResp for UpdateGroupResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateGroup<S> {
     const NSID: &'static str = "app.blebbit.authr.group.updateGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateGroupResponse;
 }
 
-/// Endpoint type for app.blebbit.authr.group.updateGroup
+/** Endpoint marker for the `app.blebbit.authr.group.updateGroup` procedure.
+
+Path: `/xrpc/app.blebbit.authr.group.updateGroup`. The request payload type is `UpdateGroup<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct UpdateGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateGroupRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.updateGroup";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateGroup<S>;
     type Response = UpdateGroupResponse;
 }
 
 pub mod update_group_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -109,7 +108,10 @@ pub mod update_group_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateGroupParamsBuilder<St: update_group_params_state::State, S: BosStr = DefaultStr> {
+pub struct UpdateGroupParamsBuilder<
+    St: update_group_params_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -117,7 +119,10 @@ pub struct UpdateGroupParamsBuilder<St: update_group_params_state::State, S: Bos
 
 impl UpdateGroupParams<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UpdateGroupParamsBuilder<update_group_params_state::Empty, DefaultStr> {
+    pub fn new() -> UpdateGroupParamsBuilder<
+        update_group_params_state::Empty,
+        DefaultStr,
+    > {
         UpdateGroupParamsBuilder::new()
     }
 }
@@ -170,6 +175,8 @@ where
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateGroupParams<S> {
-        UpdateGroupParams { id: self._fields.0 }
+        UpdateGroupParams {
+            id: self._fields.0,
+        }
     }
 }

@@ -10,28 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListBranches<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub repo: Did<S>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -39,9 +37,18 @@ pub struct ListBranchesOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListBranchesError {
     /// Repository not found or access denied
@@ -52,10 +59,7 @@ pub enum ListBranchesError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListBranchesError {
@@ -86,7 +90,9 @@ impl core::fmt::Display for ListBranchesError {
     }
 }
 
-/// Response type for sh.tangled.git.temp.listBranches
+/** Response marker for the `sh.tangled.git.temp.listBranches` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListBranchesOutput` for this endpoint.*/
 pub struct ListBranchesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListBranchesResponse {
     const NSID: &'static str = "sh.tangled.git.temp.listBranches";
@@ -120,7 +126,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListBranches<S> {
     type Response = ListBranchesResponse;
 }
 
-/// Endpoint type for sh.tangled.git.temp.listBranches
+/** Endpoint marker for the `sh.tangled.git.temp.listBranches` query.
+
+Path: `/xrpc/sh.tangled.git.temp.listBranches`. The request payload type is `ListBranches<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListBranchesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListBranchesRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.listBranches";
@@ -135,7 +143,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_branches_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

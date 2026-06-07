@@ -3,5 +3,6 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `pub.leaflet.pages` Lexicon namespace/module.
 pub mod canvas;
 pub mod linear_document;

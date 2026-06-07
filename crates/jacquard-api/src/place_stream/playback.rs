@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `place.stream.playback` Lexicon namespace/module.
 pub mod get_live_playlist;
 pub mod get_live_segment;
 pub mod get_playback_server;

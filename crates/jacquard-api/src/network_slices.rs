@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `network.slices` Lexicon namespace/module.
 pub mod actor;
 pub mod lexicon;
 pub mod slice;

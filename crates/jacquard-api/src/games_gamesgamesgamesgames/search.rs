@@ -8,24 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::CollectionSummaryView;
 use crate::games_gamesgamesgamesgames::EngineSummaryView;
 use crate::games_gamesgamesgamesgames::GameSummaryView;
 use crate::games_gamesgamesgamesgames::PlatformSummaryView;
 use crate::games_gamesgamesgamesgames::ProfileSummaryView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Search<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_ratings: Option<Vec<S>>,
@@ -35,15 +32,15 @@ pub struct Search<S: BosStr = DefaultStr> {
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub genres: Option<Vec<S>>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(default = "_default_include_cancelled")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_cancelled: Option<bool>,
-    /// Defaults to `false`.
+    ///  Defaults to `false`.
     #[serde(default = "_default_include_unrated")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_unrated: Option<bool>,
-    ///Defaults to `20`. Min: 1. Max: 100.
+    /// Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -60,11 +57,9 @@ pub struct Search<S: BosStr = DefaultStr> {
     pub types: Option<Vec<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -75,6 +70,7 @@ pub struct SearchOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -92,7 +88,9 @@ pub enum SearchOutputResultsItem<S: BosStr = DefaultStr> {
     EngineSummaryView(Box<EngineSummaryView<S>>),
 }
 
-/// Response type for games.gamesgamesgamesgames.search
+/** Response marker for the `games.gamesgamesgamesgames.search` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SearchOutput<S>` for this endpoint.*/
 pub struct SearchResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.search";
@@ -107,7 +105,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Search<S> {
     type Response = SearchResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.search
+/** Endpoint marker for the `games.gamesgamesgamesgames.search` query.
+
+Path: `/xrpc/games.gamesgamesgamesgames.search`. The request payload type is `Search<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SearchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.search";
@@ -130,7 +130,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -201,7 +201,19 @@ impl SearchBuilder<search_state::Empty, DefaultStr> {
         SearchBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -214,7 +226,19 @@ impl<S: BosStr> SearchBuilder<search_state::Empty, S> {
         SearchBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }

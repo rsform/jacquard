@@ -10,33 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileShouts<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
-    ///(min: 1)
+    /// (min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///(min: 0)
+    /// (min: 0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileShoutsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shouts: Option<Vec<Data<S>>>,
@@ -44,7 +39,9 @@ pub struct GetProfileShoutsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.shout.getProfileShouts
+/** Response marker for the `app.rocksky.shout.getProfileShouts` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetProfileShoutsOutput<S>` for this endpoint.*/
 pub struct GetProfileShoutsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileShoutsResponse {
     const NSID: &'static str = "app.rocksky.shout.getProfileShouts";
@@ -59,7 +56,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetProfileShouts<S> {
     type Response = GetProfileShoutsResponse;
 }
 
-/// Endpoint type for app.rocksky.shout.getProfileShouts
+/** Endpoint marker for the `app.rocksky.shout.getProfileShouts` query.
+
+Path: `/xrpc/app.rocksky.shout.getProfileShouts`. The request payload type is `GetProfileShouts<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetProfileShoutsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileShoutsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.getProfileShouts";
@@ -70,7 +69,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetProfileShoutsRequest {
 
 pub mod get_profile_shouts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,7 +100,10 @@ pub mod get_profile_shouts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetProfileShoutsBuilder<St: get_profile_shouts_state::State, S: BosStr = DefaultStr> {
+pub struct GetProfileShoutsBuilder<
+    St: get_profile_shouts_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -109,7 +111,10 @@ pub struct GetProfileShoutsBuilder<St: get_profile_shouts_state::State, S: BosSt
 
 impl GetProfileShouts<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetProfileShoutsBuilder<get_profile_shouts_state::Empty, DefaultStr> {
+    pub fn new() -> GetProfileShoutsBuilder<
+        get_profile_shouts_state::Empty,
+        DefaultStr,
+    > {
         GetProfileShoutsBuilder::new()
     }
 }

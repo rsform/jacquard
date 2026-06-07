@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateBlock<S: BosStr = DefaultStr> {
     ///Optional reason for the block.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -34,11 +31,9 @@ pub struct CreateBlock<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateBlockOutput<S: BosStr = DefaultStr> {
     ///The CID of the created block record.
     pub cid: Cid<S>,
@@ -48,9 +43,18 @@ pub struct CreateBlockOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CreateBlockError {
     /// The request lacks valid authentication credentials.
@@ -64,10 +68,7 @@ pub enum CreateBlockError {
     SessionNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CreateBlockError {
@@ -105,7 +106,9 @@ impl core::fmt::Display for CreateBlockError {
     }
 }
 
-/// Response type for place.stream.moderation.createBlock
+/** Response marker for the `place.stream.moderation.createBlock` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CreateBlockOutput<S>` for this endpoint.*/
 pub struct CreateBlockResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateBlockResponse {
     const NSID: &'static str = "place.stream.moderation.createBlock";
@@ -116,24 +119,28 @@ impl jacquard_common::xrpc::XrpcResp for CreateBlockResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateBlock<S> {
     const NSID: &'static str = "place.stream.moderation.createBlock";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateBlockResponse;
 }
 
-/// Endpoint type for place.stream.moderation.createBlock
+/** Endpoint marker for the `place.stream.moderation.createBlock` procedure.
+
+Path: `/xrpc/place.stream.moderation.createBlock`. The request payload type is `CreateBlock<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CreateBlockRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateBlockRequest {
     const PATH: &'static str = "/xrpc/place.stream.moderation.createBlock";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateBlock<S>;
     type Response = CreateBlockResponse;
 }
 
 pub mod create_block_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -285,7 +292,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateBlock<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateBlock<S> {
         CreateBlock {
             reason: self._fields.0,
             streamer: self._fields.1.unwrap(),

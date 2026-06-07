@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::queue::QueueView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::queue::QueueView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListQueues<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collection: Option<S>,
@@ -29,7 +26,7 @@ pub struct ListQueues<S: BosStr = DefaultStr> {
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -39,11 +36,9 @@ pub struct ListQueues<S: BosStr = DefaultStr> {
     pub subject_type: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListQueuesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -52,7 +47,9 @@ pub struct ListQueuesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.queue.listQueues
+/** Response marker for the `tools.ozone.queue.listQueues` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListQueuesOutput<S>` for this endpoint.*/
 pub struct ListQueuesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListQueuesResponse {
     const NSID: &'static str = "tools.ozone.queue.listQueues";
@@ -67,7 +64,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListQueues<S> {
     type Response = ListQueuesResponse;
 }
 
-/// Endpoint type for tools.ozone.queue.listQueues
+/** Endpoint marker for the `tools.ozone.queue.listQueues` query.
+
+Path: `/xrpc/tools.ozone.queue.listQueues`. The request payload type is `ListQueues<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListQueuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListQueuesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.queue.listQueues";
@@ -82,7 +81,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_queues_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

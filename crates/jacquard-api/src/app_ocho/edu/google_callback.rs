@@ -10,23 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GoogleCallback<S: BosStr = DefaultStr> {
     pub code: S,
     pub state: S,
 }
 
-/// Response type for app.ocho.edu.googleCallback
+/** Response marker for the `app.ocho.edu.googleCallback` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct GoogleCallbackResponse;
 impl jacquard_common::xrpc::XrpcResp for GoogleCallbackResponse {
     const NSID: &'static str = "app.ocho.edu.googleCallback";
@@ -41,7 +40,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GoogleCallback<S> {
     type Response = GoogleCallbackResponse;
 }
 
-/// Endpoint type for app.ocho.edu.googleCallback
+/** Endpoint marker for the `app.ocho.edu.googleCallback` query.
+
+Path: `/xrpc/app.ocho.edu.googleCallback`. The request payload type is `GoogleCallback<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GoogleCallbackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GoogleCallbackRequest {
     const PATH: &'static str = "/xrpc/app.ocho.edu.googleCallback";
@@ -52,7 +53,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GoogleCallbackRequest {
 
 pub mod google_callback_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -95,7 +96,10 @@ pub mod google_callback_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GoogleCallbackBuilder<St: google_callback_state::State, S: BosStr = DefaultStr> {
+pub struct GoogleCallbackBuilder<
+    St: google_callback_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,

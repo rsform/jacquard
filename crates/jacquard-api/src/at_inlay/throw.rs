@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Throw<S: BosStr = DefaultStr> {
     ///Human-readable error message
     pub message: S,
@@ -32,11 +29,9 @@ pub struct Throw<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThrowOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -44,7 +39,9 @@ pub struct ThrowOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for at.inlay.Throw
+/** Response marker for the `at.inlay.Throw` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ThrowOutput<S>` for this endpoint.*/
 pub struct ThrowResponse;
 impl jacquard_common::xrpc::XrpcResp for ThrowResponse {
     const NSID: &'static str = "at.inlay.Throw";
@@ -55,17 +52,21 @@ impl jacquard_common::xrpc::XrpcResp for ThrowResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Throw<S> {
     const NSID: &'static str = "at.inlay.Throw";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ThrowResponse;
 }
 
-/// Endpoint type for at.inlay.Throw
+/** Endpoint marker for the `at.inlay.Throw` procedure.
+
+Path: `/xrpc/at.inlay.Throw`. The request payload type is `Throw<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ThrowRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ThrowRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Throw";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Throw<S>;
     type Response = ThrowResponse;
 }

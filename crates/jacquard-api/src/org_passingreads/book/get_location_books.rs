@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::org_passingreads::book::StatefulBook;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_passingreads::book::StatefulBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLocationBooks<S: BosStr = DefaultStr> {
     pub h3: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLocationBooksOutput<S: BosStr = DefaultStr> {
     pub books: Vec<StatefulBook<S>>,
     ///Human-readable name of the requested location
@@ -40,7 +35,9 @@ pub struct GetLocationBooksOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for org.passingreads.book.getLocationBooks
+/** Response marker for the `org.passingreads.book.getLocationBooks` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetLocationBooksOutput<S>` for this endpoint.*/
 pub struct GetLocationBooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLocationBooksResponse {
     const NSID: &'static str = "org.passingreads.book.getLocationBooks";
@@ -55,7 +52,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetLocationBooks<S> {
     type Response = GetLocationBooksResponse;
 }
 
-/// Endpoint type for org.passingreads.book.getLocationBooks
+/** Endpoint marker for the `org.passingreads.book.getLocationBooks` query.
+
+Path: `/xrpc/org.passingreads.book.getLocationBooks`. The request payload type is `GetLocationBooks<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetLocationBooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLocationBooksRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.book.getLocationBooks";
@@ -66,7 +65,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLocationBooksRequest {
 
 pub mod get_location_books_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -97,7 +96,10 @@ pub mod get_location_books_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetLocationBooksBuilder<St: get_location_books_state::State, S: BosStr = DefaultStr> {
+pub struct GetLocationBooksBuilder<
+    St: get_location_books_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -105,7 +107,10 @@ pub struct GetLocationBooksBuilder<St: get_location_books_state::State, S: BosSt
 
 impl GetLocationBooks<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetLocationBooksBuilder<get_location_books_state::Empty, DefaultStr> {
+    pub fn new() -> GetLocationBooksBuilder<
+        get_location_books_state::Empty,
+        DefaultStr,
+    > {
         GetLocationBooksBuilder::new()
     }
 }

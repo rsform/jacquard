@@ -8,29 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::shout::ShoutView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::shout::ShoutView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveShoutParams<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveShoutOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ShoutView<S>,
@@ -38,11 +33,15 @@ pub struct RemoveShoutOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `app.rocksky.shout.removeShout` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct RemoveShout;
-/// Response type for app.rocksky.shout.removeShout
+/** Response marker for the `app.rocksky.shout.removeShout` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `RemoveShoutOutput<S>` for this endpoint.*/
 pub struct RemoveShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveShoutResponse {
     const NSID: &'static str = "app.rocksky.shout.removeShout";
@@ -53,24 +52,28 @@ impl jacquard_common::xrpc::XrpcResp for RemoveShoutResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RemoveShout {
     const NSID: &'static str = "app.rocksky.shout.removeShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RemoveShoutResponse;
 }
 
-/// Endpoint type for app.rocksky.shout.removeShout
+/** Endpoint marker for the `app.rocksky.shout.removeShout` procedure.
+
+Path: `/xrpc/app.rocksky.shout.removeShout`. The request payload type is `RemoveShout`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct RemoveShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.removeShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RemoveShout;
     type Response = RemoveShoutResponse;
 }
 
 pub mod remove_shout_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,7 +104,10 @@ pub mod remove_shout_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RemoveShoutParamsBuilder<St: remove_shout_params_state::State, S: BosStr = DefaultStr> {
+pub struct RemoveShoutParamsBuilder<
+    St: remove_shout_params_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -109,7 +115,10 @@ pub struct RemoveShoutParamsBuilder<St: remove_shout_params_state::State, S: Bos
 
 impl RemoveShoutParams<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RemoveShoutParamsBuilder<remove_shout_params_state::Empty, DefaultStr> {
+    pub fn new() -> RemoveShoutParamsBuilder<
+        remove_shout_params_state::Empty,
+        DefaultStr,
+    > {
         RemoveShoutParamsBuilder::new()
     }
 }

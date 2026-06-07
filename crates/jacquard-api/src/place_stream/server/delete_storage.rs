@@ -10,28 +10,29 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteStorageOutput<S: BosStr = DefaultStr> {
     pub success: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `place.stream.server.deleteStorage` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct DeleteStorage;
-/// Response type for place.stream.server.deleteStorage
+/** Response marker for the `place.stream.server.deleteStorage` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DeleteStorageOutput<S>` for this endpoint.*/
 pub struct DeleteStorageResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteStorageResponse {
     const NSID: &'static str = "place.stream.server.deleteStorage";
@@ -42,17 +43,21 @@ impl jacquard_common::xrpc::XrpcResp for DeleteStorageResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteStorage {
     const NSID: &'static str = "place.stream.server.deleteStorage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteStorageResponse;
 }
 
-/// Endpoint type for place.stream.server.deleteStorage
+/** Endpoint marker for the `place.stream.server.deleteStorage` procedure.
+
+Path: `/xrpc/place.stream.server.deleteStorage`. The request payload type is `DeleteStorage`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct DeleteStorageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteStorageRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.deleteStorage";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteStorage;
     type Response = DeleteStorageResponse;
 }

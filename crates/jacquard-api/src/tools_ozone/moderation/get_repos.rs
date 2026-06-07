@@ -8,36 +8,32 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::moderation::RepoViewDetail;
-use crate::tools_ozone::moderation::RepoViewNotFound;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::RepoViewDetail;
+use crate::tools_ozone::moderation::RepoViewNotFound;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRepos<S: BosStr = DefaultStr> {
     pub dids: Vec<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetReposOutput<S: BosStr = DefaultStr> {
     pub repos: Vec<GetReposOutputReposItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -49,7 +45,9 @@ pub enum GetReposOutputReposItem<S: BosStr = DefaultStr> {
     RepoViewNotFound(Box<RepoViewNotFound<S>>),
 }
 
-/// Response type for tools.ozone.moderation.getRepos
+/** Response marker for the `tools.ozone.moderation.getRepos` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetReposOutput<S>` for this endpoint.*/
 pub struct GetReposResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReposResponse {
     const NSID: &'static str = "tools.ozone.moderation.getRepos";
@@ -64,7 +62,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRepos<S> {
     type Response = GetReposResponse;
 }
 
-/// Endpoint type for tools.ozone.moderation.getRepos
+/** Endpoint marker for the `tools.ozone.moderation.getRepos` query.
+
+Path: `/xrpc/tools.ozone.moderation.getRepos`. The request payload type is `GetRepos<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetReposRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReposRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getRepos";
@@ -75,7 +75,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetReposRequest {
 
 pub mod get_repos_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

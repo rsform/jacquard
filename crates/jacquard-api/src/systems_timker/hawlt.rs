@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `systems.timker.hawlt` Lexicon namespace/module.
 pub mod get_note;
 pub mod list_notes;
 pub mod note;

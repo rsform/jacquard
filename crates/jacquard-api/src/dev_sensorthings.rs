@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `dev.sensorthings` Lexicon namespace/module.
 pub mod datastream;
 pub mod feature_of_interest;
 pub mod multi_observation;

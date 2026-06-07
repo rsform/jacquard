@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `ooo.bsky.hidden` Lexicon namespace/module.
 pub mod r#box;
 pub mod encrypted_blob_keys;
 pub mod encrypted_blobs;

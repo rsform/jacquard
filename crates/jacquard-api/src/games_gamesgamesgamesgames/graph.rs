@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `games.gamesgamesgamesgames.graph` Lexicon namespace/module.
 pub mod get_like_count;
 pub mod get_likes;
 pub mod like;

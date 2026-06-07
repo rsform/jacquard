@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RequestCrew<S: BosStr = DefaultStr> {
     ///Requested permissions (default: ['blob:read', 'blob:write'])
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -34,11 +31,9 @@ pub struct RequestCrew<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RequestCrewOutput<S: BosStr = DefaultStr> {
     ///CID of the crew record
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -128,15 +123,28 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             RequestCrewOutputStatus::Created => RequestCrewOutputStatus::Created,
-            RequestCrewOutputStatus::AlreadyMember => RequestCrewOutputStatus::AlreadyMember,
-            RequestCrewOutputStatus::Other(v) => RequestCrewOutputStatus::Other(v.into_static()),
+            RequestCrewOutputStatus::AlreadyMember => {
+                RequestCrewOutputStatus::AlreadyMember
+            }
+            RequestCrewOutputStatus::Other(v) => {
+                RequestCrewOutputStatus::Other(v.into_static())
+            }
         }
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum RequestCrewError {
     #[serde(rename = "AuthRequired")]
@@ -145,10 +153,7 @@ pub enum RequestCrewError {
     RegistrationDisabled(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for RequestCrewError {
@@ -179,7 +184,9 @@ impl core::fmt::Display for RequestCrewError {
     }
 }
 
-/// Response type for io.atcr.hold.requestCrew
+/** Response marker for the `io.atcr.hold.requestCrew` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `RequestCrewOutput<S>` for this endpoint.*/
 pub struct RequestCrewResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestCrewResponse {
     const NSID: &'static str = "io.atcr.hold.requestCrew";
@@ -190,17 +197,21 @@ impl jacquard_common::xrpc::XrpcResp for RequestCrewResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RequestCrew<S> {
     const NSID: &'static str = "io.atcr.hold.requestCrew";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestCrewResponse;
 }
 
-/// Endpoint type for io.atcr.hold.requestCrew
+/** Endpoint marker for the `io.atcr.hold.requestCrew` procedure.
+
+Path: `/xrpc/io.atcr.hold.requestCrew`. The request payload type is `RequestCrew<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct RequestCrewRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestCrewRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.requestCrew";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RequestCrew<S>;
     type Response = RequestCrewResponse;
 }

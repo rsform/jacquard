@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `at.unthread.document` Lexicon namespace/module.
 pub mod delete_draft;
 pub mod get_draft;
 pub mod list_drafts;

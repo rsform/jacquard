@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -22,11 +22,15 @@ pub struct SeekParams {
     pub position: i64,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `app.rocksky.spotify.seek` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Seek;
-/// Response type for app.rocksky.spotify.seek
+/** Response marker for the `app.rocksky.spotify.seek` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct SeekResponse;
 impl jacquard_common::xrpc::XrpcResp for SeekResponse {
     const NSID: &'static str = "app.rocksky.spotify.seek";
@@ -37,24 +41,28 @@ impl jacquard_common::xrpc::XrpcResp for SeekResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Seek {
     const NSID: &'static str = "app.rocksky.spotify.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SeekResponse;
 }
 
-/// Endpoint type for app.rocksky.spotify.seek
+/** Endpoint marker for the `app.rocksky.spotify.seek` procedure.
+
+Path: `/xrpc/app.rocksky.spotify.seek`. The request payload type is `Seek`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct SeekRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Seek;
     type Response = SeekResponse;
 }
 
 pub mod seek_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

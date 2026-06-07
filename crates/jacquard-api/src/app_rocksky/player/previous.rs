@@ -10,16 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
-/// XRPC request marker type.
+use serde::{Serialize, Deserialize};
+/** Request marker for the `app.rocksky.player.previous` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Previous;
-/// Response type for app.rocksky.player.previous
+/** Response marker for the `app.rocksky.player.previous` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct PreviousResponse;
 impl jacquard_common::xrpc::XrpcResp for PreviousResponse {
     const NSID: &'static str = "app.rocksky.player.previous";
@@ -30,17 +34,21 @@ impl jacquard_common::xrpc::XrpcResp for PreviousResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Previous {
     const NSID: &'static str = "app.rocksky.player.previous";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PreviousResponse;
 }
 
-/// Endpoint type for app.rocksky.player.previous
+/** Endpoint marker for the `app.rocksky.player.previous` procedure.
+
+Path: `/xrpc/app.rocksky.player.previous`. The request payload type is `Previous`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct PreviousRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PreviousRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.previous";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Previous;
     type Response = PreviousResponse;
 }

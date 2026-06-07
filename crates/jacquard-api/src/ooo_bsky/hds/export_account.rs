@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -23,11 +23,15 @@ pub struct ExportAccountOutput {
     pub body: Bytes,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `ooo.bsky.hds.exportAccount` procedure.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct ExportAccount;
-/// Response type for ooo.bsky.hds.exportAccount
+/** Response marker for the `ooo.bsky.hds.exportAccount` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ExportAccountOutput` for this endpoint.*/
 pub struct ExportAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportAccountResponse {
     const NSID: &'static str = "ooo.bsky.hds.exportAccount";
@@ -57,17 +61,21 @@ impl jacquard_common::xrpc::XrpcResp for ExportAccountResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for ExportAccount {
     const NSID: &'static str = "ooo.bsky.hds.exportAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ExportAccountResponse;
 }
 
-/// Endpoint type for ooo.bsky.hds.exportAccount
+/** Endpoint marker for the `ooo.bsky.hds.exportAccount` procedure.
+
+Path: `/xrpc/ooo.bsky.hds.exportAccount`. The request payload type is `ExportAccount`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct ExportAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportAccountRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.exportAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ExportAccount;
     type Response = ExportAccountResponse;
 }

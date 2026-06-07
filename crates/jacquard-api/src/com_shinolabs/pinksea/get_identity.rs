@@ -10,23 +10,20 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Handle;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetIdentity;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetIdentityOutput<S: BosStr = DefaultStr> {
     ///The DID of the user.
     pub did: AtIdentifier<S>,
@@ -36,7 +33,9 @@ pub struct GetIdentityOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.shinolabs.pinksea.getIdentity
+/** Response marker for the `com.shinolabs.pinksea.getIdentity` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetIdentityOutput<S>` for this endpoint.*/
 pub struct GetIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetIdentityResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getIdentity";
@@ -51,7 +50,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetIdentity {
     type Response = GetIdentityResponse;
 }
 
-/// Endpoint type for com.shinolabs.pinksea.getIdentity
+/** Endpoint marker for the `com.shinolabs.pinksea.getIdentity` query.
+
+Path: `/xrpc/com.shinolabs.pinksea.getIdentity`. The request payload type is `GetIdentity`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetIdentityRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getIdentity";

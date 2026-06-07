@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnassignModerator<S: BosStr = DefaultStr> {
     ///DID to be unassigned.
     pub did: Did<S>,
@@ -31,9 +28,18 @@ pub struct UnassignModerator<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum UnassignModeratorError {
     /// No active assignment exists for the given queue and user.
@@ -41,10 +47,7 @@ pub enum UnassignModeratorError {
     InvalidAssignment(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for UnassignModeratorError {
@@ -68,7 +71,9 @@ impl core::fmt::Display for UnassignModeratorError {
     }
 }
 
-/// Response type for tools.ozone.queue.unassignModerator
+/** Response marker for the `tools.ozone.queue.unassignModerator` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `()` for this endpoint.*/
 pub struct UnassignModeratorResponse;
 impl jacquard_common::xrpc::XrpcResp for UnassignModeratorResponse {
     const NSID: &'static str = "tools.ozone.queue.unassignModerator";
@@ -79,24 +84,28 @@ impl jacquard_common::xrpc::XrpcResp for UnassignModeratorResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UnassignModerator<S> {
     const NSID: &'static str = "tools.ozone.queue.unassignModerator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UnassignModeratorResponse;
 }
 
-/// Endpoint type for tools.ozone.queue.unassignModerator
+/** Endpoint marker for the `tools.ozone.queue.unassignModerator` procedure.
+
+Path: `/xrpc/tools.ozone.queue.unassignModerator`. The request payload type is `UnassignModerator<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct UnassignModeratorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnassignModeratorRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.queue.unassignModerator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UnassignModerator<S>;
     type Response = UnassignModeratorResponse;
 }
 
 pub mod unassign_moderator_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -139,7 +148,10 @@ pub mod unassign_moderator_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UnassignModeratorBuilder<St: unassign_moderator_state::State, S: BosStr = DefaultStr> {
+pub struct UnassignModeratorBuilder<
+    St: unassign_moderator_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -147,7 +159,10 @@ pub struct UnassignModeratorBuilder<St: unassign_moderator_state::State, S: BosS
 
 impl UnassignModerator<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UnassignModeratorBuilder<unassign_moderator_state::Empty, DefaultStr> {
+    pub fn new() -> UnassignModeratorBuilder<
+        unassign_moderator_state::Empty,
+        DefaultStr,
+    > {
         UnassignModeratorBuilder::new()
     }
 }
@@ -234,7 +249,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnassignModerator<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnassignModerator<S> {
         UnassignModerator {
             did: self._fields.0.unwrap(),
             queue_id: self._fields.1.unwrap(),

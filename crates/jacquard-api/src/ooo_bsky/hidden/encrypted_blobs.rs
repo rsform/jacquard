@@ -23,13 +23,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EncryptedBlobs<S: BosStr = DefaultStr> {
     pub blobs: Vec<BlobRef<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -53,7 +50,7 @@ impl<S: BosStr> LexiconSchema for EncryptedBlobs<S> {
 
 pub mod encrypted_blobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -84,7 +81,10 @@ pub mod encrypted_blobs_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EncryptedBlobsBuilder<St: encrypted_blobs_state::State, S: BosStr = DefaultStr> {
+pub struct EncryptedBlobsBuilder<
+    St: encrypted_blobs_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<BlobRef<S>>>,),
     _type: PhantomData<fn() -> S>,
@@ -158,7 +158,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EncryptedBlobs<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EncryptedBlobs<S> {
         EncryptedBlobs {
             blobs: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -167,10 +170,10 @@ where
 }
 
 fn lexicon_doc_ooo_bsky_hidden_encryptedBlobs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ooo.bsky.hidden.encryptedBlobs"),
@@ -186,9 +189,7 @@ fn lexicon_doc_ooo_bsky_hidden_encryptedBlobs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("blobs"),
                             LexObjectProperty::Array(LexArray {
-                                items: LexArrayItem::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                items: LexArrayItem::Blob(LexBlob { ..Default::default() }),
                                 ..Default::default()
                             }),
                         );

@@ -10,27 +10,33 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OwnerOutput<S: BosStr = DefaultStr> {
     pub owner: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum OwnerError {
     /// Owner is not set for this service
@@ -38,10 +44,7 @@ pub enum OwnerError {
     OwnerNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for OwnerError {
@@ -65,11 +68,15 @@ impl core::fmt::Display for OwnerError {
     }
 }
 
-/// XRPC request marker type.
+/** Request marker for the `sh.tangled.owner` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct Owner;
-/// Response type for sh.tangled.owner
+/** Response marker for the `sh.tangled.owner` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `OwnerOutput<S>` for this endpoint.*/
 pub struct OwnerResponse;
 impl jacquard_common::xrpc::XrpcResp for OwnerResponse {
     const NSID: &'static str = "sh.tangled.owner";
@@ -84,7 +91,9 @@ impl jacquard_common::xrpc::XrpcRequest for Owner {
     type Response = OwnerResponse;
 }
 
-/// Endpoint type for sh.tangled.owner
+/** Endpoint marker for the `sh.tangled.owner` query.
+
+Path: `/xrpc/sh.tangled.owner`. The request payload type is `Owner`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct OwnerRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for OwnerRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.owner";

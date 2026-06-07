@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Scientific publication record bridged from Octopus.ac via Octosphere. Represents a single version of an Octopus publication.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -143,7 +143,8 @@ impl<S: BosStr> Serialize for PublicationPublicationType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PublicationPublicationType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for PublicationPublicationType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -170,7 +171,9 @@ where
             PublicationPublicationType::ResearchProblem => {
                 PublicationPublicationType::ResearchProblem
             }
-            PublicationPublicationType::Hypothesis => PublicationPublicationType::Hypothesis,
+            PublicationPublicationType::Hypothesis => {
+                PublicationPublicationType::Hypothesis
+            }
             PublicationPublicationType::Protocol => PublicationPublicationType::Protocol,
             PublicationPublicationType::Analysis => PublicationPublicationType::Analysis,
             PublicationPublicationType::Interpretation => {
@@ -180,7 +183,9 @@ where
                 PublicationPublicationType::RealWorldApplication
             }
             PublicationPublicationType::Data => PublicationPublicationType::Data,
-            PublicationPublicationType::PeerReview => PublicationPublicationType::PeerReview,
+            PublicationPublicationType::PeerReview => {
+                PublicationPublicationType::PeerReview
+            }
             PublicationPublicationType::Other(v) => {
                 PublicationPublicationType::Other(v.into_static())
             }
@@ -343,7 +348,7 @@ impl<S: BosStr> LexiconSchema for Publication<S> {
 
 pub mod publication_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -659,8 +664,22 @@ impl PublicationBuilder<publication_state::Empty, DefaultStr> {
         PublicationBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -673,8 +692,22 @@ impl<S: BosStr> PublicationBuilder<publication_state::Empty, S> {
         PublicationBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1000,7 +1033,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Publication<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Publication<S> {
         Publication {
             canonical_url: self._fields.0,
             citations: self._fields.1.unwrap(),
@@ -1024,10 +1060,10 @@ where
 }
 
 fn lexicon_doc_social_octosphere_publication() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.octosphere.publication"),

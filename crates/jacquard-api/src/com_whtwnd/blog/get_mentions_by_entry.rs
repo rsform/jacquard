@@ -10,34 +10,31 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMentionsByEntry<S: BosStr = DefaultStr> {
     pub post_uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetMentionsByEntryOutput<S: BosStr = DefaultStr> {
     pub mentions: Vec<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for com.whtwnd.blog.getMentionsByEntry
+/** Response marker for the `com.whtwnd.blog.getMentionsByEntry` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetMentionsByEntryOutput<S>` for this endpoint.*/
 pub struct GetMentionsByEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMentionsByEntryResponse {
     const NSID: &'static str = "com.whtwnd.blog.getMentionsByEntry";
@@ -52,7 +49,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetMentionsByEntry<S> {
     type Response = GetMentionsByEntryResponse;
 }
 
-/// Endpoint type for com.whtwnd.blog.getMentionsByEntry
+/** Endpoint marker for the `com.whtwnd.blog.getMentionsByEntry` query.
+
+Path: `/xrpc/com.whtwnd.blog.getMentionsByEntry`. The request payload type is `GetMentionsByEntry<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetMentionsByEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMentionsByEntryRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.getMentionsByEntry";
@@ -63,7 +62,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetMentionsByEntryRequest {
 
 pub mod get_mentions_by_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -94,8 +93,10 @@ pub mod get_mentions_by_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetMentionsByEntryBuilder<St: get_mentions_by_entry_state::State, S: BosStr = DefaultStr>
-{
+pub struct GetMentionsByEntryBuilder<
+    St: get_mentions_by_entry_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -103,14 +104,20 @@ pub struct GetMentionsByEntryBuilder<St: get_mentions_by_entry_state::State, S: 
 
 impl GetMentionsByEntry<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetMentionsByEntryBuilder<get_mentions_by_entry_state::Empty, DefaultStr> {
+    pub fn new() -> GetMentionsByEntryBuilder<
+        get_mentions_by_entry_state::Empty,
+        DefaultStr,
+    > {
         GetMentionsByEntryBuilder::new()
     }
 }
 
 impl<S: BosStr> GetMentionsByEntry<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetMentionsByEntryBuilder<get_mentions_by_entry_state::Empty, S> {
+    pub fn builder() -> GetMentionsByEntryBuilder<
+        get_mentions_by_entry_state::Empty,
+        S,
+    > {
         GetMentionsByEntryBuilder::builder()
     }
 }

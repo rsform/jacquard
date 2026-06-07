@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Element;
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Element;
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Maybe<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,11 +28,9 @@ pub struct Maybe<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MaybeOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -43,7 +38,9 @@ pub struct MaybeOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for at.inlay.Maybe
+/** Response marker for the `at.inlay.Maybe` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `MaybeOutput<S>` for this endpoint.*/
 pub struct MaybeResponse;
 impl jacquard_common::xrpc::XrpcResp for MaybeResponse {
     const NSID: &'static str = "at.inlay.Maybe";
@@ -54,24 +51,28 @@ impl jacquard_common::xrpc::XrpcResp for MaybeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Maybe<S> {
     const NSID: &'static str = "at.inlay.Maybe";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MaybeResponse;
 }
 
-/// Endpoint type for at.inlay.Maybe
+/** Endpoint marker for the `at.inlay.Maybe` procedure.
+
+Path: `/xrpc/at.inlay.Maybe`. The request payload type is `Maybe<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct MaybeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MaybeRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Maybe";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Maybe<S>;
     type Response = MaybeResponse;
 }
 
 pub mod maybe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -8,38 +8,33 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::ooo_bsky::hidden::r#box::HiddenBox;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ooo_bsky::hidden::r#box::HiddenBox;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRecords<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub repo: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRecordsOutput<S: BosStr = DefaultStr> {
     pub boxes: Vec<HiddenBox<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,7 +43,9 @@ pub struct ListRecordsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for ooo.bsky.hds.listRecords
+/** Response marker for the `ooo.bsky.hds.listRecords` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListRecordsOutput<S>` for this endpoint.*/
 pub struct ListRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListRecordsResponse {
     const NSID: &'static str = "ooo.bsky.hds.listRecords";
@@ -63,7 +60,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListRecords<S> {
     type Response = ListRecordsResponse;
 }
 
-/// Endpoint type for ooo.bsky.hds.listRecords
+/** Endpoint marker for the `ooo.bsky.hds.listRecords` query.
+
+Path: `/xrpc/ooo.bsky.hds.listRecords`. The request payload type is `ListRecords<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListRecordsRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.listRecords";
@@ -78,7 +77,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -123,12 +122,7 @@ pub mod list_records_state {
 /// Builder for constructing an instance of this type.
 pub struct ListRecordsBuilder<St: list_records_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Nsid<S>>,
-        Option<S>,
-        Option<i64>,
-        Option<AtIdentifier<S>>,
-    ),
+    _fields: (Option<Nsid<S>>, Option<S>, Option<i64>, Option<AtIdentifier<S>>),
     _type: PhantomData<fn() -> S>,
 }
 

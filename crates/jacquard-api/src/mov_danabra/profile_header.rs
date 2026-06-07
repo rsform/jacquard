@@ -8,32 +8,27 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileHeader<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileHeaderOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -41,7 +36,9 @@ pub struct ProfileHeaderOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for mov.danabra.ProfileHeader
+/** Response marker for the `mov.danabra.ProfileHeader` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ProfileHeaderOutput<S>` for this endpoint.*/
 pub struct ProfileHeaderResponse;
 impl jacquard_common::xrpc::XrpcResp for ProfileHeaderResponse {
     const NSID: &'static str = "mov.danabra.ProfileHeader";
@@ -52,24 +49,28 @@ impl jacquard_common::xrpc::XrpcResp for ProfileHeaderResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ProfileHeader<S> {
     const NSID: &'static str = "mov.danabra.ProfileHeader";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ProfileHeaderResponse;
 }
 
-/// Endpoint type for mov.danabra.ProfileHeader
+/** Endpoint marker for the `mov.danabra.ProfileHeader` procedure.
+
+Path: `/xrpc/mov.danabra.ProfileHeader`. The request payload type is `ProfileHeader<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ProfileHeaderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ProfileHeaderRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.ProfileHeader";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ProfileHeader<S>;
     type Response = ProfileHeaderResponse;
 }
 
 pub mod profile_header_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,7 +101,10 @@ pub mod profile_header_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileHeaderBuilder<St: profile_header_state::State, S: BosStr = DefaultStr> {
+pub struct ProfileHeaderBuilder<
+    St: profile_header_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -174,7 +178,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileHeader<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileHeader<S> {
         ProfileHeader {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

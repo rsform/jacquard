@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_asadaame5121::at_circle::RingRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_asadaame5121::at_circle::RingRef;
 /// Membership in an at-circle (Sidecar Record)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -182,7 +182,7 @@ impl<S: BosStr> LexiconSchema for Member<S> {
 
 pub mod member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -374,7 +374,10 @@ where
     St::Title: member_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> MemberBuilder<member_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> MemberBuilder<member_state::SetTitle<St>, S> {
         self._fields.4 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
@@ -438,10 +441,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_member() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.member"),
@@ -450,17 +453,18 @@ fn lexicon_doc_net_asadaame5121_at_circle_member() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Membership in an at-circle (Sidecar Record)",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Membership in an at-circle (Sidecar Record)"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ring"),
-                            SmolStr::new_static("url"),
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ring"), SmolStr::new_static("url"),
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -501,9 +505,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_member() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Title of the participant's site",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Title of the participant's site"),
+                                    ),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()
@@ -512,9 +516,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_member() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("url"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL of the participant's site",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URL of the participant's site"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     max_length: Some(2000usize),
                                     ..Default::default()

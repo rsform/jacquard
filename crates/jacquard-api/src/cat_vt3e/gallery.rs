@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `cat.vt3e.gallery` Lexicon namespace/module.
 pub mod group;
 pub mod group_item;
 pub mod image;

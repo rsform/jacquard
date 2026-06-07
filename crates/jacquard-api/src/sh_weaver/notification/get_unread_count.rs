@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -24,18 +24,18 @@ pub struct GetUnreadCount {
     pub seen_at: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUnreadCountOutput<S: BosStr = DefaultStr> {
     pub count: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.notification.getUnreadCount
+/** Response marker for the `sh.weaver.notification.getUnreadCount` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetUnreadCountOutput<S>` for this endpoint.*/
 pub struct GetUnreadCountResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUnreadCountResponse {
     const NSID: &'static str = "sh.weaver.notification.getUnreadCount";
@@ -50,7 +50,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetUnreadCount {
     type Response = GetUnreadCountResponse;
 }
 
-/// Endpoint type for sh.weaver.notification.getUnreadCount
+/** Endpoint marker for the `sh.weaver.notification.getUnreadCount` query.
+
+Path: `/xrpc/sh.weaver.notification.getUnreadCount`. The request payload type is `GetUnreadCount`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetUnreadCountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notification.getUnreadCount";
@@ -61,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {
 
 pub mod get_unread_count_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

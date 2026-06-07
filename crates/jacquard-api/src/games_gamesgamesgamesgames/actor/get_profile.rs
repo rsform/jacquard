@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::games_gamesgamesgamesgames::ActorProfileDetailView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::ActorProfileDetailView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetProfileOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile: Option<ActorProfileDetailView<S>>,
@@ -29,11 +26,15 @@ pub struct GetProfileOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// XRPC request marker type.
+/** Request marker for the `games.gamesgamesgamesgames.actor.getProfile` query.
+
+This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Copy)]
 pub struct GetProfile;
-/// Response type for games.gamesgamesgamesgames.actor.getProfile
+/** Response marker for the `games.gamesgamesgamesgames.actor.getProfile` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetProfileOutput<S>` for this endpoint.*/
 pub struct GetProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.getProfile";
@@ -48,7 +49,9 @@ impl jacquard_common::xrpc::XrpcRequest for GetProfile {
     type Response = GetProfileResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.actor.getProfile
+/** Endpoint marker for the `games.gamesgamesgamesgames.actor.getProfile` query.
+
+Path: `/xrpc/games.gamesgamesgamesgames.actor.getProfile`. The request payload type is `GetProfile`; use this marker with lower-level `XrpcEndpoint` APIs when you need endpoint metadata.*/
 pub struct GetProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.actor.getProfile";

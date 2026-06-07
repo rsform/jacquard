@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `social.lexical.works` Lexicon namespace/module.
 pub mod collection;
 pub mod collectionitem;
 pub mod identifiers;

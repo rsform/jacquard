@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Cover<S: BosStr = DefaultStr> {
     ///DID of the blob owner. Used to resolve blob URLs.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,11 +30,9 @@ pub struct Cover<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CoverOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -45,7 +40,9 @@ pub struct CoverOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for org.atsui.Cover
+/** Response marker for the `org.atsui.Cover` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CoverOutput<S>` for this endpoint.*/
 pub struct CoverResponse;
 impl jacquard_common::xrpc::XrpcResp for CoverResponse {
     const NSID: &'static str = "org.atsui.Cover";
@@ -56,24 +53,28 @@ impl jacquard_common::xrpc::XrpcResp for CoverResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Cover<S> {
     const NSID: &'static str = "org.atsui.Cover";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CoverResponse;
 }
 
-/// Endpoint type for org.atsui.Cover
+/** Endpoint marker for the `org.atsui.Cover` procedure.
+
+Path: `/xrpc/org.atsui.Cover`. The request payload type is `Cover<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CoverRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CoverRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Cover";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Cover<S>;
     type Response = CoverResponse;
 }
 
 pub mod cover_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -165,7 +166,10 @@ where
     St::Src: cover_state::IsUnset,
 {
     /// Set the `src` field (required)
-    pub fn src(mut self, value: impl Into<Data<S>>) -> CoverBuilder<cover_state::SetSrc<St>, S> {
+    pub fn src(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> CoverBuilder<cover_state::SetSrc<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CoverBuilder {
             _state: PhantomData,

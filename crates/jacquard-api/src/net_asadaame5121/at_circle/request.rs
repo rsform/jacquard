@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_asadaame5121::at_circle::RingRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_asadaame5121::at_circle::RingRef;
 /// A request to join a webring
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -161,7 +161,7 @@ impl<S: BosStr> LexiconSchema for Request<S> {
 
 pub mod request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -420,10 +420,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.request"),
@@ -435,12 +435,13 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A request to join a webring")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ring"),
-                            SmolStr::new_static("siteUrl"),
-                            SmolStr::new_static("siteTitle"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ring"), SmolStr::new_static("siteUrl"),
+                                SmolStr::new_static("siteTitle"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -454,7 +455,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("message"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Introduction message")),
+                                    description: Some(
+                                        CowStr::new_static("Introduction message"),
+                                    ),
                                     max_length: Some(1000usize),
                                     max_graphemes: Some(100usize),
                                     ..Default::default()
@@ -472,9 +475,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("rssUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "RSS feed URL of the site",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("RSS feed URL of the site"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -491,9 +494,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_request() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("siteUrl"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL of the site to register",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URL of the site to register"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

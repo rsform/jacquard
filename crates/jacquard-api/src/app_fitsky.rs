@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.fitsky` Lexicon namespace/module.
 pub mod bluesky_post;
 pub mod goal;
 pub mod profile;

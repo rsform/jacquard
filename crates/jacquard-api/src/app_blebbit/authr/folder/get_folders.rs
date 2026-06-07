@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_blebbit::authr::folder::FolderView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_blebbit::authr::folder::FolderView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFolders<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -29,11 +26,9 @@ pub struct GetFolders<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFoldersOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub folders: Option<Vec<FolderView<S>>>,
@@ -41,7 +36,9 @@ pub struct GetFoldersOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.blebbit.authr.folder.getFolders
+/** Response marker for the `app.blebbit.authr.folder.getFolders` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetFoldersOutput<S>` for this endpoint.*/
 pub struct GetFoldersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFoldersResponse {
     const NSID: &'static str = "app.blebbit.authr.folder.getFolders";
@@ -56,7 +53,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetFolders<S> {
     type Response = GetFoldersResponse;
 }
 
-/// Endpoint type for app.blebbit.authr.folder.getFolders
+/** Endpoint marker for the `app.blebbit.authr.folder.getFolders` query.
+
+Path: `/xrpc/app.blebbit.authr.folder.getFolders`. The request payload type is `GetFolders<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetFoldersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFoldersRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.getFolders";
@@ -67,7 +66,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFoldersRequest {
 
 pub mod get_folders_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

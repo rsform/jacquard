@@ -8,23 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::NotebookView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNotebookFeed<S: BosStr = DefaultStr> {
-    ///Defaults to `"chronological"`.
+    /// Defaults to `"chronological"`.
     #[serde(default = "_default_algorithm")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub algorithm: Option<S>,
@@ -32,7 +29,7 @@ pub struct GetNotebookFeed<S: BosStr = DefaultStr> {
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed: Option<AtUri<S>>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -40,11 +37,9 @@ pub struct GetNotebookFeed<S: BosStr = DefaultStr> {
     pub tags: Option<Vec<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNotebookFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -53,7 +48,9 @@ pub struct GetNotebookFeedOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for sh.weaver.notebook.getNotebookFeed
+/** Response marker for the `sh.weaver.notebook.getNotebookFeed` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetNotebookFeedOutput<S>` for this endpoint.*/
 pub struct GetNotebookFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNotebookFeedResponse {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookFeed";
@@ -68,7 +65,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetNotebookFeed<S> {
     type Response = GetNotebookFeedResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getNotebookFeed
+/** Endpoint marker for the `sh.weaver.notebook.getNotebookFeed` query.
+
+Path: `/xrpc/sh.weaver.notebook.getNotebookFeed`. The request payload type is `GetNotebookFeed<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetNotebookFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookFeedRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookFeed";
@@ -87,7 +86,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_notebook_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -105,15 +104,12 @@ pub mod get_notebook_feed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetNotebookFeedBuilder<St: get_notebook_feed_state::State, S: BosStr = DefaultStr> {
+pub struct GetNotebookFeedBuilder<
+    St: get_notebook_feed_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<AtUri<S>>,
-        Option<i64>,
-        Option<Vec<S>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<i64>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 

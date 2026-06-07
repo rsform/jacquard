@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeletePost<S: BosStr = DefaultStr> {
     ///Post ID to delete.
     pub id: S,
@@ -28,11 +25,9 @@ pub struct DeletePost<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeletePostOutput<S: BosStr = DefaultStr> {
     ///Deletion success flag.
     pub success: bool,
@@ -40,9 +35,18 @@ pub struct DeletePostOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DeletePostError {
     #[serde(rename = "PostNotFound")]
@@ -51,10 +55,7 @@ pub enum DeletePostError {
     PostNotPending(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DeletePostError {
@@ -85,7 +86,9 @@ impl core::fmt::Display for DeletePostError {
     }
 }
 
-/// Response type for app.chronosky.schedule.deletePost
+/** Response marker for the `app.chronosky.schedule.deletePost` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DeletePostOutput<S>` for this endpoint.*/
 pub struct DeletePostResponse;
 impl jacquard_common::xrpc::XrpcResp for DeletePostResponse {
     const NSID: &'static str = "app.chronosky.schedule.deletePost";
@@ -96,17 +99,21 @@ impl jacquard_common::xrpc::XrpcResp for DeletePostResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeletePost<S> {
     const NSID: &'static str = "app.chronosky.schedule.deletePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeletePostResponse;
 }
 
-/// Endpoint type for app.chronosky.schedule.deletePost
+/** Endpoint marker for the `app.chronosky.schedule.deletePost` procedure.
+
+Path: `/xrpc/app.chronosky.schedule.deletePost`. The request payload type is `DeletePost<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DeletePostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeletePostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.deletePost";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeletePost<S>;
     type Response = DeletePostResponse;
 }

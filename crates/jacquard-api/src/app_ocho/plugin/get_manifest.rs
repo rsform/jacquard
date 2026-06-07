@@ -8,31 +8,26 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_ocho::plugin::Manifest;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_ocho::plugin::Manifest;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetManifest<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub platform: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetManifestOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Manifest<S>,
@@ -40,7 +35,9 @@ pub struct GetManifestOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.ocho.plugin.getManifest
+/** Response marker for the `app.ocho.plugin.getManifest` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetManifestOutput<S>` for this endpoint.*/
 pub struct GetManifestResponse;
 impl jacquard_common::xrpc::XrpcResp for GetManifestResponse {
     const NSID: &'static str = "app.ocho.plugin.getManifest";
@@ -55,7 +52,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetManifest<S> {
     type Response = GetManifestResponse;
 }
 
-/// Endpoint type for app.ocho.plugin.getManifest
+/** Endpoint marker for the `app.ocho.plugin.getManifest` query.
+
+Path: `/xrpc/app.ocho.plugin.getManifest`. The request payload type is `GetManifest<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetManifestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetManifestRequest {
     const PATH: &'static str = "/xrpc/app.ocho.plugin.getManifest";
@@ -66,7 +65,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetManifestRequest {
 
 pub mod get_manifest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

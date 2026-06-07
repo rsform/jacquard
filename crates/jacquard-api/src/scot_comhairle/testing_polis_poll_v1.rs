@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A poll/topic for deliberation in the Polis-style system
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -133,7 +133,7 @@ impl<S: BosStr> LexiconSchema for TestingPolisPollV1<S> {
 
 pub mod testing_polis_poll_v1_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -176,8 +176,10 @@ pub mod testing_polis_poll_v1_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TestingPolisPollV1Builder<St: testing_polis_poll_v1_state::State, S: BosStr = DefaultStr>
-{
+pub struct TestingPolisPollV1Builder<
+    St: testing_polis_poll_v1_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Datetime>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -185,14 +187,20 @@ pub struct TestingPolisPollV1Builder<St: testing_polis_poll_v1_state::State, S: 
 
 impl TestingPolisPollV1<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> TestingPolisPollV1Builder<testing_polis_poll_v1_state::Empty, DefaultStr> {
+    pub fn new() -> TestingPolisPollV1Builder<
+        testing_polis_poll_v1_state::Empty,
+        DefaultStr,
+    > {
         TestingPolisPollV1Builder::new()
     }
 }
 
 impl<S: BosStr> TestingPolisPollV1<S> {
     /// Create a new builder for this type
-    pub fn builder() -> TestingPolisPollV1Builder<testing_polis_poll_v1_state::Empty, S> {
+    pub fn builder() -> TestingPolisPollV1Builder<
+        testing_polis_poll_v1_state::Empty,
+        S,
+    > {
         TestingPolisPollV1Builder::builder()
     }
 }
@@ -219,7 +227,10 @@ impl<S: BosStr> TestingPolisPollV1Builder<testing_polis_poll_v1_state::Empty, S>
     }
 }
 
-impl<St: testing_polis_poll_v1_state::State, S: BosStr> TestingPolisPollV1Builder<St, S> {
+impl<
+    St: testing_polis_poll_v1_state::State,
+    S: BosStr,
+> TestingPolisPollV1Builder<St, S> {
     /// Set the `closedAt` field (optional)
     pub fn closed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -251,7 +262,10 @@ where
     }
 }
 
-impl<St: testing_polis_poll_v1_state::State, S: BosStr> TestingPolisPollV1Builder<St, S> {
+impl<
+    St: testing_polis_poll_v1_state::State,
+    S: BosStr,
+> TestingPolisPollV1Builder<St, S> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -300,7 +314,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TestingPolisPollV1<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TestingPolisPollV1<S> {
         TestingPolisPollV1 {
             closed_at: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -312,10 +329,10 @@ where
 }
 
 fn lexicon_doc_scot_comhairle_testingPolisPollV1() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("scot.comhairle.testingPolisPollV1"),

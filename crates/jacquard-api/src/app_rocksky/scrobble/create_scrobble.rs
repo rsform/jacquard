@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateScrobble<S: BosStr = DefaultStr> {
     ///The album of the track being scrobbled
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,11 +89,9 @@ pub struct CreateScrobble<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateScrobbleOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ScrobbleViewBasic<S>,
@@ -104,7 +99,9 @@ pub struct CreateScrobbleOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.scrobble.createScrobble
+/** Response marker for the `app.rocksky.scrobble.createScrobble` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `CreateScrobbleOutput<S>` for this endpoint.*/
 pub struct CreateScrobbleResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateScrobbleResponse {
     const NSID: &'static str = "app.rocksky.scrobble.createScrobble";
@@ -115,17 +112,21 @@ impl jacquard_common::xrpc::XrpcResp for CreateScrobbleResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateScrobble<S> {
     const NSID: &'static str = "app.rocksky.scrobble.createScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateScrobbleResponse;
 }
 
-/// Endpoint type for app.rocksky.scrobble.createScrobble
+/** Endpoint marker for the `app.rocksky.scrobble.createScrobble` procedure.
+
+Path: `/xrpc/app.rocksky.scrobble.createScrobble`. The request payload type is `CreateScrobble<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct CreateScrobbleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateScrobbleRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.scrobble.createScrobble";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateScrobble<S>;
     type Response = CreateScrobbleResponse;
 }

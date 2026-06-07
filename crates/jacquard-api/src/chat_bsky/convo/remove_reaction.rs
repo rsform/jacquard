@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::MessageView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::MessageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message_id: S,
@@ -30,20 +27,27 @@ pub struct RemoveReaction<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RemoveReactionOutput<S: BosStr = DefaultStr> {
     pub message: MessageView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum RemoveReactionError {
     #[serde(rename = "InvalidConvo")]
@@ -59,10 +63,7 @@ pub enum RemoveReactionError {
     ReactionInvalidValue(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for RemoveReactionError {
@@ -107,7 +108,9 @@ impl core::fmt::Display for RemoveReactionError {
     }
 }
 
-/// Response type for chat.bsky.convo.removeReaction
+/** Response marker for the `chat.bsky.convo.removeReaction` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `RemoveReactionOutput<S>` for this endpoint.*/
 pub struct RemoveReactionResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveReactionResponse {
     const NSID: &'static str = "chat.bsky.convo.removeReaction";
@@ -118,17 +121,21 @@ impl jacquard_common::xrpc::XrpcResp for RemoveReactionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveReaction<S> {
     const NSID: &'static str = "chat.bsky.convo.removeReaction";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RemoveReactionResponse;
 }
 
-/// Endpoint type for chat.bsky.convo.removeReaction
+/** Endpoint marker for the `chat.bsky.convo.removeReaction` procedure.
+
+Path: `/xrpc/chat.bsky.convo.removeReaction`. The request payload type is `RemoveReaction<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct RemoveReactionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveReactionRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.removeReaction";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RemoveReaction<S>;
     type Response = RemoveReactionResponse;
 }

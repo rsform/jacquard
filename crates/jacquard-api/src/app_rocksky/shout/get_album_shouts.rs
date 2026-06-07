@@ -10,33 +10,28 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAlbumShouts<S: BosStr = DefaultStr> {
-    ///(min: 1)
+    /// (min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    ///(min: 0)
+    /// (min: 0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAlbumShoutsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shouts: Option<Vec<Data<S>>>,
@@ -44,7 +39,9 @@ pub struct GetAlbumShoutsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.shout.getAlbumShouts
+/** Response marker for the `app.rocksky.shout.getAlbumShouts` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetAlbumShoutsOutput<S>` for this endpoint.*/
 pub struct GetAlbumShoutsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAlbumShoutsResponse {
     const NSID: &'static str = "app.rocksky.shout.getAlbumShouts";
@@ -59,7 +56,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetAlbumShouts<S> {
     type Response = GetAlbumShoutsResponse;
 }
 
-/// Endpoint type for app.rocksky.shout.getAlbumShouts
+/** Endpoint marker for the `app.rocksky.shout.getAlbumShouts` query.
+
+Path: `/xrpc/app.rocksky.shout.getAlbumShouts`. The request payload type is `GetAlbumShouts<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetAlbumShoutsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAlbumShoutsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.getAlbumShouts";
@@ -70,7 +69,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetAlbumShoutsRequest {
 
 pub mod get_album_shouts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,7 +100,10 @@ pub mod get_album_shouts_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAlbumShoutsBuilder<St: get_album_shouts_state::State, S: BosStr = DefaultStr> {
+pub struct GetAlbumShoutsBuilder<
+    St: get_album_shouts_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,

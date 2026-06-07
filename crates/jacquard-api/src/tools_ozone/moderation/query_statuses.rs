@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::moderation::SubjectStatusView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, Nsid, UriValue};
+use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::SubjectStatusView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryStatuses<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_assurance_state: Option<S>,
@@ -54,18 +51,18 @@ pub struct QueryStatuses<S: BosStr = DefaultStr> {
     pub include_muted: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_reviewed_by: Option<Did<S>>,
-    ///Defaults to `50`. Min: 1. Max: 100.
+    /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_account_suspend_count: Option<i64>,
-    ///(min: 0, max: 100)
+    /// (min: 0, max: 100)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_priority_score: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_reported_records_count: Option<i64>,
-    ///(min: 1)
+    /// (min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min_strike_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -88,11 +85,11 @@ pub struct QueryStatuses<S: BosStr = DefaultStr> {
     pub reviewed_after: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reviewed_before: Option<Datetime>,
-    ///Defaults to `"desc"`.
+    /// Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_direction: Option<S>,
-    ///Defaults to `"lastReportedAt"`.
+    /// Defaults to `"lastReportedAt"`.
     #[serde(default = "_default_sort_field")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_field: Option<S>,
@@ -106,11 +103,9 @@ pub struct QueryStatuses<S: BosStr = DefaultStr> {
     pub takendown: Option<bool>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryStatusesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -119,7 +114,9 @@ pub struct QueryStatusesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.moderation.queryStatuses
+/** Response marker for the `tools.ozone.moderation.queryStatuses` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `QueryStatusesOutput<S>` for this endpoint.*/
 pub struct QueryStatusesResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryStatusesResponse {
     const NSID: &'static str = "tools.ozone.moderation.queryStatuses";
@@ -134,7 +131,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for QueryStatuses<S> {
     type Response = QueryStatusesResponse;
 }
 
-/// Endpoint type for tools.ozone.moderation.queryStatuses
+/** Endpoint marker for the `tools.ozone.moderation.queryStatuses` query.
+
+Path: `/xrpc/tools.ozone.moderation.queryStatuses`. The request payload type is `QueryStatuses<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct QueryStatusesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryStatusesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.queryStatuses";
@@ -157,7 +156,7 @@ fn _default_sort_field<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod query_statuses_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -175,7 +174,10 @@ pub mod query_statuses_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct QueryStatusesBuilder<St: query_statuses_state::State, S: BosStr = DefaultStr> {
+pub struct QueryStatusesBuilder<
+    St: query_statuses_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -238,9 +240,42 @@ impl QueryStatusesBuilder<query_statuses_state::Empty, DefaultStr> {
         QueryStatusesBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -253,9 +288,42 @@ impl<S: BosStr> QueryStatusesBuilder<query_statuses_state::Empty, S> {
         QueryStatusesBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -407,7 +475,10 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `ignoreSubjects` field (optional)
-    pub fn ignore_subjects(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
+    pub fn ignore_subjects(
+        mut self,
+        value: impl Into<Option<Vec<UriValue<S>>>>,
+    ) -> Self {
         self._fields.11 = value.into();
         self
     }

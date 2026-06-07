@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ToggleLike<S: BosStr = DefaultStr> {
     ///AT URI of the game record to like/unlike.
     pub subject: AtUri<S>,
@@ -29,11 +26,9 @@ pub struct ToggleLike<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ToggleLikeOutput<S: BosStr = DefaultStr> {
     ///Whether the game was liked or unliked.
     pub action: ToggleLikeOutputAction<S>,
@@ -121,12 +116,16 @@ where
         match self {
             ToggleLikeOutputAction::Liked => ToggleLikeOutputAction::Liked,
             ToggleLikeOutputAction::Unliked => ToggleLikeOutputAction::Unliked,
-            ToggleLikeOutputAction::Other(v) => ToggleLikeOutputAction::Other(v.into_static()),
+            ToggleLikeOutputAction::Other(v) => {
+                ToggleLikeOutputAction::Other(v.into_static())
+            }
         }
     }
 }
 
-/// Response type for games.gamesgamesgamesgames.graph.toggleLike
+/** Response marker for the `games.gamesgamesgamesgames.graph.toggleLike` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ToggleLikeOutput<S>` for this endpoint.*/
 pub struct ToggleLikeResponse;
 impl jacquard_common::xrpc::XrpcResp for ToggleLikeResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.graph.toggleLike";
@@ -137,24 +136,28 @@ impl jacquard_common::xrpc::XrpcResp for ToggleLikeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ToggleLike<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.graph.toggleLike";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ToggleLikeResponse;
 }
 
-/// Endpoint type for games.gamesgamesgamesgames.graph.toggleLike
+/** Endpoint marker for the `games.gamesgamesgamesgames.graph.toggleLike` procedure.
+
+Path: `/xrpc/games.gamesgamesgamesgames.graph.toggleLike`. The request payload type is `ToggleLike<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ToggleLikeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ToggleLikeRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.graph.toggleLike";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ToggleLike<S>;
     type Response = ToggleLikeResponse;
 }
 
 pub mod toggle_like_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -259,7 +262,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ToggleLike<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ToggleLike<S> {
         ToggleLike {
             subject: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

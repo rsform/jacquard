@@ -8,33 +8,28 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::EntryView;
-use crate::sh_weaver::notebook::NotebookView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::EntryView;
+use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryDetail<S: BosStr = DefaultStr> {
     pub entry: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notebook_context: Option<AtUri<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryDetailOutput<S: BosStr = DefaultStr> {
     pub entry: EntryView<S>,
     pub notebook_count: i64,
@@ -45,19 +40,25 @@ pub struct GetEntryDetailOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetEntryDetailError {
     #[serde(rename = "EntryNotFound")]
     EntryNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEntryDetailError {
@@ -81,7 +82,9 @@ impl core::fmt::Display for GetEntryDetailError {
     }
 }
 
-/// Response type for sh.weaver.notebook.getEntryDetail
+/** Response marker for the `sh.weaver.notebook.getEntryDetail` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetEntryDetailOutput<S>` for this endpoint.*/
 pub struct GetEntryDetailResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryDetailResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
@@ -96,7 +99,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntryDetail<S> {
     type Response = GetEntryDetailResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getEntryDetail
+/** Endpoint marker for the `sh.weaver.notebook.getEntryDetail` query.
+
+Path: `/xrpc/sh.weaver.notebook.getEntryDetail`. The request payload type is `GetEntryDetail<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetEntryDetailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryDetailRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryDetail";
@@ -107,7 +112,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEntryDetailRequest {
 
 pub mod get_entry_detail_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -138,7 +143,10 @@ pub mod get_entry_detail_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetEntryDetailBuilder<St: get_entry_detail_state::State, S: BosStr = DefaultStr> {
+pub struct GetEntryDetailBuilder<
+    St: get_entry_detail_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,

@@ -8,34 +8,29 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::notebook::BookEntryView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::notebook::BookEntryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookEntry<S: BosStr = DefaultStr> {
-    ///Defaults to `0`. Min: 0.
+    /// Defaults to `0`. Min: 0.
     #[serde(default = "_default_index")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<i64>,
     pub notebook: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetBookEntryOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: BookEntryView<S>,
@@ -43,9 +38,18 @@ pub struct GetBookEntryOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetBookEntryError {
     #[serde(rename = "NotebookNotFound")]
@@ -54,10 +58,7 @@ pub enum GetBookEntryError {
     EntryNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetBookEntryError {
@@ -88,7 +89,9 @@ impl core::fmt::Display for GetBookEntryError {
     }
 }
 
-/// Response type for sh.weaver.notebook.getBookEntry
+/** Response marker for the `sh.weaver.notebook.getBookEntry` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetBookEntryOutput<S>` for this endpoint.*/
 pub struct GetBookEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookEntryResponse {
     const NSID: &'static str = "sh.weaver.notebook.getBookEntry";
@@ -103,7 +106,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetBookEntry<S> {
     type Response = GetBookEntryResponse;
 }
 
-/// Endpoint type for sh.weaver.notebook.getBookEntry
+/** Endpoint marker for the `sh.weaver.notebook.getBookEntry` query.
+
+Path: `/xrpc/sh.weaver.notebook.getBookEntry`. The request payload type is `GetBookEntry<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetBookEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookEntryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getBookEntry";
@@ -118,7 +123,7 @@ fn _default_index() -> Option<i64> {
 
 pub mod get_book_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

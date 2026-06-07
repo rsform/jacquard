@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `app.chronosky.schedule` Lexicon namespace/module.
 pub mod create_post;
 pub mod delete_post;
 pub mod get_post;

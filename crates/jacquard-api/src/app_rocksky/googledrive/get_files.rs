@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_rocksky::googledrive::FileListView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::googledrive::FileListView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFiles<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub at: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFilesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: FileListView<S>,
@@ -39,7 +34,9 @@ pub struct GetFilesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for app.rocksky.googledrive.getFiles
+/** Response marker for the `app.rocksky.googledrive.getFiles` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetFilesOutput<S>` for this endpoint.*/
 pub struct GetFilesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFilesResponse {
     const NSID: &'static str = "app.rocksky.googledrive.getFiles";
@@ -54,7 +51,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetFiles<S> {
     type Response = GetFilesResponse;
 }
 
-/// Endpoint type for app.rocksky.googledrive.getFiles
+/** Endpoint marker for the `app.rocksky.googledrive.getFiles` query.
+
+Path: `/xrpc/app.rocksky.googledrive.getFiles`. The request payload type is `GetFiles<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetFilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFilesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.googledrive.getFiles";
@@ -65,7 +64,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFilesRequest {
 
 pub mod get_files_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

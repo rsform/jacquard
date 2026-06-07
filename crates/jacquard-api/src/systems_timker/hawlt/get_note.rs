@@ -8,32 +8,27 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::systems_timker::hawlt::note::Note;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::systems_timker::hawlt::note::Note;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNote<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
     pub rkey: RecordKey<Rkey<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNoteOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -42,7 +37,9 @@ pub struct GetNoteOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for systems.timker.hawlt.getNote
+/** Response marker for the `systems.timker.hawlt.getNote` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetNoteOutput<S>` for this endpoint.*/
 pub struct GetNoteResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNoteResponse {
     const NSID: &'static str = "systems.timker.hawlt.getNote";
@@ -57,7 +54,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetNote<S> {
     type Response = GetNoteResponse;
 }
 
-/// Endpoint type for systems.timker.hawlt.getNote
+/** Endpoint marker for the `systems.timker.hawlt.getNote` query.
+
+Path: `/xrpc/systems.timker.hawlt.getNote`. The request payload type is `GetNote<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetNoteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNoteRequest {
     const PATH: &'static str = "/xrpc/systems.timker.hawlt.getNote";
@@ -68,7 +67,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetNoteRequest {
 
 pub mod get_note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

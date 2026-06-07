@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteItem<S: BosStr = DefaultStr> {
     ///The AT-URI of the item to delete
     pub uri: AtUri<S>,
@@ -30,13 +27,16 @@ pub struct DeleteItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct DeleteItemOutput {
     pub body: Bytes,
 }
 
-/// Response type for social.showcase.library.deleteItem
+/** Response marker for the `social.showcase.library.deleteItem` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `DeleteItemOutput` for this endpoint.*/
 pub struct DeleteItemResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteItemResponse {
     const NSID: &'static str = "social.showcase.library.deleteItem";
@@ -47,24 +47,28 @@ impl jacquard_common::xrpc::XrpcResp for DeleteItemResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteItem<S> {
     const NSID: &'static str = "social.showcase.library.deleteItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteItemResponse;
 }
 
-/// Endpoint type for social.showcase.library.deleteItem
+/** Endpoint marker for the `social.showcase.library.deleteItem` procedure.
+
+Path: `/xrpc/social.showcase.library.deleteItem`. The request payload type is `DeleteItem<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct DeleteItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteItemRequest {
     const PATH: &'static str = "/xrpc/social.showcase.library.deleteItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteItem<S>;
     type Response = DeleteItemResponse;
 }
 
 pub mod delete_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -169,7 +173,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteItem<S> {
         DeleteItem {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

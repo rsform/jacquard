@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -28,7 +28,9 @@ pub struct ListVideosOutput {
     pub body: Bytes,
 }
 
-/// Response type for com.5jiji.test.listVideos
+/** Response marker for the `com.5jiji.test.listVideos` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `ListVideosOutput` for this endpoint.*/
 pub struct ListVideosResponse;
 impl jacquard_common::xrpc::XrpcResp for ListVideosResponse {
     const NSID: &'static str = "com.5jiji.test.listVideos";
@@ -43,7 +45,9 @@ impl jacquard_common::xrpc::XrpcRequest for ListVideos {
     type Response = ListVideosResponse;
 }
 
-/// Endpoint type for com.5jiji.test.listVideos
+/** Endpoint marker for the `com.5jiji.test.listVideos` query.
+
+Path: `/xrpc/com.5jiji.test.listVideos`. The request payload type is `ListVideos`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct ListVideosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListVideosRequest {
     const PATH: &'static str = "/xrpc/com.5jiji.test.listVideos";

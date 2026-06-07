@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 /// Extra feed type for Klearsky. Used as an extension in app.bsky.actor.defs#savedFeedsPrefV2 items.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

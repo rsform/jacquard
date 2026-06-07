@@ -8,38 +8,33 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::social_clippr::feed::TagView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::feed::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchTags<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    ///Defaults to `25`. Min: 1. Max: 100.
+    /// Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     pub q: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchTagsOutput<S: BosStr = DefaultStr> {
     ///A parameter to paginate results
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,7 +45,9 @@ pub struct SearchTagsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for social.clippr.actor.searchTags
+/** Response marker for the `social.clippr.actor.searchTags` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `SearchTagsOutput<S>` for this endpoint.*/
 pub struct SearchTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchTagsResponse {
     const NSID: &'static str = "social.clippr.actor.searchTags";
@@ -65,7 +62,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchTags<S> {
     type Response = SearchTagsResponse;
 }
 
-/// Endpoint type for social.clippr.actor.searchTags
+/** Endpoint marker for the `social.clippr.actor.searchTags` query.
+
+Path: `/xrpc/social.clippr.actor.searchTags`. The request payload type is `SearchTags<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct SearchTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchTagsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.actor.searchTags";
@@ -80,7 +79,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_tags_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -198,7 +197,10 @@ where
     St::Q: search_tags_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(mut self, value: impl Into<S>) -> SearchTagsBuilder<search_tags_state::SetQ<St>, S> {
+    pub fn q(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchTagsBuilder<search_tags_state::SetQ<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SearchTagsBuilder {
             _state: PhantomData,

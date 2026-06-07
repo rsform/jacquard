@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `io.atcr.hold` Lexicon namespace/module.
 pub mod abort_upload;
 pub mod captain;
 pub mod complete_upload;
@@ -18,6 +19,7 @@ pub mod request_crew;
 pub mod scan;
 pub mod set_stats;
 pub mod stats;
+
 
 #[cfg(feature = "streaming")]
 pub mod subscribe_scan_jobs;

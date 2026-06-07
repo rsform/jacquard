@@ -3,6 +3,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `garden.goals` Lexicon namespace/module.
 pub mod category;
 pub mod completion;
 pub mod completion_details;

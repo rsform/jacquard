@@ -5,6 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
+//! Generated bindings for the `chat.bsky.convo` Lexicon namespace/module.
 pub mod accept_convo;
 pub mod add_reaction;
 pub mod delete_message_for_self;
@@ -27,34 +28,35 @@ pub mod unmute_convo;
 pub mod update_all_read;
 pub mod update_read;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::embed::record;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::record::Record;
 use crate::app_bsky::richtext::facet::Facet;
 use crate::chat_bsky::actor::MemberRole;
 use crate::chat_bsky::actor::ProfileViewBasic;
-use crate::chat_bsky::convo;
-use crate::chat_bsky::embed::join_link;
 use crate::chat_bsky::embed::join_link::JoinLink;
 use crate::chat_bsky::group::JoinLinkView;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::app_bsky::embed::record;
+use crate::chat_bsky::convo;
+use crate::chat_bsky::embed::join_link;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConvoKind<S: BosStr = DefaultStr> {
@@ -126,6 +128,7 @@ where
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConvoLockStatus<S: BosStr = DefaultStr> {
@@ -202,17 +205,16 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConvoRef<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConvoStatus<S: BosStr = DefaultStr> {
@@ -285,11 +287,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConvoView<S: BosStr = DefaultStr> {
     pub id: S,
     ///Union field that has data specific to different kinds of convos.
@@ -311,6 +311,7 @@ pub struct ConvoView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -320,6 +321,7 @@ pub enum ConvoViewKind<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#groupConvo")]
     GroupConvo(Box<convo::GroupConvo<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -333,11 +335,9 @@ pub enum ConvoViewLastMessage<S: BosStr = DefaultStr> {
     SystemMessageView(Box<convo::SystemMessageView<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeletedMessageView<S: BosStr = DefaultStr> {
     pub id: S,
     pub rev: S,
@@ -350,10 +350,7 @@ pub struct DeletedMessageView<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here].
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DirectConvo<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -362,10 +359,7 @@ pub struct DirectConvo<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here].
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GroupConvo<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -391,10 +385,7 @@ pub struct GroupConvo<S: BosStr = DefaultStr> {
 /// Event indicating the viewer accepted a convo, and it can be moved out of the request inbox. Can be direct or group.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -405,10 +396,7 @@ pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member was added to a group convo. The member who was added gets a logBeginConvo (to create the convo) but also a logAddMember (to show the system message as the first message the user sees).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogAddMember<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataAddMember
@@ -423,10 +411,7 @@ pub struct LogAddMember<S: BosStr = DefaultStr> {
 /// Event indicating a reaction was added to a message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogAddReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogAddReactionMessage<S>,
@@ -438,6 +423,7 @@ pub struct LogAddReaction<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -452,10 +438,7 @@ pub enum LogAddReactionMessage<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was approved by the viewer. Only the owner gets this. The approved member gets a logBeginConvo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogApproveJoinRequest<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///Prospective member who requested to join.
@@ -468,10 +451,7 @@ pub struct LogApproveJoinRequest<S: BosStr = DefaultStr> {
 /// Event indicating a convo containing the viewer was started. Can be direct or group. When a member is added to a group convo, they also get this event.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogBeginConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -482,10 +462,7 @@ pub struct LogBeginConvo<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was created for a group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogCreateJoinLink<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataCreateJoinLink
@@ -498,10 +475,7 @@ pub struct LogCreateJoinLink<S: BosStr = DefaultStr> {
 /// Event indicating a user-originated message was created. Is not emitted for system messages.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogCreateMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogCreateMessageMessage<S>,
@@ -512,6 +486,7 @@ pub struct LogCreateMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -526,10 +501,7 @@ pub enum LogCreateMessageMessage<S: BosStr = DefaultStr> {
 /// Event indicating a user-originated message was deleted. Is not emitted for system messages.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogDeleteMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogDeleteMessageMessage<S>,
@@ -537,6 +509,7 @@ pub struct LogDeleteMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -551,10 +524,7 @@ pub enum LogDeleteMessageMessage<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was disabled for a group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogDisableJoinLink<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataDisableJoinLink
@@ -567,10 +537,7 @@ pub struct LogDisableJoinLink<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating info about group convo was edited.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogEditGroup<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataEditGroup
@@ -583,10 +550,7 @@ pub struct LogEditGroup<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a settings about a join link for a group convo were edited.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogEditJoinLink<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataEditJoinLink
@@ -599,10 +563,7 @@ pub struct LogEditJoinLink<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was enabled for a group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogEnableJoinLink<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataEnableJoinLink
@@ -615,10 +576,7 @@ pub struct LogEnableJoinLink<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was made to a group the viewer owns. Only the owner gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogIncomingJoinRequest<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///Prospective member who requested to join.
@@ -631,10 +589,7 @@ pub struct LogIncomingJoinRequest<S: BosStr = DefaultStr> {
 /// Event indicating the viewer left a convo. Can be direct or group.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -645,10 +600,7 @@ pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was locked.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogLockConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataLockConvo
@@ -663,10 +615,7 @@ pub struct LogLockConvo<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was locked permanently.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogLockConvoPermanently<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataLockConvoPermanently
@@ -681,10 +630,7 @@ pub struct LogLockConvoPermanently<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member joined a group convo via join link. The member who was added gets a logBeginConvo (to create the convo) but also a logMemberJoin (to show the system message as the first message the user sees).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogMemberJoin<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataMemberJoin
@@ -699,10 +645,7 @@ pub struct LogMemberJoin<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member voluntarily left a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logMemberLeave (because they already left, so can't see the system message).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogMemberLeave<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataMemberLeave
@@ -717,10 +660,7 @@ pub struct LogMemberLeave<S: BosStr = DefaultStr> {
 /// Event indicating the viewer muted a convo. Can be direct or group.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogMuteConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -731,10 +671,7 @@ pub struct LogMuteConvo<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was made by the requester. Only requester actor gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogOutgoingJoinRequest<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -745,10 +682,7 @@ pub struct LogOutgoingJoinRequest<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a convo was read up to a certain message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogReadConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogReadConvoMessage<S>,
@@ -756,6 +690,7 @@ pub struct LogReadConvo<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -772,10 +707,7 @@ pub enum LogReadConvoMessage<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating the group owner marked join requests as read. Only the owner gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogReadJoinRequests<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -786,10 +718,7 @@ pub struct LogReadJoinRequests<S: BosStr = DefaultStr> {
 /// DEPRECATED: use logReadConvo instead. Event indicating a convo was read up to a certain message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogReadMessage<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogReadMessageMessage<S>,
@@ -797,6 +726,7 @@ pub struct LogReadMessage<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -813,10 +743,7 @@ pub enum LogReadMessageMessage<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was rejected by the viewer. Only the owner gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogRejectJoinRequest<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///Prospective member who requested to join.
@@ -829,10 +756,7 @@ pub struct LogRejectJoinRequest<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member was removed from a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logRemoveMember (because they already left, so can't see the system message).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogRemoveMember<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataRemoveMember
@@ -847,10 +771,7 @@ pub struct LogRemoveMember<S: BosStr = DefaultStr> {
 /// Event indicating a reaction was removed from a message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogRemoveReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message: LogRemoveReactionMessage<S>,
@@ -862,6 +783,7 @@ pub struct LogRemoveReaction<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -876,10 +798,7 @@ pub enum LogRemoveReactionMessage<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was unlocked.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogUnlockConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///A system message with data of type #systemMessageDataUnlockConvo
@@ -894,10 +813,7 @@ pub struct LogUnlockConvo<S: BosStr = DefaultStr> {
 /// Event indicating the viewer unmuted a convo. Can be direct or group.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -908,10 +824,7 @@ pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a prospective member withdrew their join request. Only the owner gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogWithdrawIncomingJoinRequest<S: BosStr = DefaultStr> {
     pub convo_id: S,
     ///Prospective member who withdrew their join request.
@@ -924,10 +837,7 @@ pub struct LogWithdrawIncomingJoinRequest<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating the viewer withdrew their own join request. Only requester actor gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogWithdrawOutgoingJoinRequest<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub rev: S,
@@ -935,11 +845,9 @@ pub struct LogWithdrawOutgoingJoinRequest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
     pub message: convo::MessageView<S>,
     pub reaction: convo::ReactionView<S>,
@@ -947,11 +855,9 @@ pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageInput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<MessageInputEmbed<S>>,
@@ -963,6 +869,7 @@ pub struct MessageInput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -973,11 +880,9 @@ pub enum MessageInputEmbed<S: BosStr = DefaultStr> {
     JoinLink(Box<JoinLink<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageRef<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub did: Did<S>,
@@ -986,11 +891,9 @@ pub struct MessageRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub embed: Option<MessageViewEmbed<S>>,
@@ -1009,6 +912,7 @@ pub struct MessageView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1019,22 +923,18 @@ pub enum MessageViewEmbed<S: BosStr = DefaultStr> {
     JoinLinkView(Box<join_link::View<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MessageViewSender<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReactionView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub sender: convo::ReactionViewSender<S>,
@@ -1043,11 +943,9 @@ pub struct ReactionView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReactionViewSender<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -1057,10 +955,7 @@ pub struct ReactionViewSender<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user was added to the group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataAddMember<S: BosStr = DefaultStr> {
     pub added_by: convo::SystemMessageReferredUser<S>,
     ///Current view of the member who was added.
@@ -1074,10 +969,7 @@ pub struct SystemMessageDataAddMember<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was created.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataCreateJoinLink<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -1086,10 +978,7 @@ pub struct SystemMessageDataCreateJoinLink<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was disabled.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataDisableJoinLink<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -1098,10 +987,7 @@ pub struct SystemMessageDataDisableJoinLink<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group info was edited.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataEditGroup<S: BosStr = DefaultStr> {
     ///Group name that replaced the old.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1116,10 +1002,7 @@ pub struct SystemMessageDataEditGroup<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was edited.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataEditJoinLink<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -1128,10 +1011,7 @@ pub struct SystemMessageDataEditJoinLink<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was enabled.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataEnableJoinLink<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -1140,10 +1020,7 @@ pub struct SystemMessageDataEnableJoinLink<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was locked.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataLockConvo<S: BosStr = DefaultStr> {
     ///Current view of the member who locked the group.
     pub locked_by: convo::SystemMessageReferredUser<S>,
@@ -1154,10 +1031,7 @@ pub struct SystemMessageDataLockConvo<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was locked permanently.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataLockConvoPermanently<S: BosStr = DefaultStr> {
     ///Current view of the member who locked the group.
     pub locked_by: convo::SystemMessageReferredUser<S>,
@@ -1168,10 +1042,7 @@ pub struct SystemMessageDataLockConvoPermanently<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user joined the group convo via join link.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataMemberJoin<S: BosStr = DefaultStr> {
     ///If join link was configured to require approval, this will be set to who approved the request. Undefined if approval was not required.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1187,10 +1058,7 @@ pub struct SystemMessageDataMemberJoin<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user voluntarily left the group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataMemberLeave<S: BosStr = DefaultStr> {
     ///Current view of the member who left the group.
     pub member: convo::SystemMessageReferredUser<S>,
@@ -1201,10 +1069,7 @@ pub struct SystemMessageDataMemberLeave<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user was removed from the group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataRemoveMember<S: BosStr = DefaultStr> {
     ///Current view of the member who was removed.
     pub member: convo::SystemMessageReferredUser<S>,
@@ -1216,10 +1081,7 @@ pub struct SystemMessageDataRemoveMember<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was unlocked.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageDataUnlockConvo<S: BosStr = DefaultStr> {
     ///Current view of the member who unlocked the group.
     pub unlocked_by: convo::SystemMessageReferredUser<S>,
@@ -1227,11 +1089,9 @@ pub struct SystemMessageDataUnlockConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageReferredUser<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -1241,10 +1101,7 @@ pub struct SystemMessageReferredUser<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here].
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SystemMessageView<S: BosStr = DefaultStr> {
     pub data: SystemMessageViewData<S>,
     pub id: S,
@@ -1253,6 +1110,7 @@ pub struct SystemMessageView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1271,7 +1129,9 @@ pub enum SystemMessageViewData<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#systemMessageDataUnlockConvo")]
     SystemMessageDataUnlockConvo(Box<convo::SystemMessageDataUnlockConvo<S>>),
     #[serde(rename = "chat.bsky.convo.defs#systemMessageDataLockConvoPermanently")]
-    SystemMessageDataLockConvoPermanently(Box<convo::SystemMessageDataLockConvoPermanently<S>>),
+    SystemMessageDataLockConvoPermanently(
+        Box<convo::SystemMessageDataLockConvoPermanently<S>>,
+    ),
     #[serde(rename = "chat.bsky.convo.defs#systemMessageDataEditGroup")]
     SystemMessageDataEditGroup(Box<convo::SystemMessageDataEditGroup<S>>),
     #[serde(rename = "chat.bsky.convo.defs#systemMessageDataCreateJoinLink")]
@@ -2198,7 +2058,7 @@ impl<S: BosStr> LexiconSchema for SystemMessageView<S> {
 
 pub mod convo_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2346,10 +2206,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.convo.defs"),
@@ -2357,31 +2217,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("convoKind"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("convoLockStatus"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("convoRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("did"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -2397,9 +2250,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("convoStatus"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("convoView"),
@@ -2499,26 +2350,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("deletedMessageView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("sender"),
-                        SmolStr::new_static("sentAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("rev"),
+                            SmolStr::new_static("sender"), SmolStr::new_static("sentAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("sender"),
@@ -3177,27 +3024,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logLeaveConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Event indicating the viewer left a convo. Can be direct or group.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Event indicating the viewer left a convo. Can be direct or group.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -3427,27 +3271,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logMuteConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Event indicating the viewer muted a convo. Can be direct or group.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Event indicating the viewer muted a convo. Can be direct or group.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -3807,27 +3648,24 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logUnmuteConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Event indicating the viewer unmuted a convo. Can be direct or group.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("rev"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Event indicating the viewer unmuted a convo. Can be direct or group.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("rev"), SmolStr::new_static("convoId")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -3903,10 +3741,12 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("messageAndReactionView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("message"),
-                        SmolStr::new_static("reaction"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("message"),
+                            SmolStr::new_static("reaction")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -3941,7 +3781,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("app.bsky.embed.record"),
-                                    CowStr::new_static("chat.bsky.embed.joinLink"),
+                                    CowStr::new_static("chat.bsky.embed.joinLink")
                                 ],
                                 ..Default::default()
                             }),
@@ -3949,9 +3789,11 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Annotations of text (mentions, URLs, hashtags, etc)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Annotations of text (mentions, URLs, hashtags, etc)",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("app.bsky.richtext.facet"),
                                     ..Default::default()
@@ -3975,19 +3817,18 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("messageRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("messageId"),
-                        SmolStr::new_static("convoId"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("did"), SmolStr::new_static("messageId"),
+                            SmolStr::new_static("convoId")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -3998,9 +3839,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("messageId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -4117,11 +3956,12 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reactionView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("value"),
-                        SmolStr::new_static("sender"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("value"), SmolStr::new_static("sender"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4141,9 +3981,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -4570,7 +4408,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
 
 pub mod convo_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4719,7 +4557,10 @@ where
     St::Id: convo_view_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> ConvoViewBuilder<convo_view_state::SetId<St>, S> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> ConvoViewBuilder<convo_view_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -4744,7 +4585,10 @@ impl<St: convo_view_state::State, S: BosStr> ConvoViewBuilder<St, S> {
 
 impl<St: convo_view_state::State, S: BosStr> ConvoViewBuilder<St, S> {
     /// Set the `lastMessage` field (optional)
-    pub fn last_message(mut self, value: impl Into<Option<ConvoViewLastMessage<S>>>) -> Self {
+    pub fn last_message(
+        mut self,
+        value: impl Into<Option<ConvoViewLastMessage<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -4765,7 +4609,10 @@ impl<St: convo_view_state::State, S: BosStr> ConvoViewBuilder<St, S> {
         self
     }
     /// Set the `lastReaction` field to an Option value (optional)
-    pub fn maybe_last_reaction(mut self, value: Option<convo::MessageAndReactionView<S>>) -> Self {
+    pub fn maybe_last_reaction(
+        mut self,
+        value: Option<convo::MessageAndReactionView<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -4815,7 +4662,10 @@ where
     St::Rev: convo_view_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(mut self, value: impl Into<S>) -> ConvoViewBuilder<convo_view_state::SetRev<St>, S> {
+    pub fn rev(
+        mut self,
+        value: impl Into<S>,
+    ) -> ConvoViewBuilder<convo_view_state::SetRev<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ConvoViewBuilder {
             _state: PhantomData,
@@ -4882,7 +4732,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ConvoView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConvoView<S> {
         ConvoView {
             id: self._fields.0.unwrap(),
             kind: self._fields.1,
@@ -4900,7 +4753,7 @@ where
 
 pub mod deleted_message_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4973,8 +4826,10 @@ pub mod deleted_message_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeletedMessageViewBuilder<St: deleted_message_view_state::State, S: BosStr = DefaultStr>
-{
+pub struct DeletedMessageViewBuilder<
+    St: deleted_message_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -4987,7 +4842,10 @@ pub struct DeletedMessageViewBuilder<St: deleted_message_view_state::State, S: B
 
 impl DeletedMessageView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> DeletedMessageViewBuilder<deleted_message_view_state::Empty, DefaultStr> {
+    pub fn new() -> DeletedMessageViewBuilder<
+        deleted_message_view_state::Empty,
+        DefaultStr,
+    > {
         DeletedMessageViewBuilder::new()
     }
 }
@@ -5116,7 +4974,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeletedMessageView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeletedMessageView<S> {
         DeletedMessageView {
             id: self._fields.0.unwrap(),
             rev: self._fields.1.unwrap(),
@@ -5129,7 +4990,7 @@ where
 
 pub mod group_convo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5429,7 +5290,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GroupConvo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GroupConvo<S> {
         GroupConvo {
             created_at: self._fields.0.unwrap(),
             join_link: self._fields.1,
@@ -5446,7 +5310,7 @@ where
 
 pub mod log_add_member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5661,7 +5525,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogAddMember<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogAddMember<S> {
         LogAddMember {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -5674,7 +5541,7 @@ where
 
 pub mod log_add_reaction_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5747,7 +5614,10 @@ pub mod log_add_reaction_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogAddReactionBuilder<St: log_add_reaction_state::State, S: BosStr = DefaultStr> {
+pub struct LogAddReactionBuilder<
+    St: log_add_reaction_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -5854,12 +5724,18 @@ where
 
 impl<St: log_add_reaction_state::State, S: BosStr> LogAddReactionBuilder<St, S> {
     /// Set the `relatedProfiles` field (optional)
-    pub fn related_profiles(mut self, value: impl Into<Option<Vec<ProfileViewBasic<S>>>>) -> Self {
+    pub fn related_profiles(
+        mut self,
+        value: impl Into<Option<Vec<ProfileViewBasic<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `relatedProfiles` field to an Option value (optional)
-    pub fn maybe_related_profiles(mut self, value: Option<Vec<ProfileViewBasic<S>>>) -> Self {
+    pub fn maybe_related_profiles(
+        mut self,
+        value: Option<Vec<ProfileViewBasic<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -5904,7 +5780,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogAddReaction<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogAddReaction<S> {
         LogAddReaction {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -5918,7 +5797,7 @@ where
 
 pub mod log_approve_join_request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5986,15 +5865,20 @@ pub struct LogApproveJoinRequestBuilder<
 
 impl LogApproveJoinRequest<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogApproveJoinRequestBuilder<log_approve_join_request_state::Empty, DefaultStr>
-    {
+    pub fn new() -> LogApproveJoinRequestBuilder<
+        log_approve_join_request_state::Empty,
+        DefaultStr,
+    > {
         LogApproveJoinRequestBuilder::new()
     }
 }
 
 impl<S: BosStr> LogApproveJoinRequest<S> {
     /// Create a new builder for this type
-    pub fn builder() -> LogApproveJoinRequestBuilder<log_approve_join_request_state::Empty, S> {
+    pub fn builder() -> LogApproveJoinRequestBuilder<
+        log_approve_join_request_state::Empty,
+        S,
+    > {
         LogApproveJoinRequestBuilder::builder()
     }
 }
@@ -6030,7 +5914,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogApproveJoinRequestBuilder<log_approve_join_request_state::SetConvoId<St>, S> {
+    ) -> LogApproveJoinRequestBuilder<
+        log_approve_join_request_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         LogApproveJoinRequestBuilder {
             _state: PhantomData,
@@ -6110,7 +5997,7 @@ where
 
 pub mod log_create_join_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6167,7 +6054,10 @@ pub mod log_create_join_link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogCreateJoinLinkBuilder<St: log_create_join_link_state::State, S: BosStr = DefaultStr> {
+pub struct LogCreateJoinLinkBuilder<
+    St: log_create_join_link_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<convo::SystemMessageView<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -6175,7 +6065,10 @@ pub struct LogCreateJoinLinkBuilder<St: log_create_join_link_state::State, S: Bo
 
 impl LogCreateJoinLink<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogCreateJoinLinkBuilder<log_create_join_link_state::Empty, DefaultStr> {
+    pub fn new() -> LogCreateJoinLinkBuilder<
+        log_create_join_link_state::Empty,
+        DefaultStr,
+    > {
         LogCreateJoinLinkBuilder::new()
     }
 }
@@ -6283,7 +6176,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogCreateJoinLink<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogCreateJoinLink<S> {
         LogCreateJoinLink {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -6295,7 +6191,7 @@ where
 
 pub mod log_create_message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6352,7 +6248,10 @@ pub mod log_create_message_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogCreateMessageBuilder<St: log_create_message_state::State, S: BosStr = DefaultStr> {
+pub struct LogCreateMessageBuilder<
+    St: log_create_message_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -6365,7 +6264,10 @@ pub struct LogCreateMessageBuilder<St: log_create_message_state::State, S: BosSt
 
 impl LogCreateMessage<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogCreateMessageBuilder<log_create_message_state::Empty, DefaultStr> {
+    pub fn new() -> LogCreateMessageBuilder<
+        log_create_message_state::Empty,
+        DefaultStr,
+    > {
         LogCreateMessageBuilder::new()
     }
 }
@@ -6439,12 +6341,18 @@ where
 
 impl<St: log_create_message_state::State, S: BosStr> LogCreateMessageBuilder<St, S> {
     /// Set the `relatedProfiles` field (optional)
-    pub fn related_profiles(mut self, value: impl Into<Option<Vec<ProfileViewBasic<S>>>>) -> Self {
+    pub fn related_profiles(
+        mut self,
+        value: impl Into<Option<Vec<ProfileViewBasic<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `relatedProfiles` field to an Option value (optional)
-    pub fn maybe_related_profiles(mut self, value: Option<Vec<ProfileViewBasic<S>>>) -> Self {
+    pub fn maybe_related_profiles(
+        mut self,
+        value: Option<Vec<ProfileViewBasic<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -6487,7 +6395,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogCreateMessage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogCreateMessage<S> {
         LogCreateMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -6500,7 +6411,7 @@ where
 
 pub mod log_delete_message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6557,7 +6468,10 @@ pub mod log_delete_message_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogDeleteMessageBuilder<St: log_delete_message_state::State, S: BosStr = DefaultStr> {
+pub struct LogDeleteMessageBuilder<
+    St: log_delete_message_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<LogDeleteMessageMessage<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -6565,7 +6479,10 @@ pub struct LogDeleteMessageBuilder<St: log_delete_message_state::State, S: BosSt
 
 impl LogDeleteMessage<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogDeleteMessageBuilder<log_delete_message_state::Empty, DefaultStr> {
+    pub fn new() -> LogDeleteMessageBuilder<
+        log_delete_message_state::Empty,
+        DefaultStr,
+    > {
         LogDeleteMessageBuilder::new()
     }
 }
@@ -6673,7 +6590,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogDeleteMessage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogDeleteMessage<S> {
         LogDeleteMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -6685,7 +6605,7 @@ where
 
 pub mod log_disable_join_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -6742,8 +6662,10 @@ pub mod log_disable_join_link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogDisableJoinLinkBuilder<St: log_disable_join_link_state::State, S: BosStr = DefaultStr>
-{
+pub struct LogDisableJoinLinkBuilder<
+    St: log_disable_join_link_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<convo::SystemMessageView<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -6751,14 +6673,20 @@ pub struct LogDisableJoinLinkBuilder<St: log_disable_join_link_state::State, S: 
 
 impl LogDisableJoinLink<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogDisableJoinLinkBuilder<log_disable_join_link_state::Empty, DefaultStr> {
+    pub fn new() -> LogDisableJoinLinkBuilder<
+        log_disable_join_link_state::Empty,
+        DefaultStr,
+    > {
         LogDisableJoinLinkBuilder::new()
     }
 }
 
 impl<S: BosStr> LogDisableJoinLink<S> {
     /// Create a new builder for this type
-    pub fn builder() -> LogDisableJoinLinkBuilder<log_disable_join_link_state::Empty, S> {
+    pub fn builder() -> LogDisableJoinLinkBuilder<
+        log_disable_join_link_state::Empty,
+        S,
+    > {
         LogDisableJoinLinkBuilder::builder()
     }
 }
@@ -6859,7 +6787,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogDisableJoinLink<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogDisableJoinLink<S> {
         LogDisableJoinLink {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -6871,7 +6802,7 @@ where
 
 pub mod log_edit_group_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7044,7 +6975,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogEditGroup<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogEditGroup<S> {
         LogEditGroup {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -7056,7 +6990,7 @@ where
 
 pub mod log_edit_join_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7113,7 +7047,10 @@ pub mod log_edit_join_link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogEditJoinLinkBuilder<St: log_edit_join_link_state::State, S: BosStr = DefaultStr> {
+pub struct LogEditJoinLinkBuilder<
+    St: log_edit_join_link_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<convo::SystemMessageView<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -7229,7 +7166,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogEditJoinLink<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogEditJoinLink<S> {
         LogEditJoinLink {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -7241,7 +7181,7 @@ where
 
 pub mod log_enable_join_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7298,7 +7238,10 @@ pub mod log_enable_join_link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogEnableJoinLinkBuilder<St: log_enable_join_link_state::State, S: BosStr = DefaultStr> {
+pub struct LogEnableJoinLinkBuilder<
+    St: log_enable_join_link_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<convo::SystemMessageView<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -7306,7 +7249,10 @@ pub struct LogEnableJoinLinkBuilder<St: log_enable_join_link_state::State, S: Bo
 
 impl LogEnableJoinLink<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogEnableJoinLinkBuilder<log_enable_join_link_state::Empty, DefaultStr> {
+    pub fn new() -> LogEnableJoinLinkBuilder<
+        log_enable_join_link_state::Empty,
+        DefaultStr,
+    > {
         LogEnableJoinLinkBuilder::new()
     }
 }
@@ -7414,7 +7360,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogEnableJoinLink<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogEnableJoinLink<S> {
         LogEnableJoinLink {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -7426,7 +7375,7 @@ where
 
 pub mod log_incoming_join_request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7494,15 +7443,20 @@ pub struct LogIncomingJoinRequestBuilder<
 
 impl LogIncomingJoinRequest<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogIncomingJoinRequestBuilder<log_incoming_join_request_state::Empty, DefaultStr>
-    {
+    pub fn new() -> LogIncomingJoinRequestBuilder<
+        log_incoming_join_request_state::Empty,
+        DefaultStr,
+    > {
         LogIncomingJoinRequestBuilder::new()
     }
 }
 
 impl<S: BosStr> LogIncomingJoinRequest<S> {
     /// Create a new builder for this type
-    pub fn builder() -> LogIncomingJoinRequestBuilder<log_incoming_join_request_state::Empty, S> {
+    pub fn builder() -> LogIncomingJoinRequestBuilder<
+        log_incoming_join_request_state::Empty,
+        S,
+    > {
         LogIncomingJoinRequestBuilder::builder()
     }
 }
@@ -7518,7 +7472,9 @@ impl LogIncomingJoinRequestBuilder<log_incoming_join_request_state::Empty, Defau
     }
 }
 
-impl<S: BosStr> LogIncomingJoinRequestBuilder<log_incoming_join_request_state::Empty, S> {
+impl<
+    S: BosStr,
+> LogIncomingJoinRequestBuilder<log_incoming_join_request_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         LogIncomingJoinRequestBuilder {
@@ -7538,7 +7494,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogIncomingJoinRequestBuilder<log_incoming_join_request_state::SetConvoId<St>, S> {
+    ) -> LogIncomingJoinRequestBuilder<
+        log_incoming_join_request_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         LogIncomingJoinRequestBuilder {
             _state: PhantomData,
@@ -7557,7 +7516,10 @@ where
     pub fn member(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> LogIncomingJoinRequestBuilder<log_incoming_join_request_state::SetMember<St>, S> {
+    ) -> LogIncomingJoinRequestBuilder<
+        log_incoming_join_request_state::SetMember<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         LogIncomingJoinRequestBuilder {
             _state: PhantomData,
@@ -7618,7 +7580,7 @@ where
 
 pub mod log_lock_convo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7833,7 +7795,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogLockConvo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogLockConvo<S> {
         LogLockConvo {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -7846,7 +7811,7 @@ where
 
 pub mod log_lock_convo_permanently_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7935,20 +7900,28 @@ pub struct LogLockConvoPermanentlyBuilder<
 
 impl LogLockConvoPermanently<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::Empty, DefaultStr> {
+    pub fn new() -> LogLockConvoPermanentlyBuilder<
+        log_lock_convo_permanently_state::Empty,
+        DefaultStr,
+    > {
         LogLockConvoPermanentlyBuilder::new()
     }
 }
 
 impl<S: BosStr> LogLockConvoPermanently<S> {
     /// Create a new builder for this type
-    pub fn builder() -> LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::Empty, S> {
+    pub fn builder() -> LogLockConvoPermanentlyBuilder<
+        log_lock_convo_permanently_state::Empty,
+        S,
+    > {
         LogLockConvoPermanentlyBuilder::builder()
     }
 }
 
-impl LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::Empty, DefaultStr> {
+impl LogLockConvoPermanentlyBuilder<
+    log_lock_convo_permanently_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogLockConvoPermanentlyBuilder {
@@ -7959,7 +7932,9 @@ impl LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::Empty, Def
     }
 }
 
-impl<S: BosStr> LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::Empty, S> {
+impl<
+    S: BosStr,
+> LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         LogLockConvoPermanentlyBuilder {
@@ -7979,7 +7954,10 @@ where
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::SetConvoId<St>, S> {
+    ) -> LogLockConvoPermanentlyBuilder<
+        log_lock_convo_permanently_state::SetConvoId<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         LogLockConvoPermanentlyBuilder {
             _state: PhantomData,
@@ -7998,7 +7976,10 @@ where
     pub fn message(
         mut self,
         value: impl Into<convo::SystemMessageView<S>>,
-    ) -> LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::SetMessage<St>, S> {
+    ) -> LogLockConvoPermanentlyBuilder<
+        log_lock_convo_permanently_state::SetMessage<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         LogLockConvoPermanentlyBuilder {
             _state: PhantomData,
@@ -8017,8 +7998,10 @@ where
     pub fn related_profiles(
         mut self,
         value: impl Into<Vec<ProfileViewBasic<S>>>,
-    ) -> LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::SetRelatedProfiles<St>, S>
-    {
+    ) -> LogLockConvoPermanentlyBuilder<
+        log_lock_convo_permanently_state::SetRelatedProfiles<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         LogLockConvoPermanentlyBuilder {
             _state: PhantomData,
@@ -8037,7 +8020,10 @@ where
     pub fn rev(
         mut self,
         value: impl Into<S>,
-    ) -> LogLockConvoPermanentlyBuilder<log_lock_convo_permanently_state::SetRev<St>, S> {
+    ) -> LogLockConvoPermanentlyBuilder<
+        log_lock_convo_permanently_state::SetRev<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         LogLockConvoPermanentlyBuilder {
             _state: PhantomData,
@@ -8082,7 +8068,7 @@ where
 
 pub mod log_member_join_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8155,7 +8141,10 @@ pub mod log_member_join_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogMemberJoinBuilder<St: log_member_join_state::State, S: BosStr = DefaultStr> {
+pub struct LogMemberJoinBuilder<
+    St: log_member_join_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -8297,7 +8286,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogMemberJoin<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogMemberJoin<S> {
         LogMemberJoin {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -8310,7 +8302,7 @@ where
 
 pub mod log_member_leave_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8383,7 +8375,10 @@ pub mod log_member_leave_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogMemberLeaveBuilder<St: log_member_leave_state::State, S: BosStr = DefaultStr> {
+pub struct LogMemberLeaveBuilder<
+    St: log_member_leave_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -8525,7 +8520,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogMemberLeave<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogMemberLeave<S> {
         LogMemberLeave {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -8538,7 +8536,7 @@ where
 
 pub mod log_read_convo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8711,7 +8709,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogReadConvo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogReadConvo<S> {
         LogReadConvo {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -8723,7 +8724,7 @@ where
 
 pub mod log_read_message_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8780,7 +8781,10 @@ pub mod log_read_message_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogReadMessageBuilder<St: log_read_message_state::State, S: BosStr = DefaultStr> {
+pub struct LogReadMessageBuilder<
+    St: log_read_message_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<LogReadMessageMessage<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -8896,7 +8900,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogReadMessage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogReadMessage<S> {
         LogReadMessage {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -8908,7 +8915,7 @@ where
 
 pub mod log_reject_join_request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -8976,14 +8983,20 @@ pub struct LogRejectJoinRequestBuilder<
 
 impl LogRejectJoinRequest<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogRejectJoinRequestBuilder<log_reject_join_request_state::Empty, DefaultStr> {
+    pub fn new() -> LogRejectJoinRequestBuilder<
+        log_reject_join_request_state::Empty,
+        DefaultStr,
+    > {
         LogRejectJoinRequestBuilder::new()
     }
 }
 
 impl<S: BosStr> LogRejectJoinRequest<S> {
     /// Create a new builder for this type
-    pub fn builder() -> LogRejectJoinRequestBuilder<log_reject_join_request_state::Empty, S> {
+    pub fn builder() -> LogRejectJoinRequestBuilder<
+        log_reject_join_request_state::Empty,
+        S,
+    > {
         LogRejectJoinRequestBuilder::builder()
     }
 }
@@ -9099,7 +9112,7 @@ where
 
 pub mod log_remove_member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9172,7 +9185,10 @@ pub mod log_remove_member_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogRemoveMemberBuilder<St: log_remove_member_state::State, S: BosStr = DefaultStr> {
+pub struct LogRemoveMemberBuilder<
+    St: log_remove_member_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -9314,7 +9330,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogRemoveMember<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogRemoveMember<S> {
         LogRemoveMember {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -9327,7 +9346,7 @@ where
 
 pub mod log_remove_reaction_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9400,7 +9419,10 @@ pub mod log_remove_reaction_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogRemoveReactionBuilder<St: log_remove_reaction_state::State, S: BosStr = DefaultStr> {
+pub struct LogRemoveReactionBuilder<
+    St: log_remove_reaction_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -9414,7 +9436,10 @@ pub struct LogRemoveReactionBuilder<St: log_remove_reaction_state::State, S: Bos
 
 impl LogRemoveReaction<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LogRemoveReactionBuilder<log_remove_reaction_state::Empty, DefaultStr> {
+    pub fn new() -> LogRemoveReactionBuilder<
+        log_remove_reaction_state::Empty,
+        DefaultStr,
+    > {
         LogRemoveReactionBuilder::new()
     }
 }
@@ -9507,12 +9532,18 @@ where
 
 impl<St: log_remove_reaction_state::State, S: BosStr> LogRemoveReactionBuilder<St, S> {
     /// Set the `relatedProfiles` field (optional)
-    pub fn related_profiles(mut self, value: impl Into<Option<Vec<ProfileViewBasic<S>>>>) -> Self {
+    pub fn related_profiles(
+        mut self,
+        value: impl Into<Option<Vec<ProfileViewBasic<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `relatedProfiles` field to an Option value (optional)
-    pub fn maybe_related_profiles(mut self, value: Option<Vec<ProfileViewBasic<S>>>) -> Self {
+    pub fn maybe_related_profiles(
+        mut self,
+        value: Option<Vec<ProfileViewBasic<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -9557,7 +9588,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogRemoveReaction<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogRemoveReaction<S> {
         LogRemoveReaction {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -9571,7 +9605,7 @@ where
 
 pub mod log_unlock_convo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9644,7 +9678,10 @@ pub mod log_unlock_convo_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LogUnlockConvoBuilder<St: log_unlock_convo_state::State, S: BosStr = DefaultStr> {
+pub struct LogUnlockConvoBuilder<
+    St: log_unlock_convo_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -9786,7 +9823,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LogUnlockConvo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LogUnlockConvo<S> {
         LogUnlockConvo {
             convo_id: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -9799,7 +9839,7 @@ where
 
 pub mod log_withdraw_incoming_join_request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -9877,19 +9917,18 @@ impl LogWithdrawIncomingJoinRequest<DefaultStr> {
 
 impl<S: BosStr> LogWithdrawIncomingJoinRequest<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> LogWithdrawIncomingJoinRequestBuilder<log_withdraw_incoming_join_request_state::Empty, S>
-    {
+    pub fn builder() -> LogWithdrawIncomingJoinRequestBuilder<
+        log_withdraw_incoming_join_request_state::Empty,
+        S,
+    > {
         LogWithdrawIncomingJoinRequestBuilder::builder()
     }
 }
 
-impl
-    LogWithdrawIncomingJoinRequestBuilder<
-        log_withdraw_incoming_join_request_state::Empty,
-        DefaultStr,
-    >
-{
+impl LogWithdrawIncomingJoinRequestBuilder<
+    log_withdraw_incoming_join_request_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LogWithdrawIncomingJoinRequestBuilder {
@@ -9900,9 +9939,12 @@ impl
     }
 }
 
-impl<S: BosStr>
-    LogWithdrawIncomingJoinRequestBuilder<log_withdraw_incoming_join_request_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> LogWithdrawIncomingJoinRequestBuilder<
+    log_withdraw_incoming_join_request_state::Empty,
+    S,
+> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         LogWithdrawIncomingJoinRequestBuilder {
@@ -10011,7 +10053,7 @@ where
 
 pub mod message_and_reaction_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10059,24 +10101,26 @@ pub struct MessageAndReactionViewBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<convo::MessageView<S>>,
-        Option<convo::ReactionView<S>>,
-    ),
+    _fields: (Option<convo::MessageView<S>>, Option<convo::ReactionView<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl MessageAndReactionView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> MessageAndReactionViewBuilder<message_and_reaction_view_state::Empty, DefaultStr>
-    {
+    pub fn new() -> MessageAndReactionViewBuilder<
+        message_and_reaction_view_state::Empty,
+        DefaultStr,
+    > {
         MessageAndReactionViewBuilder::new()
     }
 }
 
 impl<S: BosStr> MessageAndReactionView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> MessageAndReactionViewBuilder<message_and_reaction_view_state::Empty, S> {
+    pub fn builder() -> MessageAndReactionViewBuilder<
+        message_and_reaction_view_state::Empty,
+        S,
+    > {
         MessageAndReactionViewBuilder::builder()
     }
 }
@@ -10092,7 +10136,9 @@ impl MessageAndReactionViewBuilder<message_and_reaction_view_state::Empty, Defau
     }
 }
 
-impl<S: BosStr> MessageAndReactionViewBuilder<message_and_reaction_view_state::Empty, S> {
+impl<
+    S: BosStr,
+> MessageAndReactionViewBuilder<message_and_reaction_view_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         MessageAndReactionViewBuilder {
@@ -10112,7 +10158,10 @@ where
     pub fn message(
         mut self,
         value: impl Into<convo::MessageView<S>>,
-    ) -> MessageAndReactionViewBuilder<message_and_reaction_view_state::SetMessage<St>, S> {
+    ) -> MessageAndReactionViewBuilder<
+        message_and_reaction_view_state::SetMessage<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         MessageAndReactionViewBuilder {
             _state: PhantomData,
@@ -10131,7 +10180,10 @@ where
     pub fn reaction(
         mut self,
         value: impl Into<convo::ReactionView<S>>,
-    ) -> MessageAndReactionViewBuilder<message_and_reaction_view_state::SetReaction<St>, S> {
+    ) -> MessageAndReactionViewBuilder<
+        message_and_reaction_view_state::SetReaction<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         MessageAndReactionViewBuilder {
             _state: PhantomData,
@@ -10170,7 +10222,7 @@ where
 
 pub mod message_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10343,7 +10395,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageRef<S> {
         MessageRef {
             convo_id: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -10355,7 +10410,7 @@ where
 
 pub mod message_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10544,12 +10599,18 @@ where
 
 impl<St: message_view_state::State, S: BosStr> MessageViewBuilder<St, S> {
     /// Set the `reactions` field (optional)
-    pub fn reactions(mut self, value: impl Into<Option<Vec<convo::ReactionView<S>>>>) -> Self {
+    pub fn reactions(
+        mut self,
+        value: impl Into<Option<Vec<convo::ReactionView<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `reactions` field to an Option value (optional)
-    pub fn maybe_reactions(mut self, value: Option<Vec<convo::ReactionView<S>>>) -> Self {
+    pub fn maybe_reactions(
+        mut self,
+        value: Option<Vec<convo::ReactionView<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -10655,7 +10716,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageView<S> {
         MessageView {
             embed: self._fields.0,
             facets: self._fields.1,
@@ -10672,7 +10736,7 @@ where
 
 pub mod message_view_sender_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10703,7 +10767,10 @@ pub mod message_view_sender_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MessageViewSenderBuilder<St: message_view_sender_state::State, S: BosStr = DefaultStr> {
+pub struct MessageViewSenderBuilder<
+    St: message_view_sender_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -10711,7 +10778,10 @@ pub struct MessageViewSenderBuilder<St: message_view_sender_state::State, S: Bos
 
 impl MessageViewSender<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> MessageViewSenderBuilder<message_view_sender_state::Empty, DefaultStr> {
+    pub fn new() -> MessageViewSenderBuilder<
+        message_view_sender_state::Empty,
+        DefaultStr,
+    > {
         MessageViewSenderBuilder::new()
     }
 }
@@ -10777,7 +10847,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MessageViewSender<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageViewSender<S> {
         MessageViewSender {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -10787,7 +10860,7 @@ where
 
 pub mod reaction_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -10846,11 +10919,7 @@ pub mod reaction_view_state {
 /// Builder for constructing an instance of this type.
 pub struct ReactionViewBuilder<St: reaction_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<convo::ReactionViewSender<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<convo::ReactionViewSender<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -10964,7 +11033,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReactionView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReactionView<S> {
         ReactionView {
             created_at: self._fields.0.unwrap(),
             sender: self._fields.1.unwrap(),
@@ -10976,7 +11048,7 @@ where
 
 pub mod reaction_view_sender_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11007,8 +11079,10 @@ pub mod reaction_view_sender_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReactionViewSenderBuilder<St: reaction_view_sender_state::State, S: BosStr = DefaultStr>
-{
+pub struct ReactionViewSenderBuilder<
+    St: reaction_view_sender_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -11016,7 +11090,10 @@ pub struct ReactionViewSenderBuilder<St: reaction_view_sender_state::State, S: B
 
 impl ReactionViewSender<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ReactionViewSenderBuilder<reaction_view_sender_state::Empty, DefaultStr> {
+    pub fn new() -> ReactionViewSenderBuilder<
+        reaction_view_sender_state::Empty,
+        DefaultStr,
+    > {
         ReactionViewSenderBuilder::new()
     }
 }
@@ -11082,7 +11159,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReactionViewSender<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReactionViewSender<S> {
         ReactionViewSender {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -11092,7 +11172,7 @@ where
 
 pub mod system_message_data_add_member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11164,22 +11244,28 @@ pub struct SystemMessageDataAddMemberBuilder<
 
 impl SystemMessageDataAddMember<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::Empty, DefaultStr>
-    {
+    pub fn new() -> SystemMessageDataAddMemberBuilder<
+        system_message_data_add_member_state::Empty,
+        DefaultStr,
+    > {
         SystemMessageDataAddMemberBuilder::new()
     }
 }
 
 impl<S: BosStr> SystemMessageDataAddMember<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::Empty, S> {
+    pub fn builder() -> SystemMessageDataAddMemberBuilder<
+        system_message_data_add_member_state::Empty,
+        S,
+    > {
         SystemMessageDataAddMemberBuilder::builder()
     }
 }
 
-impl SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::Empty, DefaultStr> {
+impl SystemMessageDataAddMemberBuilder<
+    system_message_data_add_member_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SystemMessageDataAddMemberBuilder {
@@ -11190,7 +11276,9 @@ impl SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::Emp
     }
 }
 
-impl<S: BosStr> SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::Empty, S> {
+impl<
+    S: BosStr,
+> SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SystemMessageDataAddMemberBuilder {
@@ -11210,8 +11298,10 @@ where
     pub fn added_by(
         mut self,
         value: impl Into<convo::SystemMessageReferredUser<S>>,
-    ) -> SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::SetAddedBy<St>, S>
-    {
+    ) -> SystemMessageDataAddMemberBuilder<
+        system_message_data_add_member_state::SetAddedBy<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         SystemMessageDataAddMemberBuilder {
             _state: PhantomData,
@@ -11230,8 +11320,10 @@ where
     pub fn member(
         mut self,
         value: impl Into<convo::SystemMessageReferredUser<S>>,
-    ) -> SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::SetMember<St>, S>
-    {
+    ) -> SystemMessageDataAddMemberBuilder<
+        system_message_data_add_member_state::SetMember<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         SystemMessageDataAddMemberBuilder {
             _state: PhantomData,
@@ -11250,8 +11342,10 @@ where
     pub fn role(
         mut self,
         value: impl Into<MemberRole<S>>,
-    ) -> SystemMessageDataAddMemberBuilder<system_message_data_add_member_state::SetRole<St>, S>
-    {
+    ) -> SystemMessageDataAddMemberBuilder<
+        system_message_data_add_member_state::SetRole<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         SystemMessageDataAddMemberBuilder {
             _state: PhantomData,
@@ -11293,7 +11387,7 @@ where
 
 pub mod system_message_data_lock_convo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11335,22 +11429,28 @@ pub struct SystemMessageDataLockConvoBuilder<
 
 impl SystemMessageDataLockConvo<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> SystemMessageDataLockConvoBuilder<system_message_data_lock_convo_state::Empty, DefaultStr>
-    {
+    pub fn new() -> SystemMessageDataLockConvoBuilder<
+        system_message_data_lock_convo_state::Empty,
+        DefaultStr,
+    > {
         SystemMessageDataLockConvoBuilder::new()
     }
 }
 
 impl<S: BosStr> SystemMessageDataLockConvo<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> SystemMessageDataLockConvoBuilder<system_message_data_lock_convo_state::Empty, S> {
+    pub fn builder() -> SystemMessageDataLockConvoBuilder<
+        system_message_data_lock_convo_state::Empty,
+        S,
+    > {
         SystemMessageDataLockConvoBuilder::builder()
     }
 }
 
-impl SystemMessageDataLockConvoBuilder<system_message_data_lock_convo_state::Empty, DefaultStr> {
+impl SystemMessageDataLockConvoBuilder<
+    system_message_data_lock_convo_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SystemMessageDataLockConvoBuilder {
@@ -11361,7 +11461,9 @@ impl SystemMessageDataLockConvoBuilder<system_message_data_lock_convo_state::Emp
     }
 }
 
-impl<S: BosStr> SystemMessageDataLockConvoBuilder<system_message_data_lock_convo_state::Empty, S> {
+impl<
+    S: BosStr,
+> SystemMessageDataLockConvoBuilder<system_message_data_lock_convo_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SystemMessageDataLockConvoBuilder {
@@ -11381,8 +11483,10 @@ where
     pub fn locked_by(
         mut self,
         value: impl Into<convo::SystemMessageReferredUser<S>>,
-    ) -> SystemMessageDataLockConvoBuilder<system_message_data_lock_convo_state::SetLockedBy<St>, S>
-    {
+    ) -> SystemMessageDataLockConvoBuilder<
+        system_message_data_lock_convo_state::SetLockedBy<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         SystemMessageDataLockConvoBuilder {
             _state: PhantomData,
@@ -11418,7 +11522,7 @@ where
 
 pub mod system_message_data_lock_convo_permanently_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11478,12 +11582,10 @@ impl<S: BosStr> SystemMessageDataLockConvoPermanently<S> {
     }
 }
 
-impl
-    SystemMessageDataLockConvoPermanentlyBuilder<
-        system_message_data_lock_convo_permanently_state::Empty,
-        DefaultStr,
-    >
-{
+impl SystemMessageDataLockConvoPermanentlyBuilder<
+    system_message_data_lock_convo_permanently_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SystemMessageDataLockConvoPermanentlyBuilder {
@@ -11494,12 +11596,12 @@ impl
     }
 }
 
-impl<S: BosStr>
-    SystemMessageDataLockConvoPermanentlyBuilder<
-        system_message_data_lock_convo_permanently_state::Empty,
-        S,
-    >
-{
+impl<
+    S: BosStr,
+> SystemMessageDataLockConvoPermanentlyBuilder<
+    system_message_data_lock_convo_permanently_state::Empty,
+    S,
+> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SystemMessageDataLockConvoPermanentlyBuilder {
@@ -11558,7 +11660,7 @@ where
 
 pub mod system_message_data_member_join_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11616,22 +11718,28 @@ pub struct SystemMessageDataMemberJoinBuilder<
 
 impl SystemMessageDataMemberJoin<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> SystemMessageDataMemberJoinBuilder<system_message_data_member_join_state::Empty, DefaultStr>
-    {
+    pub fn new() -> SystemMessageDataMemberJoinBuilder<
+        system_message_data_member_join_state::Empty,
+        DefaultStr,
+    > {
         SystemMessageDataMemberJoinBuilder::new()
     }
 }
 
 impl<S: BosStr> SystemMessageDataMemberJoin<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> SystemMessageDataMemberJoinBuilder<system_message_data_member_join_state::Empty, S> {
+    pub fn builder() -> SystemMessageDataMemberJoinBuilder<
+        system_message_data_member_join_state::Empty,
+        S,
+    > {
         SystemMessageDataMemberJoinBuilder::builder()
     }
 }
 
-impl SystemMessageDataMemberJoinBuilder<system_message_data_member_join_state::Empty, DefaultStr> {
+impl SystemMessageDataMemberJoinBuilder<
+    system_message_data_member_join_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SystemMessageDataMemberJoinBuilder {
@@ -11642,9 +11750,9 @@ impl SystemMessageDataMemberJoinBuilder<system_message_data_member_join_state::E
     }
 }
 
-impl<S: BosStr>
-    SystemMessageDataMemberJoinBuilder<system_message_data_member_join_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> SystemMessageDataMemberJoinBuilder<system_message_data_member_join_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SystemMessageDataMemberJoinBuilder {
@@ -11655,9 +11763,10 @@ impl<S: BosStr>
     }
 }
 
-impl<St: system_message_data_member_join_state::State, S: BosStr>
-    SystemMessageDataMemberJoinBuilder<St, S>
-{
+impl<
+    St: system_message_data_member_join_state::State,
+    S: BosStr,
+> SystemMessageDataMemberJoinBuilder<St, S> {
     /// Set the `approvedBy` field (optional)
     pub fn approved_by(
         mut self,
@@ -11667,7 +11776,10 @@ impl<St: system_message_data_member_join_state::State, S: BosStr>
         self
     }
     /// Set the `approvedBy` field to an Option value (optional)
-    pub fn maybe_approved_by(mut self, value: Option<convo::SystemMessageReferredUser<S>>) -> Self {
+    pub fn maybe_approved_by(
+        mut self,
+        value: Option<convo::SystemMessageReferredUser<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -11682,8 +11794,10 @@ where
     pub fn member(
         mut self,
         value: impl Into<convo::SystemMessageReferredUser<S>>,
-    ) -> SystemMessageDataMemberJoinBuilder<system_message_data_member_join_state::SetMember<St>, S>
-    {
+    ) -> SystemMessageDataMemberJoinBuilder<
+        system_message_data_member_join_state::SetMember<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         SystemMessageDataMemberJoinBuilder {
             _state: PhantomData,
@@ -11702,8 +11816,10 @@ where
     pub fn role(
         mut self,
         value: impl Into<MemberRole<S>>,
-    ) -> SystemMessageDataMemberJoinBuilder<system_message_data_member_join_state::SetRole<St>, S>
-    {
+    ) -> SystemMessageDataMemberJoinBuilder<
+        system_message_data_member_join_state::SetRole<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         SystemMessageDataMemberJoinBuilder {
             _state: PhantomData,
@@ -11744,7 +11860,7 @@ where
 
 pub mod system_message_data_member_leave_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11796,15 +11912,18 @@ impl SystemMessageDataMemberLeave<DefaultStr> {
 
 impl<S: BosStr> SystemMessageDataMemberLeave<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> SystemMessageDataMemberLeaveBuilder<system_message_data_member_leave_state::Empty, S> {
+    pub fn builder() -> SystemMessageDataMemberLeaveBuilder<
+        system_message_data_member_leave_state::Empty,
+        S,
+    > {
         SystemMessageDataMemberLeaveBuilder::builder()
     }
 }
 
-impl
-    SystemMessageDataMemberLeaveBuilder<system_message_data_member_leave_state::Empty, DefaultStr>
-{
+impl SystemMessageDataMemberLeaveBuilder<
+    system_message_data_member_leave_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SystemMessageDataMemberLeaveBuilder {
@@ -11815,9 +11934,9 @@ impl
     }
 }
 
-impl<S: BosStr>
-    SystemMessageDataMemberLeaveBuilder<system_message_data_member_leave_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> SystemMessageDataMemberLeaveBuilder<system_message_data_member_leave_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SystemMessageDataMemberLeaveBuilder {
@@ -11837,8 +11956,10 @@ where
     pub fn member(
         mut self,
         value: impl Into<convo::SystemMessageReferredUser<S>>,
-    ) -> SystemMessageDataMemberLeaveBuilder<system_message_data_member_leave_state::SetMember<St>, S>
-    {
+    ) -> SystemMessageDataMemberLeaveBuilder<
+        system_message_data_member_leave_state::SetMember<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         SystemMessageDataMemberLeaveBuilder {
             _state: PhantomData,
@@ -11874,7 +11995,7 @@ where
 
 pub mod system_message_data_remove_member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -11941,15 +12062,18 @@ impl SystemMessageDataRemoveMember<DefaultStr> {
 
 impl<S: BosStr> SystemMessageDataRemoveMember<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> SystemMessageDataRemoveMemberBuilder<system_message_data_remove_member_state::Empty, S> {
+    pub fn builder() -> SystemMessageDataRemoveMemberBuilder<
+        system_message_data_remove_member_state::Empty,
+        S,
+    > {
         SystemMessageDataRemoveMemberBuilder::builder()
     }
 }
 
-impl
-    SystemMessageDataRemoveMemberBuilder<system_message_data_remove_member_state::Empty, DefaultStr>
-{
+impl SystemMessageDataRemoveMemberBuilder<
+    system_message_data_remove_member_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SystemMessageDataRemoveMemberBuilder {
@@ -11960,9 +12084,12 @@ impl
     }
 }
 
-impl<S: BosStr>
-    SystemMessageDataRemoveMemberBuilder<system_message_data_remove_member_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> SystemMessageDataRemoveMemberBuilder<
+    system_message_data_remove_member_state::Empty,
+    S,
+> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SystemMessageDataRemoveMemberBuilder {
@@ -12046,7 +12173,7 @@ where
 
 pub mod system_message_data_unlock_convo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -12098,15 +12225,18 @@ impl SystemMessageDataUnlockConvo<DefaultStr> {
 
 impl<S: BosStr> SystemMessageDataUnlockConvo<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> SystemMessageDataUnlockConvoBuilder<system_message_data_unlock_convo_state::Empty, S> {
+    pub fn builder() -> SystemMessageDataUnlockConvoBuilder<
+        system_message_data_unlock_convo_state::Empty,
+        S,
+    > {
         SystemMessageDataUnlockConvoBuilder::builder()
     }
 }
 
-impl
-    SystemMessageDataUnlockConvoBuilder<system_message_data_unlock_convo_state::Empty, DefaultStr>
-{
+impl SystemMessageDataUnlockConvoBuilder<
+    system_message_data_unlock_convo_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SystemMessageDataUnlockConvoBuilder {
@@ -12117,9 +12247,9 @@ impl
     }
 }
 
-impl<S: BosStr>
-    SystemMessageDataUnlockConvoBuilder<system_message_data_unlock_convo_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> SystemMessageDataUnlockConvoBuilder<system_message_data_unlock_convo_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SystemMessageDataUnlockConvoBuilder {
@@ -12178,7 +12308,7 @@ where
 
 pub mod system_message_referred_user_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -12220,21 +12350,28 @@ pub struct SystemMessageReferredUserBuilder<
 
 impl SystemMessageReferredUser<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> SystemMessageReferredUserBuilder<system_message_referred_user_state::Empty, DefaultStr> {
+    pub fn new() -> SystemMessageReferredUserBuilder<
+        system_message_referred_user_state::Empty,
+        DefaultStr,
+    > {
         SystemMessageReferredUserBuilder::new()
     }
 }
 
 impl<S: BosStr> SystemMessageReferredUser<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> SystemMessageReferredUserBuilder<system_message_referred_user_state::Empty, S> {
+    pub fn builder() -> SystemMessageReferredUserBuilder<
+        system_message_referred_user_state::Empty,
+        S,
+    > {
         SystemMessageReferredUserBuilder::builder()
     }
 }
 
-impl SystemMessageReferredUserBuilder<system_message_referred_user_state::Empty, DefaultStr> {
+impl SystemMessageReferredUserBuilder<
+    system_message_referred_user_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         SystemMessageReferredUserBuilder {
@@ -12245,7 +12382,9 @@ impl SystemMessageReferredUserBuilder<system_message_referred_user_state::Empty,
     }
 }
 
-impl<S: BosStr> SystemMessageReferredUserBuilder<system_message_referred_user_state::Empty, S> {
+impl<
+    S: BosStr,
+> SystemMessageReferredUserBuilder<system_message_referred_user_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         SystemMessageReferredUserBuilder {
@@ -12265,7 +12404,10 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SystemMessageReferredUserBuilder<system_message_referred_user_state::SetDid<St>, S> {
+    ) -> SystemMessageReferredUserBuilder<
+        system_message_referred_user_state::SetDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         SystemMessageReferredUserBuilder {
             _state: PhantomData,
@@ -12301,7 +12443,7 @@ where
 
 pub mod system_message_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -12374,20 +12516,21 @@ pub mod system_message_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SystemMessageViewBuilder<St: system_message_view_state::State, S: BosStr = DefaultStr> {
+pub struct SystemMessageViewBuilder<
+    St: system_message_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<SystemMessageViewData<S>>,
-        Option<S>,
-        Option<S>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<SystemMessageViewData<S>>, Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl SystemMessageView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SystemMessageViewBuilder<system_message_view_state::Empty, DefaultStr> {
+    pub fn new() -> SystemMessageViewBuilder<
+        system_message_view_state::Empty,
+        DefaultStr,
+    > {
         SystemMessageViewBuilder::new()
     }
 }
@@ -12516,7 +12659,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SystemMessageView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SystemMessageView<S> {
         SystemMessageView {
             data: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),

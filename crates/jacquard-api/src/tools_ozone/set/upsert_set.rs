@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::set::Set;
-use crate::tools_ozone::set::SetView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::set::Set;
+use crate::tools_ozone::set::SetView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpsertSet<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Set<S>,
@@ -30,11 +27,9 @@ pub struct UpsertSet<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpsertSetOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: SetView<S>,
@@ -42,7 +37,9 @@ pub struct UpsertSetOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for tools.ozone.set.upsertSet
+/** Response marker for the `tools.ozone.set.upsertSet` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `UpsertSetOutput<S>` for this endpoint.*/
 pub struct UpsertSetResponse;
 impl jacquard_common::xrpc::XrpcResp for UpsertSetResponse {
     const NSID: &'static str = "tools.ozone.set.upsertSet";
@@ -53,17 +50,21 @@ impl jacquard_common::xrpc::XrpcResp for UpsertSetResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpsertSet<S> {
     const NSID: &'static str = "tools.ozone.set.upsertSet";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpsertSetResponse;
 }
 
-/// Endpoint type for tools.ozone.set.upsertSet
+/** Endpoint marker for the `tools.ozone.set.upsertSet` procedure.
+
+Path: `/xrpc/tools.ozone.set.upsertSet`. The request payload type is `UpsertSet<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct UpsertSetRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpsertSetRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.upsertSet";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpsertSet<S>;
     type Response = UpsertSetResponse;
 }

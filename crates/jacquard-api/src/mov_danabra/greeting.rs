@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Greeting<S: BosStr = DefaultStr> {
     ///Name to greet.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,11 +27,9 @@ pub struct Greeting<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GreetingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -42,7 +37,9 @@ pub struct GreetingOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for mov.danabra.Greeting
+/** Response marker for the `mov.danabra.Greeting` procedure.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GreetingOutput<S>` for this endpoint.*/
 pub struct GreetingResponse;
 impl jacquard_common::xrpc::XrpcResp for GreetingResponse {
     const NSID: &'static str = "mov.danabra.Greeting";
@@ -53,17 +50,21 @@ impl jacquard_common::xrpc::XrpcResp for GreetingResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Greeting<S> {
     const NSID: &'static str = "mov.danabra.Greeting";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GreetingResponse;
 }
 
-/// Endpoint type for mov.danabra.Greeting
+/** Endpoint marker for the `mov.danabra.Greeting` procedure.
+
+Path: `/xrpc/mov.danabra.Greeting`. The request payload type is `Greeting<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GreetingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GreetingRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.Greeting";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Greeting<S>;
     type Response = GreetingResponse;
 }

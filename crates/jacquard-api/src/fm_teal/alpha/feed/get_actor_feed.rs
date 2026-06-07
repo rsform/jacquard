@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::fm_teal::alpha::feed::PlayView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::fm_teal::alpha::feed::PlayView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorFeed<S: BosStr = DefaultStr> {
     pub author_did: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,18 +28,18 @@ pub struct GetActorFeed<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorFeedOutput<S: BosStr = DefaultStr> {
     pub plays: Vec<PlayView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Response type for fm.teal.alpha.feed.getActorFeed
+/** Response marker for the `fm.teal.alpha.feed.getActorFeed` query.
+
+Implements `jacquard_common::xrpc::XrpcResp`; successful bodies decode as `Self::Output<S>`, which is `GetActorFeedOutput<S>` for this endpoint.*/
 pub struct GetActorFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorFeedResponse {
     const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
@@ -57,7 +54,9 @@ impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorFeed<S> {
     type Response = GetActorFeedResponse;
 }
 
-/// Endpoint type for fm.teal.alpha.feed.getActorFeed
+/** Endpoint marker for the `fm.teal.alpha.feed.getActorFeed` query.
+
+Path: `/xrpc/fm.teal.alpha.feed.getActorFeed`. The request payload type is `GetActorFeed<S>`; send that request with `jacquard::Client` or use this marker through lower-level `XrpcEndpoint` APIs.*/
 pub struct GetActorFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorFeedRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getActorFeed";
@@ -68,7 +67,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorFeedRequest {
 
 pub mod get_actor_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
