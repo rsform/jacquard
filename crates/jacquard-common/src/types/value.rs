@@ -708,7 +708,8 @@ impl IntoStatic for RawData<'_> {
 ///
 /// # Example
 /// ```
-/// # use jacquard_common::types::value::{Data, from_data};
+/// # use jacquard_common::{atproto, Data};
+/// # use jacquard_common::types::value::from_data;
 /// # use serde::Deserialize;
 /// #
 /// #[derive(Deserialize)]
@@ -720,8 +721,7 @@ impl IntoStatic for RawData<'_> {
 /// }
 ///
 /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
-/// # let json = serde_json::json!({"text": "hello", "author": "alice"});
-/// # let data = Data::from_json(&json)?;
+/// # let data: Data = atproto!({"text": "hello", "author": "alice"});
 /// let post: Post = from_data(&data)?;
 /// # Ok(())
 /// # }

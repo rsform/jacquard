@@ -1,5 +1,52 @@
 //! `atproto!` macro.
-/// Construct a atproto `Data<'_>` value from a literal.
+
+use crate::{DefaultStr, FromStaticStr, types::value::Data};
+
+/// Hidden conversion hook used by the [`atproto!`] macro.
+#[doc(hidden)]
+pub trait AtprotoMacroLiteral {
+    /// Convert this literal into default-backed AT Protocol data.
+    fn into_atproto_data(self) -> Data;
+}
+
+impl AtprotoMacroLiteral for &'static str {
+    fn into_atproto_data(self) -> Data {
+        Data::String(crate::types::string::AtprotoStr::new(
+            DefaultStr::from_static(self),
+        ))
+    }
+}
+
+macro_rules! impl_atproto_macro_integer_literal {
+    ($($ty:ty),* $(,)?) => {
+        $(
+            impl AtprotoMacroLiteral for $ty {
+                fn into_atproto_data(self) -> Data {
+                    Data::Integer(i64::from(self))
+                }
+            }
+        )*
+    };
+}
+
+macro_rules! impl_atproto_macro_checked_integer_literal {
+    ($($ty:ty),* $(,)?) => {
+        $(
+            impl AtprotoMacroLiteral for $ty {
+                fn into_atproto_data(self) -> Data {
+                    Data::Integer(self.try_into().expect("integer literal exceeds the AT Protocol i64 range"))
+                }
+            }
+        )*
+    };
+}
+
+impl_atproto_macro_integer_literal!(i8, i16, i32, u8, u16, u32);
+impl_atproto_macro_checked_integer_literal!(i64, i128, isize, u64, u128, usize);
+
+/// Construct a default-backed atproto [`Data`] value from a literal.
+///
+/// [`Data`]: crate::types::value::Data
 ///
 /// ```
 /// # use jacquard_common::atproto;
@@ -18,10 +65,10 @@
 ///
 /// Variables or expressions can be interpolated into the ATProto literal. Any type
 /// interpolated into an array element or object value must implement Serde's
-/// `Serialize` trait, while any type interpolated into a object key must
-/// implement `Into<String>`. If the `Serialize` implementation of the
-/// interpolated type decides to fail, or if the interpolated type contains a
-/// map with non-string keys, the `atproto!` macro will panic.
+/// `Serialize` trait, while any type interpolated into an object key must
+/// convert into the default string backing. If the `Serialize` implementation
+/// of the interpolated type decides to fail, or if the interpolated type
+/// contains a map with non-string keys, the `atproto!` macro will panic.
 ///
 /// ```
 /// # use jacquard_common::atproto;
@@ -138,7 +185,7 @@ macro_rules! atproto_internal {
 
     // Insert the current entry followed by trailing comma.
     (@object $object:ident [$($key:tt)+] ($value:expr) , $($rest:tt)*) => {
-        let _ = $object.insert(($($key)+).into(), $value);
+        let _ = $object.insert(atproto_internal_key!($($key)+), $value);
         atproto_internal!(@object $object () ($($rest)*) ($($rest)*));
     };
 
@@ -149,7 +196,7 @@ macro_rules! atproto_internal {
 
     // Insert the last entry without trailing comma.
     (@object $object:ident [$($key:tt)+] ($value:expr)) => {
-        let _ = $object.insert(($($key)+).into(), $value);
+        let _ = $object.insert(atproto_internal_key!($($key)+), $value);
     };
 
     // Next value is `null`.
@@ -230,42 +277,48 @@ macro_rules! atproto_internal {
     //////////////////////////////////////////////////////////////////////////
 
     (null) => {
-        $crate::types::value::Data::Null
+        $crate::types::value::Data::<$crate::DefaultStr>::Null
     };
 
     (true) => {
-        $crate::types::value::Data::Boolean(true)
+        $crate::types::value::Data::<$crate::DefaultStr>::Boolean(true)
     };
 
     (false) => {
-        $crate::types::value::Data::Boolean(false)
+        $crate::types::value::Data::<$crate::DefaultStr>::Boolean(false)
     };
 
     ([]) => {
-        $crate::types::value::Data::Array($crate::types::value::Array(atproto_internal_vec![]))
+        $crate::types::value::Data::<$crate::DefaultStr>::Array($crate::types::value::Array(atproto_internal_vec![]))
     };
 
     ([ $($tt:tt)+ ]) => {
-        $crate::types::value::Data::Array($crate::types::value::Array(atproto_internal!(@array [] $($tt)+)))
+        $crate::types::value::Data::<$crate::DefaultStr>::Array($crate::types::value::Array(atproto_internal!(@array [] $($tt)+)))
     };
 
     ({}) => {
-        $crate::types::value::Data::Object($crate::types::value::Object(::std::collections::BTreeMap::new()))
+        $crate::types::value::Data::<$crate::DefaultStr>::Object($crate::types::value::Object(::std::collections::BTreeMap::new()))
     };
 
     ({ $($tt:tt)+ }) => {
-        $crate::types::value::Data::Object($crate::types::value::Object({
+        $crate::types::value::Data::<$crate::DefaultStr>::Object($crate::types::value::Object({
             let mut object = ::std::collections::BTreeMap::new();
             atproto_internal!(@object object () ($($tt)+) ($($tt)+));
             object
         }))
     };
 
-    // Any Serialize type: numbers, strings, struct literals, variables etc.
+    // Literal values go through a helper so string literals can use static
+    // storage while integer literals remain integers.
+    ($literal:literal) => {
+        $crate::macros::AtprotoMacroLiteral::into_atproto_data($literal)
+    };
+
+    // Any Serialize type: variables, struct literals, dynamic strings etc.
     // Must be below every other rule.
     ($other:expr) => {
         {
-            $crate::types::value::Data::from($other)
+            $crate::types::value::Data::<$crate::DefaultStr>::from($other)
         }
     };
 }
@@ -283,6 +336,58 @@ macro_rules! atproto_internal_vec {
 
 #[macro_export]
 #[doc(hidden)]
+macro_rules! atproto_internal_key {
+    ($key:literal) => {
+        <$crate::DefaultStr as $crate::FromStaticStr>::from_static($key)
+    };
+
+    ($key:expr) => {
+        ($key).into()
+    };
+}
+
+#[macro_export]
+#[doc(hidden)]
 macro_rules! atproto_unexpected {
     () => {};
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{DefaultStr, types::value::Data};
+
+    const LONG_KEY: &str = "a-static-key-that-is-longer-than-inline-capacity";
+    const LONG_VALUE: &str = "a static string value that is longer than inline capacity";
+
+    #[test]
+    fn string_literals_use_static_default_backing() {
+        let value = atproto!({
+            "a-static-key-that-is-longer-than-inline-capacity":
+                "a static string value that is longer than inline capacity"
+        });
+
+        let Data::Object(object) = value else {
+            panic!("expected object");
+        };
+        let (key, value) = object.0.iter().next().expect("object has one field");
+
+        assert_eq!(key.as_str(), LONG_KEY);
+        assert!(!key.is_heap_allocated());
+
+        let Data::String(string) = value else {
+            panic!("expected string value");
+        };
+        assert_eq!(string.as_str(), LONG_VALUE);
+        if let crate::types::string::AtprotoStr::String(backing) = string {
+            assert!(!backing.is_heap_allocated());
+        } else {
+            panic!("test value should not be inferred as a richer atproto string type");
+        }
+    }
+
+    #[test]
+    fn macro_result_defaults_to_default_backing_without_context() {
+        let value = atproto!(["hello", 200, true, null]);
+        let _: Data<DefaultStr> = value;
+    }
 }

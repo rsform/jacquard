@@ -67,8 +67,8 @@
 //!     const NSID: &'static str;
 //!     /// Output encoding (MIME type)
 //!     const ENCODING: &'static str;
-//!     type Output<'de>: Deserialize<'de> + IntoStatic;
-//!     type Err<'de>: Error + Deserialize<'de> + IntoStatic;
+//!     type Output<S: BosStr>;
+//!     type Err: Error + Serialize + DeserializeOwned;
 //! }
 //! ```
 //! Here are the implementations for [`GetTimeline`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/get_timeline.rs). You'll also note that `send()` doesn't return the fully decoded response on success. It returns a Response struct which has a generic parameter that must implement the XrpcResp trait above. Here's its definition. It's essentially just a cheaply cloneable byte buffer and a type marker.
@@ -81,116 +81,67 @@
 //! }
 //!
 //! impl<R: XrpcResp> Response<R> {
-//!     pub fn parse<'s>(
-//!         &'s self
-//!     ) -> Result<<Resp as XrpcResp>::Output<'s>, XrpcError<<Resp as XrpcResp>::Err<'s>>> {
-//!         // Borrowed parsing into Output or Err
+//!     pub fn parse<'s, S>(&'s self) -> Result<R::Output<S>, XrpcError<R::Err>>
+//!     where
+//!         S: BosStr + Deserialize<'s>,
+//!         R::Output<S>: Deserialize<'s>,
+//!     {
+//!         // Parse with the caller's chosen string backing.
 //!     }
-//!     pub fn into_output(
-//!         self
-//!     ) -> Result<<Resp as XrpcResp>::Output<'static>, XrpcError<<Resp as XrpcResp>::Err<'static>>>
-//!     where ...
-//!     {  /* Owned parsing into Output or Err */  }
+//!     pub fn into_output(self) -> Result<R::Output<SmolStr>, XrpcError<R::Err>>
+//!     where
+//!         R::Output<SmolStr>: DeserializeOwned,
+//!     {
+//!         // Parse into owned/default-backed output.
+//!     }
 //! }
 //! ```
-//! You decode the response (or the endpoint-specific error) out of this, borrowing from the buffer or taking ownership so you can drop the buffer. There are two reasons for this. One is separation of concerns. By two-staging the parsing, it's easier to distinguish network and authentication problems from application-level errors. The second is lifetimes and borrowed deserialization.
+//! You decode the response (or the endpoint-specific error) out of this when you are ready. There
+//! are two reasons for this. One is separation of concerns: by two-staging the parsing, it is easier
+//! to distinguish network and authentication problems from application-level errors. The second is
+//! string backing: callers can choose ordinary owned output or explicit borrowed parsing.
 //!
-//! ## Working with Lifetimes and Zero-Copy Deserialization
+//! ## String backing, borrowing, and response parsing
 //!
-//! Jacquard is designed around zero-copy/borrowed deserialization: types like [`Post<'a>`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/post.rs) can borrow strings and other data directly from the response buffer instead of allocating owned copies. This is great for performance, but it creates some interesting challenges, especially in async contexts. So how do you specify the lifetime of the borrow?
+//! Most generated output types are parameterized over a string backing type: `Output<S: BosStr>`.
+//! The usual path is owned output:
 //!
-//! The naive approach would be to put a lifetime parameter on the trait itself:
+//! ```ignore
+//! let output = response.into_output()?;
+//! ```
 //!
-//!```ignore
-//!// This looks reasonable but creates problems in generic/async contexts
-//!trait NaiveXrpcRequest<'de> {
-//!    type Output: Deserialize<'de>;
-//!    // ...
-//!}
-//!```
+//! `into_output()` parses into `SmolStr`-backed output. This is the convenient default when values
+//! need to be stored, moved independently of the response buffer, or passed through frameworks and
+//! APIs that require `DeserializeOwned`.
 //!
-//! This looks reasonable until you try to use it in a generic context. If you have a function that works with *any* lifetime, you need a Higher-ranked trait bound:
+//! When you specifically want to borrow from the response buffer, choose a borrowed or
+//! borrow-or-own backing at parse time:
 //!
-//!```ignore
-//!fn parse<R>(response: &[u8]) ... // return type
-//!where
-//!    R: for<'any> XrpcRequest<'any>
-//!{ /*  deserialize from response... */  }
-//!```
+//! ```ignore
+//! let output = response.parse::<CowStr<'_>>()?;
+//! let output = response.parse::<&str>()?;
+//! ```
 //!
-//! The `for<'any>` bound says "this type must implement `XrpcRequest` for *every possible lifetime*", which, for `Deserialize`, is effectively the same as requiring `DeserializeOwned`. You've probably just thrown away your zero-copy optimization, and furthermore that trait bound just straight-up won't work on most of the types in Jacquard. The vast majority of them have either a custom Deserialize implementation which will borrow if it can, a `#[serde(borrow)]` attribute on one or more fields, or an equivalent lifetime bound attribute, associated with the Deserialize derive macro. You will get "Deserialize implementation not general enough" if you try. And no, you cannot have an additional deserialize implementation for the `'static` lifetime due to how serde works.
+//! Borrowed output works fine across async code as long as the value remains tied to the
+//! buffer-owning `Response`. The `.send()` method itself can stay lifetime-free because it returns
+//! that buffer-owning response, and the caller decides whether to parse into owned data or borrow
+//! from the buffer.
 //!
-//! If you instead try something like the below function signature and specify a specific lifetime, it will compile in isolation, but when you go to use it, the Rust compiler will not generally be able to figure out the lifetimes at the call site, and will complain about things being dropped while still borrowed, even if you convert the response to an owned/ `'static` lifetime version of the type.
+//! `XrpcResp` stays lifetime-free too. Its success output is a GAT over the backing string type,
+//! and its error type is a plain owned type:
 //!
-//!```ignore
-//!fn parse<'s, R: XrpcRequest<'s>>(response: &'s [u8]) ... // return type with the same lifetime
-//!{ /*  deserialize from response... */  }
-//!```
+//! ```ignore
+//! pub trait XrpcResp {
+//!     const NSID: &'static str;
+//!     const ENCODING: &'static str;
+//!     type Output<S: BosStr>;
+//!     type Err: Error + Serialize + DeserializeOwned;
+//! }
+//! ```
 //!
-//! It gets worse with async. If you want to return borrowed data from an async method, where does the lifetime come from? The response buffer needs to outlive the borrow, but the buffer is consumed or potentially has to have an unbounded lifetime. You end up with confusing and frustrating errors because the compiler can't prove the buffer will stay alive or that you have taken ownership of the parts of it you care about. You *could* do some lifetime laundering with `unsafe`, but that road leads to potential soundness issues, and besides, you don't actually *need* to tell `rustc` to "trust me, bro", you can, with some cleverness, explain this to the compiler in a way that it can reason about perfectly well.
-//!
-//! ### Explaining where the buffer goes to `rustc`
-//!
-//! The fix is to use Generic Associated Types (GATs) on the trait's associated types, while keeping the trait itself lifetime-free:
-//!
-//!```ignore
-//!pub trait XrpcResp {
-//!    const NSID: &'static str;
-//!    /// Output encoding (MIME type)
-//!    const ENCODING: &'static str;
-//!    type Output<'de>: Deserialize<'de> + IntoStatic;
-//!    type Err<'de>: Error + Deserialize<'de> + IntoStatic;
-//!}
-//!```
-//!
-//!Now you can write trait bounds without HRTBs, and with lifetime bounds that are actually possible for Jacquard's borrowed deserializing types to meet:
-//!
-//!```ignore
-//!fn parse<'s, R: XrpcResp>(response: &'s [u8]) /* return type with same lifetime */ {
-//!    // Compiler can pick a concrete lifetime for R::Output<'_> or have it specified easily
-//!}
-//!```
-//!
-//!Methods that need lifetimes use method-level generic parameters:
-//!
-//!```ignore
-//!// This is part of a trait from jacquard itself, used to genericize updates to things like the Bluesky
-//!// preferences union, so that if you implement a similar lexicon type in your app, you don't have
-//!// to special-case it. Instead you can do a relatively simple trait implementation and then call
-//!// .update_vec() with a modifier function or .update_vec_item() with a single item you want to set.
-//
-//!pub trait VecUpdate {
-//!    type GetRequest: XrpcRequest;
-//!    type PutRequest: XrpcRequest;
-//!    //... more stuff
-//
-//!    //Method-level lifetime, GAT on response type
-//!    fn extract_vec<'s>(
-//!        output: <<Self::GetRequest as XrpcRequest>::Response as XrpcResp>::Output<'s>
-//!    ) -> Vec<Self::Item>;
-//!    //... more stuff
-//!}
-//!```
-//!
-//!The compiler can monomorphize for concrete lifetimes instead of trying to prove bounds hold for *all* lifetimes at once, or struggle to figure out when you're done with a buffer. `XrpcResp` being separate and lifetime-free lets async methods like `.send()` return a `Response` that owns the response buffer, and then the *caller* decides the lifetime strategy:
-//!
-//!```ignore
-//!// Zero-copy: borrow from the owned buffer
-//!let output: R::Output<'_> = response.parse()?;
-//
-//!// Owned: convert to 'static via IntoStatic
-//!let output: R::Output<'static> = response.into_output()?;
-//!```
-//!
-//! The async method doesn't need to know or care about lifetimes for the most part - it just returns the `Response`. The caller gets full control over whether to use borrowed or owned data. It can even decide after the fact that it doesn't want to parse out the API response type that it asked for. Instead it can call `.parse_data()` or `.parse_raw()` on the response to get loosely typed, validated data or minimally typed maximally accepting data values out.
-//!
-//! When you see types like `Response<R: XrpcResp>` or methods with lifetime parameters,
-//! this is the pattern at work. It looks a bit funky, but it's solving a specific problem
-//! in a way that doesn't require unsafe code or much actual work from you, if you're using it.
-//! It's also not too bad to write, once you're aware of the pattern and why it works. If you run
-//! into a lifetime/borrowing inference issue in jacquard, please contact the crate author. She'd
-//! be happy to debug, and if it's using a method from one of the jacquard crates and seems like
-//! it *should* just work, that is a bug in jacquard, and you should [file an issue](https://tangled.org/nonbinary.computer/jacquard/).
+//! Keeping endpoint errors owned avoids lifetime gymnastics on the unhappy path. If you do not want
+//! to parse the endpoint-specific success type, `Response` also supports `.parse_data()` and
+//! `.parse_raw()` for loosely typed atproto data.
 
 #![no_std]
 #![warn(missing_docs)]

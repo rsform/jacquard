@@ -469,15 +469,15 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
 /// # #[tokio::main]
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// use jacquard_common::xrpc::XrpcExt;
-/// use jacquard_common::{AuthorizationToken, CowStr};
+/// use jacquard_common::AuthorizationToken;
 /// use jacquard_common::deps::fluent_uri::Uri;
 ///
 /// let http = reqwest::Client::new();
-/// let base = Uri::parse("https://public.api.bsky.app").unwrap().to_owned();
+/// let base = Uri::parse("https://public.api.bsky.app").unwrap();
 /// let call = http
 ///     .xrpc(base)
-///     .auth(AuthorizationToken::Bearer(CowStr::from("ACCESS_JWT")))
-///     .accept_labelers(vec![CowStr::from("did:plc:labelerid")])
+///     .auth(AuthorizationToken::Bearer("ACCESS_JWT".into()))
+///     .accept_labelers(vec!["did:plc:labelerid".into()])
 ///     .header(http::header::USER_AGENT, http::HeaderValue::from_static("jacquard-example"));
 /// // let resp = call.send(&request).await?;
 /// # Ok(())

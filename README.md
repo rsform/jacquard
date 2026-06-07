@@ -6,7 +6,7 @@ A suite of Rust crates intended to make it much easier to get started with atpro
 
 [Jacquard is simpler](https://alpha.weaver.sh/nonbinary.computer/jacquard/jacquard_magic) because it is designed in a way which makes things simple that almost every other atproto library seems to make difficult.
 
-It is also designed around zero-copy/borrowed deserialization: types like [`Post<'_>`](https://tangled.org/nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/app_bsky/feed/post.rs) can borrow data (via the [`CowStr<'_>`](https://docs.rs/jacquard/latest/jacquard/cowstr/enum.CowStr.html) type and a host of other types built on top of it) directly from the response buffer instead of allocating owned copies. Owned versions are themselves mostly inlined or reference-counted pointers and are therefore still quite efficient. The `IntoStatic` trait (which is derivable) makes it easy to get an owned version and avoid worrying about lifetimes.
+Jacquard generated types are generic over their string backing, but ordinary client code can usually ignore that detail. Use the generated request builders, pass normal strings, and call `.send(...).into_output()?` to get owned output that is easy to store, move independently of the response buffer, and pass through frameworks or APIs that require `DeserializeOwned`. If you need tighter control later, Jacquard still supports borrowing and zero-copy parsing with backing types such as `&str` and `CowStr<'_>`.
 
 
 ## Features
@@ -26,50 +26,46 @@ It is also designed around zero-copy/borrowed deserialization: types like [`Post
 
 ## Example
 
-Dead simple API client. Logs in with OAuth and prints the latest 5 posts from your timeline.
+Dead simple API client. Resumes a stored OAuth session or opens a browser login, then prints the latest 5 posts from your timeline. This is the default path for local scripts and CLIs where browser login is acceptable; app-password credential sessions are mainly for unattended workflows that must re-authenticate non-interactively.
 
 ```rust
-// Note: this requires the `loopback` feature enabled (it is currently by default)
-use clap::Parser;
-use jacquard::CowStr;
+// Note: this requires the `loopback` feature enabled (it is currently by default).
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::client::{Agent, FileAuthStore};
+use jacquard::common::session::SessionHint;
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
-use jacquard::types::xrpc::XrpcClient;
+use jacquard::oauth::types::AuthorizeOptions;
+use jacquard::xrpc::XrpcClient;
 use miette::IntoDiagnostic;
 
-#[derive(Parser, Debug)]
-#[command(author, version, about = "Jacquard - OAuth (DPoP) loopback demo")]
-struct Args {
-    /// Handle (e.g., alice.bsky.social), DID, or PDS URL
-    input: CowStr<'static>,
-
-    /// Path to auth store file (will be created if missing)
-    #[arg(long, default_value = "/tmp/jacquard-oauth-session.json")]
-    store: String,
-}
+const STORE_PATH: &str = "/tmp/jacquard-oauth-session.json";
 
 #[tokio::main]
 async fn main() -> miette::Result<()> {
-    let args = Args::parse();
+    let login_hint = std::env::args().nth(1);
+    let oauth = OAuthClient::with_default_config(FileAuthStore::new(STORE_PATH));
+    let hint = SessionHint::from_optional_input(login_hint.as_deref());
 
-    // Build an OAuth client with file-backed auth store and default localhost config
-    let oauth = OAuthClient::with_default_config(FileAuthStore::new(&args.store));
-    // Authenticate with a PDS, using a loopback server to handle the callback flow
-    let session = oauth
-        .login_with_local_server(
-            args.input.clone(),
-            Default::default(),
+    let Some(session) = oauth
+        .resume_or_login_with_local_server(
+            &hint,
+            AuthorizeOptions::default(),
             LoopbackConfig::default(),
         )
-        .await?;
-    // Wrap in Agent and fetch the timeline
+        .await?
+    else {
+        miette::bail!(
+            "no stored OAuth session found in {STORE_PATH}; pass a handle, DID, or PDS URL to log in"
+        );
+    };
+
     let agent: Agent<_> = Agent::from(session);
     let timeline = agent
-        .send(&GetTimeline::new().limit(5).build())
+        .send(GetTimeline::new().limit(5).build())
         .await?
         .into_output()?;
+
     for (i, post) in timeline.feed.iter().enumerate() {
         println!("\n{}. by {}", i + 1, post.post.author.handle);
         println!(
@@ -80,7 +76,6 @@ async fn main() -> miette::Result<()> {
 
     Ok(())
 }
-
 ```
 
 If you have `just` installed, you can run the [examples](https://tangled.org/nonbinary.computer/jacquard/tree/main/examples) using `just example {example-name} {ARGS}` or `just examples` to see what's available.

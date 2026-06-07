@@ -144,7 +144,7 @@ impl BasicClient {
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// let client = BasicClient::unauthenticated();
-    /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.feed.post/3l5abc").unwrap();
+    /// let uri: AtUri = AtUri::new_static("at://did:plc:xyz/app.bsky.feed.post/3l5abc").unwrap();
     /// let response = client.get_record::<Post, _>(&uri).await?;
     /// # Ok(())
     /// # }
@@ -655,7 +655,7 @@ type VecUpdatePutError<U> =
 ///
 /// // Read it back
 /// let response = agent.get_record::<Post, _>(&output.uri).await?;
-/// let record = response.parse()?;
+/// let record = response.into_output()?;
 /// println!("Post: {}", record.value.text);
 /// # Ok(())
 /// # }
@@ -744,7 +744,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// Get a record from the repository using an at:// URI.
     ///
     /// Returns a typed `Response` that deserializes directly to the record type.
-    /// Use `.parse()` to borrow from the response buffer, or `.into_output()` for owned data.
+    /// Use `.into_output()` for owned data, or `.parse::<S>()` to choose another string backing.
     ///
     /// # Example
     ///
@@ -752,18 +752,20 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// # use jacquard::client::BasicClient;
     /// # use jacquard_api::app_bsky::feed::post::Post;
     /// # use jacquard_common::types::string::AtUri;
-    /// # use jacquard_common::IntoStatic;
+    /// # use jacquard_common::CowStr;
     /// use jacquard::client::AgentSessionExt;
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let agent: BasicClient = todo!();
-    /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.feed.post/3l5bqm7lepk2c").unwrap();
+    /// let uri: AtUri = AtUri::new_static("at://did:plc:xyz/app.bsky.feed.post/3l5bqm7lepk2c").unwrap();
     /// let response = agent.get_record::<Post, _>(&uri).await?;
-    /// let output = response.parse()?;  // PostGetRecordOutput<'_> borrowing from buffer
+    /// let output = response.into_output()?;
     /// println!("Post text: {}", output.value.text);
     ///
-    /// // Or get owned data
-    /// let output_owned = response.into_output()?;
+    /// // Or choose borrowed parsing explicitly.
+    /// let response = agent.get_record::<Post, _>(&uri).await?;
+    /// let borrowed = response.parse::<CowStr<'_>>()?;
+    /// let borrowed_strs = response.parse::<&str>()?;
     /// # Ok(())
     /// # }
     /// ```
@@ -945,17 +947,16 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// ```no_run
     /// # use jacquard::client::BasicClient;
     /// # use jacquard_api::app_bsky::actor::profile::Profile;
-    /// # use jacquard_common::CowStr;
     /// # use jacquard_common::types::string::AtUri;
     /// use jacquard::client::AgentSessionExt;
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let agent: BasicClient = todo!();
-    /// let uri = AtUri::new_static("at://did:plc:xyz/app.bsky.actor.profile/self").unwrap();
+    /// let uri: AtUri = AtUri::new_static("at://did:plc:xyz/app.bsky.actor.profile/self").unwrap();
     /// // Update profile record in-place
     /// agent.update_record::<Profile, _>(&uri, |profile| {
-    ///     profile.display_name = Some(CowStr::from("New Name"));
-    ///     profile.description = Some(CowStr::from("Updated bio"));
+    ///     profile.display_name = Some("New Name".into());
+    ///     profile.description = Some("Updated bio".into());
     /// }).await?;
     /// # Ok(())
     /// # }
@@ -1124,7 +1125,7 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let agent: BasicClient = todo!();
     /// let data = std::fs::read("image.png")?;
-    /// let mime_type = MimeType::new_static("image/png");
+    /// let mime_type = MimeType::new("image/png");
     /// let blob_ref = agent.upload_blob(data, mime_type).await?;
     /// # Ok(())
     /// # }
@@ -1274,7 +1275,7 @@ where
         async move {
             CredentialSession::<S, T, W>::session_info(self)
                 .await
-                // Convert the SmolStr session id to CowStr<'static>.
+                // The session id is already owned as SmolStr.
                 .map(|key| (key.did, Some(key.session_id)))
         }
     }
@@ -1305,7 +1306,7 @@ where
     fn session_info(&self) -> impl Future<Output = Option<(Did, Option<SmolStr>)>> {
         async {
             let (did, sid) = OAuthSession::<T, S, W>::session_info(self).await;
-            // did is already Did<SmolStr>; convert SmolStr sid to CowStr<'static>.
+            // Both the DID and session id are already owned.
             Some((did, Some(sid)))
         }
     }
