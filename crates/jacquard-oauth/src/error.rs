@@ -107,6 +107,10 @@ pub enum CallbackError {
     #[error("timeout")]
     #[diagnostic(code(jacquard_oauth::callback::timeout))]
     Timeout,
+    /// The local loopback callback server could not start or accept callbacks.
+    #[error("loopback callback server error: {0}")]
+    #[diagnostic(code(jacquard_oauth::callback::loopback_server))]
+    LoopbackServer(String),
     /// An error occurred resolving permission sets during session creation.
     #[cfg(feature = "scope-check")]
     #[error("scope resolution failed: {detail}")]

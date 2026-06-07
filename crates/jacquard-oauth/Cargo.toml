@@ -14,7 +14,7 @@ license.workspace = true
 
 [features]
 default = []
-loopback = ["dep:rouille"]
+loopback = []
 browser-open = ["dep:webbrowser"]
 tracing = ["dep:tracing"]
 websocket = ["jacquard-common/websocket"]
@@ -52,9 +52,8 @@ webbrowser = { version = "1", optional = true }
 tracing = { workspace = true, optional = true }
 smallvec.workspace = true
 
-[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-tokio = { workspace = true, features = ["rt", "net", "time"] }
-rouille = { version = "3.6.2", optional = true }
+[target.'cfg(not(all(target_arch = "wasm32", target_os = "unknown")))'.dependencies]
+tokio = { workspace = true, features = ["rt", "net", "time", "io-util"] }
 
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

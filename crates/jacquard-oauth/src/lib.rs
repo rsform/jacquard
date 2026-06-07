@@ -78,5 +78,8 @@ pub mod utils;
 pub const FALLBACK_ALG: &str = "ES256";
 
 /// Loopback server helpers for the local redirect-based OAuth flow.
-#[cfg(feature = "loopback")]
+#[cfg(all(
+    feature = "loopback",
+    not(all(target_arch = "wasm32", target_os = "unknown"))
+))]
 pub mod loopback;

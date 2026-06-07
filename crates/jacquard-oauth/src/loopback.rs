@@ -43,7 +43,10 @@
 //! ```
 //!
 //!
-#![cfg(feature = "loopback")]
+#![cfg(all(
+    feature = "loopback",
+    not(all(target_arch = "wasm32", target_os = "unknown"))
+))]
 use crate::{
     atproto::AtprotoClientMetadata,
     authstore::{ClientAuthStore, OAuthSessionMatch},
@@ -57,10 +60,13 @@ use jacquard_common::IntoStatic;
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::session::{SessionHint, SessionSelector, SessionStoreError};
 use jacquard_common::types::{did::Did, string::Handle};
-use rouille::Server;
-use smol_str::{SmolStr, ToSmolStr};
+use smol_str::SmolStr;
 use std::net::SocketAddr;
-use tokio::sync::mpsc;
+use tokio::{
+    io::{AsyncBufReadExt, AsyncWriteExt, BufReader},
+    net::{TcpListener, TcpStream, ToSocketAddrs},
+    sync::{mpsc, oneshot},
+};
 
 fn oauth_hint_from_input(input: &str) -> SessionHint<SmolStr> {
     if let Ok(did) = Did::new(input) {
@@ -118,32 +124,62 @@ pub fn try_open_in_browser(_url: &str) -> bool {
     false
 }
 
-fn create_callback_router(
-    request: &rouille::Request,
-    tx: mpsc::Sender<CallbackParams>,
-) -> rouille::Response {
-    rouille::router!(request,
-            (GET) (/oauth/callback) => {
-                let state = request.get_param("state").unwrap();
-                let code = request.get_param("code").unwrap();
-                let iss = request.get_param("iss").unwrap();
-                let callback_params = CallbackParams {
-                    state: Some(state.to_smolstr()),
-                    code: code.to_smolstr(),
-                    iss: Some(iss.to_smolstr()),
-                };
-                tx.try_send(callback_params).unwrap();
-                rouille::Response::text("Logged in!")
-            },
-            _ => rouille::Response::empty_404()
-    )
+async fn handle_callback_connection(mut stream: TcpStream, tx: mpsc::Sender<CallbackParams>) {
+    let Some(Some(params)) = read_callback_params(&mut stream).await else {
+        let _ = write_http_response(&mut stream, 404, "Not found").await;
+        return;
+    };
+
+    match tx.try_send(params) {
+        Ok(()) => {
+            let _ = write_http_response(&mut stream, 200, "Logged in!").await;
+        }
+        Err(_) => {
+            let _ = write_http_response(&mut stream, 500, "Could not deliver OAuth callback").await;
+        }
+    }
+}
+
+async fn read_callback_params(stream: &mut TcpStream) -> Option<Option<CallbackParams>> {
+    let mut reader = BufReader::new(stream);
+    let mut request_line = String::new();
+    reader.read_line(&mut request_line).await.ok()?;
+    let mut parts = request_line.split_whitespace();
+    let method = parts.next()?;
+    let target = parts.next()?;
+    if method != "GET" {
+        return Some(None);
+    }
+    let (path, query) = target.split_once('?').unwrap_or((target, ""));
+    if path != "/oauth/callback" {
+        return Some(None);
+    }
+    serde_html_form::from_str(query).ok().map(Some)
+}
+
+async fn write_http_response(
+    stream: &mut TcpStream,
+    status: u16,
+    body: &str,
+) -> std::io::Result<()> {
+    let reason = match status {
+        200 => "OK",
+        404 => "Not Found",
+        500 => "Internal Server Error",
+        _ => "OK",
+    };
+    let response = format!(
+        "HTTP/1.1 {status} {reason}\r\ncontent-type: text/plain; charset=utf-8\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{}",
+        body.len(),
+        body
+    );
+    stream.write_all(response.as_bytes()).await
 }
 
 /// Handle to a running loopback callback server, used to await the OAuth redirect.
 pub struct CallbackHandle {
-    #[allow(dead_code)]
-    server_handle: std::thread::JoinHandle<()>,
-    server_stop: std::sync::mpsc::Sender<()>,
+    server_handle: tokio::task::JoinHandle<()>,
+    server_stop: oneshot::Sender<()>,
     callback_rx: mpsc::Receiver<CallbackParams>,
 }
 
@@ -155,19 +191,57 @@ pub struct CallbackHandle {
 ///
 /// Use in combination with [`handle_localhost_callback`] to handle the
 /// callback for the localhost loopback server.
-pub fn one_shot_server(addr: SocketAddr) -> (SocketAddr, CallbackHandle) {
+pub async fn one_shot_server(
+    addr: impl ToSocketAddrs,
+) -> std::io::Result<(SocketAddr, CallbackHandle)> {
     let (tx, callback_rx) = mpsc::channel(5);
-    let server = Server::new(addr, move |request| {
-        create_callback_router(request, tx.clone())
-    })
-    .expect("Could not start server");
-    let (server_handle, server_stop) = server.stoppable();
+    let listener = TcpListener::bind(addr).await?;
+    let local_addr = listener.local_addr()?;
+    let (server_stop, mut stop_rx) = oneshot::channel();
+    let server_handle = tokio::spawn(async move {
+        loop {
+            tokio::select! {
+                _ = &mut stop_rx => break,
+                accepted = listener.accept() => {
+                    match accepted {
+                        Ok((stream, _)) => {
+                            tokio::spawn(handle_callback_connection(stream, tx.clone()));
+                        }
+                        Err(_) => break,
+                    }
+                }
+            }
+        }
+    });
     let handle = CallbackHandle {
         server_handle,
         server_stop,
         callback_rx,
     };
-    (addr, handle)
+    Ok((local_addr, handle))
+}
+
+async fn wait_for_callback(
+    handle: CallbackHandle,
+    timeout_ms: u64,
+) -> Result<CallbackParams, OAuthError> {
+    let CallbackHandle {
+        server_handle,
+        server_stop,
+        mut callback_rx,
+    } = handle;
+    let cb = tokio::time::timeout(
+        std::time::Duration::from_millis(timeout_ms),
+        callback_rx.recv(),
+    )
+    .await;
+    let _ = server_stop.send(());
+    let _ = server_handle.await;
+    if let Ok(Some(cb)) = cb {
+        Ok(cb)
+    } else {
+        Err(OAuthError::Callback(CallbackError::Timeout))
+    }
 }
 
 /// Handles the OAuth callback for the localhost loopback server.
@@ -187,21 +261,9 @@ where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
     S: ClientAuthStore + Send + Sync + 'static,
 {
-    // Await callback or timeout
-    let mut callback_rx = handle.callback_rx;
-    let cb = tokio::time::timeout(
-        std::time::Duration::from_millis(cfg.timeout_ms),
-        callback_rx.recv(),
-    )
-    .await;
-    // trigger shutdown
-    let _ = handle.server_stop.send(());
-    if let Ok(Some(cb)) = cb {
-        // Handle callback and create a session
-        Ok(flow_client.callback(cb).await?)
-    } else {
-        Err(OAuthError::Callback(CallbackError::Timeout))
-    }
+    Ok(flow_client
+        .callback(wait_for_callback(handle, cfg.timeout_ms).await?)
+        .await?)
 }
 
 /// Handles the OAuth callback for the localhost loopback server.
@@ -226,83 +288,56 @@ where
         + 'static,
     S: ClientAuthStore + Send + Sync + 'static,
 {
-    // Await callback or timeout
-    let mut callback_rx = handle.callback_rx;
-    let cb = tokio::time::timeout(
-        std::time::Duration::from_millis(cfg.timeout_ms),
-        callback_rx.recv(),
-    )
-    .await;
-    // trigger shutdown
-    let _ = handle.server_stop.send(());
-    if let Ok(Some(cb)) = cb {
-        // Handle callback and create a session
-        Ok(flow_client.callback(cb).await?)
-    } else {
-        Err(OAuthError::Callback(CallbackError::Timeout))
+    Ok(flow_client
+        .callback(wait_for_callback(handle, cfg.timeout_ms).await?)
+        .await?)
+}
+
+fn loopback_port(cfg: &LoopbackConfig) -> u16 {
+    match cfg.port {
+        LoopbackPort::Fixed(port) => port,
+        LoopbackPort::Ephemeral => 0,
     }
 }
 
-#[cfg(not(feature = "scope-check"))]
+fn redirect_host(host: &str) -> String {
+    if host.contains(':') && !host.starts_with('[') {
+        format!("[{host}]")
+    } else {
+        host.to_owned()
+    }
+}
+
 impl<T, S> OAuthClient<T, S>
 where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
     S: ClientAuthStore + Send + Sync + 'static,
 {
-    /// Drive the full OAuth flow using a local loopback server.
-    ///
-    /// This uses localhost OAuth and an ephemeral in-process web server to
-    /// handle the OAuth callback redirect. It has a bunch of nice friendly
-    /// defaults to help you get started and will basically drive the *entire*
-    /// callback flow itself.
-    ///
-    /// Best used for development and for small CLI applications that don't
-    /// require long session lengths. For long-running unattended sessions,
-    /// app passwords (via CredentialSession in the jacquard crate) remain
-    /// the best option. For more complex OAuth, or if you want more control
-    /// over the process, use the other methods on OAuthClient.
-    ///
-    /// 'input' parameter is what you type in the login box (usually, your handle)
-    /// for it to look up your PDS and redirect to its authentication interface.
-    ///
-    /// If the `browser-open` feature is enabled, this will open a web browser
-    /// for you to authenticate with your PDS. It will also print the
-    /// callback url to the console for you to copy.
-    pub async fn login_with_local_server(
+    async fn start_loopback_flow(
         &self,
-        input: impl AsRef<str>,
+        input: &str,
         opts: AuthorizeOptions<SmolStr>,
-        cfg: LoopbackConfig,
-    ) -> crate::error::Result<super::client::OAuthSession<T, S>> {
-        let port = match cfg.port {
-            LoopbackPort::Fixed(p) => p,
-            LoopbackPort::Ephemeral => 0,
-        };
-        // TODO: fix this to it also accepts ipv6 and properly finds a free port
-        let bind_addr: SocketAddr = format!("0.0.0.0:{}", port)
-            .parse()
-            .expect("invalid loopback host/port");
-        let (local_addr, handle) = one_shot_server(bind_addr);
+        cfg: &LoopbackConfig,
+    ) -> crate::error::Result<(OAuthClient<T, S>, CallbackHandle)> {
+        let (local_addr, handle) = one_shot_server((cfg.host.as_str(), loopback_port(cfg)))
+            .await
+            .map_err(|err| OAuthError::Callback(CallbackError::LoopbackServer(err.to_string())))?;
         println!("Listening on {}", local_addr);
 
-        let client_data = self.build_localhost_client_data(&cfg, &opts, local_addr);
-        // Build client using store and resolver
+        let client_data = self.build_localhost_client_data(cfg, &opts, local_addr);
         let flow_client = OAuthClient::new_with_shared(
             self.registry.store.clone(),
             self.client.clone(),
             client_data,
         );
 
-        // Start auth and get authorization URL
-        let auth_url = flow_client.start_auth(input.as_ref(), opts).await?;
-        // Print URL for copy/paste
+        let auth_url = flow_client.start_auth(input, opts).await?;
         println!("To authenticate with your PDS, visit:\n{}\n", auth_url);
-        // Optionally open browser
         if cfg.open_browser {
             let _ = try_open_in_browser(&auth_url);
         }
 
-        handle_localhost_callback(handle, &flow_client, &cfg).await
+        Ok((flow_client, handle))
     }
 
     /// Builds a [`crate::session::ClientData`] for use with the local loopback server method of OAuth.
@@ -312,7 +347,11 @@ where
         opts: &AuthorizeOptions<SmolStr>,
         local_addr: SocketAddr,
     ) -> crate::session::ClientData<SmolStr> {
-        let redirect_uri = format!("http://{}:{}/oauth/callback", cfg.host, local_addr.port(),);
+        let redirect_uri = format!(
+            "http://{}:{}/oauth/callback",
+            redirect_host(&cfg.host),
+            local_addr.port(),
+        );
         let redirect = Uri::parse(redirect_uri).unwrap();
 
         let scopes = if opts.scopes.is_empty() {
@@ -328,6 +367,46 @@ where
         .into_static()
     }
 
+    async fn restore_matching_session(
+        &self,
+        input: &str,
+    ) -> crate::error::Result<Option<super::client::OAuthSession<T, S>>>
+    where
+        S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
+    {
+        let hint = oauth_hint_from_input(input);
+        if let Some(matched) = self.registry.store.select_session(&hint).await? {
+            Ok(Some(
+                self.restore(&matched.key.did, matched.key.session_id.as_str())
+                    .await?,
+            ))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
+#[cfg(not(feature = "scope-check"))]
+impl<T, S> OAuthClient<T, S>
+where
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+    S: ClientAuthStore + Send + Sync + 'static,
+{
+    /// Drive the full OAuth flow using a local loopback server.
+    ///
+    /// This uses localhost OAuth and an ephemeral in-process web server to
+    /// handle the OAuth callback redirect. It has friendly defaults to drive
+    /// the entire callback flow for development and small CLI applications.
+    pub async fn login_with_local_server(
+        &self,
+        input: impl AsRef<str>,
+        opts: AuthorizeOptions<SmolStr>,
+        cfg: LoopbackConfig,
+    ) -> crate::error::Result<super::client::OAuthSession<T, S>> {
+        let (flow_client, handle) = self.start_loopback_flow(input.as_ref(), opts, &cfg).await?;
+        handle_localhost_callback(handle, &flow_client, &cfg).await
+    }
+
     /// Resume a stored session for the input identity, or drive the full OAuth flow using a local loopback server.
     pub async fn resume_or_login_with_local_server(
         &self,
@@ -339,11 +418,8 @@ where
         S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
     {
         let input_ref = input.as_ref();
-        let hint = oauth_hint_from_input(input_ref);
-        if let Some(matched) = self.registry.store.select_session(&hint).await? {
-            return self
-                .restore(&matched.key.did, matched.key.session_id.as_str())
-                .await;
+        if let Some(session) = self.restore_matching_session(input_ref).await? {
+            return Ok(session);
         }
         self.login_with_local_server(input_ref, opts, cfg).await
     }
@@ -363,56 +439,15 @@ where
     /// Drive the full OAuth flow using a local loopback server.
     ///
     /// This uses localhost OAuth and an ephemeral in-process web server to
-    /// handle the OAuth callback redirect. It has a bunch of nice friendly
-    /// defaults to help you get started and will basically drive the *entire*
-    /// callback flow itself.
-    ///
-    /// Best used for development and for small CLI applications that don't
-    /// require long session lengths. For long-running unattended sessions,
-    /// app passwords (via CredentialSession in the jacquard crate) remain
-    /// the best option. For more complex OAuth, or if you want more control
-    /// over the process, use the other methods on OAuthClient.
-    ///
-    /// 'input' parameter is what you type in the login box (usually, your handle)
-    /// for it to look up your PDS and redirect to its authentication interface.
-    ///
-    /// If the `browser-open` feature is enabled, this will open a web browser
-    /// for you to authenticate with your PDS. It will also print the
-    /// callback url to the console for you to copy.
+    /// handle the OAuth callback redirect. It has friendly defaults to drive
+    /// the entire callback flow for development and small CLI applications.
     pub async fn login_with_local_server(
         &self,
         input: impl AsRef<str>,
         opts: AuthorizeOptions<SmolStr>,
         cfg: LoopbackConfig,
     ) -> crate::error::Result<super::client::OAuthSession<T, S>> {
-        let port = match cfg.port {
-            LoopbackPort::Fixed(p) => p,
-            LoopbackPort::Ephemeral => 0,
-        };
-        // TODO: fix this to it also accepts ipv6 and properly finds a free port
-        let bind_addr: SocketAddr = format!("0.0.0.0:{}", port)
-            .parse()
-            .expect("invalid loopback host/port");
-        let (local_addr, handle) = one_shot_server(bind_addr);
-        println!("Listening on {}", local_addr);
-
-        let client_data = self.build_localhost_client_data(&cfg, &opts, local_addr);
-        // Build client using store and resolver
-        let flow_client = OAuthClient::new_with_shared(
-            self.registry.store.clone(),
-            self.client.clone(),
-            client_data,
-        );
-
-        // Start auth and get authorization URL
-        let auth_url = flow_client.start_auth(input.as_ref(), opts).await?;
-        // Print URL for copy/paste
-        println!("To authenticate with your PDS, visit:\n{}\n", auth_url);
-        // Optionally open browser
-        if cfg.open_browser {
-            let _ = try_open_in_browser(&auth_url);
-        }
-
+        let (flow_client, handle) = self.start_loopback_flow(input.as_ref(), opts, &cfg).await?;
         handle_localhost_callback(handle, &flow_client, &cfg).await
     }
 
@@ -427,35 +462,9 @@ where
         S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
     {
         let input_ref = input.as_ref();
-        let hint = oauth_hint_from_input(input_ref);
-        if let Some(matched) = self.registry.store.select_session(&hint).await? {
-            return self
-                .restore(&matched.key.did, matched.key.session_id.as_str())
-                .await;
+        if let Some(session) = self.restore_matching_session(input_ref).await? {
+            return Ok(session);
         }
         self.login_with_local_server(input_ref, opts, cfg).await
-    }
-
-    /// Builds a [`crate::session::ClientData`] for use with the local loopback server method of OAuth.
-    pub fn build_localhost_client_data(
-        &self,
-        cfg: &LoopbackConfig,
-        opts: &AuthorizeOptions<SmolStr>,
-        local_addr: SocketAddr,
-    ) -> crate::session::ClientData<SmolStr> {
-        let redirect_uri = format!("http://{}:{}/oauth/callback", cfg.host, local_addr.port(),);
-        let redirect = Uri::parse(redirect_uri).unwrap();
-
-        let scopes = if opts.scopes.is_empty() {
-            Some(self.registry.client_data.config.scopes.clone())
-        } else {
-            Some(opts.scopes.clone())
-        };
-
-        crate::session::ClientData {
-            keyset: self.registry.client_data.keyset.clone(),
-            config: AtprotoClientMetadata::new_localhost(Some(vec![redirect]), scopes),
-        }
-        .into_static()
     }
 }
