@@ -8,12 +8,15 @@ use jacquard::client::Agent;
 use jacquard::xrpc::XrpcClient;
 use jacquard_common::http_client::HttpClient;
 use jacquard_common::session::SessionHint;
-use jacquard_oauth::atproto::AtprotoClientMetadata;
+use jacquard_common::types::did::Did;
+use jacquard_common::{IntoStatic, deps::fluent_uri::Uri};
 use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthClient;
 use jacquard_oauth::resolver::OAuthResolver;
 use jacquard_oauth::scopes::Scopes;
-use jacquard_oauth::session::ClientData;
+use jacquard_oauth::session::{ClientData, ClientSessionData, DpopClientData};
+use jacquard_oauth::types::{OAuthTokenType, TokenSet};
+use jacquard_oauth::{atproto::AtprotoClientMetadata, client::OAuthResumeOrLogin};
 use smol_str::{SmolStr, format_smolstr};
 
 #[derive(Clone, Default)]
@@ -339,15 +342,113 @@ async fn oauth_resume_or_start_auth_rejects_any_without_identity() {
         },
     );
 
-    let err = match oauth
+    match oauth
         .resume_or_start_auth(
-            &SessionHint::Any,
-            jacquard_oauth::types::AuthorizeOptions::<SmolStr>::default(),
+            &SessionHint::any(),
+            jacquard_oauth::types::AuthorizeOptions::default(),
         )
         .await
     {
-        Ok(_) => panic!("Any cannot start auth without identity"),
-        Err(err) => err,
+        Ok(OAuthResumeOrLogin::NeedsInput) => {}
+        _ => panic!("Any cannot start auth without identity"),
     };
-    assert!(err.to_string().contains("cannot start OAuth authorization"));
+}
+
+#[tokio::test]
+async fn oauth_resume_or_start_auth_recovers_from_permanent_stored_session_failure() {
+    let client = MockClient::default();
+    client
+        .push(
+            HttpResponse::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .header(http::header::CONTENT_TYPE, "application/json")
+                .body(
+                    serde_json::to_vec(&serde_json::json!({
+                        "error": "invalid_grant",
+                        "error_description": "Token was not issued to this client"
+                    }))
+                    .unwrap(),
+                )
+                .unwrap(),
+        )
+        .await;
+    client
+        .push(
+            HttpResponse::builder()
+                .status(StatusCode::CREATED)
+                .header(http::header::CONTENT_TYPE, "application/json")
+                .body(
+                    serde_json::to_vec(&serde_json::json!({
+                        "request_uri": "urn:par:fresh",
+                        "expires_in": 60
+                    }))
+                    .unwrap(),
+                )
+                .unwrap(),
+        )
+        .await;
+
+    let mut path = std::env::temp_dir();
+    path.push(format!(
+        "jacquard-oauth-stale-recovers-{}.json",
+        std::process::id()
+    ));
+    std::fs::write(&path, "{}").unwrap();
+    let store = jacquard::client::FileAuthStore::new(&path);
+    let stored = ClientSessionData {
+        account_did: Did::new_static("did:plc:alice").unwrap(),
+        session_id: SmolStr::from("stale"),
+        host_url: Uri::parse("https://pds.example.com").unwrap().to_owned(),
+        authserver_url: SmolStr::from("https://issuer"),
+        authserver_token_endpoint: SmolStr::from("https://issuer/token"),
+        authserver_revocation_endpoint: None,
+        scopes: Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap(),
+        dpop_data: DpopClientData {
+            dpop_key: jacquard_oauth::utils::generate_key(&[SmolStr::from("ES256")]).unwrap(),
+            dpop_authserver_nonce: SmolStr::from(""),
+            dpop_host_nonce: SmolStr::from(""),
+        },
+        token_set: TokenSet {
+            iss: SmolStr::from("https://issuer"),
+            sub: Did::new_static("did:plc:alice").unwrap(),
+            aud: SmolStr::from("https://pds.example.com"),
+            scope: None,
+            refresh_token: Some(SmolStr::from("stale-refresh")),
+            access_token: SmolStr::from("stale-access"),
+            token_type: OAuthTokenType::DPoP,
+            expires_at: None,
+        },
+        resolved_scopes: None,
+    }
+    .into_static();
+    store.upsert_session(stored).await.unwrap();
+
+    let oauth = OAuthClient::new_from_resolver(
+        store,
+        client,
+        ClientData {
+            keyset: None,
+            config: AtprotoClientMetadata::new_localhost(
+                None,
+                Some(Scopes::new(SmolStr::new_static("atproto rpc:*")).unwrap()),
+            ),
+        },
+    );
+
+    match oauth
+        .resume_or_start_auth(
+            &SessionHint::from_input("alice.bsky.social"),
+            jacquard_oauth::types::AuthorizeOptions::default(),
+        )
+        .await
+        .unwrap()
+    {
+        OAuthResumeOrLogin::LoginUrl(url) => {
+            assert!(url.starts_with("https://issuer/authorize?"));
+            assert!(url.contains("request_uri=urn%3Apar%3Afresh"));
+        }
+        _ => panic!("stale stored session with concrete input should start fresh auth"),
+    }
+
+    let _ = std::fs::remove_file(&path);
 }

@@ -826,4 +826,4 @@ pub fn build_dpop_proof(
     )?)
 }
 
-impl DpopExt for JacquardResolver {}
+impl<C: HttpClient + Sync> DpopExt for JacquardResolver<C> {}

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,15 +21,18 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::place_atwork::get_listings;
+use crate::place_atwork::listing::Listing;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::place_atwork::listing::Listing;
-use crate::place_atwork::get_listings;
+use serde::{Deserialize, Serialize};
 /// A job listing record with metadata for strong references
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ListingRecord<S: BosStr = DefaultStr> {
     ///CID of the listing record
     pub cid: Cid<S>,
@@ -42,9 +45,11 @@ pub struct ListingRecord<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetListings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub identity: Option<S>,
@@ -52,9 +57,11 @@ pub struct GetListings<S: BosStr = DefaultStr> {
     pub tag: Option<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetListingsOutput<S: BosStr = DefaultStr> {
     pub listings: Vec<get_listings::ListingRecord<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -106,7 +113,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetListingsRequest {
 
 pub mod listing_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -149,10 +156,7 @@ pub mod listing_record_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListingRecordBuilder<
-    St: listing_record_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ListingRecordBuilder<St: listing_record_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<Listing<S>>),
     _type: PhantomData<fn() -> S>,
@@ -261,10 +265,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ListingRecord<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListingRecord<S> {
         ListingRecord {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -275,10 +276,10 @@ where
 }
 
 fn lexicon_doc_place_atwork_getListings() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.atwork.getListings"),
@@ -287,23 +288,17 @@ fn lexicon_doc_place_atwork_getListings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("listingRecord"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A job listing record with metadata for strong references",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A job listing record with metadata for strong references",
+                    )),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("CID of the listing record"),
-                                ),
+                                description: Some(CowStr::new_static("CID of the listing record")),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -311,11 +306,9 @@ fn lexicon_doc_place_atwork_getListings() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "AT-URI of the listing (at://did/place.atwork.listing/rkey)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the listing (at://did/place.atwork.listing/rkey)",
+                                )),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -335,36 +328,32 @@ fn lexicon_doc_place_atwork_getListings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("identity"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Filter listings by creator DID (e.g., did:plc:abc123)",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("tag"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("Filter listings by hashtag"),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("identity"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Filter listings by creator DID (e.g., did:plc:abc123)",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("tag"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Filter listings by hashtag",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
@@ -376,7 +365,7 @@ fn lexicon_doc_place_atwork_getListings() -> LexiconDoc<'static> {
 
 pub mod get_listings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

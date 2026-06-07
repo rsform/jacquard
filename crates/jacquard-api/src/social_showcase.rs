@@ -12,13 +12,12 @@ pub mod graph;
 pub mod library;
 pub mod profile;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,14 +29,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::social_showcase;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::social_showcase;
+use serde::{Deserialize, Serialize};
 /// Activity sharing preferences
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ActivitySettings<S: BosStr = DefaultStr> {
     ///Activity retention period  Defaults to `90`.
     #[serde(default = "_default_activity_settings_retention_days")]
@@ -101,8 +103,7 @@ impl<S: BosStr> Serialize for ActivitySettingsShareActivity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for ActivitySettingsShareActivity<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ActivitySettingsShareActivity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -127,9 +128,7 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             ActivitySettingsShareActivity::All => ActivitySettingsShareActivity::All,
-            ActivitySettingsShareActivity::Followers => {
-                ActivitySettingsShareActivity::Followers
-            }
+            ActivitySettingsShareActivity::Followers => ActivitySettingsShareActivity::Followers,
             ActivitySettingsShareActivity::None => ActivitySettingsShareActivity::None,
             ActivitySettingsShareActivity::Other(v) => {
                 ActivitySettingsShareActivity::Other(v.into_static())
@@ -141,7 +140,10 @@ where
 /// Image aspect ratio
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
@@ -154,7 +156,10 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
 /// Reference to an item in a collection
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CollectionItem<S: BosStr = DefaultStr> {
     pub added_at: Datetime,
     ///For custom sorting
@@ -168,7 +173,10 @@ pub struct CollectionItem<S: BosStr = DefaultStr> {
 /// View of a collection with items
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CollectionView<S: BosStr = DefaultStr> {
     pub author: social_showcase::ProfileView<S>,
     pub cid: Cid<S>,
@@ -195,7 +203,10 @@ pub struct CollectionView<S: BosStr = DefaultStr> {
 /// Display preferences
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DisplaySettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grid_layout: Option<DisplaySettingsGridLayout<S>>,
@@ -204,7 +215,6 @@ pub struct DisplaySettings<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DisplaySettingsGridLayout<S: BosStr = DefaultStr> {
@@ -252,8 +262,7 @@ impl<S: BosStr> Serialize for DisplaySettingsGridLayout<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for DisplaySettingsGridLayout<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DisplaySettingsGridLayout<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -285,7 +294,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DisplaySettingsTheme<S: BosStr = DefaultStr> {
@@ -363,9 +371,7 @@ where
             DisplaySettingsTheme::Light => DisplaySettingsTheme::Light,
             DisplaySettingsTheme::Dark => DisplaySettingsTheme::Dark,
             DisplaySettingsTheme::Auto => DisplaySettingsTheme::Auto,
-            DisplaySettingsTheme::Other(v) => {
-                DisplaySettingsTheme::Other(v.into_static())
-            }
+            DisplaySettingsTheme::Other(v) => DisplaySettingsTheme::Other(v.into_static()),
         }
     }
 }
@@ -373,7 +379,10 @@ where
 /// Image embedded in an item
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ItemImage<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -388,7 +397,10 @@ pub struct ItemImage<S: BosStr = DefaultStr> {
 /// View of an item with metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ItemView<S: BosStr = DefaultStr> {
     pub author: social_showcase::ProfileView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -417,7 +429,10 @@ pub struct ItemView<S: BosStr = DefaultStr> {
 /// Notification preferences
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct NotificationSettings<S: BosStr = DefaultStr> {
     pub comments: bool,
     pub follows: bool,
@@ -429,7 +444,10 @@ pub struct NotificationSettings<S: BosStr = DefaultStr> {
 /// Privacy preferences
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PrivacySettings<S: BosStr = DefaultStr> {
     ///Let others comment
     pub allow_comments: bool,
@@ -444,7 +462,10 @@ pub struct PrivacySettings<S: BosStr = DefaultStr> {
 /// View of a user profile
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -463,7 +484,10 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
 /// Subject of a reaction
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReactionSubject<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
@@ -474,7 +498,10 @@ pub struct ReactionSubject<S: BosStr = DefaultStr> {
 /// View of a reaction to content
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReactionView<S: BosStr = DefaultStr> {
     pub actor: social_showcase::ProfileView<S>,
     pub created_at: Datetime,
@@ -489,7 +516,10 @@ pub struct ReactionView<S: BosStr = DefaultStr> {
 /// A reference to an item featured in a user's showcase (hydrated at read time)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ShowcaseItem<S: BosStr = DefaultStr> {
     pub added_at: Datetime,
     ///Display order (0 = first)
@@ -503,7 +533,10 @@ pub struct ShowcaseItem<S: BosStr = DefaultStr> {
 /// Visibility preferences
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct VisibilitySettings<S: BosStr = DefaultStr> {
     pub default_collection_visibility: VisibilitySettingsDefaultCollectionVisibility<S>,
     pub default_item_visibility: VisibilitySettingsDefaultItemVisibility<S>,
@@ -511,7 +544,6 @@ pub struct VisibilitySettings<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsDefaultCollectionVisibility<S: BosStr = DefaultStr> {
@@ -560,7 +592,8 @@ impl<S: BosStr> Serialize for VisibilitySettingsDefaultCollectionVisibility<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for VisibilitySettingsDefaultCollectionVisibility<S> {
+    for VisibilitySettingsDefaultCollectionVisibility<S>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -576,8 +609,7 @@ impl<S: BosStr + Default> Default for VisibilitySettingsDefaultCollectionVisibil
     }
 }
 
-impl<S: BosStr> jacquard_common::IntoStatic
-for VisibilitySettingsDefaultCollectionVisibility<S>
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsDefaultCollectionVisibility<S>
 where
     S: BosStr + jacquard_common::IntoStatic,
     S::Output: BosStr,
@@ -597,7 +629,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsDefaultItemVisibility<S: BosStr = DefaultStr> {
@@ -649,7 +680,8 @@ impl<S: BosStr> Serialize for VisibilitySettingsDefaultItemVisibility<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for VisibilitySettingsDefaultItemVisibility<S> {
+    for VisibilitySettingsDefaultItemVisibility<S>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -665,8 +697,7 @@ impl<S: BosStr + Default> Default for VisibilitySettingsDefaultItemVisibility<S>
     }
 }
 
-impl<S: BosStr> jacquard_common::IntoStatic
-for VisibilitySettingsDefaultItemVisibility<S>
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsDefaultItemVisibility<S>
 where
     S: BosStr + jacquard_common::IntoStatic,
     S::Output: BosStr,
@@ -689,7 +720,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VisibilitySettingsProfileVisibility<S: BosStr = DefaultStr> {
@@ -741,7 +771,8 @@ impl<S: BosStr> Serialize for VisibilitySettingsProfileVisibility<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for VisibilitySettingsProfileVisibility<S> {
+    for VisibilitySettingsProfileVisibility<S>
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -998,25 +1029,23 @@ impl<S: BosStr> LexiconSchema for ItemImage<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -1281,7 +1310,7 @@ fn _default_activity_settings_retention_days() -> i64 {
 
 pub mod activity_settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1338,12 +1367,13 @@ pub mod activity_settings_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ActivitySettingsBuilder<
-    St: activity_settings_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ActivitySettingsBuilder<St: activity_settings_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<ActivitySettingsShareActivity<S>>, Option<bool>),
+    _fields: (
+        Option<i64>,
+        Option<ActivitySettingsShareActivity<S>>,
+        Option<bool>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1457,10 +1487,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ActivitySettings<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ActivitySettings<S> {
         ActivitySettings {
             retention_days: self._fields.0.unwrap(),
             share_activity: self._fields.1.unwrap(),
@@ -1471,10 +1498,10 @@ where
 }
 
 fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.showcase.defs"),
@@ -1483,16 +1510,12 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activitySettings"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Activity sharing preferences"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("shareNewItems"),
-                            SmolStr::new_static("shareActivity"),
-                            SmolStr::new_static("retentionDays")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Activity sharing preferences")),
+                    required: Some(vec![
+                        SmolStr::new_static("shareNewItems"),
+                        SmolStr::new_static("shareActivity"),
+                        SmolStr::new_static("retentionDays"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1505,9 +1528,9 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("shareActivity"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Who sees your activity feed"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Who sees your activity feed",
+                                )),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -1552,15 +1575,12 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("collectionItem"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Reference to an item in a collection"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("addedAt"),
-                            SmolStr::new_static("order")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Reference to an item in a collection")),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("addedAt"),
+                        SmolStr::new_static("order"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1580,11 +1600,9 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "AT-URI reference to item (always shows latest version)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "AT-URI reference to item (always shows latest version)",
+                                )),
                                 max_length: Some(8192usize),
                                 ..Default::default()
                             }),
@@ -1597,19 +1615,17 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("collectionView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("View of a collection with items"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("name"), SmolStr::new_static("tags"),
-                            SmolStr::new_static("type"),
-                            SmolStr::new_static("visibility"),
-                            SmolStr::new_static("author"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("View of a collection with items")),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("tags"),
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("visibility"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1629,7 +1645,9 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("coverImage"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -1748,9 +1766,7 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Alt text for accessibility"),
-                                ),
+                                description: Some(CowStr::new_static("Alt text for accessibility")),
                                 max_length: Some(300usize),
                                 ..Default::default()
                             }),
@@ -1764,7 +1780,9 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -1774,19 +1792,17 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("itemView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("View of an item with metadata"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("title"), SmolStr::new_static("tags"),
-                            SmolStr::new_static("images"),
-                            SmolStr::new_static("visibility"),
-                            SmolStr::new_static("author"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("View of an item with metadata")),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("title"),
+                        SmolStr::new_static("tags"),
+                        SmolStr::new_static("images"),
+                        SmolStr::new_static("visibility"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1902,13 +1918,11 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("notificationSettings"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Notification preferences")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("reactions"),
-                            SmolStr::new_static("follows"),
-                            SmolStr::new_static("comments")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("reactions"),
+                        SmolStr::new_static("follows"),
+                        SmolStr::new_static("comments"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1939,13 +1953,11 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("privacySettings"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Privacy preferences")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("allowReactions"),
-                            SmolStr::new_static("allowComments"),
-                            SmolStr::new_static("indexable")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("allowReactions"),
+                        SmolStr::new_static("allowComments"),
+                        SmolStr::new_static("indexable"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1976,19 +1988,24 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("profileView"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("View of a user profile")),
-                    required: Some(
-                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("did"),
+                        SmolStr::new_static("handle"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("banner"),
-                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                            LexObjectProperty::Blob(LexBlob {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -2030,9 +2047,7 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("reactionSubject"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Subject of a reaction")),
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2058,16 +2073,14 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reactionView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("View of a reaction to content"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("actor"),
-                            SmolStr::new_static("subject"), SmolStr::new_static("type"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("View of a reaction to content")),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("actor"),
+                        SmolStr::new_static("subject"),
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2163,13 +2176,11 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("visibilitySettings"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Visibility preferences")),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("profileVisibility"),
-                            SmolStr::new_static("defaultItemVisibility"),
-                            SmolStr::new_static("defaultCollectionVisibility")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("profileVisibility"),
+                        SmolStr::new_static("defaultItemVisibility"),
+                        SmolStr::new_static("defaultCollectionVisibility"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2207,7 +2218,7 @@ fn lexicon_doc_social_showcase_defs() -> LexiconDoc<'static> {
 
 pub mod collection_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2264,10 +2275,7 @@ pub mod collection_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionItemBuilder<
-    St: collection_item_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CollectionItemBuilder<St: collection_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -2383,10 +2391,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CollectionItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionItem<S> {
         CollectionItem {
             added_at: self._fields.0.unwrap(),
             order: self._fields.1.unwrap(),
@@ -2398,7 +2403,7 @@ where
 
 pub mod collection_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2555,10 +2560,7 @@ pub mod collection_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionViewBuilder<
-    St: collection_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CollectionViewBuilder<St: collection_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<social_showcase::ProfileView<S>>,
@@ -2598,19 +2600,7 @@ impl CollectionViewBuilder<collection_view_state::Empty, DefaultStr> {
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2623,19 +2613,7 @@ impl<S: BosStr> CollectionViewBuilder<collection_view_state::Empty, S> {
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -2740,18 +2718,12 @@ impl<St: collection_view_state::State, S: BosStr> CollectionViewBuilder<St, S> {
 
 impl<St: collection_view_state::State, S: BosStr> CollectionViewBuilder<St, S> {
     /// Set the `items` field (optional)
-    pub fn items(
-        mut self,
-        value: impl Into<Option<Vec<social_showcase::ItemView<S>>>>,
-    ) -> Self {
+    pub fn items(mut self, value: impl Into<Option<Vec<social_showcase::ItemView<S>>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `items` field to an Option value (optional)
-    pub fn maybe_items(
-        mut self,
-        value: Option<Vec<social_showcase::ItemView<S>>>,
-    ) -> Self {
+    pub fn maybe_items(mut self, value: Option<Vec<social_showcase::ItemView<S>>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -2897,10 +2869,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CollectionView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionView<S> {
         CollectionView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -2922,7 +2891,7 @@ where
 
 pub mod item_image_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2955,7 +2924,11 @@ pub mod item_image_state {
 /// Builder for constructing an instance of this type.
 pub struct ItemImageBuilder<St: item_image_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<social_showcase::AspectRatio<S>>, Option<BlobRef<S>>),
+    _fields: (
+        Option<S>,
+        Option<social_showcase::AspectRatio<S>>,
+        Option<BlobRef<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -3018,10 +2991,7 @@ impl<St: item_image_state::State, S: BosStr> ItemImageBuilder<St, S> {
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(
-        mut self,
-        value: Option<social_showcase::AspectRatio<S>>,
-    ) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<social_showcase::AspectRatio<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -3061,10 +3031,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ItemImage<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ItemImage<S> {
         ItemImage {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,
@@ -3076,7 +3043,7 @@ where
 
 pub mod item_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3274,20 +3241,7 @@ impl ItemViewBuilder<item_view_state::Empty, DefaultStr> {
         ItemViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -3300,20 +3254,7 @@ impl<S: BosStr> ItemViewBuilder<item_view_state::Empty, S> {
         ItemViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -3606,7 +3547,7 @@ where
 
 pub mod notification_settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3674,20 +3615,14 @@ pub struct NotificationSettingsBuilder<
 
 impl NotificationSettings<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> NotificationSettingsBuilder<
-        notification_settings_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> NotificationSettingsBuilder<notification_settings_state::Empty, DefaultStr> {
         NotificationSettingsBuilder::new()
     }
 }
 
 impl<S: BosStr> NotificationSettings<S> {
     /// Create a new builder for this type
-    pub fn builder() -> NotificationSettingsBuilder<
-        notification_settings_state::Empty,
-        S,
-    > {
+    pub fn builder() -> NotificationSettingsBuilder<notification_settings_state::Empty, S> {
         NotificationSettingsBuilder::builder()
     }
 }
@@ -3803,7 +3738,7 @@ where
 
 pub mod privacy_settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3860,10 +3795,7 @@ pub mod privacy_settings_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PrivacySettingsBuilder<
-    St: privacy_settings_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct PrivacySettingsBuilder<St: privacy_settings_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<bool>, Option<bool>),
     _type: PhantomData<fn() -> S>,
@@ -3979,10 +3911,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PrivacySettings<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PrivacySettings<S> {
         PrivacySettings {
             allow_comments: self._fields.0.unwrap(),
             allow_reactions: self._fields.1.unwrap(),
@@ -3994,7 +3923,7 @@ where
 
 pub mod reaction_subject_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4037,10 +3966,7 @@ pub mod reaction_subject_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReactionSubjectBuilder<
-    St: reaction_subject_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ReactionSubjectBuilder<St: reaction_subject_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -4135,10 +4061,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReactionSubject<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReactionSubject<S> {
         ReactionSubject {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -4149,7 +4072,7 @@ where
 
 pub mod reaction_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4404,10 +4327,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ReactionView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReactionView<S> {
         ReactionView {
             actor: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -4421,7 +4341,7 @@ where
 
 pub mod showcase_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4594,10 +4514,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ShowcaseItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ShowcaseItem<S> {
         ShowcaseItem {
             added_at: self._fields.0.unwrap(),
             order: self._fields.1.unwrap(),

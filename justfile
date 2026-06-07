@@ -7,7 +7,7 @@ pre-commit-all:
 
 # Run tests with default features
 test *ARGS:
-    cargo nextest run {{ARGS}}
+    cargo nextest run {{ ARGS }}
 
 # Run tests across the full feature matrix
 test-all:
@@ -25,19 +25,20 @@ test-all:
 
 # Run tests with a specific feature set
 test-feature FEATURE *ARGS:
-    cargo nextest run --features {{FEATURE}} {{ARGS}}
+    cargo nextest run --features {{ FEATURE }} {{ ARGS }}
 
 # Check that jacquard-common compiles for wasm32
 check-wasm:
     cargo build --target wasm32-unknown-unknown -p jacquard-common --features websocket,reqwest-client
+    cargo build --target wasm32-unknown-unknown -p jacquard --no-default-features --features api_bluesky,streaming
 
 # Run 'cargo run' on the project
 run *ARGS:
-    cargo run {{ARGS}}
+    cargo run {{ ARGS }}
 
 # Run 'bacon' to run the project (auto-recompiles)
 watch *ARGS:
-	bacon --job run -- -- {{ ARGS }}
+    bacon --job run -- -- {{ ARGS }}
 
 update-api:
     cargo run -p jacquard-lexgen --bin lex-fetch -- -v
@@ -46,13 +47,13 @@ generate-api:
     cargo run -p jacquard-lexgen --bin jacquard-codegen -- -i crates/jacquard-api/lexicons -o crates/jacquard-api/src
 
 lex-gen *ARGS:
-    cargo run -p jacquard-lexgen --bin lex-fetch -- {{ARGS}}
+    cargo run -p jacquard-lexgen --bin lex-fetch -- {{ ARGS }}
 
 lex-fetch *ARGS:
-    cargo run -p jacquard-lexgen --bin lex-fetch -- --no-codegen {{ARGS}}
+    cargo run -p jacquard-lexgen --bin lex-fetch -- --no-codegen {{ ARGS }}
 
 codegen *ARGS:
-    cargo run -p jacquard-lexgen --bin jacquard-codegen -- {{ARGS}}
+    cargo run -p jacquard-lexgen --bin jacquard-codegen -- {{ ARGS }}
 
 # Package binaries for distribution (creates tar.xz archives)
 package-binaries:
@@ -77,13 +78,13 @@ examples:
 # Run an example by name (auto-detects package)
 example NAME *ARGS:
     #!/usr/bin/env bash
-    if [ -f "examples/{{NAME}}.rs" ]; then
-        cargo run -p jacquard --features=api_bluesky,streaming --example {{NAME}} -- {{ARGS}}
+    if [ -f "examples/{{ NAME }}.rs" ]; then
+        cargo run -p jacquard --features=api_bluesky,streaming --example {{ NAME }} -- {{ ARGS }}
     elif cargo metadata --format-version=1 --no-deps | \
-         jq -e '.packages[] | select(.name == "jacquard-axum") | .targets[] | select(.kind[] == "example" and .name == "{{NAME}}")' > /dev/null; then
-        cargo run -p jacquard-axum --example {{NAME}}  -- {{ARGS}}
+         jq -e '.packages[] | select(.name == "jacquard-axum") | .targets[] | select(.kind[] == "example" and .name == "{{ NAME }}")' > /dev/null; then
+        cargo run -p jacquard-axum --example {{ NAME }}  -- {{ ARGS }}
     else
-        echo "Example '{{NAME}}' not found."
+        echo "Example '{{ NAME }}' not found."
         echo ""
         echo "jacquard examples:"
         for file in "examples"/*.rs; do

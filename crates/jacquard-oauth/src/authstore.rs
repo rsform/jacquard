@@ -44,9 +44,9 @@ where
 {
     type Error = SessionStoreError;
 
-    async fn select_session(
+    async fn select_session<Str: BosStr + Send + Sync>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<Str>,
     ) -> Result<Option<OAuthSessionMatch>, Self::Error> {
         if let Some(matched) = self.store.select_session(hint).await? {
             return Ok(Some(matched));
@@ -70,14 +70,15 @@ where
 /// Exact key lookup avoids enumeration. `Any`, `Did`, and `Handle` use
 /// [`ClientAuthStore::list_session_keys`] as the generic fallback; stores that need more efficient
 /// indexed lookup can add specialized APIs later without changing the common key type.
-pub async fn resolve_oauth_session_hint<S, R>(
+pub async fn resolve_oauth_session_hint<S, R, Str>(
     store: &S,
     resolver: &R,
-    hint: &SessionHint,
+    hint: &SessionHint<Str>,
 ) -> Result<Option<OAuthSessionMatch>, SessionStoreError>
 where
     S: ClientAuthStore + SessionSelector<OAuthSessionMatch, Error = SessionStoreError> + Sync,
     R: IdentityResolver + Sync,
+    Str: BosStr + Send + Sync,
 {
     OAuthSessionSelector::new(store, resolver)
         .select_session(hint)
@@ -250,9 +251,9 @@ impl ClientAuthStore for MemoryAuthStore {
 impl SessionSelector<OAuthSessionMatch> for MemoryAuthStore {
     type Error = SessionStoreError;
 
-    async fn select_session(
+    async fn select_session<Str: BosStr + Send + Sync>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<Str>,
     ) -> Result<Option<OAuthSessionMatch>, Self::Error> {
         match hint {
             SessionHint::Any => {
@@ -362,7 +363,7 @@ mod tests {
             .unwrap();
 
         let matched = store
-            .select_session(&SessionHint::Any)
+            .select_session(&SessionHint::any())
             .await
             .unwrap()
             .expect("any match");
@@ -370,14 +371,14 @@ mod tests {
         assert_eq!(matched.session, alice);
 
         let matched = store
-            .select_session(&SessionHint::Did(Did::new_static("did:plc:alice").unwrap()))
+            .select_session(&SessionHint::did(Did::new_static("did:plc:alice").unwrap()))
             .await
             .unwrap()
             .expect("did match");
         assert_eq!(matched.key, alice_key);
 
         let matched = store
-            .select_session(&SessionHint::Key(alice_key.clone()))
+            .select_session(&SessionHint::key(alice_key.clone()))
             .await
             .unwrap()
             .expect("key match");
@@ -385,7 +386,7 @@ mod tests {
 
         assert!(
             store
-                .select_session(&SessionHint::Identifier("alice@example.com".into()))
+                .select_session(&SessionHint::identifier("alice@example.com".into()))
                 .await
                 .unwrap()
                 .is_none(),
@@ -434,7 +435,7 @@ mod tests {
 
         assert!(
             OAuthSessionSelector::new(&store, &resolver)
-                .select_session(&SessionHint::Identifier("alice@example.com".into()))
+                .select_session(&SessionHint::identifier("alice@example.com".into()))
                 .await
                 .unwrap()
                 .is_none(),
@@ -443,7 +444,7 @@ mod tests {
         assert_eq!(*resolver.handle_calls.read().await, 0);
 
         let matched = OAuthSessionSelector::new(&store, &resolver)
-            .select_session(&SessionHint::Handle(
+            .select_session(&SessionHint::handle(
                 jacquard_common::types::string::Handle::new_static("alice.bsky.social").unwrap(),
             ))
             .await

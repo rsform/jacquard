@@ -1,36 +1,74 @@
 use clap::Parser;
 use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::post::Post;
-use jacquard::client::{Agent, AgentSessionExt, MemoryCredentialSession};
+use jacquard::client::credential_session::{
+    CredentialLoginOptions, CredentialResumeResult, CredentialSession,
+};
+use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
+use jacquard::common::session::SessionHint;
+use jacquard::identity::JacquardResolver;
 use jacquard::types::string::Datetime;
-use smol_str::SmolStr;
+use std::sync::Arc;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Create a simple post")]
 struct Args {
-    /// Handle (e.g., alice.bsky.social) or DID
-    input: CowStr<'static>,
+    /// Optional handle, DID, or email used to resume or start app-password auth.
+    input: Option<CowStr<'static>>,
 
-    /// App Password
-    password: CowStr<'static>,
+    /// App password, required only when no stored credential session matches.
+    password: Option<CowStr<'static>>,
 
-    /// Post text
+    /// Post text.
     #[arg(short, long)]
     text: String,
+
+    /// Path to auth store file (will be created if missing).
+    #[arg(long, default_value = "/tmp/jacquard-app-password-session.json")]
+    store: String,
 }
 
 #[tokio::main]
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    let (session, auth) =
-        MemoryCredentialSession::authenticated(args.input, args.password, None, None).await?;
+    let store = Arc::new(FileAuthStore::new(&args.store));
+    let resolver = Arc::new(JacquardResolver::new(
+        reqwest::Client::new(),
+        Default::default(),
+    ));
+    let session = CredentialSession::new(store, resolver);
+    let hint = SessionHint::from_optional_input(args.input.as_ref().map(|input| input.as_ref()));
+
+    let auth = match session.resume(&hint).await? {
+        CredentialResumeResult::Resumed(auth) => auth,
+        CredentialResumeResult::LoginRequired(challenge) => {
+            let Some(password) = args.password.as_ref() else {
+                miette::bail!(
+                    "no stored app-password session found in {}; pass a handle or DID and app password to log in",
+                    args.store
+                );
+            };
+            session
+                .login_from_challenge(
+                    challenge,
+                    CredentialLoginOptions {
+                        password: password.clone(),
+                        identifier: args.input.clone(),
+                        allow_takendown: None,
+                        auth_factor_token: None,
+                        pds: None,
+                    },
+                )
+                .await?
+        }
+    };
     println!("Signed in as {}", auth.handle);
 
     let agent: Agent<_> = Agent::from(session);
 
-    // Create a simple text post using the Agent convenience method
-    let post = Post::<SmolStr>::new()
+    // Create a simple text post using the Agent convenience method.
+    let post = Post::new()
         .text(args.text)
         .created_at(Datetime::now())
         .build();

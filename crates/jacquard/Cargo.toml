@@ -58,14 +58,17 @@ path = "../../examples/oauth_timeline.rs"
 [[example]]
 name = "create_post"
 path = "../../examples/create_post.rs"
+required-features = ["loopback"]
 
 [[example]]
 name = "post_with_image"
 path = "../../examples/post_with_image.rs"
+required-features = ["loopback"]
 
 [[example]]
 name = "update_profile"
 path = "../../examples/update_profile.rs"
+required-features = ["loopback"]
 
 [[example]]
 name = "public_atproto_feed"
@@ -76,6 +79,7 @@ path = "../../examples/public_atproto_feed.rs"
 [[example]]
 name = "create_whitewind_post"
 path = "../../examples/create_whitewind_post.rs"
+required-features = ["loopback"]
 
 [[example]]
 name = "read_whitewind_post"
@@ -88,7 +92,7 @@ path = "../../examples/read_tangled_repo.rs"
 [[example]]
 name = "stream_get_blob"
 path = "../../examples/stream_get_blob.rs"
-required-features = ["api_bluesky", "streaming"]
+required-features = ["api_bluesky", "streaming", "loopback"]
 
 [[example]]
 name = "resolve_did"
@@ -97,7 +101,7 @@ path = "../../examples/resolve_did.rs"
 [[example]]
 name = "update_preferences"
 path = "../../examples/update_preferences.rs"
-required-features = ["api_bluesky"]
+required-features = ["api_bluesky", "loopback"]
 
 
 [[example]]

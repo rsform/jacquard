@@ -16,10 +16,9 @@ pub mod get_actor_scrobbles;
 pub mod get_actor_songs;
 pub mod get_profile;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,10 +31,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     ///The URL of the actor's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,9 +64,11 @@ pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileViewDetailed<S: BosStr = DefaultStr> {
     ///The URL of the actor's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -122,10 +126,10 @@ impl<S: BosStr> LexiconSchema for ProfileViewDetailed<S> {
 }
 
 fn lexicon_doc_app_rocksky_actor_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.actor.defs"),
@@ -140,9 +144,9 @@ fn lexicon_doc_app_rocksky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("avatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL of the actor's avatar image."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL of the actor's avatar image.",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -150,11 +154,9 @@ fn lexicon_doc_app_rocksky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The date and time when the actor was created.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The date and time when the actor was created.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -162,47 +164,41 @@ fn lexicon_doc_app_rocksky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The DID of the actor."),
-                                ),
+                                description: Some(CowStr::new_static("The DID of the actor.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The display name of the actor."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The display name of the actor.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The handle of the actor."),
-                                ),
+                                description: Some(CowStr::new_static("The handle of the actor.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the actor."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the actor.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The date and time when the actor was last updated.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The date and time when the actor was last updated.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -221,9 +217,9 @@ fn lexicon_doc_app_rocksky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("avatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL of the actor's avatar image."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL of the actor's avatar image.",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -231,11 +227,9 @@ fn lexicon_doc_app_rocksky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The date and time when the actor was created.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The date and time when the actor was created.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -243,47 +237,41 @@ fn lexicon_doc_app_rocksky_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The DID of the actor."),
-                                ),
+                                description: Some(CowStr::new_static("The DID of the actor.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The display name of the actor."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The display name of the actor.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The handle of the actor."),
-                                ),
+                                description: Some(CowStr::new_static("The handle of the actor.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The unique identifier of the actor."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The unique identifier of the actor.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The date and time when the actor was last updated.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The date and time when the actor was last updated.",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),

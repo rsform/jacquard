@@ -71,8 +71,8 @@ pub mod lexicon_resolver;
 pub mod resolver;
 
 use crate::resolver::{
-    DidDocResponse, DidStep, HandleStep, IdentityError, IdentityResolver, MiniDoc, PlcSource,
-    ResolverOptions,
+    DidDocResponse, DidStep, HandleStep, IdentityError, IdentityErrorKind, IdentityResolver,
+    MiniDoc, PlcSource, ResolverOptions,
 };
 use bytes::Bytes;
 use jacquard_common::BosStr;
@@ -325,8 +325,8 @@ impl Default for ResolverCaches {
 
 /// Default resolver implementation with configurable fallback order.
 #[derive(Clone)]
-pub struct JacquardResolver {
-    http: reqwest::Client,
+pub struct JacquardResolver<C> {
+    http: C,
     opts: ResolverOptions,
     #[cfg(feature = "dns")]
     dns: Option<Arc<TokioAsyncResolver>>,
@@ -334,9 +334,9 @@ pub struct JacquardResolver {
     caches: Option<ResolverCaches>,
 }
 
-impl JacquardResolver {
+impl<C: HttpClient> JacquardResolver<C> {
     /// Create a new instance of the default resolver with all options (except DNS) up front
-    pub fn new(http: reqwest::Client, opts: ResolverOptions) -> Self {
+    pub fn new(http: C, opts: ResolverOptions) -> Self {
         // #[cfg(feature = "tracing")]
         // tracing::info!(
         //     public_fallback = opts.public_fallback_for_handle,
@@ -357,7 +357,7 @@ impl JacquardResolver {
 
     #[cfg(feature = "dns")]
     /// Create a new instance of the default resolver with all options, plus default DNS, up front
-    pub fn new_dns(http: reqwest::Client, opts: ResolverOptions) -> Self {
+    pub fn new_dns(http: C, opts: ResolverOptions) -> Self {
         Self {
             http,
             opts,
@@ -460,21 +460,29 @@ impl JacquardResolver {
     }
 
     async fn get_json_bytes(&self, uri: Uri<&str>) -> resolver::Result<(Bytes, StatusCode)> {
-        let resp = self.http.get(uri.as_str()).send().await?;
+        let resp = self
+            .http
+            .send_http(http::Request::get(uri.as_str()).body(Vec::new()).unwrap())
+            .await
+            .map_err(|e| IdentityError::transport(SmolStr::from(uri.as_str()), e))?;
         let status = resp.status();
-        let buf = resp.bytes().await?;
-        Ok((buf, status))
+        let buf = resp.into_body();
+        Ok((Bytes::from_owner(buf), status))
     }
 
     async fn get_text(&self, uri: Uri<&str>) -> resolver::Result<String> {
         let u = SmolStr::from(uri.as_str());
-        let resp = self.http.get(uri.as_str()).send().await?;
+        let resp = self
+            .http
+            .send_http(http::Request::get(uri.as_str()).body(Vec::new()).unwrap())
+            .await
+            .map_err(|e| IdentityError::transport(u.clone(), e))?;
         if resp.status() == StatusCode::OK {
-            Ok(resp.text().await?)
+            Ok(String::from_utf8_lossy(resp.body()).to_string())
         } else {
-            Err(IdentityError::transport(
-                u,
-                resp.error_for_status().unwrap_err(),
+            Err(IdentityError::new(
+                IdentityErrorKind::Transport(String::from_utf8_lossy(resp.body()).to_smolstr()),
+                None,
             ))
         }
     }
@@ -513,10 +521,14 @@ impl JacquardResolver {
 
         let response = self
             .http
-            .get(url_str.as_str())
-            .header("Accept", "application/dns-json")
-            .send()
-            .await?;
+            .send_http(
+                http::Request::get(url_str.as_str())
+                    .header("Accept", "application/dns-json")
+                    .body(Vec::new())
+                    .unwrap(),
+            )
+            .await
+            .map_err(|e| IdentityError::transport(SmolStr::from(url_str.as_str()), e))?;
 
         let status = response.status();
         if !status.is_success() {
@@ -526,7 +538,8 @@ impl JacquardResolver {
             )));
         }
 
-        let json: serde_json::Value = response.json().await?;
+        let json: serde_json::Value = serde_json::from_slice(&response.body())
+            .map_err(|e| IdentityError::transport(SmolStr::from(url_str.as_str()), e))?;
         Ok(json)
     }
 
@@ -567,7 +580,7 @@ impl JacquardResolver {
     }
 }
 
-impl JacquardResolver {
+impl<C: HttpClient> JacquardResolver<C> {
     /// Resolve handle to DID via a PDS XRPC call (stateless, unauth by default)
     pub async fn resolve_handle_via_pds<S: BosStr + Sync>(
         &self,
@@ -669,7 +682,7 @@ impl JacquardResolver {
     }
 }
 
-impl IdentityResolver for JacquardResolver {
+impl<C: HttpClient + Sync> IdentityResolver for JacquardResolver<C> {
     fn options(&self) -> &ResolverOptions {
         &self.opts
     }
@@ -922,7 +935,7 @@ impl IdentityResolver for JacquardResolver {
     }
 }
 
-impl HttpClient for JacquardResolver {
+impl<C: HttpClient + Sync> HttpClient for JacquardResolver<C> {
     type Error = IdentityError;
 
     async fn send_http(
@@ -945,7 +958,10 @@ impl HttpClient for JacquardResolver {
 }
 
 #[cfg(feature = "streaming")]
-impl jacquard_common::http_client::HttpClientExt for JacquardResolver {
+impl<C> jacquard_common::http_client::HttpClientExt for JacquardResolver<C>
+where
+    C: HttpClient + jacquard_common::http_client::HttpClientExt + Sync,
+{
     /// Send HTTP request and return streaming response
     async fn send_http_streaming(
         &self,
@@ -1032,7 +1048,7 @@ pub enum IdentityWarning {
     },
 }
 
-impl JacquardResolver {
+impl<C: HttpClient + Sync> JacquardResolver<C> {
     /// Resolve a handle to its DID, fetch the DID document, and return doc plus any warnings.
     /// This applies the default equality check on the document id (error with doc if mismatch).
     pub async fn resolve_handle_and_doc<S: BosStr + Sync>(
@@ -1194,9 +1210,9 @@ impl MiniDocResponse {
 }
 
 /// Resolver specialized for unauthenticated/public flows using reqwest and stateless XRPC
-pub type PublicResolver = JacquardResolver;
+pub type PublicResolver = JacquardResolver<reqwest::Client>;
 
-impl Default for JacquardResolver {
+impl Default for JacquardResolver<reqwest::Client> {
     /// Build a resolver with:
     /// - reqwest HTTP client
     /// - Public fallbacks enabled for handle resolution
@@ -1221,7 +1237,7 @@ impl Default for JacquardResolver {
 
 /// Build a resolver configured to use Slingshot (`https://slingshot.microcosm.blue`) for PLC and
 /// mini-doc fallbacks, unauthenticated by default.
-pub fn slingshot_resolver_default() -> JacquardResolver {
+pub fn slingshot_resolver_default() -> JacquardResolver<reqwest::Client> {
     let http = reqwest::Client::new();
     let mut opts = ResolverOptions::default();
     opts.plc_source = PlcSource::slingshot_default();

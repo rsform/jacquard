@@ -49,17 +49,16 @@
 ))]
 use crate::{
     atproto::AtprotoClientMetadata,
-    authstore::{ClientAuthStore, OAuthSessionMatch},
-    client::OAuthClient,
+    authstore::{ClientAuthStore, OAuthSessionMatch, OAuthSessionSelector},
+    client::{OAuthClient, OAuthSession},
     dpop::DpopExt,
     error::{CallbackError, OAuthError},
     resolver::OAuthResolver,
     types::{AuthorizeOptions, CallbackParams},
 };
-use jacquard_common::IntoStatic;
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::session::{SessionHint, SessionSelector, SessionStoreError};
-use jacquard_common::types::{did::Did, string::Handle};
+use jacquard_common::{IntoStatic, bos::BosStr};
 use smol_str::SmolStr;
 use std::net::SocketAddr;
 use tokio::{
@@ -67,16 +66,6 @@ use tokio::{
     net::{TcpListener, TcpStream, ToSocketAddrs},
     sync::{mpsc, oneshot},
 };
-
-fn oauth_hint_from_input(input: &str) -> SessionHint<SmolStr> {
-    if let Ok(did) = Did::new(input) {
-        SessionHint::Did(did.convert())
-    } else if let Ok(handle) = Handle::new(input) {
-        SessionHint::Handle(handle.convert())
-    } else {
-        SessionHint::Identifier(SmolStr::from(input))
-    }
-}
 
 /// Port selection strategy for the loopback OAuth callback server.
 #[derive(Clone, Debug)]
@@ -124,21 +113,66 @@ pub fn try_open_in_browser(_url: &str) -> bool {
     false
 }
 
-async fn handle_callback_connection(mut stream: TcpStream, tx: mpsc::Sender<CallbackParams>) {
+async fn handle_callback_connection(mut stream: TcpStream, tx: mpsc::Sender<CallbackRequest>) {
     let Some(Some(params)) = read_callback_params(&mut stream).await else {
         let _ = write_http_response(&mut stream, 404, "Not found").await;
         return;
     };
 
-    match tx.try_send(params) {
-        Ok(()) => {
-            let _ = write_http_response(&mut stream, 200, "Logged in!").await;
-        }
+    let (response_tx, response_rx) = oneshot::channel();
+    match tx.try_send(CallbackRequest {
+        params,
+        response_tx,
+    }) {
+        Ok(()) => match response_rx.await {
+            Ok(response) => {
+                let _ = write_http_response(&mut stream, response.status, response.body).await;
+            }
+            Err(_) => {
+                let _ = write_http_response(&mut stream, 500, OAUTH_CALLBACK_FAILURE_BODY).await;
+            }
+        },
         Err(_) => {
             let _ = write_http_response(&mut stream, 500, "Could not deliver OAuth callback").await;
         }
     }
 }
+
+struct CallbackRequest {
+    params: CallbackParams,
+    response_tx: oneshot::Sender<CallbackResponse>,
+}
+
+struct CallbackResponse {
+    status: u16,
+    body: &'static str,
+}
+
+const OAUTH_CALLBACK_SUCCESS_BODY: &str = r#"<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Jacquard OAuth login complete</title>
+</head>
+<body>
+  <h1>Jacquard OAuth login complete.</h1>
+  <p>You can close this tab and return to the application.</p>
+</body>
+</html>
+"#;
+
+const OAUTH_CALLBACK_FAILURE_BODY: &str = r#"<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Jacquard OAuth login failed</title>
+</head>
+<body>
+  <h1>Jacquard OAuth login failed.</h1>
+  <p>Return to the application for details.</p>
+</body>
+</html>
+"#;
 
 async fn read_callback_params(stream: &mut TcpStream) -> Option<Option<CallbackParams>> {
     let mut reader = BufReader::new(stream);
@@ -168,8 +202,13 @@ async fn write_http_response(
         500 => "Internal Server Error",
         _ => "OK",
     };
+    let content_type = if body.trim_start().starts_with("<!doctype html>") {
+        "text/html; charset=utf-8"
+    } else {
+        "text/plain; charset=utf-8"
+    };
     let response = format!(
-        "HTTP/1.1 {status} {reason}\r\ncontent-type: text/plain; charset=utf-8\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{}",
+        "HTTP/1.1 {status} {reason}\r\ncontent-type: {content_type}\r\ncontent-length: {}\r\nconnection: close\r\n\r\n{}",
         body.len(),
         body
     );
@@ -180,7 +219,7 @@ async fn write_http_response(
 pub struct CallbackHandle {
     server_handle: tokio::task::JoinHandle<()>,
     server_stop: oneshot::Sender<()>,
-    callback_rx: mpsc::Receiver<CallbackParams>,
+    callback_rx: mpsc::Receiver<CallbackRequest>,
 }
 
 /// One-shot OAuth callback server.
@@ -224,7 +263,7 @@ pub async fn one_shot_server(
 async fn wait_for_callback(
     handle: CallbackHandle,
     timeout_ms: u64,
-) -> Result<CallbackParams, OAuthError> {
+) -> Result<CallbackRequest, OAuthError> {
     let CallbackHandle {
         server_handle,
         server_stop,
@@ -241,6 +280,65 @@ async fn wait_for_callback(
         Ok(cb)
     } else {
         Err(OAuthError::Callback(CallbackError::Timeout))
+    }
+}
+
+#[cfg(not(feature = "scope-check"))]
+async fn complete_callback<T, S>(
+    flow_client: &super::client::OAuthClient<T, S>,
+    request: CallbackRequest,
+) -> crate::error::Result<super::client::OAuthSession<T, S>>
+where
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+    S: ClientAuthStore + Send + Sync + 'static,
+{
+    match flow_client.callback(request.params).await {
+        Ok(session) => {
+            let _ = request.response_tx.send(CallbackResponse {
+                status: 200,
+                body: OAUTH_CALLBACK_SUCCESS_BODY,
+            });
+            Ok(session)
+        }
+        Err(err) => {
+            let _ = request.response_tx.send(CallbackResponse {
+                status: 500,
+                body: OAUTH_CALLBACK_FAILURE_BODY,
+            });
+            Err(err)
+        }
+    }
+}
+
+#[cfg(feature = "scope-check")]
+async fn complete_callback<T, S>(
+    flow_client: &super::client::OAuthClient<T, S>,
+    request: CallbackRequest,
+) -> crate::error::Result<super::client::OAuthSession<T, S>>
+where
+    T: OAuthResolver
+        + DpopExt
+        + jacquard_identity::lexicon_resolver::LexiconSchemaResolver
+        + Send
+        + Sync
+        + 'static,
+    S: ClientAuthStore + Send + Sync + 'static,
+{
+    match flow_client.callback(request.params).await {
+        Ok(session) => {
+            let _ = request.response_tx.send(CallbackResponse {
+                status: 200,
+                body: OAUTH_CALLBACK_SUCCESS_BODY,
+            });
+            Ok(session)
+        }
+        Err(err) => {
+            let _ = request.response_tx.send(CallbackResponse {
+                status: 500,
+                body: OAUTH_CALLBACK_FAILURE_BODY,
+            });
+            Err(err)
+        }
     }
 }
 
@@ -261,9 +359,11 @@ where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
     S: ClientAuthStore + Send + Sync + 'static,
 {
-    Ok(flow_client
-        .callback(wait_for_callback(handle, cfg.timeout_ms).await?)
-        .await?)
+    complete_callback(
+        flow_client,
+        wait_for_callback(handle, cfg.timeout_ms).await?,
+    )
+    .await
 }
 
 /// Handles the OAuth callback for the localhost loopback server.
@@ -288,9 +388,11 @@ where
         + 'static,
     S: ClientAuthStore + Send + Sync + 'static,
 {
-    Ok(flow_client
-        .callback(wait_for_callback(handle, cfg.timeout_ms).await?)
-        .await?)
+    complete_callback(
+        flow_client,
+        wait_for_callback(handle, cfg.timeout_ms).await?,
+    )
+    .await
 }
 
 fn loopback_port(cfg: &LoopbackConfig) -> u16 {
@@ -367,15 +469,18 @@ where
         .into_static()
     }
 
-    async fn restore_matching_session(
+    async fn restore_matching_session<HintStr: BosStr + Send + Sync>(
         &self,
-        input: &str,
+        hint: &SessionHint<HintStr>,
     ) -> crate::error::Result<Option<super::client::OAuthSession<T, S>>>
     where
         S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
     {
-        let hint = oauth_hint_from_input(input);
-        if let Some(matched) = self.registry.store.select_session(&hint).await? {
+        if let Some(matched) =
+            OAuthSessionSelector::new(self.registry.store.as_ref(), self.client.as_ref())
+                .select_session(hint)
+                .await?
+        {
             Ok(Some(
                 self.restore(&matched.key.did, matched.key.session_id.as_str())
                     .await?,
@@ -384,6 +489,20 @@ where
             Ok(None)
         }
     }
+}
+
+fn loopback_start_auth_input_from_hint<S: BosStr>(hint: &SessionHint<S>) -> Option<SmolStr> {
+    match hint {
+        SessionHint::Did(did) => Some(SmolStr::new(did.as_ref())),
+        SessionHint::Handle(handle) => Some(SmolStr::new(handle.as_ref())),
+        SessionHint::Key(key) => Some(key.did.as_str().into()),
+        SessionHint::Identifier(identifier) => Some(SmolStr::new(identifier.as_ref())),
+        SessionHint::Any => None,
+    }
+}
+
+fn should_start_login_after_restore_error(err: &OAuthError) -> bool {
+    matches!(err, OAuthError::Session(session_err) if session_err.is_permanent())
 }
 
 #[cfg(not(feature = "scope-check"))]
@@ -402,26 +521,37 @@ where
         input: impl AsRef<str>,
         opts: AuthorizeOptions<SmolStr>,
         cfg: LoopbackConfig,
-    ) -> crate::error::Result<super::client::OAuthSession<T, S>> {
+    ) -> crate::error::Result<OAuthSession<T, S>> {
         let (flow_client, handle) = self.start_loopback_flow(input.as_ref(), opts, &cfg).await?;
         handle_localhost_callback(handle, &flow_client, &cfg).await
     }
 
-    /// Resume a stored session for the input identity, or drive the full OAuth flow using a local loopback server.
-    pub async fn resume_or_login_with_local_server(
+    /// Resume a stored session, or drive the full OAuth flow using a local loopback server.
+    ///
+    /// Returns `Ok(None)` when no stored session matches and `hint` does not contain enough
+    /// information to start a new loopback OAuth flow.
+    pub async fn resume_or_login_with_local_server<HintStr: BosStr + Send + Sync>(
         &self,
-        input: impl AsRef<str>,
+        hint: &SessionHint<HintStr>,
         opts: AuthorizeOptions<SmolStr>,
         cfg: LoopbackConfig,
-    ) -> crate::error::Result<super::client::OAuthSession<T, S>>
+    ) -> crate::error::Result<Option<OAuthSession<T, S>>>
     where
         S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
     {
-        let input_ref = input.as_ref();
-        if let Some(session) = self.restore_matching_session(input_ref).await? {
-            return Ok(session);
+        let input = loopback_start_auth_input_from_hint(hint);
+        match self.restore_matching_session(hint).await {
+            Ok(Some(session)) => return Ok(Some(session)),
+            Ok(None) => {}
+            Err(err) if input.is_some() && should_start_login_after_restore_error(&err) => {}
+            Err(err) => return Err(err),
         }
-        self.login_with_local_server(input_ref, opts, cfg).await
+        let Some(input) = input else {
+            return Ok(None);
+        };
+        self.login_with_local_server(input.as_str(), opts, cfg)
+            .await
+            .map(Some)
     }
 }
 
@@ -446,25 +576,36 @@ where
         input: impl AsRef<str>,
         opts: AuthorizeOptions<SmolStr>,
         cfg: LoopbackConfig,
-    ) -> crate::error::Result<super::client::OAuthSession<T, S>> {
+    ) -> crate::error::Result<OAuthSession<T, S>> {
         let (flow_client, handle) = self.start_loopback_flow(input.as_ref(), opts, &cfg).await?;
         handle_localhost_callback(handle, &flow_client, &cfg).await
     }
 
-    /// Resume a stored session for the input identity, or drive the full OAuth flow using a local loopback server.
-    pub async fn resume_or_login_with_local_server(
+    /// Resume a stored session, or drive the full OAuth flow using a local loopback server.
+    ///
+    /// Returns `Ok(None)` when no stored session matches and `hint` does not contain enough
+    /// information to start a new loopback OAuth flow.
+    pub async fn resume_or_login_with_local_server<HintStr: BosStr + Send + Sync>(
         &self,
-        input: impl AsRef<str>,
+        hint: &SessionHint<HintStr>,
         opts: AuthorizeOptions<SmolStr>,
         cfg: LoopbackConfig,
-    ) -> crate::error::Result<super::client::OAuthSession<T, S>>
+    ) -> crate::error::Result<Option<OAuthSession<T, S>>>
     where
         S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
     {
-        let input_ref = input.as_ref();
-        if let Some(session) = self.restore_matching_session(input_ref).await? {
-            return Ok(session);
+        let input = loopback_start_auth_input_from_hint(hint);
+        match self.restore_matching_session(hint).await {
+            Ok(Some(session)) => return Ok(Some(session)),
+            Ok(None) => {}
+            Err(err) if input.is_some() && should_start_login_after_restore_error(&err) => {}
+            Err(err) => return Err(err),
         }
-        self.login_with_local_server(input_ref, opts, cfg).await
+        let Some(input) = input else {
+            return Ok(None);
+        };
+        self.login_with_local_server(input.as_str(), opts, cfg)
+            .await
+            .map(Some)
     }
 }

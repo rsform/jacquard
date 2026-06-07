@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,10 +23,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Website<S: BosStr = DefaultStr> {
     ///A brief description of the website or page
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,7 +63,7 @@ impl<S: BosStr> LexiconSchema for Website<S> {
 
 pub mod website_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -93,7 +96,12 @@ pub mod website_state {
 /// Builder for constructing an instance of this type.
 pub struct WebsiteBuilder<St: website_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<UriValue<S>>, Option<UriValue<S>>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -219,10 +227,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_website() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.website"),
@@ -238,20 +246,16 @@ fn lexicon_doc_blog_pckt_block_website() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "A brief description of the website or page",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "A brief description of the website or page",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("previewImage"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("URL of the preview image"),
-                                ),
+                                description: Some(CowStr::new_static("URL of the preview image")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -259,9 +263,7 @@ fn lexicon_doc_blog_pckt_block_website() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("src"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL of the website"),
-                                ),
+                                description: Some(CowStr::new_static("The URL of the website")),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -269,9 +271,9 @@ fn lexicon_doc_blog_pckt_block_website() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The title of the website or page"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The title of the website or page",
+                                )),
                                 ..Default::default()
                             }),
                         );

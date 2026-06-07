@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_certified::Did;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_certified::Did;
+use serde::{Deserialize, Serialize};
 /// Records a funding receipt for a payment from one user to another user. It may be recorded by the recipient, by the sender, or by a third party. The sender may remain anonymous.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -204,7 +204,7 @@ impl<S: BosStr> LexiconSchema for Receipt<S> {
 
 pub mod receipt_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -332,7 +332,9 @@ impl ReceiptBuilder<receipt_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ReceiptBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -343,7 +345,9 @@ impl<S: BosStr> ReceiptBuilder<receipt_state::Empty, S> {
     pub fn builder() -> Self {
         ReceiptBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -496,10 +500,7 @@ where
     St::To: receipt_state::IsUnset,
 {
     /// Set the `to` field (required)
-    pub fn to(
-        mut self,
-        value: impl Into<S>,
-    ) -> ReceiptBuilder<receipt_state::SetTo<St>, S> {
+    pub fn to(mut self, value: impl Into<S>) -> ReceiptBuilder<receipt_state::SetTo<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ReceiptBuilder {
             _state: PhantomData,
@@ -568,10 +569,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_funding_receipt() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.funding.receipt"),

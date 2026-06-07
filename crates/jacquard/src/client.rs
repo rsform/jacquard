@@ -73,7 +73,7 @@ use jacquard_common::{
 use jacquard_identity::resolver::{
     DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
 };
-use jacquard_identity::{JacquardResolver, slingshot_resolver_default};
+use jacquard_identity::{PublicResolver, slingshot_resolver_default};
 use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::{OAuthClient, OAuthSession};
 use jacquard_oauth::dpop::DpopExt;
@@ -110,7 +110,7 @@ pub trait AgentSession: XrpcClient + HttpClient + Send + Sync {
     /// Current base endpoint.
     fn endpoint(&self) -> impl Future<Output = Uri<String>>;
     /// Override per-session call options.
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()>;
+    fn set_options(&self, opts: CallOptions) -> impl Future<Output = ()>;
     /// Refresh the session and return a fresh AuthorizationToken.
     fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<SmolStr>>>;
 }
@@ -170,19 +170,19 @@ impl Default for BasicClient {
 pub struct UnauthenticatedSession<T> {
     resolver: Arc<T>,
     endpoint: Arc<RwLock<Option<Uri<String>>>>,
-    options: Arc<RwLock<CallOptions<'static>>>,
+    options: Arc<RwLock<CallOptions>>,
 }
 
-impl Default for UnauthenticatedSession<JacquardResolver> {
+impl Default for UnauthenticatedSession<PublicResolver> {
     fn default() -> Self {
         Self::new_public()
     }
 }
 
-impl UnauthenticatedSession<JacquardResolver> {
+impl UnauthenticatedSession<PublicResolver> {
     /// Create a new unauthenticated session using the public bluesky appview api as a fallback resolver
     pub fn new_public() -> Self {
-        let resolver = Arc::new(JacquardResolver::default());
+        let resolver = Arc::new(PublicResolver::default());
         let endpoint = Arc::new(RwLock::new(None));
         let options = Arc::new(RwLock::new(CallOptions::default()));
         Self {
@@ -230,7 +230,7 @@ where
     T: Sync + Send,
 {
     #[doc = " Get the base URI for the client."]
-    fn base_uri(&self) -> impl Future<Output = Uri<String>> + Send {
+    fn base_uri(&self) -> impl Future<Output = Uri<String>> {
         async move {
             self.endpoint.read().await.clone().unwrap_or_else(|| {
                 Uri::parse("https://public.api.bsky.app")
@@ -242,7 +242,7 @@ where
 
     #[doc = " Send an XRPC request and parse the response"]
     #[cfg(not(target_arch = "wasm32"))]
-    fn send<R>(&self, request: R) -> impl Future<Output = XrpcResult<XrpcResponse<R>>> + Send
+    fn send<R>(&self, request: R) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
         R: XrpcRequest + Send + Sync + Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
@@ -259,7 +259,7 @@ where
     fn send_with_opts<R>(
         &self,
         request: R,
-        opts: CallOptions<'_>,
+        opts: CallOptions,
     ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>> + Send
     where
         R: XrpcRequest + Send + Sync + Serialize,
@@ -294,7 +294,7 @@ where
     fn send_with_opts<R>(
         &self,
         request: R,
-        opts: CallOptions<'_>,
+        opts: CallOptions,
     ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
         R: XrpcRequest + Send + Sync + Serialize,
@@ -311,7 +311,7 @@ where
     }
 
     #[doc = " Set the base URI for the client."]
-    fn set_base_uri(&self, uri: Uri<String>) -> impl Future<Output = ()> + Send {
+    fn set_base_uri(&self, uri: Uri<String>) -> impl Future<Output = ()> {
         async move {
             let normalized = crate::xrpc::normalize_base_uri(uri);
             let mut guard = self.endpoint.write().await;
@@ -320,12 +320,12 @@ where
     }
 
     #[doc = " Get the call options for the client."]
-    fn opts(&self) -> impl Future<Output = CallOptions<'_>> + Send {
+    fn opts(&self) -> impl Future<Output = CallOptions> {
         async move { self.options.read().await.clone() }
     }
 
     #[doc = " Set the call options for the client."]
-    fn set_opts(&self, opts: CallOptions<'_>) -> impl Future<Output = ()> + Send {
+    fn set_opts(&self, opts: CallOptions) -> impl Future<Output = ()> {
         async move {
             *self.options.write().await = opts.into_static();
         }
@@ -349,14 +349,14 @@ where
     }
 
     #[doc = " Override per-session call options."]
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> + Send {
+    fn set_options(&self, opts: CallOptions) -> impl Future<Output = ()> {
         async move {
-            *self.options.write().await = opts.into_static();
+            *self.options.write().await = opts;
         }
     }
 
     #[doc = " Refresh the session and return a fresh AuthorizationToken."]
-    fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<SmolStr>>> + Send {
+    fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<SmolStr>>> {
         async {
             Err(ClientError::auth(
                 jacquard_common::error::AuthError::NotAuthenticated,
@@ -417,7 +417,7 @@ impl<T: IdentityResolver + Sync> IdentityResolver for UnauthenticatedSession<T> 
 /// MemoryCredentialSession: credential session with in memory store and identity resolver
 pub type MemoryCredentialSession = CredentialSession<
     MemorySessionStore<SessionKey, AtpSession>,
-    jacquard_identity::PublicResolver,
+    jacquard_identity::JacquardResolver<reqwest::Client>,
 >;
 
 impl MemoryCredentialSession {
@@ -428,7 +428,7 @@ impl MemoryCredentialSession {
     pub fn unauthenticated() -> Self {
         use std::sync::Arc;
         let http = reqwest::Client::new();
-        let resolver = jacquard_identity::PublicResolver::new(http, Default::default());
+        let resolver = jacquard_identity::JacquardResolver::new(http, Default::default());
         let store = MemorySessionStore::default();
         CredentialSession::new(Arc::new(store), Arc::new(resolver))
     }
@@ -591,7 +591,7 @@ impl<A: AgentSession> Agent<A> {
     }
 
     /// Override call options for subsequent requests.
-    pub async fn set_options(&self, opts: CallOptions<'_>) {
+    pub async fn set_options(&self, opts: CallOptions) {
         self.inner.set_options(opts).await
     }
 
@@ -1279,10 +1279,10 @@ where
         }
     }
     fn endpoint(&self) -> impl Future<Output = Uri<String>> {
-        async move { CredentialSession::<S, T, W>::endpoint(self).await }
+        CredentialSession::<S, T, W>::endpoint(self)
     }
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
-        async move { CredentialSession::<S, T, W>::set_options(self, opts).await }
+    fn set_options(&self, opts: CallOptions) -> impl Future<Output = ()> {
+        CredentialSession::<S, T, W>::set_options(self, opts)
     }
     fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<SmolStr>>> {
         async move {
@@ -1310,10 +1310,10 @@ where
         }
     }
     fn endpoint(&self) -> impl Future<Output = Uri<String>> {
-        async { self.endpoint().await }
+        self.endpoint()
     }
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
-        async { self.set_options(opts).await }
+    fn set_options(&self, opts: CallOptions) -> impl Future<Output = ()> {
+        self.set_options(opts)
     }
     fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<SmolStr>>> {
         async {
@@ -1339,7 +1339,7 @@ where
     fn endpoint(&self) -> impl Future<Output = Uri<String>> {
         async { self.base_uri().await }
     }
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
+    fn set_options(&self, opts: CallOptions) -> impl Future<Output = ()> {
         async { self.set_opts(opts).await }
     }
     fn refresh(&self) -> impl Future<Output = ClientResult<AuthorizationToken<SmolStr>>> {
@@ -1447,11 +1447,11 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
     async fn base_uri(&self) -> Uri<String> {
         self.inner.base_uri().await
     }
-    fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
+    fn opts(&self) -> impl Future<Output = CallOptions> {
         self.inner.opts()
     }
 
-    async fn set_opts(&self, opts: CallOptions<'_>) {
+    async fn set_opts(&self, opts: CallOptions) {
         self.inner.set_opts(opts).await
     }
 
@@ -1472,7 +1472,7 @@ impl<A: AgentSession> XrpcClient for Agent<A> {
     async fn send_with_opts<R>(
         &self,
         request: R,
-        opts: CallOptions<'_>,
+        opts: CallOptions,
     ) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
         R: XrpcRequest + Send + Sync + Serialize,
@@ -1542,20 +1542,21 @@ where
     }
 
     #[cfg(target_arch = "wasm32")]
-    fn stream<S>(
+    fn stream<S, B>(
         &self,
-        stream: jacquard_common::xrpc::XrpcProcedureSend<S::Frame<'static>>,
+        stream: jacquard_common::xrpc::XrpcProcedureSend<S::Frame<B>>,
     ) -> impl Future<
         Output = core::result::Result<
-            jacquard_common::xrpc::XrpcResponseStream<<<S as jacquard_common::xrpc::XrpcProcedureStream>::Response as jacquard_common::xrpc::XrpcStreamResp>::Frame<'static>>,
+            jacquard_common::xrpc::XrpcResponseStream<<<S as jacquard_common::xrpc::XrpcProcedureStream>::Response as jacquard_common::xrpc::XrpcStreamResp>::Frame<B>>,
             jacquard_common::StreamError,
         >,
     >
     where
+        B: BosStr + 'static,
         S: jacquard_common::xrpc::XrpcProcedureStream + 'static,
-        <<S as jacquard_common::xrpc::XrpcProcedureStream>::Response as jacquard_common::xrpc::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::XrpcStreamResp,
+        <<S as jacquard_common::xrpc::XrpcProcedureStream>::Response as jacquard_common::xrpc::XrpcStreamResp>::Frame<B>: jacquard_common::xrpc::XrpcStreamResp,
     {
-        self.inner.stream::<S>(stream)
+        self.inner.stream::<S, B>(stream)
     }
 }
 
@@ -1592,7 +1593,7 @@ impl<A: AgentSession> AgentSession for Agent<A> {
         async { self.endpoint().await }
     }
 
-    fn set_options<'a>(&'a self, opts: CallOptions<'a>) -> impl Future<Output = ()> {
+    fn set_options(&self, opts: CallOptions) -> impl Future<Output = ()> {
         async { self.set_options(opts).await }
     }
 

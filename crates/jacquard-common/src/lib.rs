@@ -273,6 +273,18 @@ pub enum AuthorizationToken<S: BosStr = DefaultStr> {
     Dpop(S),
 }
 
+impl<S: BosStr> AuthorizationToken<S> {
+    /// Borrows the token as a `&str` reference.
+    pub fn borrow(&self) -> AuthorizationToken<&str> {
+        match self {
+            AuthorizationToken::Bearer(token) => {
+                AuthorizationToken::Bearer(token.borrow_or_share())
+            }
+            AuthorizationToken::Dpop(token) => AuthorizationToken::Dpop(token.borrow_or_share()),
+        }
+    }
+}
+
 impl<S: BosStr> IntoStatic for AuthorizationToken<S>
 where
     S: IntoStatic,

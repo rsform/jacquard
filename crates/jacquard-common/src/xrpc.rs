@@ -36,6 +36,7 @@ use crate::http_client::HttpClient;
 use crate::http_client::HttpClientExt;
 use crate::types::value::Data;
 use crate::{AuthorizationToken, error::AuthError};
+use crate::{BorrowOrShare, DefaultStr};
 use crate::{CowStr, error::XrpcResult};
 use crate::{IntoStatic, types::value::RawData};
 use bytes::Bytes;
@@ -245,20 +246,52 @@ impl fmt::Display for GenericError {
 impl Error for GenericError {}
 
 /// Per-request options for XRPC calls.
-#[derive(Debug, Default, Clone)]
-pub struct CallOptions<'a> {
+#[derive(Debug, Clone)]
+pub struct CallOptions<S: BosStr = DefaultStr> {
     /// Optional Authorization to apply (`Bearer` or `DPoP`).
-    pub auth: Option<AuthorizationToken<SmolStr>>,
+    pub auth: Option<AuthorizationToken<S>>,
     /// `atproto-proxy` header value.
-    pub atproto_proxy: Option<CowStr<'a>>,
+    pub atproto_proxy: Option<S>,
     /// `atproto-accept-labelers` header values.
-    pub atproto_accept_labelers: Option<Vec<CowStr<'a>>>,
+    pub atproto_accept_labelers: Option<Vec<S>>,
     /// Extra headers to attach to this request.
     pub extra_headers: Vec<(HeaderName, HeaderValue)>,
 }
 
-impl IntoStatic for CallOptions<'_> {
-    type Output = CallOptions<'static>;
+impl Default for CallOptions {
+    fn default() -> Self {
+        Self {
+            auth: None,
+            atproto_proxy: None,
+            atproto_accept_labelers: None,
+            extra_headers: Vec::new(),
+        }
+    }
+}
+
+impl<S: BosStr> CallOptions<S> {
+    /// Borrows the fields of this struct as `&str` references.
+    pub fn borrow(&self) -> CallOptions<&str> {
+        CallOptions {
+            auth: self.auth.as_ref().map(|auth| auth.borrow()),
+            atproto_proxy: self
+                .atproto_proxy
+                .as_ref()
+                .map(|proxy| proxy.borrow_or_share()),
+            atproto_accept_labelers: self
+                .atproto_accept_labelers
+                .as_ref()
+                .map(|labelers| labelers.iter().map(|l| l.as_ref()).collect()),
+            extra_headers: self.extra_headers.clone(),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for CallOptions<S>
+where
+    <S as IntoStatic>::Output: BosStr + 'static,
+{
+    type Output = CallOptions<<S as IntoStatic>::Output>;
 
     fn into_static(self) -> Self::Output {
         CallOptions {
@@ -322,7 +355,7 @@ pub trait XrpcClient: HttpClient {
     }
 
     /// Get the call options for the client.
-    fn opts(&self) -> impl Future<Output = CallOptions<'_>> {
+    fn opts(&self) -> impl Future<Output = CallOptions> {
         async { CallOptions::default() }
     }
 
@@ -352,7 +385,7 @@ pub trait XrpcClient: HttpClient {
     fn send_with_opts<R>(
         &self,
         request: R,
-        opts: CallOptions<'_>,
+        opts: CallOptions,
     ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
         R: XrpcRequest + Send + Sync + serde::Serialize,
@@ -364,7 +397,7 @@ pub trait XrpcClient: HttpClient {
     fn send_with_opts<R>(
         &self,
         request: R,
-        opts: CallOptions<'_>,
+        opts: CallOptions,
     ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
         R: XrpcRequest + Send + Sync + serde::Serialize,
@@ -453,22 +486,22 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
 pub struct XrpcCall<'a, C: HttpClient> {
     pub(crate) client: &'a C,
     pub(crate) base: Uri<&'a str>,
-    pub(crate) opts: CallOptions<'a>,
+    pub(crate) opts: CallOptions,
 }
 
 impl<'a, C: HttpClient> XrpcCall<'a, C> {
     /// Apply Authorization to this call.
-    pub fn auth(mut self, token: AuthorizationToken<SmolStr>) -> Self {
+    pub fn auth(mut self, token: AuthorizationToken) -> Self {
         self.opts.auth = Some(token);
         self
     }
     /// Set `atproto-proxy` header for this call.
-    pub fn proxy(mut self, proxy: CowStr<'a>) -> Self {
+    pub fn proxy(mut self, proxy: DefaultStr) -> Self {
         self.opts.atproto_proxy = Some(proxy);
         self
     }
     /// Set `atproto-accept-labelers` header(s) for this call.
-    pub fn accept_labelers(mut self, labelers: Vec<CowStr<'a>>) -> Self {
+    pub fn accept_labelers(mut self, labelers: Vec<DefaultStr>) -> Self {
         self.opts.atproto_accept_labelers = Some(labelers);
         self
     }
@@ -478,7 +511,7 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
         self
     }
     /// Replace the builder's options entirely.
-    pub fn with_options(mut self, opts: CallOptions<'a>) -> Self {
+    pub fn with_options(mut self, opts: CallOptions) -> Self {
         self.opts = opts;
         self
     }
@@ -616,7 +649,7 @@ fn xrpc_endpoint_uri(base: &Uri<&str>, nsid: &str, query: Option<&str>) -> XrpcR
 pub fn build_http_request<'s, R>(
     base: &Uri<&str>,
     req: &R,
-    opts: &CallOptions<'_>,
+    opts: &CallOptions,
 ) -> XrpcResult<Request<Vec<u8>>>
 where
     R: XrpcRequest + Serialize,
@@ -669,7 +702,7 @@ where
     }
 
     if let Some(proxy) = &opts.atproto_proxy {
-        builder = builder.header(Header::AtprotoProxy, proxy.as_ref());
+        builder = builder.header(Header::AtprotoProxy, proxy.as_str());
     }
     if let Some(labelers) = &opts.atproto_accept_labelers {
         if !labelers.is_empty() {
@@ -1074,7 +1107,7 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
         }
 
         if let Some(proxy) = &self.opts.atproto_proxy {
-            builder = builder.header(Header::AtprotoProxy, proxy.as_ref());
+            builder = builder.header(Header::AtprotoProxy, proxy.as_str());
         }
         if let Some(labelers) = &self.opts.atproto_accept_labelers {
             if !labelers.is_empty() {

@@ -1,13 +1,14 @@
 use clap::Parser;
 use jacquard::StreamingResponse;
 use jacquard::api::com_atproto::sync::get_blob::GetBlob;
-use jacquard::client::Agent;
+use jacquard::client::{Agent, FileAuthStore};
+use jacquard::common::session::SessionHint;
 use jacquard::types::cid::Cid;
 use jacquard::types::did::Did;
 use jacquard::xrpc::XrpcStreamingClient;
-use jacquard_oauth::authstore::MemoryAuthStore;
 use jacquard_oauth::client::OAuthClient;
 use jacquard_oauth::loopback::LoopbackConfig;
+use jacquard_oauth::types::AuthorizeOptions;
 use n0_future::StreamExt;
 
 #[derive(Parser, Debug)]
@@ -17,24 +18,42 @@ use n0_future::StreamExt;
     about = "Download a blob from a PDS and stream the response, then display it, if it's an image"
 )]
 struct Args {
-    input: String,
+    /// Optional handle, DID, or PDS URL used to resume or start OAuth.
+    input: Option<String>,
+
     #[arg(short, long)]
     did: String,
+
     #[arg(short, long)]
     cid: String,
+
+    /// Path to auth store file (will be created if missing).
+    #[arg(long, default_value = "/tmp/jacquard-oauth-session.json")]
+    store: String,
 }
 
 #[tokio::main]
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    let oauth = OAuthClient::with_default_config(MemoryAuthStore::new());
-    let session = oauth
-        .login_with_local_server(args.input, Default::default(), LoopbackConfig::default())
-        .await?;
+    let oauth = OAuthClient::with_default_config(FileAuthStore::new(&args.store));
+    let hint = SessionHint::from_optional_input(args.input.as_deref());
+    let Some(session) = oauth
+        .resume_or_login_with_local_server(
+            &hint,
+            AuthorizeOptions::default(),
+            LoopbackConfig::default(),
+        )
+        .await?
+    else {
+        miette::bail!(
+            "no stored OAuth session found in {}; pass a handle, DID, or PDS URL to log in",
+            args.store
+        );
+    };
 
     let agent: Agent<_> = Agent::from(session);
-    // Use the streaming `.download()` method with the generated API parameter struct
+    // Use the streaming `.download()` method with the generated API parameter struct.
     let output: StreamingResponse = agent
         .download(GetBlob {
             did: Did::new(args.did)?,

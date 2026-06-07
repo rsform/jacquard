@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::games_gamesgamesgamesgames::GameFeedViewItem;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSimilarGamesFeed<S: BosStr = DefaultStr> {
     /// Defaults to `5`. Min: 1. Max: 10.
     #[serde(default = "_default_limit")]
@@ -28,9 +31,11 @@ pub struct GetSimilarGamesFeed<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetSimilarGamesFeedOutput<S: BosStr = DefaultStr> {
     pub feed: Vec<GameFeedViewItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -71,7 +76,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_similar_games_feed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -113,20 +118,14 @@ pub struct GetSimilarGamesFeedBuilder<
 
 impl GetSimilarGamesFeed<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetSimilarGamesFeedBuilder<
-        get_similar_games_feed_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetSimilarGamesFeedBuilder<get_similar_games_feed_state::Empty, DefaultStr> {
         GetSimilarGamesFeedBuilder::new()
     }
 }
 
 impl<S: BosStr> GetSimilarGamesFeed<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetSimilarGamesFeedBuilder<
-        get_similar_games_feed_state::Empty,
-        S,
-    > {
+    pub fn builder() -> GetSimilarGamesFeedBuilder<get_similar_games_feed_state::Empty, S> {
         GetSimilarGamesFeedBuilder::builder()
     }
 }
@@ -153,10 +152,7 @@ impl<S: BosStr> GetSimilarGamesFeedBuilder<get_similar_games_feed_state::Empty, 
     }
 }
 
-impl<
-    St: get_similar_games_feed_state::State,
-    S: BosStr,
-> GetSimilarGamesFeedBuilder<St, S> {
+impl<St: get_similar_games_feed_state::State, S: BosStr> GetSimilarGamesFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();

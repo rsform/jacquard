@@ -94,6 +94,59 @@ impl From<SessionKey> for (Did, SmolStr) {
     }
 }
 
+impl SessionHint<DefaultStr> {
+    /// Build a session hint that matches any session.
+    pub fn any() -> Self {
+        SessionHint::Any
+    }
+
+    /// Build a session hint that matches a specific key.
+    pub fn key(key: SessionKey) -> Self {
+        SessionHint::Key(key)
+    }
+
+    /// Build a session hint that matches a login identifier.
+    pub fn identifier(identifier: DefaultStr) -> Self {
+        SessionHint::Identifier(identifier)
+    }
+
+    /// Build a session hint that matches a DID.
+    pub fn did(did: Did<DefaultStr>) -> Self {
+        SessionHint::Did(did)
+    }
+
+    /// Build a session hint that matches a handle.
+    pub fn handle(handle: Handle<DefaultStr>) -> Self {
+        SessionHint::Handle(handle)
+    }
+}
+
+impl<'a> SessionHint<&'a str> {
+    /// Build a borrowed session hint from CLI/login input.
+    ///
+    /// DIDs and handles become addressable session hints. Other inputs are kept as login
+    /// identifiers, which can start authentication but do not match resolver-free stores.
+    pub fn from_input(input: &'a str) -> Self {
+        if let Ok(did) = Did::new(input) {
+            SessionHint::Did(did)
+        } else if let Ok(handle) = Handle::new(input) {
+            SessionHint::Handle(handle)
+        } else {
+            SessionHint::Identifier(input)
+        }
+    }
+
+    /// Build a borrowed session hint from optional CLI/login input.
+    ///
+    /// Missing input means "resume any existing session".
+    pub fn from_optional_input(input: Option<&'a str>) -> Self {
+        match input {
+            Some(input) => Self::from_input(input),
+            None => SessionHint::Any,
+        }
+    }
+}
+
 /// Resolver-free hint for choosing a stored session.
 ///
 /// Matching in `jacquard-common` is intentionally key-only and does not perform identity
@@ -119,13 +172,16 @@ pub enum SessionHint<S: BosStr = DefaultStr> {
 }
 
 /// Match a session key using only resolver-free key data.
-pub fn match_session_key<I>(hint: &SessionHint, keys: I) -> Option<SessionKey>
+pub fn match_session_key<I, S>(hint: &SessionHint<S>, keys: I) -> Option<SessionKey>
 where
     I: IntoIterator<Item = SessionKey>,
+    S: BosStr,
 {
     match hint {
         SessionHint::Any => keys.into_iter().next(),
-        SessionHint::Did(did) => keys.into_iter().find(|key| key.did == *did),
+        SessionHint::Did(did) => keys
+            .into_iter()
+            .find(|key| key.did.as_str() == did.as_ref()),
         SessionHint::Handle(_) | SessionHint::Identifier(_) => None,
         SessionHint::Key(target) => keys.into_iter().find(|key| key == target),
     }
@@ -144,9 +200,9 @@ pub trait SessionSelector<M>: Send + Sync {
     type Error;
 
     /// Select a matching session, if one exists.
-    fn select_session(
+    fn select_session<S: BosStr + Send + Sync>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<S>,
     ) -> impl Future<Output = Result<Option<M>, Self::Error>>;
 }
 
@@ -213,7 +269,10 @@ where
 {
     type Error = SessionStoreError;
 
-    async fn select_session(&self, hint: &SessionHint) -> Result<Option<SessionKey>, Self::Error> {
+    async fn select_session<S: BosStr + Send + Sync>(
+        &self,
+        hint: &SessionHint<S>,
+    ) -> Result<Option<SessionKey>, Self::Error> {
         Ok(match_session_key(hint, self.list_keys().await?))
     }
 }
@@ -376,7 +435,7 @@ mod tests {
         let keys = vec![alice.clone(), bob.clone()];
 
         assert_eq!(
-            match_session_key(&SessionHint::Any, keys.clone()),
+            match_session_key(&SessionHint::any(), keys.clone()),
             Some(alice.clone())
         );
         assert_eq!(
@@ -384,12 +443,12 @@ mod tests {
             Some(bob.clone())
         );
         assert_eq!(
-            match_session_key(&SessionHint::Key(bob.clone()), keys.clone()),
+            match_session_key(&SessionHint::key(bob.clone()), keys.clone()),
             Some(bob.clone())
         );
         assert_eq!(
             match_session_key(
-                &SessionHint::Key(SessionKey::new(
+                &SessionHint::key(SessionKey::new(
                     Did::new_static("did:plc:carol").unwrap(),
                     "c",
                 )),
@@ -397,10 +456,12 @@ mod tests {
             ),
             None
         );
-        assert_eq!(match_session_key(&SessionHint::Any, Vec::new()), None);
+        assert_eq!(match_session_key(&SessionHint::any(), Vec::new()), None);
         assert_eq!(
             match_session_key(
-                &SessionHint::Handle(Handle::new_static("alice.example.com").unwrap()),
+                &SessionHint::<DefaultStr>::Handle(
+                    Handle::new_static("alice.example.com").unwrap()
+                ),
                 keys.clone(),
             ),
             None

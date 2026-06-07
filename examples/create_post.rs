@@ -1,9 +1,10 @@
 use clap::Parser;
-use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::post::Post;
 use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
+use jacquard::common::session::SessionHint;
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
+use jacquard::oauth::types::AuthorizeOptions;
 use jacquard::richtext::RichText;
 use jacquard::types::string::Datetime;
 
@@ -14,8 +15,8 @@ use jacquard::types::string::Datetime;
     about = "Create a post with automatic facet detection"
 )]
 struct Args {
-    /// Handle (e.g., alice.bsky.social), DID, or PDS URL
-    input: CowStr<'static>,
+    /// Optional handle, DID, or PDS URL used to resume or start OAuth.
+    input: Option<String>,
 
     /// Post text (can include @mentions, #hashtags, URLs, and [markdown](links))
     #[arg(short, long)]
@@ -31,9 +32,20 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     let oauth = OAuthClient::with_default_config(FileAuthStore::new(&args.store));
-    let session = oauth
-        .login_with_local_server(args.input, Default::default(), LoopbackConfig::default())
-        .await?;
+    let hint = SessionHint::from_optional_input(args.input.as_deref());
+    let Some(session) = oauth
+        .resume_or_login_with_local_server(
+            &hint,
+            AuthorizeOptions::default(),
+            LoopbackConfig::default(),
+        )
+        .await?
+    else {
+        miette::bail!(
+            "no stored OAuth session found in {}; pass a handle, DID, or PDS URL to log in",
+            args.store
+        );
+    };
 
     let agent: Agent<_> = Agent::from(session);
 

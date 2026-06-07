@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -115,7 +115,7 @@ impl<S: BosStr> LexiconSchema for Status<S> {
 
 pub mod status_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -307,10 +307,7 @@ where
     St::Status: status_state::IsUnset,
 {
     /// Set the `status` field (required)
-    pub fn status(
-        mut self,
-        value: impl Into<S>,
-    ) -> StatusBuilder<status_state::SetStatus<St>, S> {
+    pub fn status(mut self, value: impl Into<S>) -> StatusBuilder<status_state::SetStatus<St>, S> {
         self._fields.4 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
@@ -374,10 +371,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.pipeline.status"),
@@ -388,23 +385,21 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("pipeline"),
-                                SmolStr::new_static("workflow"),
-                                SmolStr::new_static("status"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("pipeline"),
+                            SmolStr::new_static("workflow"),
+                            SmolStr::new_static("status"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("time of creation of this status update"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "time of creation of this status update",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -412,9 +407,9 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("error"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("error message if failed"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "error message if failed",
+                                    )),
                                     ..Default::default()
                                 }),
                             );
@@ -427,9 +422,7 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("pipeline"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("ATURI of the pipeline"),
-                                    ),
+                                    description: Some(CowStr::new_static("ATURI of the pipeline")),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -437,20 +430,16 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("status"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("status of the workflow"),
-                                    ),
+                                    description: Some(CowStr::new_static("status of the workflow")),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("workflow"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "name of the workflow within this pipeline",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "name of the workflow within this pipeline",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

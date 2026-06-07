@@ -5,9 +5,9 @@ use jacquard_common::types::string::Nsid;
 use jacquard_common::xrpc::XrpcExt;
 use jacquard_common::xrpc::atproto::{ListRecords, ListRecordsRecord};
 use jacquard_common::{BosStr, IntoStatic};
-use jacquard_identity::JacquardResolver;
 use jacquard_identity::lexicon_resolver::LexiconSchemaResolver;
 use jacquard_identity::resolver::{IdentityResolver, ResolverOptions};
+use jacquard_identity::{JacquardResolver, PublicResolver};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use miette::{Result, miette};
 use serde::Serialize;
@@ -23,7 +23,7 @@ impl AtProtoSource {
     /// Fetch a single lexicon schema by NSID using DNS + XRPC resolution
     async fn fetch_single_lexicon<S: BosStr + Sync>(
         &self,
-        resolver: &JacquardResolver,
+        resolver: &PublicResolver,
         nsid: &Nsid<S>,
     ) -> Result<HashMap<String, LexiconDoc<'_>>> {
         let schema = resolver

@@ -10,13 +10,12 @@ pub mod get_actor_feed;
 pub mod get_play;
 pub mod play;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +26,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::fm_teal::alpha::feed;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::fm_teal::alpha::feed;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Artist<S: BosStr = DefaultStr> {
     ///The MusicBrainz artist ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,9 +46,11 @@ pub struct Artist<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PlayView<S: BosStr = DefaultStr> {
     ///Array of artists in order of original appearance.
     pub artists: Vec<feed::Artist<S>>,
@@ -231,10 +235,10 @@ impl<S: BosStr> LexiconSchema for PlayView<S> {
 }
 
 fn lexicon_doc_fm_teal_alpha_feed_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.feed.defs"),
@@ -250,11 +254,9 @@ fn lexicon_doc_fm_teal_alpha_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artistMbId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The MusicBrainz artist ID URI, formatted as mbid:<uuid>",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The MusicBrainz artist ID URI, formatted as mbid:<uuid>",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -262,9 +264,7 @@ fn lexicon_doc_fm_teal_alpha_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artistName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The name of the artist"),
-                                ),
+                                description: Some(CowStr::new_static("The name of the artist")),
                                 min_length: Some(1usize),
                                 max_length: Some(256usize),
                                 max_graphemes: Some(2560usize),
@@ -437,7 +437,7 @@ fn lexicon_doc_fm_teal_alpha_feed_defs() -> LexiconDoc<'static> {
 
 pub mod play_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -519,18 +519,7 @@ impl PlayViewBuilder<play_view_state::Empty, DefaultStr> {
         PlayViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -543,18 +532,7 @@ impl<S: BosStr> PlayViewBuilder<play_view_state::Empty, S> {
         PlayViewBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }

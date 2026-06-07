@@ -1,4 +1,5 @@
 use jacquard_common::IntoStatic;
+use jacquard_common::bos::BosStr;
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::session::{
     FileTokenStore, SessionHint, SessionKey, SessionSelector, SessionStore, SessionStoreError,
@@ -407,9 +408,9 @@ impl SessionStore<SessionKey, crate::client::AtpSession> for FileAuthStore {
 impl SessionSelector<crate::client::credential_session::CredentialSessionMatch> for FileAuthStore {
     type Error = jacquard_common::error::ClientError;
 
-    async fn select_session(
+    async fn select_session<Str: BosStr + Send + Sync>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<Str>,
     ) -> Result<Option<crate::client::credential_session::CredentialSessionMatch>, Self::Error>
     {
         match hint {
@@ -465,9 +466,9 @@ impl SessionSelector<crate::client::credential_session::CredentialSessionMatch> 
 impl SessionSelector<jacquard_oauth::authstore::OAuthSessionMatch> for FileAuthStore {
     type Error = SessionStoreError;
 
-    async fn select_session(
+    async fn select_session<Str: BosStr + Send + Sync>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<Str>,
     ) -> Result<Option<jacquard_oauth::authstore::OAuthSessionMatch>, Self::Error> {
         match hint {
             SessionHint::Any => {

@@ -20,13 +20,16 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blog_pckt::block::text::Text;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blog_pckt::block::text::Text;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TaskItem<S: BosStr = DefaultStr> {
     ///Whether the task is completed
     pub checked: bool,
@@ -53,7 +56,7 @@ impl<S: BosStr> LexiconSchema for TaskItem<S> {
 
 pub mod task_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -201,10 +204,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_taskItem() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.taskItem"),
@@ -213,12 +216,10 @@ fn lexicon_doc_blog_pckt_block_taskItem() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("checked"),
-                            SmolStr::new_static("content")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("checked"),
+                        SmolStr::new_static("content"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -231,9 +232,7 @@ fn lexicon_doc_blog_pckt_block_taskItem() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("content"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Array of text blocks"),
-                                ),
+                                description: Some(CowStr::new_static("Array of text blocks")),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![CowStr::new_static("blog.pckt.block.text")],
                                     closed: Some(false),

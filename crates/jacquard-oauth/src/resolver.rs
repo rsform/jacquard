@@ -940,7 +940,7 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
     }
 }
 
-impl OAuthResolver for jacquard_identity::JacquardResolver {}
+impl<C: HttpClient + Sync> OAuthResolver for jacquard_identity::JacquardResolver<C> {}
 
 #[cfg(test)]
 mod tests {

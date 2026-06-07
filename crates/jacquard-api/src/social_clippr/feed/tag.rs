@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A record containing a bookmark tag for organization.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -180,7 +180,7 @@ impl<S: BosStr> LexiconSchema for Tag<S> {
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -355,10 +355,10 @@ where
 }
 
 fn lexicon_doc_social_clippr_feed_tag() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.clippr.feed.tag"),
@@ -367,28 +367,24 @@ fn lexicon_doc_social_clippr_feed_tag() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A record containing a bookmark tag for organization.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A record containing a bookmark tag for organization.",
+                    )),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("color"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("A hexadecimal color code"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "A hexadecimal color code",
+                                    )),
                                     max_length: Some(70usize),
                                     max_graphemes: Some(7usize),
                                     ..Default::default()
@@ -397,11 +393,9 @@ fn lexicon_doc_social_clippr_feed_tag() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "A client-defined timestamp for the creation of the tag",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "A client-defined timestamp for the creation of the tag",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -409,11 +403,9 @@ fn lexicon_doc_social_clippr_feed_tag() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "A description of the tag for additional context",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "A description of the tag for additional context",
+                                    )),
                                     max_length: Some(50000usize),
                                     max_graphemes: Some(5000usize),
                                     ..Default::default()
@@ -422,11 +414,9 @@ fn lexicon_doc_social_clippr_feed_tag() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "A de-duplicated string containing the name of the tag",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "A de-duplicated string containing the name of the tag",
+                                    )),
                                     max_length: Some(640usize),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()

@@ -1,9 +1,10 @@
 use clap::Parser;
-use jacquard::CowStr;
 use jacquard::api::com_whtwnd::blog::entry::Entry;
 use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
+use jacquard::common::session::SessionHint;
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
+use jacquard::oauth::types::AuthorizeOptions;
 use jacquard::types::string::Datetime;
 use jacquard_common::deps::fluent_uri::Uri;
 use miette::IntoDiagnostic;
@@ -11,8 +12,8 @@ use miette::IntoDiagnostic;
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Create a WhiteWind blog post")]
 struct Args {
-    /// Handle (e.g., alice.bsky.social), DID, or PDS URL
-    input: CowStr<'static>,
+    /// Optional handle or DID used to resume a session.
+    input: Option<String>,
 
     /// Blog post title
     #[arg(short, long)]
@@ -36,9 +37,20 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     let oauth = OAuthClient::with_default_config(FileAuthStore::new(&args.store));
-    let session = oauth
-        .login_with_local_server(args.input, Default::default(), LoopbackConfig::default())
-        .await?;
+    let hint = SessionHint::from_optional_input(args.input.as_deref());
+    let Some(session) = oauth
+        .resume_or_login_with_local_server(
+            &hint,
+            AuthorizeOptions::default(),
+            LoopbackConfig::default(),
+        )
+        .await?
+    else {
+        miette::bail!(
+            "no stored OAuth session found in {}; pass a handle, DID, or PDS URL to log in",
+            args.store
+        );
+    };
 
     let agent: Agent<_> = Agent::from(session);
 

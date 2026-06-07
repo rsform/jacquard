@@ -154,7 +154,7 @@ async fn credential_session_hint_matcher_resolves_common_hints() {
         .await
         .unwrap();
 
-    let matched = resolve_credential_session_hint(&store, &client, &SessionHint::Any)
+    let matched = resolve_credential_session_hint(&store, &client, &SessionHint::any())
         .await
         .unwrap()
         .expect("any match");
@@ -165,7 +165,7 @@ async fn credential_session_hint_matcher_resolves_common_hints() {
     let matched = resolve_credential_session_hint(
         &store,
         &client,
-        &SessionHint::Did(Did::new_static("did:plc:alice").unwrap()),
+        &SessionHint::did(Did::new_static("did:plc:alice").unwrap()),
     )
     .await
     .unwrap()
@@ -175,14 +175,14 @@ async fn credential_session_hint_matcher_resolves_common_hints() {
     let matched = resolve_credential_session_hint(
         &store,
         &client,
-        &SessionHint::Handle(Handle::new_static("alice.bsky.social").unwrap()),
+        &SessionHint::handle(Handle::new_static("alice.bsky.social").unwrap()),
     )
     .await
     .unwrap()
     .expect("handle match");
     assert_eq!(matched.key, key);
 
-    let matched = resolve_credential_session_hint(&store, &client, &SessionHint::Key(key.clone()))
+    let matched = resolve_credential_session_hint(&store, &client, &SessionHint::key(key.clone()))
         .await
         .unwrap()
         .expect("key match");
@@ -191,7 +191,7 @@ async fn credential_session_hint_matcher_resolves_common_hints() {
     let missing = resolve_credential_session_hint(
         &store,
         &client,
-        &SessionHint::Key(SessionKey::new(
+        &SessionHint::key(SessionKey::new(
             Did::new_static("did:plc:bob").unwrap(),
             "session",
         )),
@@ -203,7 +203,7 @@ async fn credential_session_hint_matcher_resolves_common_hints() {
     let identifier = resolve_credential_session_hint(
         &store,
         &client,
-        &SessionHint::Identifier("alice@example.com".into()),
+        &SessionHint::identifier("alice@example.com".into()),
     )
     .await
     .unwrap();
@@ -229,7 +229,7 @@ async fn credential_resolver_selector_uses_store_before_handle_resolution() {
     let matched = resolve_credential_session_hint(
         &store,
         &client,
-        &SessionHint::Handle(Handle::new_static("alice.bsky.social").unwrap()),
+        &SessionHint::handle(Handle::new_static("alice.bsky.social").unwrap()),
     )
     .await
     .unwrap()
@@ -244,7 +244,7 @@ async fn credential_resolver_selector_uses_store_before_handle_resolution() {
     let matched = resolve_credential_session_hint(
         &store,
         &client,
-        &SessionHint::Handle(Handle::new_static("alias.bsky.social").unwrap()),
+        &SessionHint::handle(Handle::new_static("alias.bsky.social").unwrap()),
     )
     .await
     .unwrap()
@@ -263,7 +263,10 @@ async fn credential_resume_returns_challenge_details_without_password() {
     let client = Arc::new(MockClient::default());
     let session = CredentialSession::new(store, client);
 
-    let result = session.resume(&SessionHint::Any).await.expect("resume any");
+    let result = session
+        .resume(&SessionHint::any())
+        .await
+        .expect("resume any");
     let CredentialResumeResult::LoginRequired(challenge) = result else {
         panic!("expected login challenge for empty store");
     };
@@ -272,7 +275,7 @@ async fn credential_resume_returns_challenge_details_without_password() {
 
     let key = SessionKey::new(Did::new_static("did:plc:alice").unwrap(), "mobile");
     let result = session
-        .resume(&SessionHint::Key(key.clone()))
+        .resume(&SessionHint::key(key.clone()))
         .await
         .expect("resume key");
     let CredentialResumeResult::LoginRequired(challenge) = result else {
@@ -282,7 +285,7 @@ async fn credential_resume_returns_challenge_details_without_password() {
     assert_eq!(challenge.session_id.as_deref(), Some("mobile"));
 
     let result = session
-        .resume(&SessionHint::Identifier("alice@example.com".into()))
+        .resume(&SessionHint::identifier("alice@example.com".into()))
         .await
         .expect("resume identifier");
     let CredentialResumeResult::LoginRequired(challenge) = result else {
@@ -302,7 +305,10 @@ async fn credential_resume_uses_stored_pds_without_resolving_did_doc() {
     stored.pds = Some(Uri::parse("https://stored-pds").unwrap().to_owned());
     store.set(key.clone(), stored.clone()).await.unwrap();
 
-    let result = session.resume(&SessionHint::Any).await.expect("resume any");
+    let result = session
+        .resume(&SessionHint::any())
+        .await
+        .expect("resume any");
     let CredentialResumeResult::Resumed(resumed) = result else {
         panic!("expected resumed session");
     };

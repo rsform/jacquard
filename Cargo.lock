@@ -2649,6 +2649,7 @@ dependencies = [
  "p256",
  "p384",
  "rand 0.8.5",
+ "reqwest",
  "serde",
  "serde_html_form",
  "serde_json",

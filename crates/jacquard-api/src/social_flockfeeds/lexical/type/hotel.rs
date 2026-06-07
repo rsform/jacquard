@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,9 +24,6 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::article;
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
@@ -35,12 +32,18 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /** A hotel is an establishment that provides lodging paid on a short-term basis (source: Wikipedia, the free encyclopedia, see http://en.wikipedia.org/wiki/Hotel).
 <br /><br />
 See also the <a href="/docs/hotels.html">dedicated document on the use of schema.org for marking up hotels and other forms of accommodations</a>.*/
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
@@ -287,9 +290,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub smoking_allowed: Option<EmbeddedSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub special_opening_hours_specification: Option<
-        EmbeddedSpecialOpeningHoursSpecification<S>,
-    >,
+    pub special_opening_hours_specification: Option<EmbeddedSpecialOpeningHoursSpecification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -313,7 +314,6 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -363,7 +363,6 @@ pub enum EmbeddedAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -407,7 +406,6 @@ pub enum EmbeddedBranchOf<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -417,7 +415,6 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -477,7 +474,6 @@ pub enum EmbeddedDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -506,7 +502,6 @@ pub enum EmbeddedDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -525,7 +520,6 @@ pub enum EmbeddedEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -533,7 +527,6 @@ pub enum EmbeddedEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -548,7 +541,6 @@ pub enum EmbeddedEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -556,7 +548,6 @@ pub enum EmbeddedEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -573,7 +564,6 @@ pub enum EmbeddedFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -581,7 +571,6 @@ pub enum EmbeddedFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -602,7 +591,6 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -737,7 +725,6 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -796,7 +783,6 @@ pub enum EmbeddedLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -815,7 +801,6 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -833,7 +818,6 @@ pub enum EmbeddedMakesOffer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -860,7 +844,6 @@ pub enum EmbeddedMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -868,7 +851,6 @@ pub enum EmbeddedMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -879,7 +861,6 @@ pub enum EmbeddedMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -929,7 +910,6 @@ pub enum EmbeddedOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -937,7 +917,6 @@ pub enum EmbeddedParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -957,7 +936,6 @@ pub enum EmbeddedPhoto<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -965,7 +943,6 @@ pub enum EmbeddedPhotos<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1042,7 +1019,6 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1056,7 +1032,6 @@ pub enum EmbeddedSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1064,7 +1039,6 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1349,9 +1323,7 @@ pub struct Hotel<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub smoking_allowed: Option<HotelSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub special_opening_hours_specification: Option<
-        HotelSpecialOpeningHoursSpecification<S>,
-    >,
+    pub special_opening_hours_specification: Option<HotelSpecialOpeningHoursSpecification<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sponsor: Option<HotelSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1375,7 +1347,6 @@ pub struct Hotel<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1425,7 +1396,6 @@ pub enum HotelAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1469,7 +1439,6 @@ pub enum HotelBranchOf<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1479,7 +1448,6 @@ pub enum HotelBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1539,7 +1507,6 @@ pub enum HotelDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1568,7 +1535,6 @@ pub enum HotelDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1587,7 +1553,6 @@ pub enum HotelEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1595,7 +1560,6 @@ pub enum HotelEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1610,7 +1574,6 @@ pub enum HotelEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1618,7 +1581,6 @@ pub enum HotelEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1635,7 +1597,6 @@ pub enum HotelFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1643,7 +1604,6 @@ pub enum HotelFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1664,7 +1624,6 @@ pub enum HotelFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1799,7 +1758,6 @@ pub enum HotelImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1858,7 +1816,6 @@ pub enum HotelLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1877,7 +1834,6 @@ pub enum HotelLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1895,7 +1851,6 @@ pub enum HotelMakesOffer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1922,7 +1877,6 @@ pub enum HotelMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1930,7 +1884,6 @@ pub enum HotelMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1941,7 +1894,6 @@ pub enum HotelMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1991,7 +1943,6 @@ pub enum HotelOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1999,7 +1950,6 @@ pub enum HotelParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2019,7 +1969,6 @@ pub enum HotelPhoto<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2027,7 +1976,6 @@ pub enum HotelPhotos<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2104,7 +2052,6 @@ pub enum HotelSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2118,7 +2065,6 @@ pub enum HotelSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2126,7 +2072,6 @@ pub enum HotelSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2232,10 +2177,10 @@ impl<S: BosStr> LexiconSchema for Hotel<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Hotel() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Hotel"),
@@ -5057,7 +5002,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Hotel() -> LexiconDoc<'static> {
 
 pub mod hotel_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5235,139 +5180,16 @@ impl HotelBuilder<hotel_state::Empty, DefaultStr> {
         HotelBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -5380,139 +5202,16 @@ impl<S: BosStr> HotelBuilder<hotel_state::Empty, S> {
         HotelBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -5567,10 +5266,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `additionalProperty` field to an Option value (optional)
-    pub fn maybe_additional_property(
-        mut self,
-        value: Option<HotelAdditionalProperty<S>>,
-    ) -> Self {
+    pub fn maybe_additional_property(mut self, value: Option<HotelAdditionalProperty<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -5578,18 +5274,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(
-        mut self,
-        value: impl Into<Option<HotelAdditionalType<S>>>,
-    ) -> Self {
+    pub fn additional_type(mut self, value: impl Into<Option<HotelAdditionalType<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(
-        mut self,
-        value: Option<HotelAdditionalType<S>>,
-    ) -> Self {
+    pub fn maybe_additional_type(mut self, value: Option<HotelAdditionalType<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -5629,18 +5319,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(
-        mut self,
-        value: impl Into<Option<HotelAggregateRating<S>>>,
-    ) -> Self {
+    pub fn aggregate_rating(mut self, value: impl Into<Option<HotelAggregateRating<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(
-        mut self,
-        value: Option<HotelAggregateRating<S>>,
-    ) -> Self {
+    pub fn maybe_aggregate_rating(mut self, value: Option<HotelAggregateRating<S>>) -> Self {
         self._fields.6 = value;
         self
     }
@@ -5648,10 +5332,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(
-        mut self,
-        value: impl Into<Option<HotelAlternateName<S>>>,
-    ) -> Self {
+    pub fn alternate_name(mut self, value: impl Into<Option<HotelAlternateName<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -5677,18 +5358,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `amenityFeature` field (optional)
-    pub fn amenity_feature(
-        mut self,
-        value: impl Into<Option<HotelAmenityFeature<S>>>,
-    ) -> Self {
+    pub fn amenity_feature(mut self, value: impl Into<Option<HotelAmenityFeature<S>>>) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `amenityFeature` field to an Option value (optional)
-    pub fn maybe_amenity_feature(
-        mut self,
-        value: Option<HotelAmenityFeature<S>>,
-    ) -> Self {
+    pub fn maybe_amenity_feature(mut self, value: Option<HotelAmenityFeature<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -5730,10 +5405,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `availableLanguage` field to an Option value (optional)
-    pub fn maybe_available_language(
-        mut self,
-        value: Option<HotelAvailableLanguage<S>>,
-    ) -> Self {
+    pub fn maybe_available_language(mut self, value: Option<HotelAvailableLanguage<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -5806,10 +5478,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `checkinTime` field (optional)
-    pub fn checkin_time(
-        mut self,
-        value: impl Into<Option<HotelCheckinTime<S>>>,
-    ) -> Self {
+    pub fn checkin_time(mut self, value: impl Into<Option<HotelCheckinTime<S>>>) -> Self {
         self._fields.18 = value.into();
         self
     }
@@ -5822,10 +5491,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `checkoutTime` field (optional)
-    pub fn checkout_time(
-        mut self,
-        value: impl Into<Option<HotelCheckoutTime<S>>>,
-    ) -> Self {
+    pub fn checkout_time(mut self, value: impl Into<Option<HotelCheckoutTime<S>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
@@ -5857,10 +5523,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `contactPoint` field (optional)
-    pub fn contact_point(
-        mut self,
-        value: impl Into<Option<HotelContactPoint<S>>>,
-    ) -> Self {
+    pub fn contact_point(mut self, value: impl Into<Option<HotelContactPoint<S>>>) -> Self {
         self._fields.21 = value.into();
         self
     }
@@ -5873,10 +5536,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `contactPoints` field (optional)
-    pub fn contact_points(
-        mut self,
-        value: impl Into<Option<HotelContactPoints<S>>>,
-    ) -> Self {
+    pub fn contact_points(mut self, value: impl Into<Option<HotelContactPoints<S>>>) -> Self {
         self._fields.22 = value.into();
         self
     }
@@ -5889,10 +5549,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `containedIn` field (optional)
-    pub fn contained_in(
-        mut self,
-        value: impl Into<Option<HotelContainedIn<S>>>,
-    ) -> Self {
+    pub fn contained_in(mut self, value: impl Into<Option<HotelContainedIn<S>>>) -> Self {
         self._fields.23 = value.into();
         self
     }
@@ -5913,10 +5570,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `containedInPlace` field to an Option value (optional)
-    pub fn maybe_contained_in_place(
-        mut self,
-        value: Option<HotelContainedInPlace<S>>,
-    ) -> Self {
+    pub fn maybe_contained_in_place(mut self, value: Option<HotelContainedInPlace<S>>) -> Self {
         self._fields.24 = value;
         self
     }
@@ -5924,10 +5578,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `containsPlace` field (optional)
-    pub fn contains_place(
-        mut self,
-        value: impl Into<Option<HotelContainsPlace<S>>>,
-    ) -> Self {
+    pub fn contains_place(mut self, value: impl Into<Option<HotelContainsPlace<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
@@ -5948,10 +5599,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `correctionsPolicy` field to an Option value (optional)
-    pub fn maybe_corrections_policy(
-        mut self,
-        value: Option<HotelCorrectionsPolicy<S>>,
-    ) -> Self {
+    pub fn maybe_corrections_policy(mut self, value: Option<HotelCorrectionsPolicy<S>>) -> Self {
         self._fields.26 = value;
         self
     }
@@ -5967,10 +5615,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `currenciesAccepted` field to an Option value (optional)
-    pub fn maybe_currencies_accepted(
-        mut self,
-        value: Option<HotelCurrenciesAccepted<S>>,
-    ) -> Self {
+    pub fn maybe_currencies_accepted(mut self, value: Option<HotelCurrenciesAccepted<S>>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -6023,18 +5668,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `dissolutionDate` field (optional)
-    pub fn dissolution_date(
-        mut self,
-        value: impl Into<Option<HotelDissolutionDate<S>>>,
-    ) -> Self {
+    pub fn dissolution_date(mut self, value: impl Into<Option<HotelDissolutionDate<S>>>) -> Self {
         self._fields.31 = value.into();
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
-    pub fn maybe_dissolution_date(
-        mut self,
-        value: Option<HotelDissolutionDate<S>>,
-    ) -> Self {
+    pub fn maybe_dissolution_date(mut self, value: Option<HotelDissolutionDate<S>>) -> Self {
         self._fields.31 = value;
         self
     }
@@ -6042,18 +5681,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `diversityPolicy` field (optional)
-    pub fn diversity_policy(
-        mut self,
-        value: impl Into<Option<HotelDiversityPolicy<S>>>,
-    ) -> Self {
+    pub fn diversity_policy(mut self, value: impl Into<Option<HotelDiversityPolicy<S>>>) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
-    pub fn maybe_diversity_policy(
-        mut self,
-        value: Option<HotelDiversityPolicy<S>>,
-    ) -> Self {
+    pub fn maybe_diversity_policy(mut self, value: Option<HotelDiversityPolicy<S>>) -> Self {
         self._fields.32 = value;
         self
     }
@@ -6132,10 +5765,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `ethicsPolicy` field (optional)
-    pub fn ethics_policy(
-        mut self,
-        value: impl Into<Option<HotelEthicsPolicy<S>>>,
-    ) -> Self {
+    pub fn ethics_policy(mut self, value: impl Into<Option<HotelEthicsPolicy<S>>>) -> Self {
         self._fields.38 = value.into();
         self
     }
@@ -6213,10 +5843,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `foundingDate` field (optional)
-    pub fn founding_date(
-        mut self,
-        value: impl Into<Option<HotelFoundingDate<S>>>,
-    ) -> Self {
+    pub fn founding_date(mut self, value: impl Into<Option<HotelFoundingDate<S>>>) -> Self {
         self._fields.44 = value.into();
         self
     }
@@ -6229,18 +5856,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `foundingLocation` field (optional)
-    pub fn founding_location(
-        mut self,
-        value: impl Into<Option<HotelFoundingLocation<S>>>,
-    ) -> Self {
+    pub fn founding_location(mut self, value: impl Into<Option<HotelFoundingLocation<S>>>) -> Self {
         self._fields.45 = value.into();
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
-    pub fn maybe_founding_location(
-        mut self,
-        value: Option<HotelFoundingLocation<S>>,
-    ) -> Self {
+    pub fn maybe_founding_location(mut self, value: Option<HotelFoundingLocation<S>>) -> Self {
         self._fields.45 = value;
         self
     }
@@ -6287,10 +5908,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `geoContains` field (optional)
-    pub fn geo_contains(
-        mut self,
-        value: impl Into<Option<HotelGeoContains<S>>>,
-    ) -> Self {
+    pub fn geo_contains(mut self, value: impl Into<Option<HotelGeoContains<S>>>) -> Self {
         self._fields.49 = value.into();
         self
     }
@@ -6303,10 +5921,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `geoCoveredBy` field (optional)
-    pub fn geo_covered_by(
-        mut self,
-        value: impl Into<Option<HotelGeoCoveredBy<S>>>,
-    ) -> Self {
+    pub fn geo_covered_by(mut self, value: impl Into<Option<HotelGeoCoveredBy<S>>>) -> Self {
         self._fields.50 = value.into();
         self
     }
@@ -6345,10 +5960,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `geoDisjoint` field (optional)
-    pub fn geo_disjoint(
-        mut self,
-        value: impl Into<Option<HotelGeoDisjoint<S>>>,
-    ) -> Self {
+    pub fn geo_disjoint(mut self, value: impl Into<Option<HotelGeoDisjoint<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
@@ -6374,10 +5986,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `geoIntersects` field (optional)
-    pub fn geo_intersects(
-        mut self,
-        value: impl Into<Option<HotelGeoIntersects<S>>>,
-    ) -> Self {
+    pub fn geo_intersects(mut self, value: impl Into<Option<HotelGeoIntersects<S>>>) -> Self {
         self._fields.55 = value.into();
         self
     }
@@ -6390,10 +5999,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `geoOverlaps` field (optional)
-    pub fn geo_overlaps(
-        mut self,
-        value: impl Into<Option<HotelGeoOverlaps<S>>>,
-    ) -> Self {
+    pub fn geo_overlaps(mut self, value: impl Into<Option<HotelGeoOverlaps<S>>>) -> Self {
         self._fields.56 = value.into();
         self
     }
@@ -6451,18 +6057,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `hasCertification` field (optional)
-    pub fn has_certification(
-        mut self,
-        value: impl Into<Option<HotelHasCertification<S>>>,
-    ) -> Self {
+    pub fn has_certification(mut self, value: impl Into<Option<HotelHasCertification<S>>>) -> Self {
         self._fields.60 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
-    pub fn maybe_has_certification(
-        mut self,
-        value: Option<HotelHasCertification<S>>,
-    ) -> Self {
+    pub fn maybe_has_certification(mut self, value: Option<HotelHasCertification<S>>) -> Self {
         self._fields.60 = value;
         self
     }
@@ -6470,10 +6070,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `hasCredential` field (optional)
-    pub fn has_credential(
-        mut self,
-        value: impl Into<Option<HotelHasCredential<S>>>,
-    ) -> Self {
+    pub fn has_credential(mut self, value: impl Into<Option<HotelHasCredential<S>>>) -> Self {
         self._fields.61 = value.into();
         self
     }
@@ -6513,10 +6110,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
-    pub fn maybe_has_gs1_digital_link(
-        mut self,
-        value: Option<HotelHasGs1DigitalLink<S>>,
-    ) -> Self {
+    pub fn maybe_has_gs1_digital_link(mut self, value: Option<HotelHasGs1DigitalLink<S>>) -> Self {
         self._fields.63 = value;
         self
     }
@@ -6545,10 +6139,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `hasMemberProgram` field to an Option value (optional)
-    pub fn maybe_has_member_program(
-        mut self,
-        value: Option<HotelHasMemberProgram<S>>,
-    ) -> Self {
+    pub fn maybe_has_member_program(mut self, value: Option<HotelHasMemberProgram<S>>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -6575,18 +6166,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `hasOfferCatalog` field (optional)
-    pub fn has_offer_catalog(
-        mut self,
-        value: impl Into<Option<HotelHasOfferCatalog<S>>>,
-    ) -> Self {
+    pub fn has_offer_catalog(mut self, value: impl Into<Option<HotelHasOfferCatalog<S>>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
-    pub fn maybe_has_offer_catalog(
-        mut self,
-        value: Option<HotelHasOfferCatalog<S>>,
-    ) -> Self {
+    pub fn maybe_has_offer_catalog(mut self, value: Option<HotelHasOfferCatalog<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -6634,10 +6219,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `hasShippingService` field to an Option value (optional)
-    pub fn maybe_has_shipping_service(
-        mut self,
-        value: Option<HotelHasShippingService<S>>,
-    ) -> Self {
+    pub fn maybe_has_shipping_service(mut self, value: Option<HotelHasShippingService<S>>) -> Self {
         self._fields.70 = value;
         self
     }
@@ -6722,10 +6304,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `iso6523Code` field (optional)
-    pub fn iso6523_code(
-        mut self,
-        value: impl Into<Option<HotelIso6523Code<S>>>,
-    ) -> Self {
+    pub fn iso6523_code(mut self, value: impl Into<Option<HotelIso6523Code<S>>>) -> Self {
         self._fields.76 = value.into();
         self
     }
@@ -6764,10 +6343,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `knowsLanguage` field (optional)
-    pub fn knows_language(
-        mut self,
-        value: impl Into<Option<HotelKnowsLanguage<S>>>,
-    ) -> Self {
+    pub fn knows_language(mut self, value: impl Into<Option<HotelKnowsLanguage<S>>>) -> Self {
         self._fields.79 = value.into();
         self
     }
@@ -6793,10 +6369,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `legalAddress` field (optional)
-    pub fn legal_address(
-        mut self,
-        value: impl Into<Option<HotelLegalAddress<S>>>,
-    ) -> Self {
+    pub fn legal_address(mut self, value: impl Into<Option<HotelLegalAddress<S>>>) -> Self {
         self._fields.81 = value.into();
         self
     }
@@ -6901,10 +6474,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(
-        mut self,
-        value: Option<HotelMainEntityOfPage<S>>,
-    ) -> Self {
+    pub fn maybe_main_entity_of_page(mut self, value: Option<HotelMainEntityOfPage<S>>) -> Self {
         self._fields.88 = value;
         self
     }
@@ -7035,18 +6605,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `nonprofitStatus` field (optional)
-    pub fn nonprofit_status(
-        mut self,
-        value: impl Into<Option<HotelNonprofitStatus<S>>>,
-    ) -> Self {
+    pub fn nonprofit_status(mut self, value: impl Into<Option<HotelNonprofitStatus<S>>>) -> Self {
         self._fields.98 = value.into();
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
-    pub fn maybe_nonprofit_status(
-        mut self,
-        value: Option<HotelNonprofitStatus<S>>,
-    ) -> Self {
+    pub fn maybe_nonprofit_status(mut self, value: Option<HotelNonprofitStatus<S>>) -> Self {
         self._fields.98 = value;
         self
     }
@@ -7062,10 +6626,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `numberOfEmployees` field to an Option value (optional)
-    pub fn maybe_number_of_employees(
-        mut self,
-        value: Option<HotelNumberOfEmployees<S>>,
-    ) -> Self {
+    pub fn maybe_number_of_employees(mut self, value: Option<HotelNumberOfEmployees<S>>) -> Self {
         self._fields.99 = value;
         self
     }
@@ -7073,18 +6634,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `numberOfRooms` field (optional)
-    pub fn number_of_rooms(
-        mut self,
-        value: impl Into<Option<HotelNumberOfRooms<S>>>,
-    ) -> Self {
+    pub fn number_of_rooms(mut self, value: impl Into<Option<HotelNumberOfRooms<S>>>) -> Self {
         self._fields.100 = value.into();
         self
     }
     /// Set the `numberOfRooms` field to an Option value (optional)
-    pub fn maybe_number_of_rooms(
-        mut self,
-        value: Option<HotelNumberOfRooms<S>>,
-    ) -> Self {
+    pub fn maybe_number_of_rooms(mut self, value: Option<HotelNumberOfRooms<S>>) -> Self {
         self._fields.100 = value;
         self
     }
@@ -7092,10 +6647,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `openingHours` field (optional)
-    pub fn opening_hours(
-        mut self,
-        value: impl Into<Option<HotelOpeningHours<S>>>,
-    ) -> Self {
+    pub fn opening_hours(mut self, value: impl Into<Option<HotelOpeningHours<S>>>) -> Self {
         self._fields.101 = value.into();
         self
     }
@@ -7167,10 +6719,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
         self
     }
     /// Set the `parentOrganization` field to an Option value (optional)
-    pub fn maybe_parent_organization(
-        mut self,
-        value: Option<HotelParentOrganization<S>>,
-    ) -> Self {
+    pub fn maybe_parent_organization(mut self, value: Option<HotelParentOrganization<S>>) -> Self {
         self._fields.105 = value;
         self
     }
@@ -7178,18 +6727,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `paymentAccepted` field (optional)
-    pub fn payment_accepted(
-        mut self,
-        value: impl Into<Option<HotelPaymentAccepted<S>>>,
-    ) -> Self {
+    pub fn payment_accepted(mut self, value: impl Into<Option<HotelPaymentAccepted<S>>>) -> Self {
         self._fields.106 = value.into();
         self
     }
     /// Set the `paymentAccepted` field to an Option value (optional)
-    pub fn maybe_payment_accepted(
-        mut self,
-        value: Option<HotelPaymentAccepted<S>>,
-    ) -> Self {
+    pub fn maybe_payment_accepted(mut self, value: Option<HotelPaymentAccepted<S>>) -> Self {
         self._fields.106 = value;
         self
     }
@@ -7197,10 +6740,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `petsAllowed` field (optional)
-    pub fn pets_allowed(
-        mut self,
-        value: impl Into<Option<HotelPetsAllowed<S>>>,
-    ) -> Self {
+    pub fn pets_allowed(mut self, value: impl Into<Option<HotelPetsAllowed<S>>>) -> Self {
         self._fields.107 = value.into();
         self
     }
@@ -7239,18 +6779,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(
-        mut self,
-        value: impl Into<Option<HotelPotentialAction<S>>>,
-    ) -> Self {
+    pub fn potential_action(mut self, value: impl Into<Option<HotelPotentialAction<S>>>) -> Self {
         self._fields.110 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(
-        mut self,
-        value: Option<HotelPotentialAction<S>>,
-    ) -> Self {
+    pub fn maybe_potential_action(mut self, value: Option<HotelPotentialAction<S>>) -> Self {
         self._fields.110 = value;
         self
     }
@@ -7271,10 +6805,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `publicAccess` field (optional)
-    pub fn public_access(
-        mut self,
-        value: impl Into<Option<HotelPublicAccess<S>>>,
-    ) -> Self {
+    pub fn public_access(mut self, value: impl Into<Option<HotelPublicAccess<S>>>) -> Self {
         self._fields.112 = value.into();
         self
     }
@@ -7358,10 +6889,7 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `serviceArea` field (optional)
-    pub fn service_area(
-        mut self,
-        value: impl Into<Option<HotelServiceArea<S>>>,
-    ) -> Self {
+    pub fn service_area(mut self, value: impl Into<Option<HotelServiceArea<S>>>) -> Self {
         self._fields.118 = value.into();
         self
     }
@@ -7400,18 +6928,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `smokingAllowed` field (optional)
-    pub fn smoking_allowed(
-        mut self,
-        value: impl Into<Option<HotelSmokingAllowed<S>>>,
-    ) -> Self {
+    pub fn smoking_allowed(mut self, value: impl Into<Option<HotelSmokingAllowed<S>>>) -> Self {
         self._fields.121 = value.into();
         self
     }
     /// Set the `smokingAllowed` field to an Option value (optional)
-    pub fn maybe_smoking_allowed(
-        mut self,
-        value: Option<HotelSmokingAllowed<S>>,
-    ) -> Self {
+    pub fn maybe_smoking_allowed(mut self, value: Option<HotelSmokingAllowed<S>>) -> Self {
         self._fields.121 = value;
         self
     }
@@ -7464,18 +6986,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `subOrganization` field (optional)
-    pub fn sub_organization(
-        mut self,
-        value: impl Into<Option<HotelSubOrganization<S>>>,
-    ) -> Self {
+    pub fn sub_organization(mut self, value: impl Into<Option<HotelSubOrganization<S>>>) -> Self {
         self._fields.125 = value.into();
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
-    pub fn maybe_sub_organization(
-        mut self,
-        value: Option<HotelSubOrganization<S>>,
-    ) -> Self {
+    pub fn maybe_sub_organization(mut self, value: Option<HotelSubOrganization<S>>) -> Self {
         self._fields.125 = value;
         self
     }
@@ -7522,18 +7038,12 @@ impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
 
 impl<St: hotel_state::State, S: BosStr> HotelBuilder<St, S> {
     /// Set the `tourBookingPage` field (optional)
-    pub fn tour_booking_page(
-        mut self,
-        value: impl Into<Option<HotelTourBookingPage<S>>>,
-    ) -> Self {
+    pub fn tour_booking_page(mut self, value: impl Into<Option<HotelTourBookingPage<S>>>) -> Self {
         self._fields.129 = value.into();
         self
     }
     /// Set the `tourBookingPage` field to an Option value (optional)
-    pub fn maybe_tour_booking_page(
-        mut self,
-        value: Option<HotelTourBookingPage<S>>,
-    ) -> Self {
+    pub fn maybe_tour_booking_page(mut self, value: Option<HotelTourBookingPage<S>>) -> Self {
         self._fields.129 = value;
         self
     }

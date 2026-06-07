@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,9 +21,6 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::BlockedAuthor;
 use crate::app_bsky::feed::GeneratorView;
 use crate::app_bsky::graph::ListView;
@@ -36,18 +33,26 @@ use crate::sh_weaver::embed::images;
 use crate::sh_weaver::embed::record_with_media;
 use crate::sh_weaver::embed::records;
 use crate::sh_weaver::embed::video;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Records<S: BosStr = DefaultStr> {
     pub records: Vec<records::RecordEmbed<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordEmbed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
@@ -56,9 +61,11 @@ pub struct RecordEmbed<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RecordEmbedView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
@@ -66,7 +73,6 @@ pub struct RecordEmbedView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -82,15 +88,16 @@ pub enum RecordEmbedViewRecordView<S: BosStr = DefaultStr> {
     VideoView(Box<video::View<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct View<S: BosStr = DefaultStr> {
     pub record: ViewUnionRecord<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -114,9 +121,11 @@ pub enum ViewUnionRecord<S: BosStr = DefaultStr> {
     StarterPackViewBasic(Box<StarterPackViewBasic<S>>),
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewBlocked<S: BosStr = DefaultStr> {
     pub author: BlockedAuthor<S>,
     pub blocked: bool,
@@ -125,9 +134,11 @@ pub struct ViewBlocked<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewDetached<S: BosStr = DefaultStr> {
     pub detached: bool,
     pub uri: AtUri<S>,
@@ -135,9 +146,11 @@ pub struct ViewDetached<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewNotFound<S: BosStr = DefaultStr> {
     pub not_found: bool,
     pub uri: AtUri<S>,
@@ -145,9 +158,11 @@ pub struct ViewNotFound<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewRecord<S: BosStr = DefaultStr> {
     pub author: ProfileDataViewBasic<S>,
     pub cid: Cid<S>,
@@ -324,7 +339,7 @@ impl<S: BosStr> LexiconSchema for ViewRecord<S> {
 
 pub mod records_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -438,10 +453,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_embed_records() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.embed.records"),
@@ -517,7 +532,7 @@ fn lexicon_doc_sh_weaver_embed_records() -> LexiconDoc<'static> {
                                     CowStr::new_static("sh.weaver.embed.records#view"),
                                     CowStr::new_static("sh.weaver.embed.images#view"),
                                     CowStr::new_static("sh.weaver.embed.recordWithMedia#view"),
-                                    CowStr::new_static("sh.weaver.embed.video#view")
+                                    CowStr::new_static("sh.weaver.embed.video#view"),
                                 ],
                                 ..Default::default()
                             }),
@@ -545,7 +560,7 @@ fn lexicon_doc_sh_weaver_embed_records() -> LexiconDoc<'static> {
                                     CowStr::new_static("app.bsky.feed.defs#generatorView"),
                                     CowStr::new_static("app.bsky.graph.defs#listView"),
                                     CowStr::new_static("app.bsky.labeler.defs#labelerView"),
-                                    CowStr::new_static("app.bsky.graph.defs#starterPackViewBasic")
+                                    CowStr::new_static("app.bsky.graph.defs#starterPackViewBasic"),
                                 ],
                                 ..Default::default()
                             }),
@@ -558,21 +573,18 @@ fn lexicon_doc_sh_weaver_embed_records() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("viewBlocked"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("blocked"),
-                            SmolStr::new_static("author")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("blocked"),
+                        SmolStr::new_static("author"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.feed.defs#blockedAuthor",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.feed.defs#blockedAuthor"),
                                 ..Default::default()
                             }),
                         );
@@ -597,9 +609,10 @@ fn lexicon_doc_sh_weaver_embed_records() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("viewDetached"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("detached")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("detached"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -624,9 +637,10 @@ fn lexicon_doc_sh_weaver_embed_records() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("viewNotFound"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("notFound")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("notFound"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -651,13 +665,13 @@ fn lexicon_doc_sh_weaver_embed_records() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("viewRecord"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("value"),
-                            SmolStr::new_static("indexedAt")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("value"),
+                        SmolStr::new_static("indexedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -754,7 +768,7 @@ fn lexicon_doc_sh_weaver_embed_records() -> LexiconDoc<'static> {
 
 pub mod record_embed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -873,10 +887,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecordEmbed<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordEmbed<S> {
         RecordEmbed {
             name: self._fields.0,
             record: self._fields.1.unwrap(),
@@ -887,7 +898,7 @@ where
 
 pub mod record_embed_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -918,10 +929,7 @@ pub mod record_embed_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordEmbedViewBuilder<
-    St: record_embed_view_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RecordEmbedViewBuilder<St: record_embed_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<RecordEmbedViewRecordView<S>>),
     _type: PhantomData<fn() -> S>,
@@ -1009,10 +1017,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RecordEmbedView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordEmbedView<S> {
         RecordEmbedView {
             name: self._fields.0,
             record_view: self._fields.1.unwrap(),
@@ -1023,7 +1028,7 @@ where
 
 pub mod view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1138,7 +1143,7 @@ where
 
 pub mod view_blocked_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1311,10 +1316,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewBlocked<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewBlocked<S> {
         ViewBlocked {
             author: self._fields.0.unwrap(),
             blocked: self._fields.1.unwrap(),
@@ -1326,7 +1328,7 @@ where
 
 pub mod view_detached_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1464,10 +1466,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewDetached<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewDetached<S> {
         ViewDetached {
             detached: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -1478,7 +1477,7 @@ where
 
 pub mod view_not_found_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1616,10 +1615,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewNotFound<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewNotFound<S> {
         ViewNotFound {
             not_found: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -1630,7 +1626,7 @@ where
 
 pub mod view_record_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1758,7 +1754,9 @@ impl ViewRecordBuilder<view_record_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ViewRecordBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -1769,7 +1767,9 @@ impl<S: BosStr> ViewRecordBuilder<view_record_state::Empty, S> {
     pub fn builder() -> Self {
         ViewRecordBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -1815,18 +1815,12 @@ where
 
 impl<St: view_record_state::State, S: BosStr> ViewRecordBuilder<St, S> {
     /// Set the `embeds` field (optional)
-    pub fn embeds(
-        mut self,
-        value: impl Into<Option<Vec<records::RecordEmbedView<S>>>>,
-    ) -> Self {
+    pub fn embeds(mut self, value: impl Into<Option<Vec<records::RecordEmbedView<S>>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `embeds` field to an Option value (optional)
-    pub fn maybe_embeds(
-        mut self,
-        value: Option<Vec<records::RecordEmbedView<S>>>,
-    ) -> Self {
+    pub fn maybe_embeds(mut self, value: Option<Vec<records::RecordEmbedView<S>>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1981,10 +1975,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewRecord<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewRecord<S> {
         ViewRecord {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),

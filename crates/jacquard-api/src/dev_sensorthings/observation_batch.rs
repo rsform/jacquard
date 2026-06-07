@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,16 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::dev_sensorthings::observation_batch;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::dev_sensorthings::observation_batch;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct BatchEntry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub q: Option<BatchEntryQ<S>>,
@@ -41,7 +44,6 @@ pub struct BatchEntry<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BatchEntryQ<S: BosStr = DefaultStr> {
@@ -123,7 +125,6 @@ where
         }
     }
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -235,7 +236,7 @@ impl<S: BosStr> LexiconSchema for ObservationBatch<S> {
 
 pub mod batch_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -280,7 +281,11 @@ pub mod batch_entry_state {
 /// Builder for constructing an instance of this type.
 pub struct BatchEntryBuilder<St: batch_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<BatchEntryQ<S>>, Option<BatchEntryResult<S>>, Option<Datetime>),
+    _fields: (
+        Option<BatchEntryQ<S>>,
+        Option<BatchEntryResult<S>>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -387,10 +392,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> BatchEntry<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BatchEntry<S> {
         BatchEntry {
             q: self._fields.0,
             result: self._fields.1.unwrap(),
@@ -401,10 +403,10 @@ where
 }
 
 fn lexicon_doc_dev_sensorthings_observationBatch() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.sensorthings.observationBatch"),
@@ -527,7 +529,7 @@ fn lexicon_doc_dev_sensorthings_observationBatch() -> LexiconDoc<'static> {
 
 pub mod observation_batch_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -600,10 +602,7 @@ pub mod observation_batch_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ObservationBatchBuilder<
-    St: observation_batch_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ObservationBatchBuilder<St: observation_batch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
@@ -745,10 +744,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ObservationBatch<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ObservationBatch<S> {
         ObservationBatch {
             datastream: self._fields.0.unwrap(),
             observations: self._fields.1.unwrap(),

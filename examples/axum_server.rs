@@ -3,10 +3,11 @@ use std::sync::Arc;
 use axum::{Router, extract::State};
 use jacquard::{
     api::com_atproto::identity::resolve_did::{ResolveDidOutput, ResolveDidRequest},
-    identity::{JacquardResolver, resolver::IdentityResolver},
+    identity::resolver::IdentityResolver,
     types::value::to_data,
 };
 use jacquard_axum::{ExtractXrpc, GenericXrpcErrorResponse, IntoRouter, XrpcResponse};
+use jacquard_identity::PublicResolver;
 use miette::{IntoDiagnostic, Result};
 use tracing_subscriber::EnvFilter;
 
@@ -49,7 +50,7 @@ async fn main() -> Result<()> {
 }
 
 pub struct AppState {
-    pub resolver: JacquardResolver,
+    pub resolver: PublicResolver,
 }
 
 impl AppState {

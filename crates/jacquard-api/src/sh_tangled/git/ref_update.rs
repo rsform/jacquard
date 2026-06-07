@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,13 +24,16 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::git::ref_update;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::git::ref_update;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CommitCountBreakdown<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub by_email: Option<Vec<ref_update::IndividualEmailCommitCount<S>>>,
@@ -38,9 +41,11 @@ pub struct CommitCountBreakdown<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct IndividualEmailCommitCount<S: BosStr = DefaultStr> {
     pub count: i64,
     pub email: S,
@@ -48,9 +53,11 @@ pub struct IndividualEmailCommitCount<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct IndividualLanguageSize<S: BosStr = DefaultStr> {
     pub lang: S,
     pub size: i64,
@@ -58,9 +65,11 @@ pub struct IndividualLanguageSize<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LangBreakdown<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inputs: Option<Vec<ref_update::IndividualLanguageSize<S>>>,
@@ -107,9 +116,11 @@ pub struct RefUpdateGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: RefUpdate<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Meta<S: BosStr = DefaultStr> {
     pub commit_count: ref_update::CommitCountBreakdown<S>,
     /// Defaults to `false`.
@@ -313,10 +324,10 @@ impl<S: BosStr> LexiconSchema for Meta<S> {
 }
 
 fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.git.refUpdate"),
@@ -347,9 +358,10 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("individualEmailCommitCount"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("email"), SmolStr::new_static("count")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("email"),
+                        SmolStr::new_static("count"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -361,7 +373,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("email"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -371,15 +385,18 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("individualLanguageSize"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("lang"), SmolStr::new_static("size")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("lang"),
+                        SmolStr::new_static("size"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("lang"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("size"),
@@ -416,30 +433,28 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "An update to a git repository, emitted by knots.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "An update to a git repository, emitted by knots.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("ref"),
-                                SmolStr::new_static("committerDid"),
-                                SmolStr::new_static("repo"), SmolStr::new_static("oldSha"),
-                                SmolStr::new_static("newSha"), SmolStr::new_static("meta")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("ref"),
+                            SmolStr::new_static("committerDid"),
+                            SmolStr::new_static("repo"),
+                            SmolStr::new_static("oldSha"),
+                            SmolStr::new_static("newSha"),
+                            SmolStr::new_static("meta"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("committerDid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("did of the user that pushed this ref"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "did of the user that pushed this ref",
+                                    )),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -454,9 +469,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("newSha"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("new SHA of this ref"),
-                                    ),
+                                    description: Some(CowStr::new_static("new SHA of this ref")),
                                     min_length: Some(40usize),
                                     max_length: Some(40usize),
                                     ..Default::default()
@@ -465,9 +478,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("oldSha"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("old SHA of this ref"),
-                                    ),
+                                    description: Some(CowStr::new_static("old SHA of this ref")),
                                     min_length: Some(40usize),
                                     max_length: Some(40usize),
                                     ..Default::default()
@@ -476,9 +487,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("ownerDid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("did of the owner of the repo"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "did of the owner of the repo",
+                                    )),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -495,9 +506,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("repo"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("DID of the repo itself"),
-                                    ),
+                                    description: Some(CowStr::new_static("DID of the repo itself")),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -512,12 +521,10 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("meta"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("isDefaultRef"),
-                            SmolStr::new_static("commitCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("isDefaultRef"),
+                        SmolStr::new_static("commitCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -554,7 +561,7 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
 
 pub mod individual_email_commit_count_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -608,28 +615,22 @@ pub struct IndividualEmailCommitCountBuilder<
 
 impl IndividualEmailCommitCount<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> IndividualEmailCommitCountBuilder<
-        individual_email_commit_count_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new()
+    -> IndividualEmailCommitCountBuilder<individual_email_commit_count_state::Empty, DefaultStr>
+    {
         IndividualEmailCommitCountBuilder::new()
     }
 }
 
 impl<S: BosStr> IndividualEmailCommitCount<S> {
     /// Create a new builder for this type
-    pub fn builder() -> IndividualEmailCommitCountBuilder<
-        individual_email_commit_count_state::Empty,
-        S,
-    > {
+    pub fn builder()
+    -> IndividualEmailCommitCountBuilder<individual_email_commit_count_state::Empty, S> {
         IndividualEmailCommitCountBuilder::builder()
     }
 }
 
-impl IndividualEmailCommitCountBuilder<
-    individual_email_commit_count_state::Empty,
-    DefaultStr,
-> {
+impl IndividualEmailCommitCountBuilder<individual_email_commit_count_state::Empty, DefaultStr> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         IndividualEmailCommitCountBuilder {
@@ -640,9 +641,7 @@ impl IndividualEmailCommitCountBuilder<
     }
 }
 
-impl<
-    S: BosStr,
-> IndividualEmailCommitCountBuilder<individual_email_commit_count_state::Empty, S> {
+impl<S: BosStr> IndividualEmailCommitCountBuilder<individual_email_commit_count_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         IndividualEmailCommitCountBuilder {
@@ -662,10 +661,8 @@ where
     pub fn count(
         mut self,
         value: impl Into<i64>,
-    ) -> IndividualEmailCommitCountBuilder<
-        individual_email_commit_count_state::SetCount<St>,
-        S,
-    > {
+    ) -> IndividualEmailCommitCountBuilder<individual_email_commit_count_state::SetCount<St>, S>
+    {
         self._fields.0 = Option::Some(value.into());
         IndividualEmailCommitCountBuilder {
             _state: PhantomData,
@@ -684,10 +681,8 @@ where
     pub fn email(
         mut self,
         value: impl Into<S>,
-    ) -> IndividualEmailCommitCountBuilder<
-        individual_email_commit_count_state::SetEmail<St>,
-        S,
-    > {
+    ) -> IndividualEmailCommitCountBuilder<individual_email_commit_count_state::SetEmail<St>, S>
+    {
         self._fields.1 = Option::Some(value.into());
         IndividualEmailCommitCountBuilder {
             _state: PhantomData,
@@ -726,7 +721,7 @@ where
 
 pub mod individual_language_size_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -780,20 +775,15 @@ pub struct IndividualLanguageSizeBuilder<
 
 impl IndividualLanguageSize<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> IndividualLanguageSizeBuilder<
-        individual_language_size_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> IndividualLanguageSizeBuilder<individual_language_size_state::Empty, DefaultStr>
+    {
         IndividualLanguageSizeBuilder::new()
     }
 }
 
 impl<S: BosStr> IndividualLanguageSize<S> {
     /// Create a new builder for this type
-    pub fn builder() -> IndividualLanguageSizeBuilder<
-        individual_language_size_state::Empty,
-        S,
-    > {
+    pub fn builder() -> IndividualLanguageSizeBuilder<individual_language_size_state::Empty, S> {
         IndividualLanguageSizeBuilder::builder()
     }
 }
@@ -887,7 +877,7 @@ where
 
 pub mod ref_update_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1199,10 +1189,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RefUpdate<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RefUpdate<S> {
         RefUpdate {
             committer_did: self._fields.0.unwrap(),
             meta: self._fields.1.unwrap(),
@@ -1222,7 +1209,7 @@ fn _default_meta_is_default_ref() -> bool {
 
 pub mod meta_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1359,10 +1346,7 @@ impl<St: meta_state::State, S: BosStr> MetaBuilder<St, S> {
         self
     }
     /// Set the `langBreakdown` field to an Option value (optional)
-    pub fn maybe_lang_breakdown(
-        mut self,
-        value: Option<ref_update::LangBreakdown<S>>,
-    ) -> Self {
+    pub fn maybe_lang_breakdown(mut self, value: Option<ref_update::LangBreakdown<S>>) -> Self {
         self._fields.2 = value;
         self
     }

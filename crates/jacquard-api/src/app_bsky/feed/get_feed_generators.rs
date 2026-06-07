@@ -8,25 +8,30 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_bsky::feed::GeneratorView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::feed::GeneratorView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetFeedGenerators<S: BosStr = DefaultStr> {
     pub feeds: Vec<AtUri<S>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetFeedGeneratorsOutput<S: BosStr = DefaultStr> {
     pub feeds: Vec<GeneratorView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -63,7 +68,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
 
 pub mod get_feed_generators_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -94,10 +99,7 @@ pub mod get_feed_generators_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetFeedGeneratorsBuilder<
-    St: get_feed_generators_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetFeedGeneratorsBuilder<St: get_feed_generators_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
@@ -105,10 +107,7 @@ pub struct GetFeedGeneratorsBuilder<
 
 impl GetFeedGenerators<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetFeedGeneratorsBuilder<
-        get_feed_generators_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetFeedGeneratorsBuilder<get_feed_generators_state::Empty, DefaultStr> {
         GetFeedGeneratorsBuilder::new()
     }
 }

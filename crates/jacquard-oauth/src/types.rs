@@ -73,12 +73,11 @@ where
     pub state: Option<S>,
 }
 
-impl<S: BosStr + AsRef<str> + From<SmolStr>> Default for AuthorizeOptions<S> {
+impl Default for AuthorizeOptions<DefaultStr> {
     fn default() -> Self {
-        let empty_scopes: Scopes<S> = Scopes::empty().convert();
         Self {
             redirect_uri: None,
-            scopes: empty_scopes,
+            scopes: Scopes::empty(),
             prompt: None,
             state: None,
         }

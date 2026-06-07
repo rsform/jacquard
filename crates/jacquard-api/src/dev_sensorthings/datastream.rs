@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::dev_sensorthings::datastream;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::dev_sensorthings::datastream;
+use serde::{Deserialize, Serialize};
 /// Groups Observations of one ObservedProperty by one Sensor on one Thing. Carries all context needed to interpret observation results.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -78,7 +78,10 @@ pub struct DatastreamGetRecordOutput<S: BosStr = DefaultStr> {
 /// UCUM-compatible unit description.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UnitOfMeasurement<S: BosStr = DefaultStr> {
     ///URI from QUDT, UCUM, or similar unit ontology
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -207,7 +210,7 @@ impl<S: BosStr> LexiconSchema for UnitOfMeasurement<S> {
 
 pub mod datastream_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -377,7 +380,9 @@ impl DatastreamBuilder<datastream_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         DatastreamBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -388,7 +393,9 @@ impl<S: BosStr> DatastreamBuilder<datastream_state::Empty, S> {
     pub fn builder() -> Self {
         DatastreamBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -608,10 +615,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Datastream<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Datastream<S> {
         Datastream {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -630,10 +634,10 @@ where
 }
 
 fn lexicon_doc_dev_sensorthings_datastream() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.sensorthings.datastream"),
@@ -775,23 +779,20 @@ fn lexicon_doc_dev_sensorthings_datastream() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("unitOfMeasurement"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("UCUM-compatible unit description."),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("name"), SmolStr::new_static("symbol")],
-                    ),
+                    description: Some(CowStr::new_static("UCUM-compatible unit description.")),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("symbol"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("definition"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "URI from QUDT, UCUM, or similar unit ontology",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URI from QUDT, UCUM, or similar unit ontology",
+                                )),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),

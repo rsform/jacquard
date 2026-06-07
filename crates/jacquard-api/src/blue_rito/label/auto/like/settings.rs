@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blue_rito::label::auto::like::settings;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blue_rito::label::auto::like::settings;
+use serde::{Deserialize, Serialize};
 /// Setting Like based auto labeling.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -59,9 +59,11 @@ pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Settings<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PostRef<S: BosStr = DefaultStr> {
     ///CID of the post
     pub cid: S,
@@ -136,7 +138,7 @@ impl<S: BosStr> LexiconSchema for PostRef<S> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -303,10 +305,10 @@ where
 }
 
 fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.rito.label.auto.like.settings"),
@@ -315,29 +317,25 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("Setting Like based auto labeling."),
-                    ),
+                    description: Some(CowStr::new_static("Setting Like based auto labeling.")),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("apply"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("apply"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("apply"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(
-                                        CowStr::new_static("The post to apply the label to"),
-                                    ),
-                                    refs: vec![
-                                        CowStr::new_static("blue.rito.label.auto.like.settings#postRef")
-                                    ],
+                                    description: Some(CowStr::new_static(
+                                        "The post to apply the label to",
+                                    )),
+                                    refs: vec![CowStr::new_static(
+                                        "blue.rito.label.auto.like.settings#postRef",
+                                    )],
                                     ..Default::default()
                                 }),
                             );
@@ -351,12 +349,12 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("delete"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(
-                                        CowStr::new_static("The post to remove the label from"),
-                                    ),
-                                    refs: vec![
-                                        CowStr::new_static("blue.rito.label.auto.like.settings#postRef")
-                                    ],
+                                    description: Some(CowStr::new_static(
+                                        "The post to remove the label from",
+                                    )),
+                                    refs: vec![CowStr::new_static(
+                                        "blue.rito.label.auto.like.settings#postRef",
+                                    )],
                                     ..Default::default()
                                 }),
                             );
@@ -370,9 +368,7 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("postRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
-                    ),
+                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -404,7 +400,7 @@ fn lexicon_doc_blue_rito_label_auto_like_settings() -> LexiconDoc<'static> {
 
 pub mod post_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -495,10 +491,7 @@ where
     St::Cid: post_ref_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(
-        mut self,
-        value: impl Into<S>,
-    ) -> PostRefBuilder<post_ref_state::SetCid<St>, S> {
+    pub fn cid(mut self, value: impl Into<S>) -> PostRefBuilder<post_ref_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostRefBuilder {
             _state: PhantomData,

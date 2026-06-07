@@ -44,7 +44,6 @@ use jacquard::{
     api::app_bsky::feed::get_timeline::GetTimeline,
     client::{Agent, FileAuthStore},
     common::deps::{fluent_uri::Uri, smol_str::SmolStr},
-    identity::JacquardResolver,
     oauth::{
         atproto::{AtprotoClientMetadata, GrantType},
         client::OAuthClient,
@@ -57,6 +56,7 @@ use jacquard::{
 use jacquard_axum::oauth::{
     BrowserOAuthSession, ExtractOAuthSession, OAuthWebConfig, OAuthWebState, routes as oauth_routes,
 };
+use jacquard_identity::PublicResolver;
 use miette::{Context, IntoDiagnostic, Result, bail, miette};
 use rand::{RngCore, rngs::OsRng};
 use serde::Deserialize;
@@ -88,13 +88,13 @@ struct Args {
 
 #[derive(Clone)]
 struct AppState {
-    oauth: Arc<OAuthClient<JacquardResolver, FileAuthStore>>,
+    oauth: Arc<OAuthClient<PublicResolver, FileAuthStore>>,
     oauth_config: OAuthWebConfig,
     cookie_key: Key,
 }
 
-impl OAuthWebState<JacquardResolver, FileAuthStore> for AppState {
-    fn oauth_client(&self) -> &OAuthClient<JacquardResolver, FileAuthStore> {
+impl OAuthWebState<PublicResolver, FileAuthStore> for AppState {
+    fn oauth_client(&self) -> &OAuthClient<PublicResolver, FileAuthStore> {
         self.oauth.as_ref()
     }
 }
@@ -149,7 +149,7 @@ async fn login_page(Query(query): Query<LoginQuery>) -> Html<String> {
 }
 
 async fn timeline(
-    BrowserOAuthSession(session): BrowserOAuthSession<JacquardResolver, FileAuthStore>,
+    BrowserOAuthSession(session): BrowserOAuthSession<PublicResolver, FileAuthStore>,
 ) -> Result<Html<String>, AppError> {
     let agent: Agent<_> = Agent::from(session);
     let response = agent
@@ -195,7 +195,7 @@ async fn timeline(
 }
 
 async fn strict_session_json(
-    ExtractOAuthSession(session): ExtractOAuthSession<JacquardResolver, FileAuthStore>,
+    ExtractOAuthSession(session): ExtractOAuthSession<PublicResolver, FileAuthStore>,
 ) -> Json<serde_json::Value> {
     let (did, session_id) = session.session_info().await;
     Json(serde_json::json!({ "did": did, "session_id": session_id }))
@@ -220,6 +220,7 @@ async fn main() -> Result<()> {
         oauth: Arc::new(OAuthClient::new(
             FileAuthStore::new(paths.sessions.to_string_lossy().into_owned()),
             client_data,
+            reqwest::Client::new(),
         )),
         oauth_config: OAuthWebConfig::default(),
         cookie_key: load_or_generate_cookie_key(&paths.cookie_key)?,
@@ -230,7 +231,7 @@ async fn main() -> Result<()> {
         .route("/oauth/login", get(login_page))
         .route("/timeline", get(timeline))
         .route("/api/session", get(strict_session_json))
-        .merge(oauth_routes::<JacquardResolver, FileAuthStore, AppState>())
+        .merge(oauth_routes::<PublicResolver, FileAuthStore, AppState>())
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(args.listen)

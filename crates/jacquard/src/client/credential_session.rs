@@ -97,9 +97,9 @@ where
 {
     type Error = ClientError;
 
-    async fn select_session(
+    async fn select_session<Str: BosStr + Send + Sync>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<Str>,
     ) -> Result<Option<CredentialSessionMatch>, Self::Error> {
         if let Some(matched) = self.store.select_session(hint).await? {
             return Ok(Some(matched));
@@ -117,16 +117,17 @@ where
 /// Resolve a session hint against an app-password [`SessionStore`].
 ///
 /// This is a convenience wrapper around [`CredentialSessionSelector`].
-pub async fn resolve_credential_session_hint<S, R>(
+pub async fn resolve_credential_session_hint<S, R, Str>(
     store: &S,
     resolver: &R,
-    hint: &SessionHint,
+    hint: &SessionHint<Str>,
 ) -> Result<Option<CredentialSessionMatch>, ClientError>
 where
     S: SessionStore<SessionKey, AtpSession>
         + SessionSelector<CredentialSessionMatch, Error = ClientError>
         + Sync,
     R: IdentityResolver + Sync,
+    Str: BosStr + Send + Sync,
 {
     CredentialSessionSelector::new(store, resolver)
         .select_session(hint)
@@ -149,9 +150,9 @@ where
 impl SessionSelector<CredentialSessionMatch> for MemorySessionStore<SessionKey, AtpSession> {
     type Error = ClientError;
 
-    async fn select_session(
+    async fn select_session<Str: BosStr + Send + Sync>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<Str>,
     ) -> Result<Option<CredentialSessionMatch>, Self::Error> {
         match hint {
             SessionHint::Any => {
@@ -186,7 +187,7 @@ impl SessionSelector<CredentialSessionMatch> for MemorySessionStore<SessionKey, 
     }
 }
 
-fn credential_challenge_from_hint(hint: &SessionHint) -> CredentialLoginChallenge {
+fn credential_challenge_from_hint<S: BosStr>(hint: &SessionHint<S>) -> CredentialLoginChallenge {
     match hint {
         SessionHint::Any => CredentialLoginChallenge {
             identifier: None,
@@ -205,7 +206,7 @@ fn credential_challenge_from_hint(hint: &SessionHint) -> CredentialLoginChalleng
             session_id: Some(key.session_id.clone()),
         },
         SessionHint::Identifier(identifier) => CredentialLoginChallenge {
-            identifier: Some(identifier.clone()),
+            identifier: Some(identifier.as_ref().to_smolstr()),
             session_id: None,
         },
     }
@@ -225,7 +226,7 @@ where
     client: Arc<T>,
     ws_client: W,
     /// Default call options applied to each request (auth/headers/labelers).
-    pub options: RwLock<CallOptions<'static>>,
+    pub options: RwLock<CallOptions>,
     /// Active session key, if any.
     pub key: RwLock<Option<SessionKey>>,
     /// Current base endpoint (PDS); defaults to public appview when unset.
@@ -271,7 +272,7 @@ where
     }
 
     /// Return a copy configured with the provided default call options.
-    pub fn with_options(self, options: CallOptions<'_>) -> Self {
+    pub fn with_options(self, options: CallOptions) -> Self {
         Self {
             client: self.client,
             store: self.store,
@@ -283,7 +284,7 @@ where
     }
 
     /// Replace default call options.
-    pub async fn set_options(&self, options: CallOptions<'_>) {
+    pub async fn set_options(&self, options: CallOptions) {
         *self.options.write().await = options.into_static();
     }
 
@@ -514,11 +515,17 @@ where
     }
 
     /// Try to resume a stored app-password session for the given hint.
-    pub async fn resume(&self, hint: &SessionHint) -> Result<CredentialResumeResult, ClientError>
+    pub async fn resume<Str: BosStr + Send + Sync>(
+        &self,
+        hint: &SessionHint<Str>,
+    ) -> Result<CredentialResumeResult, ClientError>
     where
         S: SessionSelector<CredentialSessionMatch, Error = ClientError>,
     {
-        match self.store.select_session(hint).await? {
+        match CredentialSessionSelector::new(self.store.as_ref(), self.client.as_ref())
+            .select_session(hint)
+            .await?
+        {
             Some(matched) => {
                 let session = self.activate_session(matched.key, matched.session).await?;
                 Ok(CredentialResumeResult::Resumed(session))
@@ -556,9 +563,9 @@ where
     }
 
     /// Login using identity details derived from a session hint.
-    pub async fn login_with_hint(
+    pub async fn login_with_hint<Str: BosStr>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<Str>,
         options: CredentialLoginOptions<'_>,
     ) -> Result<AtpSession, ClientError> {
         self.login_from_challenge(credential_challenge_from_hint(hint), options)
@@ -566,9 +573,9 @@ where
     }
 
     /// Resume a stored session if available, otherwise login using the provided options.
-    pub async fn resume_or_login(
+    pub async fn resume_or_login<Str: BosStr + Send + Sync>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<Str>,
         options: CredentialLoginOptions<'_>,
     ) -> Result<AtpSession, ClientError>
     where
@@ -654,11 +661,11 @@ where
         })
     }
 
-    async fn opts(&self) -> CallOptions<'_> {
+    async fn opts(&self) -> CallOptions {
         self.options.read().await.clone()
     }
 
-    async fn set_opts(&self, opts: CallOptions<'_>) {
+    async fn set_opts(&self, opts: CallOptions) {
         let mut guard = self.options.write().await;
         *guard = opts.into_static();
     }
@@ -681,7 +688,7 @@ where
     async fn send_with_opts<R>(
         &self,
         request: R,
-        mut opts: CallOptions<'_>,
+        mut opts: CallOptions,
     ) -> XrpcResult<XrpcResponse<R>>
     where
         R: XrpcRequest + Send + Sync + serde::Serialize,
@@ -870,7 +877,7 @@ where
         }
 
         if let Some(proxy) = &opts.atproto_proxy {
-            builder = builder.header("atproto-proxy", proxy.as_ref());
+            builder = builder.header("atproto-proxy", proxy.as_str());
         }
         if let Some(labelers) = &opts.atproto_accept_labelers {
             if !labelers.is_empty() {
@@ -930,7 +937,7 @@ where
                 builder = builder.header(http::header::AUTHORIZATION, hv);
             }
             if let Some(proxy) = &opts.atproto_proxy {
-                builder = builder.header("atproto-proxy", proxy.as_ref());
+                builder = builder.header("atproto-proxy", proxy.as_str());
             }
             if let Some(labelers) = &opts.atproto_accept_labelers {
                 if !labelers.is_empty() {

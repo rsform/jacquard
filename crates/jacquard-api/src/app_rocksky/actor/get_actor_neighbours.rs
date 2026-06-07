@@ -10,22 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorNeighbours<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetActorNeighboursOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub neighbours: Option<Vec<Data<S>>>,
@@ -63,7 +68,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorNeighboursRequest {
 
 pub mod get_actor_neighbours_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -94,10 +99,8 @@ pub mod get_actor_neighbours_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorNeighboursBuilder<
-    St: get_actor_neighbours_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetActorNeighboursBuilder<St: get_actor_neighbours_state::State, S: BosStr = DefaultStr>
+{
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -105,10 +108,7 @@ pub struct GetActorNeighboursBuilder<
 
 impl GetActorNeighbours<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetActorNeighboursBuilder<
-        get_actor_neighbours_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetActorNeighboursBuilder<get_actor_neighbours_state::Empty, DefaultStr> {
         GetActorNeighboursBuilder::new()
     }
 }

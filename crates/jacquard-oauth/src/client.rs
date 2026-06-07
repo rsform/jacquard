@@ -1,6 +1,6 @@
 use crate::{
     atproto::atproto_client_metadata,
-    authstore::{ClientAuthStore, OAuthSessionMatch},
+    authstore::{ClientAuthStore, OAuthSessionMatch, OAuthSessionSelector},
     dpop::DpopExt,
     error::{CallbackError, OAuthError, Result},
     request::{OAuthMetadata, exchange_code, par},
@@ -61,6 +61,8 @@ where
     Resumed(OAuthSession<T, S>),
     /// No stored session matched; redirect the user to this login URL.
     LoginUrl(String),
+    /// No stored session matched, and the hint did not contain enough information to start OAuth.
+    NeedsInput,
 }
 
 /// The top-level OAuth client responsible for driving the authorization flow.
@@ -72,20 +74,22 @@ where
     /// Shared session registry that mediates access to the backing auth store.
     pub registry: Arc<SessionRegistry<T, S, SmolStr>>,
     /// Default call options applied to every outgoing XRPC request.
-    pub options: RwLock<CallOptions<'static>>,
+    pub options: RwLock<CallOptions>,
     /// Override for the XRPC base URI; falls back to the public Bluesky AppView when `None`.
     pub endpoint: RwLock<Option<Uri<String>>>,
     /// Underlying HTTP/identity/OAuth resolver used for all network operations.
     pub client: Arc<T>,
 }
 
-impl<S: ClientAuthStore> OAuthClient<JacquardResolver, S> {
+impl<S: ClientAuthStore, C: HttpClient + Sync> OAuthClient<JacquardResolver<C>, S> {
     /// Create an `OAuthClient` using the default [`JacquardResolver`] for identity and metadata resolution.
-    pub fn new(store: S, client_data: ClientData<SmolStr>) -> Self {
-        let client = JacquardResolver::default();
+    pub fn new(store: S, client_data: ClientData<SmolStr>, http: C) -> Self {
+        let client = JacquardResolver::new(http, ResolverOptions::default());
         Self::new_from_resolver(store, client, client_data)
     }
+}
 
+impl<S: ClientAuthStore> OAuthClient<JacquardResolver<reqwest::Client>, S> {
     /// Create an OAuth client with the provided store and default localhost client metadata.
     ///
     /// This is a convenience constructor for quickly setting up an OAuth client
@@ -108,11 +112,11 @@ impl<S: ClientAuthStore> OAuthClient<JacquardResolver, S> {
             keyset: None,
             config: crate::atproto::AtprotoClientMetadata::default_localhost(),
         };
-        Self::new(store, client_data)
+        Self::new(store, client_data, reqwest::Client::new())
     }
 }
 
-impl OAuthClient<JacquardResolver, crate::authstore::MemoryAuthStore> {
+impl OAuthClient<JacquardResolver<reqwest::Client>, crate::authstore::MemoryAuthStore> {
     /// Create an OAuth client with an in-memory auth store and default localhost client metadata.
     ///
     /// This is a convenience constructor for simple testing and development.
@@ -404,36 +408,46 @@ where
         <Str as FromStr>::Err: core::fmt::Debug,
     {
         let input = input.as_ref();
-        let hint = oauth_hint_from_input(input);
-        match self.registry.store.select_session(&hint).await? {
-            Some(matched) => Ok(OAuthResumeOrLogin::Resumed(
-                self.restore(&matched.key.did, matched.key.session_id.as_str())
-                    .await?,
-            )),
-            None => Ok(OAuthResumeOrLogin::LoginUrl(
-                self.start_auth(input, options).await?,
-            )),
-        }
+        self.resume_or_start_auth(&SessionHint::from_input(input), options)
+            .await
     }
 
     /// Resume a stored session for `hint`, or begin OAuth authorization from the hint identity.
-    pub async fn resume_or_start_auth<Str: BosStr>(
+    pub async fn resume_or_start_auth<HintStr, Str>(
         &self,
-        hint: &SessionHint,
+        hint: &SessionHint<HintStr>,
         options: AuthorizeOptions<Str>,
     ) -> Result<OAuthResumeOrLogin<T, S>>
     where
         S: SessionSelector<OAuthSessionMatch, Error = SessionStoreError>,
-        Str: FromStr + Ord + Clone + core::fmt::Debug,
+        HintStr: BosStr + Send + Sync,
+        Str: BosStr + FromStr + Ord + Clone + core::fmt::Debug,
         <Str as FromStr>::Err: core::fmt::Debug,
     {
-        match self.registry.store.select_session(hint).await? {
-            Some(matched) => Ok(OAuthResumeOrLogin::Resumed(
-                self.restore(&matched.key.did, matched.key.session_id.as_str())
-                    .await?,
-            )),
+        let input = oauth_start_auth_input_from_hint(hint);
+        match OAuthSessionSelector::new(self.registry.store.as_ref(), self.client.as_ref())
+            .select_session(hint)
+            .await?
+        {
+            Some(matched) => match self
+                .restore(&matched.key.did, matched.key.session_id.as_str())
+                .await
+            {
+                Ok(session) => Ok(OAuthResumeOrLogin::Resumed(session)),
+                Err(err) if should_start_auth_after_restore_error(&err) => {
+                    let Some(input) = input else {
+                        return Err(err);
+                    };
+                    Ok(OAuthResumeOrLogin::LoginUrl(
+                        self.start_auth(input, options).await?,
+                    ))
+                }
+                Err(err) => Err(err),
+            },
             None => {
-                let input = oauth_start_auth_input_from_hint(hint)?;
+                let Some(input) = input else {
+                    return Ok(OAuthResumeOrLogin::NeedsInput);
+                };
                 Ok(OAuthResumeOrLogin::LoginUrl(
                     self.start_auth(input, options).await?,
                 ))
@@ -455,26 +469,18 @@ where
     }
 }
 
-fn oauth_hint_from_input(input: &str) -> SessionHint<SmolStr> {
-    if let Ok(did) = Did::new(input) {
-        SessionHint::Did(did.convert())
-    } else if let Ok(handle) = Handle::new(input) {
-        SessionHint::Handle(handle.convert())
-    } else {
-        SessionHint::Identifier(SmolStr::from(input))
+fn oauth_start_auth_input_from_hint<S: BosStr>(hint: &SessionHint<S>) -> Option<SmolStr> {
+    match hint {
+        SessionHint::Did(did) => Some(did.as_ref().to_smolstr()),
+        SessionHint::Handle(handle) => Some(handle.as_ref().to_smolstr()),
+        SessionHint::Key(key) => Some(key.did.as_str().to_smolstr()),
+        SessionHint::Identifier(identifier) => Some(identifier.as_ref().to_smolstr()),
+        SessionHint::Any => None,
     }
 }
 
-fn oauth_start_auth_input_from_hint(hint: &SessionHint) -> Result<SmolStr> {
-    match hint {
-        SessionHint::Did(did) => Ok(did.as_ref().to_smolstr()),
-        SessionHint::Handle(handle) => Ok(handle.as_ref().to_smolstr()),
-        SessionHint::Key(key) => Ok(key.did.as_str().to_smolstr()),
-        SessionHint::Identifier(identifier) => Ok(identifier.clone()),
-        SessionHint::Any => Err(OAuthError::InvalidRequest(
-            "cannot start OAuth authorization from SessionHint::Any without an identity".into(),
-        )),
-    }
+fn should_start_auth_after_restore_error(err: &OAuthError) -> bool {
+    matches!(err, OAuthError::Session(session_err) if session_err.is_permanent())
 }
 
 /// Decode a percent-encoded audience string.
@@ -619,11 +625,11 @@ where
         })
     }
 
-    async fn opts(&self) -> CallOptions<'_> {
+    async fn opts(&self) -> CallOptions {
         self.options.read().await.clone()
     }
 
-    async fn set_opts(&self, opts: CallOptions<'_>) {
+    async fn set_opts(&self, opts: CallOptions) {
         let mut guard = self.options.write().await;
         *guard = opts.into_static();
     }
@@ -643,11 +649,7 @@ where
         self.send_with_opts(request, opts).await
     }
 
-    async fn send_with_opts<R>(
-        &self,
-        request: R,
-        opts: CallOptions<'_>,
-    ) -> XrpcResult<XrpcResponse<R>>
+    async fn send_with_opts<R>(&self, request: R, opts: CallOptions) -> XrpcResult<XrpcResponse<R>>
     where
         R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
@@ -684,7 +686,7 @@ where
     /// Mutable session data including DPoP key, nonces, and token set.
     pub data: RwLock<ClientSessionData>,
     /// Default call options applied to every outgoing XRPC request from this session.
-    pub options: RwLock<CallOptions<'static>>,
+    pub options: RwLock<CallOptions>,
 }
 
 impl<T, S> OAuthSession<T, S, ()>
@@ -740,7 +742,7 @@ where
     ///
     /// Useful for setting request-level defaults (e.g., `atproto-proxy` or custom headers) once
     /// at construction time rather than passing them to every individual XRPC call.
-    pub fn with_options(self, options: CallOptions<'_>) -> Self {
+    pub fn with_options(self, options: CallOptions) -> Self {
         Self {
             registry: self.registry,
             client: self.client,
@@ -756,7 +758,7 @@ where
     }
 
     /// Replace the default call options for this session without consuming it.
-    pub async fn set_options(&self, options: CallOptions<'_>) {
+    pub async fn set_options(&self, options: CallOptions) {
         *self.options.write().await = options.into_static();
     }
 
@@ -907,11 +909,11 @@ where
         self.data.read().await.host_url.clone()
     }
 
-    async fn opts(&self) -> CallOptions<'_> {
+    async fn opts(&self) -> CallOptions {
         self.options.read().await.clone()
     }
 
-    async fn set_opts(&self, opts: CallOptions<'_>) {
+    async fn set_opts(&self, opts: CallOptions) {
         let mut guard = self.options.write().await;
         *guard = opts.into_static();
     }
@@ -934,7 +936,7 @@ where
     async fn send_with_opts<R>(
         &self,
         request: R,
-        mut opts: CallOptions<'_>,
+        mut opts: CallOptions,
     ) -> XrpcResult<XrpcResponse<R>>
     where
         R: XrpcRequest + Send + Sync + serde::Serialize,
@@ -1243,7 +1245,7 @@ where
         }
 
         if let Some(proxy) = &opts.atproto_proxy {
-            builder = builder.header("atproto-proxy", proxy.as_ref());
+            builder = builder.header("atproto-proxy", proxy.as_str());
         }
         if let Some(labelers) = &opts.atproto_accept_labelers {
             if !labelers.is_empty() {

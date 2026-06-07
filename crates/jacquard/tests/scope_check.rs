@@ -129,9 +129,11 @@ impl OAuthResolver for MockClient {
         _sub: &Did<S>,
     ) -> Result<jacquard::deps::fluent_uri::Uri<String>, jacquard_oauth::resolver::ResolverError>
     {
-        Ok(jacquard::deps::fluent_uri::Uri::parse("https://pds.example.com")
-            .unwrap()
-            .to_owned())
+        Ok(
+            jacquard::deps::fluent_uri::Uri::parse("https://pds.example.com")
+                .unwrap()
+                .to_owned(),
+        )
     }
 }
 
@@ -156,7 +158,9 @@ fn create_session_data(resolved_scopes: Option<Vec<Scope<SmolStr>>>) -> ClientSe
     ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: SmolStr::from("state"),
-        host_url: Uri::parse("https://pds.example.com").expect("valid uri").to_owned(),
+        host_url: Uri::parse("https://pds.example.com")
+            .expect("valid uri")
+            .to_owned(),
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,

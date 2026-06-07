@@ -12,27 +12,26 @@ pub mod query_rules;
 pub mod remove_rule;
 pub mod update_rule;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::tools_ozone::safelink;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::tools_ozone::safelink;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ActionType<S: BosStr = DefaultStr> {
@@ -112,7 +111,10 @@ where
 /// An event for URL safety decisions
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Event<S: BosStr = DefaultStr> {
     pub action: safelink::ActionType<S>,
     ///Optional comment about the decision
@@ -131,7 +133,6 @@ pub struct Event<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EventType<S: BosStr = DefaultStr> {
@@ -208,7 +209,6 @@ where
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PatternType<S: BosStr = DefaultStr> {
     Domain,
@@ -279,7 +279,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReasonType<S: BosStr = DefaultStr> {
@@ -363,7 +362,10 @@ where
 /// Input for creating a URL safety rule
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UrlRule<S: BosStr = DefaultStr> {
     pub action: safelink::ActionType<S>,
     ///Optional comment about the decision
@@ -415,7 +417,7 @@ impl<S: BosStr> LexiconSchema for UrlRule<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -719,10 +721,7 @@ where
     St::Id: event_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<i64>,
-    ) -> EventBuilder<event_state::SetId<St>, S> {
+    pub fn id(mut self, value: impl Into<i64>) -> EventBuilder<event_state::SetId<St>, S> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -776,10 +775,7 @@ where
     St::Url: event_state::IsUnset,
 {
     /// Set the `url` field (required)
-    pub fn url(
-        mut self,
-        value: impl Into<S>,
-    ) -> EventBuilder<event_state::SetUrl<St>, S> {
+    pub fn url(mut self, value: impl Into<S>) -> EventBuilder<event_state::SetUrl<St>, S> {
         self._fields.8 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -834,10 +830,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.safelink.defs"),
@@ -845,23 +841,24 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("actionType"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("event"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("An event for URL safety decisions"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("eventType"),
-                            SmolStr::new_static("url"), SmolStr::new_static("pattern"),
-                            SmolStr::new_static("action"), SmolStr::new_static("reason"),
-                            SmolStr::new_static("createdBy"),
-                            SmolStr::new_static("createdAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("An event for URL safety decisions")),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("eventType"),
+                        SmolStr::new_static("url"),
+                        SmolStr::new_static("pattern"),
+                        SmolStr::new_static("action"),
+                        SmolStr::new_static("reason"),
+                        SmolStr::new_static("createdBy"),
+                        SmolStr::new_static("createdAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -875,9 +872,9 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("comment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Optional comment about the decision"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional comment about the decision",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -891,9 +888,9 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdBy"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID of the user who created this rule"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the user who created this rule",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -928,9 +925,9 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL that this rule applies to"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL that this rule applies to",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -941,31 +938,35 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("eventType"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("patternType"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("reasonType"),
-                LexUserType::String(LexString { ..Default::default() }),
+                LexUserType::String(LexString {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("urlRule"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Input for creating a URL safety rule"),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("url"), SmolStr::new_static("pattern"),
-                            SmolStr::new_static("action"), SmolStr::new_static("reason"),
-                            SmolStr::new_static("createdBy"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("updatedAt")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static("Input for creating a URL safety rule")),
+                    required: Some(vec![
+                        SmolStr::new_static("url"),
+                        SmolStr::new_static("pattern"),
+                        SmolStr::new_static("action"),
+                        SmolStr::new_static("reason"),
+                        SmolStr::new_static("createdBy"),
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("updatedAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -979,18 +980,18 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("comment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Optional comment about the decision"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional comment about the decision",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Timestamp when the rule was created"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the rule was created",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -998,9 +999,9 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdBy"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("DID of the user added the rule."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "DID of the user added the rule.",
+                                )),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -1022,11 +1023,9 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("updatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Timestamp when the rule was last updated",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Timestamp when the rule was last updated",
+                                )),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1034,9 +1033,9 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("The URL or domain to apply the rule to"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The URL or domain to apply the rule to",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -1053,7 +1052,7 @@ fn lexicon_doc_tools_ozone_safelink_defs() -> LexiconDoc<'static> {
 
 pub mod url_rule_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1370,10 +1369,7 @@ where
     St::Url: url_rule_state::IsUnset,
 {
     /// Set the `url` field (required)
-    pub fn url(
-        mut self,
-        value: impl Into<S>,
-    ) -> UrlRuleBuilder<url_rule_state::SetUrl<St>, S> {
+    pub fn url(mut self, value: impl Into<S>) -> UrlRuleBuilder<url_rule_state::SetUrl<St>, S> {
         self._fields.7 = Option::Some(value.into());
         UrlRuleBuilder {
             _state: PhantomData,

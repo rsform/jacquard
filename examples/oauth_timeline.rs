@@ -1,21 +1,27 @@
 use clap::Parser;
-use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::client::{Agent, FileAuthStore};
+#[cfg(not(feature = "loopback"))]
+use jacquard::common::deps::fluent_uri::Uri;
+use jacquard::common::session::SessionHint;
 use jacquard::oauth::atproto::AtprotoClientMetadata;
 use jacquard::oauth::client::OAuthClient;
+#[cfg(not(feature = "loopback"))]
+use jacquard::oauth::client::OAuthResumeOrLogin;
 #[cfg(feature = "loopback")]
 use jacquard::oauth::loopback::LoopbackConfig;
-use jacquard::xrpc::XrpcClient;
+use jacquard::oauth::types::AuthorizeOptions;
 #[cfg(not(feature = "loopback"))]
-use jacquard_oauth::types::AuthorizeOptions;
+use jacquard::oauth::types::CallbackParams;
+use jacquard::xrpc::XrpcClient;
 use miette::IntoDiagnostic;
+use std::io::{BufRead, Write, stdin, stdout};
 
 #[derive(Parser, Debug)]
-#[command(author, version, about = "Jacquard - OAuth (DPoP) loopback demo")]
+#[command(author, version, about = "Jacquard - OAuth loopback demo")]
 struct Args {
-    /// Handle (e.g., alice.bsky.social), DID, or PDS URL
-    input: CowStr<'static>,
+    /// Optional handle, DID, or PDS URL used to start or resume OAuth.
+    input: Option<String>,
 
     /// Path to auth store file (will be created if missing)
     #[arg(long, default_value = "/tmp/jacquard-oauth-session.json")]
@@ -26,50 +32,69 @@ struct Args {
 async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
-    // File-backed auth store shared by OAuthClient and session registry
+    // File-backed auth store shared by OAuthClient and session registry.
     let store = FileAuthStore::new(&args.store);
     let client_data = jacquard_oauth::session::ClientData {
         keyset: None,
         // Default sets normal localhost redirect URIs and "atproto transition:generic" scopes.
-        // The localhost helper will ensure you have at least "atproto" and will fix urls
+        // The localhost helper will ensure you have at least "atproto" and will fix urls.
         config: AtprotoClientMetadata::default_localhost(),
     };
 
-    // Build an OAuth client (this is reusable, and can create multiple sessions)
-    let oauth = OAuthClient::new(store, client_data);
+    // Build an OAuth client (this is reusable, and can create multiple sessions).
+    let oauth = OAuthClient::new(store, client_data, reqwest::Client::new());
+    let hint = SessionHint::from_optional_input(args.input.as_deref());
 
     #[cfg(feature = "loopback")]
-    // Authenticate with a PDS, using a loopback server to handle the callback flow
-    let session = oauth
-        .login_with_local_server(
-            args.input.clone(),
-            Default::default(),
+    let session = match oauth
+        .resume_or_login_with_local_server(
+            &hint,
+            AuthorizeOptions::default(),
             LoopbackConfig::default(),
         )
-        .await?;
-
-    #[cfg(not(feature = "loopback"))]
-    let session = {
-        use std::io::{BufRead, Write, stdin, stdout};
-
-        let auth_url = oauth
-            .start_auth(args.input, AuthorizeOptions::default())
-            .await?;
-
-        println!("To authenticate with your PDS, visit:\n{}\n", auth_url);
-        print!("\nPaste the callback url here:");
-        stdout().lock().flush().into_diagnostic()?;
-        let mut url = String::new();
-        stdin().lock().read_line(&mut url).into_diagnostic()?;
-
-        let uri = url.trim().parse::<http::Uri>().into_diagnostic()?;
-        let params =
-            serde_html_form::from_str(uri.query().ok_or(miette::miette!("invalid callback url"))?)
-                .into_diagnostic()?;
-        oauth.callback(params).await?
+        .await?
+    {
+        Some(session) => session,
+        None => {
+            let input = prompt_login_input(&args.store)?;
+            oauth
+                .login_with_local_server(
+                    input,
+                    AuthorizeOptions::default(),
+                    LoopbackConfig::default(),
+                )
+                .await?
+        }
     };
 
-    // Wrap in Agent and fetch the timeline
+    #[cfg(not(feature = "loopback"))]
+    let session = match oauth
+        .resume_or_start_auth(&hint, AuthorizeOptions::default())
+        .await
+    {
+        Ok(OAuthResumeOrLogin::Resumed(session)) => session,
+        Ok(OAuthResumeOrLogin::LoginUrl(auth_url)) => finish_manual_oauth(&oauth, auth_url).await?,
+        Ok(OAuthResumeOrLogin::NeedsInput) => {
+            let input = prompt_login_input(&args.store)?;
+            match oauth
+                .resume_or_start_auth_for(input, AuthorizeOptions::default())
+                .await?
+            {
+                OAuthResumeOrLogin::Resumed(session) => session,
+                OAuthResumeOrLogin::LoginUrl(auth_url) => {
+                    finish_manual_oauth(&oauth, auth_url).await?
+                }
+                OAuthResumeOrLogin::NeedsInput => {
+                    miette::bail!("login input must be a handle, DID, or PDS URL")
+                }
+            }
+        }
+        Err(err) => {
+            return Err(err).into_diagnostic();
+        }
+    };
+
+    // Wrap in Agent and fetch the timeline.
     let agent: Agent<_> = Agent::from(session);
     let output = agent.send(GetTimeline::new().limit(5).build()).await?;
     let timeline = output.into_output()?;
@@ -82,4 +107,97 @@ async fn main() -> miette::Result<()> {
     }
 
     Ok(())
+}
+
+fn prompt_login_input(store_path: &str) -> miette::Result<String> {
+    eprintln!("No stored OAuth session was found in {store_path}.");
+    read_required_line("Enter a handle, DID, or PDS URL to log in: ")
+}
+
+#[cfg(not(feature = "loopback"))]
+async fn finish_manual_oauth<T, S>(
+    oauth: &OAuthClient<T, S>,
+    auth_url: String,
+) -> miette::Result<jacquard::oauth::client::OAuthSession<T, S>>
+where
+    T: jacquard::oauth::resolver::OAuthResolver
+        + jacquard::oauth::dpop::DpopExt
+        + Send
+        + Sync
+        + 'static,
+    S: jacquard::oauth::authstore::ClientAuthStore + Send + Sync + 'static,
+{
+    eprintln!("Open this URL in your browser to authorize Jacquard:");
+    eprintln!("\n{auth_url}\n");
+    let callback_url = read_required_line("Paste the full redirect URL after authorization: ")?;
+    let params = callback_params_from_redirect(&callback_url)?;
+    oauth.callback(params).await.into_diagnostic()
+}
+
+fn read_required_line(prompt: &str) -> miette::Result<String> {
+    print!("{prompt}");
+    stdout().flush().into_diagnostic()?;
+
+    let mut line = String::new();
+    stdin().lock().read_line(&mut line).into_diagnostic()?;
+    let line = line.trim().to_owned();
+    if line.is_empty() {
+        miette::bail!("input must not be empty");
+    }
+    Ok(line)
+}
+
+#[cfg(not(feature = "loopback"))]
+fn callback_params_from_redirect(callback_url: &str) -> miette::Result<CallbackParams> {
+    let query = redirect_query(callback_url)?;
+    serde_html_form::from_str(query).into_diagnostic()
+}
+
+#[cfg(not(feature = "loopback"))]
+fn redirect_query(callback_url: &str) -> miette::Result<&str> {
+    let callback_url = callback_url.trim();
+    if callback_url.is_empty() {
+        miette::bail!("redirect URL must not be empty");
+    }
+
+    if let Ok(uri) = Uri::parse(callback_url) {
+        return uri
+            .query()
+            .filter(|query| !query.is_empty())
+            .map(|query| query.as_str())
+            .ok_or_else(|| {
+                miette::miette!("redirect URL must include OAuth callback query parameters")
+            });
+    }
+
+    Ok(callback_url)
+}
+
+#[cfg(all(test, not(feature = "loopback")))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_full_redirect_url() {
+        let params = callback_params_from_redirect(
+            "http://127.0.0.1:8080/callback?code=abc&state=xyz&iss=https%3A%2F%2Fexample.com",
+        )
+        .unwrap();
+        assert_eq!(params.code, "abc");
+        assert_eq!(params.state.as_deref(), Some("xyz"));
+        assert_eq!(params.iss.as_deref(), Some("https://example.com"));
+    }
+
+    #[test]
+    fn parses_raw_query_string() {
+        let params = callback_params_from_redirect("code=abc&state=xyz").unwrap();
+        assert_eq!(params.code, "abc");
+        assert_eq!(params.state.as_deref(), Some("xyz"));
+        assert_eq!(params.iss, None);
+    }
+
+    #[test]
+    fn rejects_empty_redirect_input() {
+        assert!(callback_params_from_redirect("").is_err());
+    }
 }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_showcase::ActivitySettings;
 use crate::social_showcase::DisplaySettings;
 use crate::social_showcase::NotificationSettings;
 use crate::social_showcase::PrivacySettings;
 use crate::social_showcase::VisibilitySettings;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// User preferences and settings
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -122,7 +122,7 @@ fn _default_preferences_schema_version() -> Option<i64> {
 
 pub mod preferences_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -407,10 +407,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Preferences<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Preferences<S> {
         Preferences {
             activity: self._fields.0.unwrap(),
             display: self._fields.1,
@@ -425,10 +422,10 @@ where
 }
 
 fn lexicon_doc_social_showcase_profile_preferences() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.showcase.profile.preferences"),
@@ -437,20 +434,16 @@ fn lexicon_doc_social_showcase_profile_preferences() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("User preferences and settings"),
-                    ),
+                    description: Some(CowStr::new_static("User preferences and settings")),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("visibility"),
-                                SmolStr::new_static("activity"),
-                                SmolStr::new_static("notifications"),
-                                SmolStr::new_static("privacy"),
-                                SmolStr::new_static("updatedAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("visibility"),
+                            SmolStr::new_static("activity"),
+                            SmolStr::new_static("notifications"),
+                            SmolStr::new_static("privacy"),
+                            SmolStr::new_static("updatedAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

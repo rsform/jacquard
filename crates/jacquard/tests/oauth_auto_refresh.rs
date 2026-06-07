@@ -124,9 +124,11 @@ impl OAuthResolver for MockClient {
         _sub: &Did<S>,
     ) -> Result<jacquard::deps::fluent_uri::Uri<String>, jacquard_oauth::resolver::ResolverError>
     {
-        Ok(jacquard::deps::fluent_uri::Uri::parse("https://pds.example.com")
-            .unwrap()
-            .to_owned())
+        Ok(
+            jacquard::deps::fluent_uri::Uri::parse("https://pds.example.com")
+                .unwrap()
+                .to_owned(),
+        )
     }
 }
 
@@ -222,7 +224,9 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: SmolStr::from("state"),
-        host_url: Uri::parse("https://pds.example.com").expect("valid uri").to_owned(),
+        host_url: Uri::parse("https://pds.example.com")
+            .expect("valid uri")
+            .to_owned(),
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
@@ -251,7 +255,9 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     let data_store = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: SmolStr::from("state"),
-        host_url: Uri::parse("https://pds.example.com").expect("valid uri").to_owned(),
+        host_url: Uri::parse("https://pds.example.com")
+            .expect("valid uri")
+            .to_owned(),
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
@@ -356,7 +362,9 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
         session_id: SmolStr::new_static("state"),
-        host_url: Uri::parse("https://pds.example.com").expect("valid uri").to_owned(),
+        host_url: Uri::parse("https://pds.example.com")
+            .expect("valid uri")
+            .to_owned(),
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,

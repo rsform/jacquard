@@ -1,18 +1,19 @@
 use clap::Parser;
-use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::get_timeline::GetTimeline;
 use jacquard::api::app_bsky::feed::post::Post;
 use jacquard::api::app_bsky::labeler::get_services::GetServicesOutput;
 use jacquard::client::{Agent, FileAuthStore};
-use jacquard::cowstr::ToCowStr;
+use jacquard::common::session::SessionHint;
 use jacquard::from_data;
 use jacquard::moderation::{Blur, Moderateable, ModerationPrefs, fetch_labeler_defs};
 use jacquard::oauth::atproto::AtprotoClientMetadata;
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
+use jacquard::oauth::types::AuthorizeOptions;
 use jacquard::xrpc::{CallOptions, XrpcClient};
 use jacquard_api::app_bsky::feed::{ReplyRefParent, ReplyRefRoot};
 use jacquard_api::app_bsky::labeler::get_services::GetServicesOutputViewsItem;
+use smol_str::ToSmolStr;
 
 // To save having to fetch prefs, etc., we're borrowing some from our test cases.
 const LABELER_SERVICES_JSON: &str =
@@ -25,8 +26,8 @@ const LABELER_SERVICES_JSON: &str =
     about = "Fetch timeline with moderation labels applied"
 )]
 struct Args {
-    /// Handle (e.g., alice.bsky.social), DID, or PDS URL
-    input: CowStr<'static>,
+    /// Optional handle, DID, or PDS URL used to resume a session.
+    input: Option<String>,
 
     /// Path to auth store file (will be created if missing)
     #[arg(long, default_value = "/tmp/jacquard-oauth-session.json")]
@@ -65,14 +66,21 @@ async fn main() -> miette::Result<()> {
         config: AtprotoClientMetadata::default_localhost(),
     };
 
-    let oauth = OAuthClient::new(store, client_data);
-    let session = oauth
-        .login_with_local_server(
-            args.input.clone(),
-            Default::default(),
+    let oauth = OAuthClient::new(store, client_data, reqwest::Client::new());
+    let hint = SessionHint::from_optional_input(args.input.as_deref());
+    let Some(session) = oauth
+        .resume_or_login_with_local_server(
+            &hint,
+            AuthorizeOptions::default(),
             LoopbackConfig::default(),
         )
-        .await?;
+        .await?
+    else {
+        miette::bail!(
+            "no stored OAuth session found in {}; pass a handle, DID, or PDS URL to log in",
+            args.store
+        );
+    };
 
     let agent: Agent<_> = Agent::from(session);
 
@@ -86,7 +94,7 @@ async fn main() -> miette::Result<()> {
     opts.atproto_accept_labelers = Some(
         accepted_labelers
             .iter()
-            .map(|did| did.to_cowstr())
+            .map(|did| did.to_smolstr())
             .collect(),
     );
     let request: GetTimeline = GetTimeline::new().limit(args.limit).build();

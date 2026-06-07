@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::pub_quizzy::team_score;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A team's scored answers for a quiz
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -63,7 +63,10 @@ pub struct TeamScoreGetRecordOutput<S: BosStr = DefaultStr> {
 /// An answer with scores for each expected answer
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ScoredAnswer<S: BosStr = DefaultStr> {
     ///Reference to the answer record
     pub answer: StrongRef<S>,
@@ -196,7 +199,7 @@ impl<S: BosStr> LexiconSchema for ScoredAnswer<S> {
 
 pub mod team_score_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -373,10 +376,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TeamScore<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TeamScore<S> {
         TeamScore {
             answers: self._fields.0.unwrap(),
             quiz_begin: self._fields.1.unwrap(),
@@ -387,10 +387,10 @@ where
 }
 
 fn lexicon_doc_pub_quizzy_teamScore() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.quizzy.teamScore"),
@@ -399,26 +399,23 @@ fn lexicon_doc_pub_quizzy_teamScore() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A team's scored answers for a quiz"),
-                    ),
+                    description: Some(CowStr::new_static("A team's scored answers for a quiz")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("quizBegin"),
-                                SmolStr::new_static("team"), SmolStr::new_static("answers")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("quizBegin"),
+                            SmolStr::new_static("team"),
+                            SmolStr::new_static("answers"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("answers"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Scored answers for this team"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Scored answers for this team",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#scoredAnswer"),
                                         ..Default::default()
@@ -451,16 +448,13 @@ fn lexicon_doc_pub_quizzy_teamScore() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("scoredAnswer"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "An answer with scores for each expected answer",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("answer"), SmolStr::new_static("scores")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "An answer with scores for each expected answer",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("answer"),
+                        SmolStr::new_static("scores"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -474,11 +468,9 @@ fn lexicon_doc_pub_quizzy_teamScore() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("commentary"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Optional commentary from the quiz master",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Optional commentary from the quiz master",
+                                )),
                                 max_length: Some(5000usize),
                                 max_graphemes: Some(500usize),
                                 ..Default::default()
@@ -487,11 +479,9 @@ fn lexicon_doc_pub_quizzy_teamScore() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("scores"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Points awarded for each expected answer in the question",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Points awarded for each expected answer in the question",
+                                )),
                                 items: LexArrayItem::Integer(LexInteger {
                                     ..Default::default()
                                 }),
@@ -513,7 +503,7 @@ fn lexicon_doc_pub_quizzy_teamScore() -> LexiconDoc<'static> {
 
 pub mod scored_answer_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -665,10 +655,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ScoredAnswer<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ScoredAnswer<S> {
         ScoredAnswer {
             answer: self._fields.0.unwrap(),
             commentary: self._fields.1,
