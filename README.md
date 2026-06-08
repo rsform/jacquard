@@ -6,8 +6,6 @@ A suite of Rust crates intended to make it much easier to get started with atpro
 
 [Jacquard is simpler](https://alpha.weaver.sh/nonbinary.computer/jacquard/jacquard_magic) because it is designed in a way which makes things simple that almost every other atproto library seems to make difficult.
 
-Jacquard generated types are generic over their string backing, but ordinary client code can usually ignore that detail. Use the generated request builders, pass normal strings, and call `.send(...).into_output()?` to get owned output that is easy to store, move independently of the response buffer, and pass through frameworks or APIs that require `DeserializeOwned`. If you need tighter control later, Jacquard still supports borrowing and zero-copy parsing with backing types such as `&str` and `CowStr<'_>`.
-
 
 ## Features
 
@@ -26,7 +24,7 @@ Jacquard generated types are generic over their string backing, but ordinary cli
 
 ## Example
 
-Dead simple API client. Resumes a stored OAuth session or opens a browser login, then prints the latest 5 posts from your timeline. This is the default path for local scripts and CLIs where browser login is acceptable; app-password credential sessions are mainly for unattended workflows that must re-authenticate non-interactively.
+Dead simple API client. Resumes a stored OAuth session or opens a browser login, then prints the latest 5 posts from your timeline.
 
 ```rust
 // Note: this requires the `loopback` feature enabled (it is currently by default).
@@ -81,43 +79,38 @@ async fn main() -> miette::Result<()> {
 If you have `just` installed, you can run the [examples](https://tangled.org/nonbinary.computer/jacquard/tree/main/examples) using `just example {example-name} {ARGS}` or `just examples` to see what's available.
 
 > [!WARNING]
-> The latest version swaps from the `url` crate to the lighter and quicker `fluent-uri`. It also moves the re-exported crate paths around and renames the `Uri<'_>` value type enum to `UriValue<'_>` to avoid confusion. This is likely to have broken some things. Migrating is pretty straightforward but consider yourself forewarned. This crate is *not* 1.0 for a reason.
+> Jacquard 0.12 includes **many** breaking changes from 0.11. The most notable and far-reaching is the borrow-or-share rewrite, but it is *far* from the only API to have changed. Please read the release highlights and the changelog carefully, as well as the documentation. There may also be regressions not yet fixed. Please report any such issues on Tangled.
 
 ### Changelog
 
 [CHANGELOG.md](./CHANGELOG.md)
 
-#### 0.11 Release Highlights:
+#### 0.12 Release Highlights:
 
-- `jacquard-lexgen` and `jacquard-identity` no longer depend on the generated API crate. This is mostly for my own benefit.
+#### Borrow-or-share
+Jacquard 0.12 swaps from lifetime-based CowStr<'_>-backed string types to the "borrow-or-share" pattern. Jacquard generated types are now generic over their string backing type, as opposed to having a lifetime, where that backing type is one that implements the requisite traits for the pattern. The default backing type, aliased `DefaultStr`, is `SmolStr`, but any of `CowStr<'_>`, `String`, `&str`, and `Cow<'_, str>` can be used currently. Defaulting to `SmolStr` maintains the niceties it added to `CowStr<'_>`, such as non-allocating construction from static string slices regardless of length, and inlining small strings in all cases while vastly simplifying the common cases where you don't want to deal with lifetimes.
 
-**Code generation pipeline overhaul** (`jacquard-lexicon`, `jacquard-lexgen`)
-- Jacquard's codegen output already was nice to *use*. now it's going to be nice to read.
-- New code generation tracks the types used, makes an import block for the file, and then organizes the file with stuff you care about at the top and internal stuff, like the builders, at the bottom.
-- Import resolution pass now conditionally generates short paths when types are unambiguous within a module, falling back to fully-qualified paths when collisions exist
+**Type updates**
+- Jacquard types backed by owned string types can now meet `DeserializeOwned` trait bounds. 
+- New `.borrow()` method on `Did`, `Handle`, `Nsid`, `Rkey`, `RecordKey` returns `Type<&str>` for cheap borrowing (analogous to `Uri::borrow()` from `fluent_uri`)
+- New `.convert::<B>()` method for cross-backing-type conversion
 
-#### 0.10 Release Highlights:
+**Response parsing** (`jacquard-common`)
+- `Response::parse::<S>()`: caller chooses backing type via turbofish
+- `Response::into_output()`: returns `SmolStr`-backed owned types via `DeserializeOwned`
 
-**URL type migration**
-- Migrated from `url` crate to `fluent_uri` for validated URL/URI types
-- All `Url` types are now `Uri` from `fluent_uri`
-- Affects any code that constructs, passes, or pattern-matches on endpoint URLs
+**Generated API types** (`jacquard-api`, `jacquard-lexicon`)
+- All generated structs/enums: `Foo<S: BosStr = DefaultStr>` with `#[serde(bound(deserialize = "S: Deserialize<'de> + BosStr"))]`
+- `#[serde(borrow)]` removed from all generated code
+- String field defaults use `FromStaticStr::from_static()` for zero-alloc construction
+- Error enums: `SmolStr` message fields, no lifetime parameters
+- **Generated builders now have two entry points:**
+  - `Type::new()` picks `DefaultStr` as the backing type. This avoids awkward turbofishes or explicit annotations in many scenarios where the builder couldn't work out what type it needed to be from the immediate surroundings.
+  - `Type::builder()` allows the caller to choose, either explicitly via turbofish, or implicitly via inference if possible, the backing type (the previous behaviour).
 
-**Re-exported crate paths**
-- Re-exported crates (including non-proc-macro dependencies of the generated API crate) are now centralized into a distinct module
-- Import paths for re-exported types have changed
+**Note:** `RawData<'a>` currently remains lifetime-based, as do a few other mostly internal types.
 
-**`no_std` groundwork** 
-- Initial work toward allowing jacquard to function on platforms without access to the standard library.
-- `std` usage is now feature-gated. the library currently *does not compile* without `std` due to some remaining dependencies.
-
-### Projects using Jacquard
-
-- [Tranquil PDS](https://tangled.org/tranquil.farm/tranquil-pds)
-- [skywatch-phash-rs](https://tangled.org/skywatch.blue/skywatch-phash-rs)
-- [Weaver](https://weaver.sh/) - [tangled repository](https://tangled.org/nonbinary.computer/weaver)
-- [wisp.place CLI tool](https://docs.wisp.place/cli/) - formerly
-- [PDS MOOver](https://pdsmoover.com/) - [tangled repository](https://tangled.org/baileytownsend.dev/pds-moover)
+#### Jacquard-axum
 
 ## Component crates
 
@@ -135,6 +128,18 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 | `jacquard-lexicon` | Lexicon parsing and code generation | [![Crates.io](https://img.shields.io/crates/v/jacquard-lexicon.svg)](https://crates.io/crates/jacquard-lexicon) [![Documentation](https://docs.rs/jacquard-lexicon/badge.svg)](https://docs.rs/jacquard-lexicon) |
 | `jacquard-lexgen` | Code generation binaries | [![Crates.io](https://img.shields.io/crates/v/jacquard-lexgen.svg)](https://crates.io/crates/jacquard-lexgen) [![Documentation](https://docs.rs/jacquard-lexgen/badge.svg)](https://docs.rs/jacquard-lexgen) |
 | `jacquard-derive` | Macros for lexicon types | [![Crates.io](https://img.shields.io/crates/v/jacquard-derive.svg)](https://crates.io/crates/jacquard-derive) [![Documentation](https://docs.rs/jacquard-derive/badge.svg)](https://docs.rs/jacquard-derive) |
+
+### Session Types
+
+
+
+### Projects using Jacquard
+
+- [Tranquil PDS](https://tangled.org/tranquil.farm/tranquil-pds)
+- [skywatch-phash-rs](https://tangled.org/skywatch.blue/skywatch-phash-rs)
+- [Weaver](https://weaver.sh/) - [tangled repository](https://tangled.org/nonbinary.computer/weaver)
+- [wisp.place CLI tool](https://docs.wisp.place/cli/) - formerly
+- [PDS MOOver](https://pdsmoover.com/) - [tangled repository](https://tangled.org/baileytownsend.dev/pds-moover)
 
 ### Testimonials
 

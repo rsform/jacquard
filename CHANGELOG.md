@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.12.0-rc.1] - 2026-06-07
+
+### Breaking changes
+
+**Session resume rework** (`jacquard`, `jacquard-common`, `jacquard-oauth`)
+- Reworked session storage primitives somewhat, moving toward a shared `SessionKey` type
+- Added enumeration method to the `SessionStore` trait to list existing session keys, defaulted to return an empty Vec.
+- Added `SessionHint` enum and `SessionSelector` trait to enable generic resume of sessions with varying levels of input information and implementations for existing store types, as well as wrappers backed by an `IdentityResolver` for handle resolution.
+- Added resume-or-auth helpers for OAuth and app password session types, making the process of resuming any existing session, reauthenticating, or punting to the login if there's not enough information more straightforward.
+
+**`jacquard-identity` no longer requires `reqwest`**
+- JacquardResolver now parameterized on `C: HttpClient` with `PublicResolver` aliased to the default `reqwest`-backed version.
+
+
+### Added
+
+- `Cow<'a, str>` now supported by borrow-or-share pattern traits
+
+**`jacquard-axum` re-added and overhauled**
+- Reworked XRPC extractor to work with borrow-or-share types. Backing type for the query or body of the input can differ from the handler-visible backing type, to allow for non-overlapping extractor impls for the different backing types so that the potentially borrowed types like `CowStr<'_>` can still be used.
+- Better type enforcement in handler responses by default.
+- **Service auth**
+  - Improved service auth extractor to properly handle 'did:web:for.some.reason.still.blueskyweb.xyz#bsky_appview'-type service ids (thanks @pds.dad)
+  - Added default replay protection for `jti` using a `ReplayStore` trait, default-implemented using a `mini-moka` in-memory cache.
+- **OAuth web helpers**
+  - Added OAuth client counterparts to the service auth extractors.
+  - API-oriented extractor provides a useful error on auth failure, if auth is required.
+  - Browser-oriented extractor redirects unauthenticated users to a configured URL, while passing state to allow returning to the original URL after login.
+  - Configurable routes and handlers for common oauth paths
+  - Added axum-based server-side confidential oauth client example
+
+
+
+### Changed
+
+- Reduced allocations in the `atproto!()` macro by cleverly allowing use of the `FromStaticStr` constructions method or `SmolStr::new_static()` constructor in keys and values.
+- Improved type inference in the `atproto!()` macro and several other locations by explicitly defaulting to `DefaultStr` more clearly.
+
+**Codegen** 
+- Added some improved doc comment creation paths in lexicon-generated code
+- **Generated builders now have two entry points:**
+  - `Type::new()` picks `DefaultStr` as the backing type. This avoids awkward turbofishes or explicit annotations in many scenarios where the builder couldn't work out what type it needed to be from the immediate surroundings.
+  - `Type::builder()` allows the caller to choose, either explicitly via turbofish, or implicitly via inference if possible, the backing type (the previous behaviour).
+
+### Fixed
+
+**Documentation**
+- Updated documentation for 0.12 version, fixed a number of reported areas of confusion or lack of clarity
+**Crate features**
+- Added `reqwest-compression` feature to jacquard-common which enables reqwest's compression options (or, more importantly, means you can *disable* them)
+
+
 ## [0.12.0-beta.1] - 2026-03-23
 
 ### Breaking changes

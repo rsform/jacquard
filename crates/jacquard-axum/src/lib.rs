@@ -49,11 +49,6 @@
 //!
 //! Deserialization errors return a 400 Bad Request with a JSON body matching the
 //! XRPC error format.
-//!
-//! [`IntoRouter`] is implemented for endpoint marker types. The endpoint marker
-//! receiver style, such as `ResolveHandleRequest::into_router(handle_resolve)`,
-//! keeps routing no-turbofish while still deriving the path and HTTP method from
-//! [`XrpcEndpoint`].
 
 pub mod did_web;
 pub mod oauth;
