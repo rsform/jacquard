@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewBasic;
 use crate::sh_weaver::actor::ProfileView;
 use crate::sh_weaver::notebook::authors;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A single author in a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AuthorListItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<i64>,
@@ -42,7 +45,6 @@ pub struct AuthorListItem<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -147,7 +149,7 @@ impl<S: BosStr> LexiconSchema for Authors<S> {
 
 pub mod author_list_item_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,10 +180,7 @@ pub mod author_list_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AuthorListItemBuilder<
-    St: author_list_item_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct AuthorListItemBuilder<St: author_list_item_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<AuthorListItemProfile<S>>),
     _type: PhantomData<fn() -> S>,
@@ -238,10 +237,7 @@ impl<St: author_list_item_state::State, S: BosStr> AuthorListItemBuilder<St, S> 
 
 impl<St: author_list_item_state::State, S: BosStr> AuthorListItemBuilder<St, S> {
     /// Set the `profile` field (optional)
-    pub fn profile(
-        mut self,
-        value: impl Into<Option<AuthorListItemProfile<S>>>,
-    ) -> Self {
+    pub fn profile(mut self, value: impl Into<Option<AuthorListItemProfile<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -266,10 +262,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AuthorListItem<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AuthorListItem<S> {
         AuthorListItem {
             index: self._fields.0,
             profile: self._fields.1,
@@ -279,10 +272,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.notebook.authors"),
@@ -291,9 +284,7 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("authorListItem"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A single author in a Weaver notebook."),
-                    ),
+                    description: Some(CowStr::new_static("A single author in a Weaver notebook.")),
                     required: Some(vec![SmolStr::new_static("profile, index")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -309,7 +300,7 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
-                                    CowStr::new_static("sh.weaver.actor.defs#profileView")
+                                    CowStr::new_static("sh.weaver.actor.defs#profileView"),
                                 ],
                                 ..Default::default()
                             }),
@@ -322,9 +313,7 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("Authors of a Weaver notebook."),
-                    ),
+                    description: Some(CowStr::new_static("Authors of a Weaver notebook.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("authorList")]),
@@ -363,7 +352,7 @@ fn lexicon_doc_sh_weaver_notebook_authors() -> LexiconDoc<'static> {
 
 pub mod authors_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

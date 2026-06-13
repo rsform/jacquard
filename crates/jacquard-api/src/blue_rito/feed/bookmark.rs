@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,16 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blue_rito::feed::bookmark;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blue_rito::feed::bookmark;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Locale<S: BosStr = DefaultStr> {
     ///URI's comment. It can use GitHub Flavored Markdown.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -226,10 +229,10 @@ impl<S: BosStr> LexiconSchema for Bookmark<S> {
 }
 
 fn lexicon_doc_blue_rito_feed_bookmark() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.rito.feed.bookmark"),
@@ -238,20 +241,19 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("locale"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("lang"), SmolStr::new_static("title")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("lang"),
+                        SmolStr::new_static("title"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "URI's comment. It can use GitHub Flavored Markdown.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "URI's comment. It can use GitHub Flavored Markdown.",
+                                )),
                                 max_length: Some(100000usize),
                                 max_graphemes: Some(10000usize),
                                 ..Default::default()
@@ -381,7 +383,7 @@ fn lexicon_doc_blue_rito_feed_bookmark() -> LexiconDoc<'static> {
 
 pub mod bookmark_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

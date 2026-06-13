@@ -13,10 +13,9 @@ pub mod profile_status;
 pub mod search_actors;
 pub mod status;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,16 +26,19 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
+use crate::fm_teal::alpha::actor;
 use crate::fm_teal::alpha::actor::profile::FeaturedItem;
 use crate::fm_teal::alpha::feed::PlayView;
-use crate::fm_teal::alpha::actor;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct MiniProfileView<S: BosStr = DefaultStr> {
     ///IPLD of the avatar
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -52,9 +54,11 @@ pub struct MiniProfileView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ProfileView<S: BosStr = DefaultStr> {
     ///IPLD of the avatar
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,7 +91,10 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
 /// A declaration of the status of the actor.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct StatusView<S: BosStr = DefaultStr> {
     ///The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -147,10 +154,10 @@ impl<S: BosStr> LexiconSchema for StatusView<S> {
 }
 
 fn lexicon_doc_fm_teal_alpha_actor_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.actor.defs"),
@@ -172,21 +179,23 @@ fn lexicon_doc_fm_teal_alpha_actor_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The decentralized identifier of the actor",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "The decentralized identifier of the actor",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },

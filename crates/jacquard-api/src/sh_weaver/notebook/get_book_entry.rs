@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::sh_weaver::notebook::BookEntryView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::sh_weaver::notebook::BookEntryView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBookEntry<S: BosStr = DefaultStr> {
     /// Defaults to `0`. Min: 0.
     #[serde(default = "_default_index")]
@@ -28,9 +31,11 @@ pub struct GetBookEntry<S: BosStr = DefaultStr> {
     pub notebook: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetBookEntryOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: BookEntryView<S>,
@@ -38,18 +43,9 @@ pub struct GetBookEntryOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetBookEntryError {
     #[serde(rename = "NotebookNotFound")]
@@ -58,7 +54,10 @@ pub enum GetBookEntryError {
     EntryNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetBookEntryError {
@@ -123,7 +122,7 @@ fn _default_index() -> Option<i64> {
 
 pub mod get_book_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

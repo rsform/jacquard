@@ -10,24 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Datetime};
+use jacquard_common::types::string::{Datetime, Did};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::sh_tangled::git::temp::get_tree;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::sh_tangled::git::temp::get_tree;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct LastCommit<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<get_tree::Signature<S>>,
@@ -41,9 +44,11 @@ pub struct LastCommit<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTree<S: BosStr = DefaultStr> {
     /// Defaults to `""`.
     #[serde(default = "_default_path")]
@@ -53,9 +58,11 @@ pub struct GetTree<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTreeOutput<S: BosStr = DefaultStr> {
     ///Parent directory path
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -75,18 +82,9 @@ pub struct GetTreeOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetTreeError {
     /// Repository not found or access denied
@@ -103,7 +101,10 @@ pub enum GetTreeError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetTreeError {
@@ -148,9 +149,11 @@ impl core::fmt::Display for GetTreeError {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Readme<S: BosStr = DefaultStr> {
     ///Contents of the readme file
     pub contents: S,
@@ -160,9 +163,11 @@ pub struct Readme<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Signature<S: BosStr = DefaultStr> {
     ///Author email
     pub email: S,
@@ -174,9 +179,11 @@ pub struct Signature<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TreeEntry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_commit: Option<get_tree::LastCommit<S>>,
@@ -280,7 +287,7 @@ impl<S: BosStr> LexiconSchema for TreeEntry<S> {
 
 pub mod last_commit_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -339,7 +346,12 @@ pub mod last_commit_state {
 /// Builder for constructing an instance of this type.
 pub struct LastCommitBuilder<St: last_commit_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<get_tree::Signature<S>>, Option<S>, Option<S>, Option<Datetime>),
+    _fields: (
+        Option<get_tree::Signature<S>>,
+        Option<S>,
+        Option<S>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -467,10 +479,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> LastCommit<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LastCommit<S> {
         LastCommit {
             author: self._fields.0,
             hash: self._fields.1.unwrap(),
@@ -482,10 +491,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_git_temp_getTree() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.git.temp.getTree"),
@@ -494,12 +503,11 @@ fn lexicon_doc_sh_tangled_git_temp_getTree() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("lastCommit"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("hash"), SmolStr::new_static("message"),
-                            SmolStr::new_static("when")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("hash"),
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("when"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -540,81 +548,70 @@ fn lexicon_doc_sh_tangled_git_temp_getTree() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(
-                                vec![
-                                    SmolStr::new_static("repo"), SmolStr::new_static("ref")
-                                ],
-                            ),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("path"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("Path within the repository tree"),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("ref"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "Git reference (branch, tag, or commit SHA)",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("repo"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static("DID of the repository"),
-                                        ),
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![
+                            SmolStr::new_static("repo"),
+                            SmolStr::new_static("ref"),
+                        ]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("path"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Path within the repository tree",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("ref"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "Git reference (branch, tag, or commit SHA)",
+                                    )),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("repo"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static("DID of the repository")),
+                                    format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("readme"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("filename"),
-                            SmolStr::new_static("contents")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("filename"),
+                        SmolStr::new_static("contents"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("contents"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Contents of the readme file"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Contents of the readme file",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("filename"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Name of the readme file"),
-                                ),
+                                description: Some(CowStr::new_static("Name of the readme file")),
                                 ..Default::default()
                             }),
                         );
@@ -626,12 +623,11 @@ fn lexicon_doc_sh_tangled_git_temp_getTree() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("signature"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("name"), SmolStr::new_static("email"),
-                            SmolStr::new_static("when")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("email"),
+                        SmolStr::new_static("when"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -665,12 +661,11 @@ fn lexicon_doc_sh_tangled_git_temp_getTree() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("treeEntry"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("name"), SmolStr::new_static("mode"),
-                            SmolStr::new_static("size")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("mode"),
+                        SmolStr::new_static("size"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -691,9 +686,9 @@ fn lexicon_doc_sh_tangled_git_temp_getTree() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Relative file or directory name"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Relative file or directory name",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -720,7 +715,7 @@ fn _default_path<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_tree_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -824,10 +819,7 @@ where
     St::Ref: get_tree_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<S>,
-    ) -> GetTreeBuilder<get_tree_state::SetRef<St>, S> {
+    pub fn r#ref(mut self, value: impl Into<S>) -> GetTreeBuilder<get_tree_state::SetRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetTreeBuilder {
             _state: PhantomData,
@@ -874,7 +866,7 @@ where
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1047,10 +1039,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Signature<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
         Signature {
             email: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1062,7 +1051,7 @@ where
 
 pub mod tree_entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1121,7 +1110,12 @@ pub mod tree_entry_state {
 /// Builder for constructing an instance of this type.
 pub struct TreeEntryBuilder<St: tree_entry_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<get_tree::LastCommit<S>>, Option<S>, Option<S>, Option<i64>),
+    _fields: (
+        Option<get_tree::LastCommit<S>>,
+        Option<S>,
+        Option<S>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1163,10 +1157,7 @@ impl<S: BosStr> TreeEntryBuilder<tree_entry_state::Empty, S> {
 
 impl<St: tree_entry_state::State, S: BosStr> TreeEntryBuilder<St, S> {
     /// Set the `last_commit` field (optional)
-    pub fn last_commit(
-        mut self,
-        value: impl Into<Option<get_tree::LastCommit<S>>>,
-    ) -> Self {
+    pub fn last_commit(mut self, value: impl Into<Option<get_tree::LastCommit<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -1252,10 +1243,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TreeEntry<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TreeEntry<S> {
         TreeEntry {
             last_commit: self._fields.0,
             mode: self._fields.1.unwrap(),

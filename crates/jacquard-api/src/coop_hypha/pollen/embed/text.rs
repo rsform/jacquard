@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -19,11 +19,14 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Free-form text content for a claim.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Text<S: BosStr = DefaultStr> {
     ///Context or description of the provenance claim.
     pub text: S,
@@ -47,10 +50,10 @@ impl<S: BosStr> LexiconSchema for Text<S> {
 }
 
 fn lexicon_doc_coop_hypha_pollen_embed_text() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.pollen.embed.text"),
@@ -59,9 +62,7 @@ fn lexicon_doc_coop_hypha_pollen_embed_text() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Free-form text content for a claim."),
-                    ),
+                    description: Some(CowStr::new_static("Free-form text content for a claim.")),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -69,11 +70,9 @@ fn lexicon_doc_coop_hypha_pollen_embed_text() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Context or description of the provenance claim.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Context or description of the provenance claim.",
+                                )),
                                 ..Default::default()
                             }),
                         );

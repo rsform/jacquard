@@ -8,17 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_rocksky::shout::ShoutView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_rocksky::shout::ShoutView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReportShout<S: BosStr = DefaultStr> {
     ///The reason for reporting the shout
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -29,9 +32,11 @@ pub struct ReportShout<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReportShoutOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: ShoutView<S>,
@@ -52,9 +57,8 @@ impl jacquard_common::xrpc::XrpcResp for ReportShoutResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ReportShout<S> {
     const NSID: &'static str = "app.rocksky.shout.reportShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = ReportShoutResponse;
 }
 
@@ -64,9 +68,8 @@ Path: `/xrpc/app.rocksky.shout.reportShout`. The request payload type is `Report
 pub struct ReportShoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReportShoutRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.reportShout";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = ReportShout<S>;
     type Response = ReportShoutResponse;
 }

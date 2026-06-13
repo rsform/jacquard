@@ -231,7 +231,9 @@ async fn main() -> Result<()> {
         .route("/oauth/login", get(login_page))
         .route("/timeline", get(timeline))
         .route("/api/session", get(strict_session_json))
-        .merge(oauth_routes::<PublicResolver, FileAuthStore, AppState>(&state.oauth_config))
+        .merge(oauth_routes::<PublicResolver, FileAuthStore, AppState>(
+            &state.oauth_config,
+        ))
         .with_state(state);
 
     let listener = tokio::net::TcpListener::bind(args.listen)

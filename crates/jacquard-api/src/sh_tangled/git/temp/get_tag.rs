@@ -10,21 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetTag<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
     pub tag: S,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -32,18 +34,9 @@ pub struct GetTagOutput {
     pub body: Bytes,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetTagError {
     /// Repository not found or access denied
@@ -57,7 +50,10 @@ pub enum GetTagError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetTagError {
@@ -144,7 +140,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetTagRequest {
 
 pub mod get_tag_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -254,10 +250,7 @@ where
     St::Tag: get_tag_state::IsUnset,
 {
     /// Set the `tag` field (required)
-    pub fn tag(
-        mut self,
-        value: impl Into<S>,
-    ) -> GetTagBuilder<get_tag_state::SetTag<St>, S> {
+    pub fn tag(mut self, value: impl Into<S>) -> GetTagBuilder<get_tag_state::SetTag<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetTagBuilder {
             _state: PhantomData,

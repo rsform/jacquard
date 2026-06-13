@@ -368,10 +368,12 @@ where
             RawData::Null => Ok(Data::Null),
             RawData::Boolean(b) => Ok(Data::Boolean(b)),
             RawData::SignedInt(i) => Ok(Data::Integer(i)),
-            RawData::UnsignedInt(u) => {
-                // Convert to i64, clamping if necessary
-                Ok(Data::Integer((u % (i64::MAX as u64)) as i64))
-            }
+            RawData::UnsignedInt(u) => match i64::try_from(u) {
+                Ok(i) => Ok(Data::Integer(i)),
+                Err(_) => Err(ConversionError::InvalidRawData {
+                    message: "unsigned integer is too large for AT Protocol integer".to_string(),
+                }),
+            },
             RawData::String(s) => {
                 // Apply string type inference
                 Ok(Data::String(parsing::parse_string(S::from(s))))
@@ -397,8 +399,16 @@ where
                         ) = (map.get("ref"), map.get("mimeType"), map.get("size"))
                         {
                             let size_val = match size {
-                                RawData::UnsignedInt(u) => *u as usize,
-                                RawData::SignedInt(i) => *i as usize,
+                                RawData::UnsignedInt(u) => usize::try_from(*u).map_err(|_| {
+                                    ConversionError::InvalidRawData {
+                                        message: "blob size is too large".to_string(),
+                                    }
+                                })?,
+                                RawData::SignedInt(i) => usize::try_from(*i).map_err(|_| {
+                                    ConversionError::InvalidRawData {
+                                        message: "blob size must be non-negative".to_string(),
+                                    }
+                                })?,
                                 _ => {
                                     return Err(ConversionError::InvalidRawData {
                                         message: "blob size must be integer".to_string(),

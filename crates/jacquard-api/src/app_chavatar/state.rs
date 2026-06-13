@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Current execution state of rotation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -117,7 +117,7 @@ impl<S: BosStr> LexiconSchema for State<S> {
 
 pub mod state_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -208,10 +208,7 @@ where
     St::Cursor: state_state::IsUnset,
 {
     /// Set the `cursor` field (required)
-    pub fn cursor(
-        mut self,
-        value: impl Into<S>,
-    ) -> StateBuilder<state_state::SetCursor<St>, S> {
+    pub fn cursor(mut self, value: impl Into<S>) -> StateBuilder<state_state::SetCursor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
@@ -265,10 +262,10 @@ where
 }
 
 fn lexicon_doc_app_chavatar_state() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.state"),

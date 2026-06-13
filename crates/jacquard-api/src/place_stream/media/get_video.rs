@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,22 +21,27 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_bsky::actor::ProfileViewBasic;
+use crate::place_stream::media::get_video;
+use crate::place_stream::media::track::TrackView;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::actor::ProfileViewBasic;
-use crate::place_stream::media::track::TrackView;
-use crate::place_stream::media::get_video;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetVideo<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetVideoOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -44,18 +49,9 @@ pub struct GetVideoOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetVideoError {
     /// No record indexed at the supplied AT-URI.
@@ -63,7 +59,10 @@ pub enum GetVideoError {
     VideoNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetVideoError {
@@ -87,9 +86,11 @@ impl core::fmt::Display for GetVideoError {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct VideoView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -108,7 +109,10 @@ pub struct VideoView<S: BosStr = DefaultStr> {
 /// Sums across every place.stream.media.viewCount record indexed for this video, regardless of reporter or window. The underlying records are window-bounded; the consumer sees a running total.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ViewCountSummary<S: BosStr = DefaultStr> {
     ///Sum of bytes transferred across every track row in every indexed report.
     pub bytes: i64,
@@ -232,7 +236,7 @@ impl<S: BosStr> LexiconSchema for ViewCountSummary<S> {
 
 pub mod get_video_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -339,7 +343,7 @@ where
 
 pub mod video_view_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -651,10 +655,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> VideoView<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VideoView<S> {
         VideoView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -669,10 +670,10 @@ where
 }
 
 fn lexicon_doc_place_stream_media_getVideo() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.media.getVideo"),
@@ -681,52 +682,46 @@ fn lexicon_doc_place_stream_media_getVideo() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("uri")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("uri"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "AT-URI of the place.stream.video record.",
-                                            ),
-                                        ),
-                                        format: Some(LexStringFormat::AtUri),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
+                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
+                        required: Some(vec![SmolStr::new_static("uri")]),
+                        properties: {
+                            #[allow(unused_mut)]
+                            let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("uri"),
+                                LexXrpcParametersProperty::String(LexString {
+                                    description: Some(CowStr::new_static(
+                                        "AT-URI of the place.stream.video record.",
+                                    )),
+                                    format: Some(LexStringFormat::AtUri),
+                                    ..Default::default()
+                                }),
+                            );
+                            map
+                        },
+                        ..Default::default()
+                    })),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("videoView"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
-                            SmolStr::new_static("author"), SmolStr::new_static("record"),
-                            SmolStr::new_static("viewCounts"),
-                            SmolStr::new_static("likeCount")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("author"),
+                        SmolStr::new_static("record"),
+                        SmolStr::new_static("viewCounts"),
+                        SmolStr::new_static("likeCount"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "app.bsky.actor.defs#profileViewBasic",
-                                ),
+                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
                                 ..Default::default()
                             }),
                         );
@@ -754,9 +749,7 @@ fn lexicon_doc_place_stream_media_getVideo() -> LexiconDoc<'static> {
                             SmolStr::new_static("tracks"),
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static(
-                                        "place.stream.media.track#trackView",
-                                    ),
+                                    r#ref: CowStr::new_static("place.stream.media.track#trackView"),
                                     ..Default::default()
                                 }),
                                 ..Default::default()
@@ -840,7 +833,7 @@ fn lexicon_doc_place_stream_media_getVideo() -> LexiconDoc<'static> {
 
 pub mod view_count_summary_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -913,10 +906,7 @@ pub mod view_count_summary_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ViewCountSummaryBuilder<
-    St: view_count_summary_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct ViewCountSummaryBuilder<St: view_count_summary_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -924,10 +914,7 @@ pub struct ViewCountSummaryBuilder<
 
 impl ViewCountSummary<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ViewCountSummaryBuilder<
-        view_count_summary_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> ViewCountSummaryBuilder<view_count_summary_state::Empty, DefaultStr> {
         ViewCountSummaryBuilder::new()
     }
 }
@@ -1056,10 +1043,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> ViewCountSummary<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewCountSummary<S> {
         ViewCountSummary {
             bytes: self._fields.0.unwrap(),
             count: self._fields.1.unwrap(),

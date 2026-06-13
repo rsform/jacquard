@@ -18,7 +18,7 @@
 
 - `Cow<'a, str>` now supported by borrow-or-share pattern traits
 
-**OAuth Permission Sets, refactored scopes** (`jacquard-oauth`, `jacquard`, `jacquard-lexicon`)
+**OAuth permission sets, refactored scopes** (`jacquard-oauth`, `jacquard`, `jacquard-lexicon`)
 - Added `Scopes<S>` validated container for space-separated OAuth scope strings, replacing `Vec<Scope<S>>`. Stores a single string buffer with pre-computed byte-range indices, yielding zero-copy `Scope<&str>` views.
 - Added `IncludeScope<S>` scope variant referencing permission set NSIDs with optional `?aud=<did>` audience.
 - Added permission set lexicon types (`LexPermissionSet`, `LexPermission`, `LexPermissionResource`) in jacquard-lexicon.
@@ -84,9 +84,28 @@
 ### Fixed
 
 **Documentation**
-- Updated documentation for 0.12 version, fixed a number of reported areas of confusion or lack of clarity
+- Updated documentation for 0.12 version, fixed a number of reported areas of confusion or lack of clarity.
+
 **Crate features**
-- Added `reqwest-compression` feature to jacquard-common which enables reqwest's compression options (or, more importantly, means you can *disable* them)
+- Added `reqwest-compression` feature to `jacquard-common`, which enables reqwest's compression options or, more importantly, means consumers can disable them.
+
+**Lexicon schema derive** (`jacquard-derive`, `jacquard-lexicon`)
+- Re-enabled and hardened `#[derive(LexiconSchema)]` for borrow-or-share generic types, including defaulted `S: BosStr = DefaultStr` parameters and lifetime-plus-type generic combinations.
+- Fixed schema type mapping for BOS generic strings inside `Option<S>` and `Vec<S>`, and for non-`S` type parameter names such as `Text: BosStr`.
+- Preserved the intended negative behavior for unconstrained generics, which continue to generate local refs rather than being mistaken for strings.
+- Made open-union schema generation robust when `#[open_union]` has already injected the `Unknown(Data<S>)` variant before schema derivation runs.
+- Added focused tests for generic open unions, recursive BOS type mapping, old-style `Bos<str> + AsRef<str>` bounds, and local-ref behavior for nested object schemas.
+
+**Value serialization and conversion** (`jacquard-common`)
+- Fixed `Data` unsigned integer handling so values larger than `i64::MAX` are rejected instead of silently wrapping during deserialization, serialization into `Data`, or `RawData` conversion.
+- Fixed raw blob-size conversion to reject negative or out-of-range sizes instead of casting with truncation or wraparound.
+- Added direct borrowed-string regression coverage for `Data<&str>` and nested `Data<&str>` object values.
+
+
+**OAuth requests** (`jacquard-oauth`)
+- Reserved OAuth token introspection as a future, unconstructible API placeholder rather than leaving reachable runtime `unimplemented!()` paths.
+- Marked `OAuthRequest` as non-exhaustive to preserve future request API flexibility.
+- Replaced the non-PAR authorization path with a structured `ParRequired` error instead of panicking.
 
 
 ## [0.12.0-beta.1] - 2026-03-23

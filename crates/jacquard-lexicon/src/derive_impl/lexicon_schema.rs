@@ -2,7 +2,7 @@
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Data, DeriveInput, parse2};
+use syn::{Data, DeriveInput, GenericParam, parse2};
 
 /// Implementation for the LexiconSchema derive macro
 pub fn impl_derive_lexicon_schema(input: TokenStream) -> TokenStream {
@@ -29,18 +29,45 @@ fn lexicon_schema_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
     }
 }
 
+fn monomorphic_schema_type(input: &DeriveInput) -> syn::Result<TokenStream> {
+    let name = &input.ident;
+    if input.generics.params.is_empty() {
+        return Ok(quote! { #name });
+    }
+
+    let mut args = Vec::new();
+    for param in &input.generics.params {
+        match param {
+            GenericParam::Lifetime(_) => args.push(quote! { 'static }),
+            GenericParam::Type(param) => {
+                let Some(default) = &param.default else {
+                    return Err(syn::Error::new_spanned(
+                        param,
+                        "LexiconSchema inventory registration for generic types requires default type parameters",
+                    ));
+                };
+                args.push(quote! { #default });
+            }
+            GenericParam::Const(param) => {
+                let Some(default) = &param.default else {
+                    return Err(syn::Error::new_spanned(
+                        param,
+                        "LexiconSchema inventory registration for const-generic types requires default const parameters",
+                    ));
+                };
+                args.push(quote! { #default });
+            }
+        }
+    }
+
+    Ok(quote! { #name < #(#args),* > })
+}
+
 /// Struct implementation
 fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
     let name = &input.ident;
-    let generics = &input.generics;
-
-    // Detect lifetime
-    let has_lifetime = generics.lifetimes().next().is_some();
-    let lifetime = if has_lifetime {
-        quote! { <'_> }
-    } else {
-        quote! {}
-    };
+    let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+    let provider_type = monomorphic_schema_type(input)?;
 
     // Use schema builder to get actual data
     let built = crate::schema::from_ast::build_struct_schema(input)?;
@@ -83,7 +110,7 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
 
     // Generate trait impl
     Ok(quote! {
-        impl #generics ::jacquard_lexicon::schema::LexiconSchema for #name #lifetime {
+        impl #impl_generics ::jacquard_lexicon::schema::LexiconSchema for #name #ty_generics #where_clause {
             fn nsid() -> &'static str {
                 #nsid
             }
@@ -110,7 +137,7 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
                 nsid: #nsid,
                 def_name: #fragment_name,
                 provider: || {
-                    <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc()
+                    <#provider_type as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc()
                 },
             }
         }
@@ -120,15 +147,8 @@ fn impl_for_struct(input: &DeriveInput) -> syn::Result<TokenStream> {
 /// Enum implementation (union support)
 fn impl_for_enum(input: &DeriveInput) -> syn::Result<TokenStream> {
     let name = &input.ident;
-    let generics = &input.generics;
-
-    // Detect lifetime
-    let has_lifetime = generics.lifetimes().next().is_some();
-    let lifetime = if has_lifetime {
-        quote! { <'_> }
-    } else {
-        quote! {}
-    };
+    let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
+    let provider_type = monomorphic_schema_type(input)?;
 
     // Use schema builder to get actual data
     let built = crate::schema::from_ast::build_enum_schema(input)?;
@@ -139,7 +159,7 @@ fn impl_for_enum(input: &DeriveInput) -> syn::Result<TokenStream> {
     let nsid = &built.nsid;
 
     Ok(quote! {
-        impl #generics ::jacquard_lexicon::schema::LexiconSchema for #name #lifetime {
+        impl #impl_generics ::jacquard_lexicon::schema::LexiconSchema for #name #ty_generics #where_clause {
             fn nsid() -> &'static str {
                 #nsid
             }
@@ -163,7 +183,7 @@ fn impl_for_enum(input: &DeriveInput) -> syn::Result<TokenStream> {
                 nsid: #nsid,
                 def_name: "main",
                 provider: || {
-                    <#name as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc()
+                    <#provider_type as ::jacquard_lexicon::schema::LexiconSchema>::lexicon_doc()
                 },
             }
         }

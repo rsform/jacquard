@@ -10,7 +10,7 @@ use bytes::Bytes;
 use core::fmt;
 use core::marker::PhantomData;
 use core::str::FromStr;
-use serde::de::value::StrDeserializer;
+use serde::de::value::{StrDeserializer, StringDeserializer};
 use serde::{Deserialize, Deserializer, Serialize, Serializer, de::VariantAccess};
 use smol_str::{SmolStr, ToSmolStr};
 
@@ -147,7 +147,12 @@ where
     where
         E: serde::de::Error,
     {
-        Ok(Data::Integer((v % (i64::MAX as u64)) as i64))
+        match i64::try_from(v) {
+            Ok(i) => Ok(Data::Integer(i)),
+            Err(_) => Err(E::custom(
+                "unsigned integer is too large for AT Protocol integer",
+            )),
+        }
     }
 
     fn visit_f64<E>(self, v: f64) -> Result<Self::Value, E>
@@ -166,24 +171,27 @@ where
     where
         E: serde::de::Error,
     {
-        let s = StrDeserializer::new(v);
-        Ok(Data::String(AtprotoStr::String(S::deserialize(s)?)))
+        Ok(Data::String(AtprotoStr::String(S::deserialize(
+            StrDeserializer::<E>::new(v),
+        )?)))
     }
 
     fn visit_borrowed_str<E>(self, v: &'v str) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        let s = StrDeserializer::new(v);
-        Ok(Data::String(AtprotoStr::String(S::deserialize(s)?)))
+        Ok(Data::String(AtprotoStr::String(
+            S::deserialize(BorrowedStrDeserializer(v)).map_err(E::custom)?,
+        )))
     }
 
     fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
     where
         E: serde::de::Error,
     {
-        let s = StrDeserializer::new(&v);
-        Ok(Data::String(AtprotoStr::String(S::deserialize(s)?)))
+        Ok(Data::String(AtprotoStr::String(S::deserialize(
+            StringDeserializer::<E>::new(v),
+        )?)))
     }
 
     fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
@@ -333,11 +341,12 @@ where
         let Some(Data::Integer(size)) = map.remove("size") else {
             return Err(AtDataError::Deserialization);
         };
+        let size = usize::try_from(size).map_err(|_| AtDataError::Deserialization)?;
         map.remove("$type");
         return Ok(Data::Blob(Blob {
             r#ref: CidLink(ref_cid),
             mime_type: MimeType::new(mime_str),
-            size: size as usize,
+            size,
         }));
     }
 
@@ -873,9 +882,9 @@ fn apply_raw_type_inference<'s>(
 
             let size = map.get("size").and_then(|v| {
                 if let RawData::UnsignedInt(i) = v {
-                    Some(*i as usize)
+                    usize::try_from(*i).ok()
                 } else if let RawData::SignedInt(i) = v {
-                    Some(*i as usize)
+                    usize::try_from(*i).ok()
                 } else {
                     None
                 }
@@ -1678,7 +1687,12 @@ impl serde::Serializer for DataSerializer {
     }
 
     fn serialize_u64(self, v: u64) -> Result<Self::Ok, Self::Error> {
-        Ok(Data::Integer((v as i128 % (i64::MAX as i128)) as i64))
+        match i64::try_from(v) {
+            Ok(i) => Ok(Data::Integer(i)),
+            Err(_) => Err(RawDataSerializerError::Message(
+                "unsigned integer is too large for AT Protocol integer".to_string(),
+            )),
+        }
     }
 
     fn serialize_f32(self, v: f32) -> Result<Self::Ok, Self::Error> {

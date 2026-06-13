@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AddSecret<S: BosStr = DefaultStr> {
     pub key: S,
     pub repo: AtUri<S>,
@@ -40,9 +43,8 @@ impl jacquard_common::xrpc::XrpcResp for AddSecretResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddSecret<S> {
     const NSID: &'static str = "sh.tangled.repo.addSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AddSecretResponse;
 }
 
@@ -52,16 +54,15 @@ Path: `/xrpc/sh.tangled.repo.addSecret`. The request payload type is `AddSecret<
 pub struct AddSecretRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AddSecretRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.addSecret";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = AddSecret<S>;
     type Response = AddSecretResponse;
 }
 
 pub mod add_secret_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -166,10 +167,7 @@ where
     St::Key: add_secret_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(
-        mut self,
-        value: impl Into<S>,
-    ) -> AddSecretBuilder<add_secret_state::SetKey<St>, S> {
+    pub fn key(mut self, value: impl Into<S>) -> AddSecretBuilder<add_secret_state::SetKey<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AddSecretBuilder {
             _state: PhantomData,
@@ -234,10 +232,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> AddSecret<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AddSecret<S> {
         AddSecret {
             key: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

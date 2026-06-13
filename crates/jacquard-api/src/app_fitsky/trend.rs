@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,13 +25,16 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::app_fitsky::trend;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::app_fitsky::trend;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DataPoint<S: BosStr = DefaultStr> {
     pub date: Datetime,
     ///Value in base units (meters, seconds, calories, count, bpm)
@@ -66,7 +69,6 @@ pub struct Trend<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendChartStyle<S: BosStr = DefaultStr> {
@@ -144,7 +146,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendMetric<S: BosStr = DefaultStr> {
@@ -243,7 +244,6 @@ where
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendPeriod<S: BosStr = DefaultStr> {
     _1d,
@@ -332,7 +332,6 @@ where
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TrendWidgetType<S: BosStr = DefaultStr> {
@@ -434,9 +433,11 @@ pub struct TrendGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Trend<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TrendSummary<S: BosStr = DefaultStr> {
     ///Average value in base units
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -551,25 +552,20 @@ impl<S: BosStr> LexiconSchema for Trend<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
-                        accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string()
-                        ],
+                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
                         actual: mime.to_string(),
                     });
                 }
@@ -629,7 +625,7 @@ impl<S: BosStr> LexiconSchema for TrendSummary<S> {
 
 pub mod data_point_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -767,10 +763,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> DataPoint<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DataPoint<S> {
         DataPoint {
             date: self._fields.0.unwrap(),
             value: self._fields.1.unwrap(),
@@ -780,10 +773,10 @@ where
 }
 
 fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.fitsky.trend"),
@@ -792,9 +785,10 @@ fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dataPoint"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("date"), SmolStr::new_static("value")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("date"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -819,22 +813,18 @@ fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A shared fitness trend or dashboard snapshot",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A shared fitness trend or dashboard snapshot",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("widgetType"),
-                                SmolStr::new_static("metric"),
-                                SmolStr::new_static("period"),
-                                SmolStr::new_static("summary"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("widgetType"),
+                            SmolStr::new_static("metric"),
+                            SmolStr::new_static("period"),
+                            SmolStr::new_static("summary"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -871,7 +861,9 @@ fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("image"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("metric"),
@@ -957,7 +949,7 @@ fn lexicon_doc_app_fitsky_trend() -> LexiconDoc<'static> {
 
 pub mod trend_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1147,10 +1139,7 @@ where
 
 impl<St: trend_state::State, S: BosStr> TrendBuilder<St, S> {
     /// Set the `dataPoints` field (optional)
-    pub fn data_points(
-        mut self,
-        value: impl Into<Option<Vec<trend::DataPoint<S>>>>,
-    ) -> Self {
+    pub fn data_points(mut self, value: impl Into<Option<Vec<trend::DataPoint<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }

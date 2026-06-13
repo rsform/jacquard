@@ -35,7 +35,8 @@ pub fn build_struct_schema(input: &DeriveInput) -> syn::Result<BuiltSchema> {
     let rename_all = parse_serde_rename_all(&input.attrs)?;
 
     // Build properties
-    let field_properties = build_object_properties(&data_struct.fields, rename_all)?;
+    let field_properties =
+        build_object_properties(&data_struct.fields, rename_all, &input.generics)?;
 
     // Extract properties map, required list, and unresolved refs
     let mut properties = BTreeMap::new();
@@ -239,8 +240,10 @@ pub fn build_enum_schema(input: &DeriveInput) -> syn::Result<BuiltSchema> {
         }
     };
 
-    // Check if open union
-    let is_open = has_open_union_attr(&input.attrs);
+    // Check if open union. Attribute macro expansion can leave only the generated
+    // Unknown variant visible to this derive, so accept either signal.
+    let has_unknown_variant = data_enum.variants.iter().any(|v| v.ident == "Unknown");
+    let is_open = has_open_union_attr(&input.attrs) || has_unknown_variant;
 
     // Extract variant refs
     let mut refs = Vec::new();

@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Record defining a 'teleport', that is active during a certain time.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -127,7 +127,7 @@ impl<S: BosStr> LexiconSchema for Teleport<S> {
 
 pub mod teleport_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -290,10 +290,10 @@ where
 }
 
 fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.live.teleport"),
@@ -302,19 +302,15 @@ fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Record defining a 'teleport', that is active during a certain time.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Record defining a 'teleport', that is active during a certain time.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("streamer"),
-                                SmolStr::new_static("startsAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("streamer"),
+                            SmolStr::new_static("startsAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -329,9 +325,9 @@ fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("startsAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("The time the teleport becomes active."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The time the teleport becomes active.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -339,11 +335,9 @@ fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("streamer"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The DID of the streamer to teleport to.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The DID of the streamer to teleport to.",
+                                    )),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),

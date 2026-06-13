@@ -11,10 +11,9 @@ pub mod follow;
 pub mod like;
 pub mod podcast;
 
-
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,11 +26,14 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A podcast category from the Apple Podcasts taxonomy.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AppleCategory<S: BosStr = DefaultStr> {
     ///The category value. Subcategories use the format 'Category > Subcategory'.
     pub value: AppleCategoryValue<S>,
@@ -188,9 +190,7 @@ impl<S: BosStr> AppleCategoryValue<S> {
             Self::FictionScienceFiction => "Fiction > Science Fiction",
             Self::Government => "Government",
             Self::HealthFitness => "Health & Fitness",
-            Self::HealthFitnessAlternativeHealth => {
-                "Health & Fitness > Alternative Health"
-            }
+            Self::HealthFitnessAlternativeHealth => "Health & Fitness > Alternative Health",
             Self::HealthFitnessFitness => "Health & Fitness > Fitness",
             Self::HealthFitnessMedicine => "Health & Fitness > Medicine",
             Self::HealthFitnessMentalHealth => "Health & Fitness > Mental Health",
@@ -225,16 +225,12 @@ impl<S: BosStr> AppleCategoryValue<S> {
             Self::NewsTechNews => "News > Tech News",
             Self::ReligionSpirituality => "Religion & Spirituality",
             Self::ReligionSpiritualityBuddhism => "Religion & Spirituality > Buddhism",
-            Self::ReligionSpiritualityChristianity => {
-                "Religion & Spirituality > Christianity"
-            }
+            Self::ReligionSpiritualityChristianity => "Religion & Spirituality > Christianity",
             Self::ReligionSpiritualityHinduism => "Religion & Spirituality > Hinduism",
             Self::ReligionSpiritualityIslam => "Religion & Spirituality > Islam",
             Self::ReligionSpiritualityJudaism => "Religion & Spirituality > Judaism",
             Self::ReligionSpiritualityReligion => "Religion & Spirituality > Religion",
-            Self::ReligionSpiritualitySpirituality => {
-                "Religion & Spirituality > Spirituality"
-            }
+            Self::ReligionSpiritualitySpirituality => "Religion & Spirituality > Spirituality",
             Self::Science => "Science",
             Self::ScienceAstronomy => "Science > Astronomy",
             Self::ScienceChemistry => "Science > Chemistry",
@@ -247,9 +243,7 @@ impl<S: BosStr> AppleCategoryValue<S> {
             Self::ScienceSocialSciences => "Science > Social Sciences",
             Self::SocietyCulture => "Society & Culture",
             Self::SocietyCultureDocumentary => "Society & Culture > Documentary",
-            Self::SocietyCulturePersonalJournals => {
-                "Society & Culture > Personal Journals"
-            }
+            Self::SocietyCulturePersonalJournals => "Society & Culture > Personal Journals",
             Self::SocietyCulturePhilosophy => "Society & Culture > Philosophy",
             Self::SocietyCulturePlacesTravel => "Society & Culture > Places & Travel",
             Self::SocietyCultureRelationships => "Society & Culture > Relationships",
@@ -312,9 +306,7 @@ impl<S: BosStr> AppleCategoryValue<S> {
             "Fiction > Science Fiction" => Self::FictionScienceFiction,
             "Government" => Self::Government,
             "Health & Fitness" => Self::HealthFitness,
-            "Health & Fitness > Alternative Health" => {
-                Self::HealthFitnessAlternativeHealth
-            }
+            "Health & Fitness > Alternative Health" => Self::HealthFitnessAlternativeHealth,
             "Health & Fitness > Fitness" => Self::HealthFitnessFitness,
             "Health & Fitness > Medicine" => Self::HealthFitnessMedicine,
             "Health & Fitness > Mental Health" => Self::HealthFitnessMentalHealth,
@@ -349,16 +341,12 @@ impl<S: BosStr> AppleCategoryValue<S> {
             "News > Tech News" => Self::NewsTechNews,
             "Religion & Spirituality" => Self::ReligionSpirituality,
             "Religion & Spirituality > Buddhism" => Self::ReligionSpiritualityBuddhism,
-            "Religion & Spirituality > Christianity" => {
-                Self::ReligionSpiritualityChristianity
-            }
+            "Religion & Spirituality > Christianity" => Self::ReligionSpiritualityChristianity,
             "Religion & Spirituality > Hinduism" => Self::ReligionSpiritualityHinduism,
             "Religion & Spirituality > Islam" => Self::ReligionSpiritualityIslam,
             "Religion & Spirituality > Judaism" => Self::ReligionSpiritualityJudaism,
             "Religion & Spirituality > Religion" => Self::ReligionSpiritualityReligion,
-            "Religion & Spirituality > Spirituality" => {
-                Self::ReligionSpiritualitySpirituality
-            }
+            "Religion & Spirituality > Spirituality" => Self::ReligionSpiritualitySpirituality,
             "Science" => Self::Science,
             "Science > Astronomy" => Self::ScienceAstronomy,
             "Science > Chemistry" => Self::ScienceChemistry,
@@ -371,9 +359,7 @@ impl<S: BosStr> AppleCategoryValue<S> {
             "Science > Social Sciences" => Self::ScienceSocialSciences,
             "Society & Culture" => Self::SocietyCulture,
             "Society & Culture > Documentary" => Self::SocietyCultureDocumentary,
-            "Society & Culture > Personal Journals" => {
-                Self::SocietyCulturePersonalJournals
-            }
+            "Society & Culture > Personal Journals" => Self::SocietyCulturePersonalJournals,
             "Society & Culture > Philosophy" => Self::SocietyCulturePhilosophy,
             "Society & Culture > Places & Travel" => Self::SocietyCulturePlacesTravel,
             "Society & Culture > Relationships" => Self::SocietyCultureRelationships,
@@ -454,31 +440,19 @@ where
             AppleCategoryValue::Arts => AppleCategoryValue::Arts,
             AppleCategoryValue::ArtsBooks => AppleCategoryValue::ArtsBooks,
             AppleCategoryValue::ArtsDesign => AppleCategoryValue::ArtsDesign,
-            AppleCategoryValue::ArtsFashionBeauty => {
-                AppleCategoryValue::ArtsFashionBeauty
-            }
+            AppleCategoryValue::ArtsFashionBeauty => AppleCategoryValue::ArtsFashionBeauty,
             AppleCategoryValue::ArtsFood => AppleCategoryValue::ArtsFood,
-            AppleCategoryValue::ArtsPerformingArts => {
-                AppleCategoryValue::ArtsPerformingArts
-            }
+            AppleCategoryValue::ArtsPerformingArts => AppleCategoryValue::ArtsPerformingArts,
             AppleCategoryValue::ArtsVisualArts => AppleCategoryValue::ArtsVisualArts,
             AppleCategoryValue::Business => AppleCategoryValue::Business,
             AppleCategoryValue::BusinessCareers => AppleCategoryValue::BusinessCareers,
             AppleCategoryValue::BusinessEntrepreneurship => {
                 AppleCategoryValue::BusinessEntrepreneurship
             }
-            AppleCategoryValue::BusinessInvesting => {
-                AppleCategoryValue::BusinessInvesting
-            }
-            AppleCategoryValue::BusinessManagement => {
-                AppleCategoryValue::BusinessManagement
-            }
-            AppleCategoryValue::BusinessMarketing => {
-                AppleCategoryValue::BusinessMarketing
-            }
-            AppleCategoryValue::BusinessNonProfit => {
-                AppleCategoryValue::BusinessNonProfit
-            }
+            AppleCategoryValue::BusinessInvesting => AppleCategoryValue::BusinessInvesting,
+            AppleCategoryValue::BusinessManagement => AppleCategoryValue::BusinessManagement,
+            AppleCategoryValue::BusinessMarketing => AppleCategoryValue::BusinessMarketing,
+            AppleCategoryValue::BusinessNonProfit => AppleCategoryValue::BusinessNonProfit,
             AppleCategoryValue::Comedy => AppleCategoryValue::Comedy,
             AppleCategoryValue::ComedyComedyInterviews => {
                 AppleCategoryValue::ComedyComedyInterviews
@@ -495,24 +469,16 @@ where
                 AppleCategoryValue::EducationSelfImprovement
             }
             AppleCategoryValue::Fiction => AppleCategoryValue::Fiction,
-            AppleCategoryValue::FictionComedyFiction => {
-                AppleCategoryValue::FictionComedyFiction
-            }
+            AppleCategoryValue::FictionComedyFiction => AppleCategoryValue::FictionComedyFiction,
             AppleCategoryValue::FictionDrama => AppleCategoryValue::FictionDrama,
-            AppleCategoryValue::FictionScienceFiction => {
-                AppleCategoryValue::FictionScienceFiction
-            }
+            AppleCategoryValue::FictionScienceFiction => AppleCategoryValue::FictionScienceFiction,
             AppleCategoryValue::Government => AppleCategoryValue::Government,
             AppleCategoryValue::HealthFitness => AppleCategoryValue::HealthFitness,
             AppleCategoryValue::HealthFitnessAlternativeHealth => {
                 AppleCategoryValue::HealthFitnessAlternativeHealth
             }
-            AppleCategoryValue::HealthFitnessFitness => {
-                AppleCategoryValue::HealthFitnessFitness
-            }
-            AppleCategoryValue::HealthFitnessMedicine => {
-                AppleCategoryValue::HealthFitnessMedicine
-            }
+            AppleCategoryValue::HealthFitnessFitness => AppleCategoryValue::HealthFitnessFitness,
+            AppleCategoryValue::HealthFitnessMedicine => AppleCategoryValue::HealthFitnessMedicine,
             AppleCategoryValue::HealthFitnessMentalHealth => {
                 AppleCategoryValue::HealthFitnessMentalHealth
             }
@@ -527,57 +493,33 @@ where
             AppleCategoryValue::KidsFamilyEducationForKids => {
                 AppleCategoryValue::KidsFamilyEducationForKids
             }
-            AppleCategoryValue::KidsFamilyParenting => {
-                AppleCategoryValue::KidsFamilyParenting
-            }
-            AppleCategoryValue::KidsFamilyPetsAnimals => {
-                AppleCategoryValue::KidsFamilyPetsAnimals
-            }
+            AppleCategoryValue::KidsFamilyParenting => AppleCategoryValue::KidsFamilyParenting,
+            AppleCategoryValue::KidsFamilyPetsAnimals => AppleCategoryValue::KidsFamilyPetsAnimals,
             AppleCategoryValue::KidsFamilyStoriesForKids => {
                 AppleCategoryValue::KidsFamilyStoriesForKids
             }
             AppleCategoryValue::Leisure => AppleCategoryValue::Leisure,
-            AppleCategoryValue::LeisureAnimationManga => {
-                AppleCategoryValue::LeisureAnimationManga
-            }
-            AppleCategoryValue::LeisureAutomotive => {
-                AppleCategoryValue::LeisureAutomotive
-            }
+            AppleCategoryValue::LeisureAnimationManga => AppleCategoryValue::LeisureAnimationManga,
+            AppleCategoryValue::LeisureAutomotive => AppleCategoryValue::LeisureAutomotive,
             AppleCategoryValue::LeisureAviation => AppleCategoryValue::LeisureAviation,
             AppleCategoryValue::LeisureCrafts => AppleCategoryValue::LeisureCrafts,
             AppleCategoryValue::LeisureGames => AppleCategoryValue::LeisureGames,
             AppleCategoryValue::LeisureHobbies => AppleCategoryValue::LeisureHobbies,
-            AppleCategoryValue::LeisureHomeGarden => {
-                AppleCategoryValue::LeisureHomeGarden
-            }
-            AppleCategoryValue::LeisureVideoGames => {
-                AppleCategoryValue::LeisureVideoGames
-            }
+            AppleCategoryValue::LeisureHomeGarden => AppleCategoryValue::LeisureHomeGarden,
+            AppleCategoryValue::LeisureVideoGames => AppleCategoryValue::LeisureVideoGames,
             AppleCategoryValue::Music => AppleCategoryValue::Music,
-            AppleCategoryValue::MusicMusicCommentary => {
-                AppleCategoryValue::MusicMusicCommentary
-            }
-            AppleCategoryValue::MusicMusicHistory => {
-                AppleCategoryValue::MusicMusicHistory
-            }
-            AppleCategoryValue::MusicMusicInterviews => {
-                AppleCategoryValue::MusicMusicInterviews
-            }
+            AppleCategoryValue::MusicMusicCommentary => AppleCategoryValue::MusicMusicCommentary,
+            AppleCategoryValue::MusicMusicHistory => AppleCategoryValue::MusicMusicHistory,
+            AppleCategoryValue::MusicMusicInterviews => AppleCategoryValue::MusicMusicInterviews,
             AppleCategoryValue::News => AppleCategoryValue::News,
             AppleCategoryValue::NewsBusinessNews => AppleCategoryValue::NewsBusinessNews,
             AppleCategoryValue::NewsDailyNews => AppleCategoryValue::NewsDailyNews,
-            AppleCategoryValue::NewsEntertainmentNews => {
-                AppleCategoryValue::NewsEntertainmentNews
-            }
-            AppleCategoryValue::NewsNewsCommentary => {
-                AppleCategoryValue::NewsNewsCommentary
-            }
+            AppleCategoryValue::NewsEntertainmentNews => AppleCategoryValue::NewsEntertainmentNews,
+            AppleCategoryValue::NewsNewsCommentary => AppleCategoryValue::NewsNewsCommentary,
             AppleCategoryValue::NewsPolitics => AppleCategoryValue::NewsPolitics,
             AppleCategoryValue::NewsSportsNews => AppleCategoryValue::NewsSportsNews,
             AppleCategoryValue::NewsTechNews => AppleCategoryValue::NewsTechNews,
-            AppleCategoryValue::ReligionSpirituality => {
-                AppleCategoryValue::ReligionSpirituality
-            }
+            AppleCategoryValue::ReligionSpirituality => AppleCategoryValue::ReligionSpirituality,
             AppleCategoryValue::ReligionSpiritualityBuddhism => {
                 AppleCategoryValue::ReligionSpiritualityBuddhism
             }
@@ -602,23 +544,15 @@ where
             AppleCategoryValue::Science => AppleCategoryValue::Science,
             AppleCategoryValue::ScienceAstronomy => AppleCategoryValue::ScienceAstronomy,
             AppleCategoryValue::ScienceChemistry => AppleCategoryValue::ScienceChemistry,
-            AppleCategoryValue::ScienceEarthSciences => {
-                AppleCategoryValue::ScienceEarthSciences
-            }
-            AppleCategoryValue::ScienceLifeSciences => {
-                AppleCategoryValue::ScienceLifeSciences
-            }
-            AppleCategoryValue::ScienceMathematics => {
-                AppleCategoryValue::ScienceMathematics
-            }
+            AppleCategoryValue::ScienceEarthSciences => AppleCategoryValue::ScienceEarthSciences,
+            AppleCategoryValue::ScienceLifeSciences => AppleCategoryValue::ScienceLifeSciences,
+            AppleCategoryValue::ScienceMathematics => AppleCategoryValue::ScienceMathematics,
             AppleCategoryValue::ScienceNaturalSciences => {
                 AppleCategoryValue::ScienceNaturalSciences
             }
             AppleCategoryValue::ScienceNature => AppleCategoryValue::ScienceNature,
             AppleCategoryValue::SciencePhysics => AppleCategoryValue::SciencePhysics,
-            AppleCategoryValue::ScienceSocialSciences => {
-                AppleCategoryValue::ScienceSocialSciences
-            }
+            AppleCategoryValue::ScienceSocialSciences => AppleCategoryValue::ScienceSocialSciences,
             AppleCategoryValue::SocietyCulture => AppleCategoryValue::SocietyCulture,
             AppleCategoryValue::SocietyCultureDocumentary => {
                 AppleCategoryValue::SocietyCultureDocumentary
@@ -639,9 +573,7 @@ where
             AppleCategoryValue::SportsBaseball => AppleCategoryValue::SportsBaseball,
             AppleCategoryValue::SportsBasketball => AppleCategoryValue::SportsBasketball,
             AppleCategoryValue::SportsCricket => AppleCategoryValue::SportsCricket,
-            AppleCategoryValue::SportsFantasySports => {
-                AppleCategoryValue::SportsFantasySports
-            }
+            AppleCategoryValue::SportsFantasySports => AppleCategoryValue::SportsFantasySports,
             AppleCategoryValue::SportsFootball => AppleCategoryValue::SportsFootball,
             AppleCategoryValue::SportsGolf => AppleCategoryValue::SportsGolf,
             AppleCategoryValue::SportsHockey => AppleCategoryValue::SportsHockey,
@@ -657,15 +589,9 @@ where
             AppleCategoryValue::TrueCrime => AppleCategoryValue::TrueCrime,
             AppleCategoryValue::TvFilm => AppleCategoryValue::TvFilm,
             AppleCategoryValue::TvFilmAfterShows => AppleCategoryValue::TvFilmAfterShows,
-            AppleCategoryValue::TvFilmFilmHistory => {
-                AppleCategoryValue::TvFilmFilmHistory
-            }
-            AppleCategoryValue::TvFilmFilmInterviews => {
-                AppleCategoryValue::TvFilmFilmInterviews
-            }
-            AppleCategoryValue::TvFilmFilmReviews => {
-                AppleCategoryValue::TvFilmFilmReviews
-            }
+            AppleCategoryValue::TvFilmFilmHistory => AppleCategoryValue::TvFilmFilmHistory,
+            AppleCategoryValue::TvFilmFilmInterviews => AppleCategoryValue::TvFilmFilmInterviews,
+            AppleCategoryValue::TvFilmFilmReviews => AppleCategoryValue::TvFilmFilmReviews,
             AppleCategoryValue::TvFilmTvReviews => AppleCategoryValue::TvFilmTvReviews,
             AppleCategoryValue::Other(v) => AppleCategoryValue::Other(v.into_static()),
         }
@@ -675,7 +601,10 @@ where
 /// Identifies a podcast episode by its podcast GUID and feed item identifier, independent of which repository currently holds the record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct EpisodeRef<S: BosStr = DefaultStr> {
     ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item.
     pub feed_item_guid: S,
@@ -691,7 +620,10 @@ pub struct EpisodeRef<S: BosStr = DefaultStr> {
 /// Identifies a podcast by its Podcasting 2.0 GUID, independent of which repository currently holds the record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PodcastRef<S: BosStr = DefaultStr> {
     ///URL of the podcast's RSS feed.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -781,10 +713,10 @@ impl<S: BosStr> LexiconSchema for PodcastRef<S> {
 }
 
 fn lexicon_doc_org_atpodcasting_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atpodcasting.defs"),

@@ -3,7 +3,9 @@
 use super::parse::{parse_field_attrs, parse_serde_attrs};
 use super::types::*;
 use crate::lexicon::*;
-use crate::schema::type_mapping::{LexiconPrimitiveType, rust_type_to_lexicon_type};
+use crate::schema::type_mapping::{
+    LexiconPrimitiveType, TypeMappingContext, rust_type_to_lexicon_type_with_context,
+};
 use heck::ToLowerCamelCase;
 use std::collections::BTreeMap;
 use syn::Type;
@@ -13,6 +15,7 @@ use syn::ext::IdentExt;
 pub fn build_object_properties(
     fields: &syn::Fields,
     rename_rule: Option<RenameRule>,
+    generics: &syn::Generics,
 ) -> syn::Result<Vec<FieldProperty>> {
     let named_fields = match fields {
         syn::Fields::Named(fields) => &fields.named,
@@ -25,6 +28,7 @@ pub fn build_object_properties(
     };
 
     let mut properties = Vec::new();
+    let type_context = TypeMappingContext::from_generics(generics);
 
     for field in named_fields {
         // Strip r# prefix from raw identifiers (r#type -> type)
@@ -65,6 +69,7 @@ pub fn build_object_properties(
             required,
             &lex_attrs,
             doc_comment,
+            &type_context,
         )?;
 
         properties.push(field_prop);
@@ -81,10 +86,11 @@ fn build_field_property(
     required: bool,
     constraints: &LexiconFieldAttrs,
     description: Option<String>,
+    type_context: &TypeMappingContext,
 ) -> syn::Result<FieldProperty> {
     // Build the lexicon property
     let (mut property, mut unresolved_refs, union_type_path) =
-        build_lex_property(rust_type, constraints)?;
+        build_lex_property(rust_type, constraints, type_context)?;
 
     // Add description if present
     if let Some(desc) = description {
@@ -97,7 +103,14 @@ fn build_field_property(
     }
 
     // Build validation checks
-    let validations = build_validations(field_name, schema_name, rust_type, required, constraints)?;
+    let validations = build_validations(
+        field_name,
+        schema_name,
+        rust_type,
+        required,
+        constraints,
+        type_context,
+    )?;
 
     Ok(FieldProperty {
         field_name: field_name.to_string(),
@@ -116,6 +129,7 @@ fn build_field_property(
 fn build_lex_property(
     rust_type: &Type,
     constraints: &LexiconFieldAttrs,
+    type_context: &TypeMappingContext,
 ) -> syn::Result<(
     LexObjectProperty<'static>,
     Vec<UnresolvedRef>,
@@ -168,7 +182,7 @@ fn build_lex_property(
     }
 
     // Try to detect primitive type
-    let lex_type = rust_type_to_lexicon_type(rust_type);
+    let lex_type = rust_type_to_lexicon_type_with_context(rust_type, type_context);
 
     match lex_type {
         Some(LexiconPrimitiveType::Boolean) => Ok((
@@ -524,9 +538,10 @@ fn build_validations(
     field_type: &Type,
     is_required: bool,
     constraints: &LexiconFieldAttrs,
+    type_context: &TypeMappingContext,
 ) -> syn::Result<Vec<ValidationCheck>> {
     let mut checks = Vec::new();
-    let lex_type = rust_type_to_lexicon_type(field_type);
+    let lex_type = rust_type_to_lexicon_type_with_context(field_type, type_context);
 
     let field_type_str = quote::quote!(#field_type).to_string();
 

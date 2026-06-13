@@ -614,7 +614,8 @@ fn state_from_return_cookie(response: &axum_test::TestResponse, prefix: &str) ->
 #[tokio::test]
 async fn start_auth_return_to_callback_redirects_back_and_cookie_states_do_not_conflict() {
     let (state, client) = app_state();
-    let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state.clone());
+    let app =
+        routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state.clone());
     let server = TestServer::builder().save_cookies().build(app).unwrap();
 
     queue_par_response(&client, "urn:par:first").await;
@@ -714,12 +715,15 @@ async fn custom_config_paths_are_honored_by_routes() {
     let server = TestServer::new(app).unwrap();
 
     // The custom start path issues a redirect to the authorization endpoint.
-    let response = server
-        .get("/auth/begin?identifier=alice.bsky.social")
-        .await;
+    let response = server.get("/auth/begin?identifier=alice.bsky.social").await;
     response.assert_status(StatusCode::TEMPORARY_REDIRECT);
     let location = response.header("location");
-    assert!(location.to_str().unwrap().starts_with("https://issuer/authorize?"));
+    assert!(
+        location
+            .to_str()
+            .unwrap()
+            .starts_with("https://issuer/authorize?")
+    );
 
     // The callback route exists at its custom path (unknown state still 400s,
     // which proves the route is mounted and handled rather than 404).
@@ -742,5 +746,8 @@ async fn default_config_metadata_route_remains_fixed() {
     let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
     let server = TestServer::new(app).unwrap();
 
-    server.get("/oauth-client-metadata.json").await.assert_status_ok();
+    server
+        .get("/oauth-client-metadata.json")
+        .await
+        .assert_status_ok();
 }

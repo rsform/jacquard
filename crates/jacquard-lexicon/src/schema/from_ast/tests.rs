@@ -146,6 +146,127 @@ fn test_optional_vs_required_fields() {
 }
 
 #[test]
+fn test_bos_generic_field_maps_to_string() {
+    let input: syn::DeriveInput = parse_quote! {
+        #[lexicon(nsid = "test.generic")]
+        struct Generic<S: jacquard_common::BosStr = jacquard_common::DefaultStr> {
+            text: S,
+        }
+    };
+
+    let result = build_struct_schema(&input).expect("build schema");
+    let main_def = result.doc.defs.get("main").expect("has main");
+    if let LexUserType::Object(obj) = main_def {
+        assert!(matches!(
+            obj.properties.get("text"),
+            Some(LexObjectProperty::String(_))
+        ));
+    } else {
+        panic!("main def should be object");
+    }
+}
+
+#[test]
+fn test_optional_bos_generic_field_maps_to_optional_string() {
+    let input: syn::DeriveInput = parse_quote! {
+        #[lexicon(nsid = "test.optional_generic")]
+        struct OptionalGeneric<S: jacquard_common::BosStr = jacquard_common::DefaultStr> {
+            #[lexicon(max_length = 100)]
+            text: Option<S>,
+        }
+    };
+
+    let result = build_struct_schema(&input).expect("build schema");
+    let main_def = result.doc.defs.get("main").expect("has main");
+    if let LexUserType::Object(obj) = main_def {
+        let text_prop = obj.properties.get("text").expect("has text");
+        if let LexObjectProperty::String(s) = text_prop {
+            assert_eq!(s.max_length, Some(100));
+        } else {
+            panic!("text should be string");
+        }
+        assert!(
+            !obj.required
+                .as_ref()
+                .is_some_and(|required| required.contains(&"text".into()))
+        );
+    } else {
+        panic!("main def should be object");
+    }
+}
+
+#[test]
+fn test_vec_bos_generic_field_maps_to_string_array() {
+    let input: syn::DeriveInput = parse_quote! {
+        #[lexicon(nsid = "test.vec_generic")]
+        struct GenericArray<S: jacquard_common::BosStr = jacquard_common::DefaultStr> {
+            #[lexicon(max_items = 5)]
+            tags: Vec<S>,
+        }
+    };
+
+    let result = build_struct_schema(&input).expect("build schema");
+    let main_def = result.doc.defs.get("main").expect("has main");
+    if let LexUserType::Object(obj) = main_def {
+        let tags_prop = obj.properties.get("tags").expect("has tags");
+        if let LexObjectProperty::Array(array) = tags_prop {
+            assert_eq!(array.max_length, Some(5));
+            assert!(matches!(array.items, LexArrayItem::String(_)));
+        } else {
+            panic!("tags should be array");
+        }
+    } else {
+        panic!("main def should be object");
+    }
+}
+
+#[test]
+fn test_unconstrained_generic_field_remains_local_ref() {
+    let input: syn::DeriveInput = parse_quote! {
+        #[lexicon(nsid = "test.unconstrained")]
+        struct Generic<T> {
+            value: T,
+        }
+    };
+
+    let result = build_struct_schema(&input).expect("build schema");
+    let main_def = result.doc.defs.get("main").expect("has main");
+    if let LexUserType::Object(obj) = main_def {
+        let value_prop = obj.properties.get("value").expect("has value");
+        if let LexObjectProperty::Ref(r) = value_prop {
+            assert_eq!(r.r#ref.as_ref(), "#t");
+        } else {
+            panic!("unconstrained generic should be a local ref");
+        }
+    } else {
+        panic!("main def should be object");
+    }
+}
+
+#[test]
+fn test_unconstrained_generic_named_s_remains_local_ref() {
+    let input: syn::DeriveInput = parse_quote! {
+        #[lexicon(nsid = "test.unconstrained_s")]
+        struct Generic<S> {
+            value: S,
+        }
+    };
+
+    let result = build_struct_schema(&input).expect("build schema");
+    let main_def = result.doc.defs.get("main").expect("has main");
+    if let LexUserType::Object(obj) = main_def {
+        let value_prop = obj.properties.get("value").expect("has value");
+        if let LexObjectProperty::Ref(r) = value_prop {
+            assert_eq!(r.r#ref.as_ref(), "#s");
+        } else {
+            panic!("unconstrained generic named S should be a local ref");
+        }
+    } else {
+        panic!("main def should be object");
+    }
+}
+
+#[test]
 fn test_serde_rename_all_camelcase() {
     let input: syn::DeriveInput = parse_quote! {
         #[lexicon(nsid = "test.rename")]
@@ -446,7 +567,6 @@ fn test_f64_field() {
 }
 
 #[test]
-#[ignore] // we're changing how this works
 fn test_nested_object_generates_ref() {
     let input: syn::DeriveInput = parse_quote! {
         #[lexicon(nsid = "test.nested")]
@@ -460,15 +580,16 @@ fn test_nested_object_generates_ref() {
     let main_def = result.doc.defs.get("main").expect("has main");
     if let LexUserType::Object(obj) = main_def {
         let inner_prop = obj.properties.get("inner").expect("has inner");
-        // Nested structs should generate Ref or Object depending on implementation
-        assert!(matches!(
-            inner_prop,
-            LexObjectProperty::Ref(_) | LexObjectProperty::Object(_)
-        ));
+        if let LexObjectProperty::Ref(r) = inner_prop {
+            assert_eq!(r.r#ref.as_ref(), "#inner");
+        } else {
+            panic!("inner should be a local ref property");
+        }
+    } else {
+        panic!("main should be an object");
     }
 
-    // Should have unresolved ref for Inner type
-    assert!(!result.unresolved_refs.is_empty());
+    assert!(result.unresolved_refs.is_empty());
 }
 
 #[test]

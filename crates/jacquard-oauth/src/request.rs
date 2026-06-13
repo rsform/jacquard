@@ -162,6 +162,16 @@ pub enum RequestErrorKind {
     #[diagnostic(code(jacquard_oauth::request::serde_json))]
     SerdeJson,
 
+    /// Atproto OAuth requires pushed authorization requests, but the server does not advertise PAR support.
+    #[error("atproto OAuth requires pushed authorization requests")]
+    #[diagnostic(
+        code(jacquard_oauth::request::par_required),
+        help(
+            "use an atproto-compatible authorization server that supports pushed authorization requests"
+        )
+    )]
+    ParRequired,
+
     /// Atproto metadata error
     #[error("atproto error")]
     #[diagnostic(code(jacquard_oauth::request::atproto))]
@@ -314,6 +324,14 @@ impl RequestError {
         Self::new(RequestErrorKind::Atproto, Some(Box::new(source)))
     }
 
+    /// Create an error for atproto metadata that does not advertise required PAR support.
+    pub fn par_required() -> Self {
+        Self::new(RequestErrorKind::ParRequired, None)
+            .with_context("atproto OAuth requires pushed authorization requests")
+            .with_details("authorization server metadata did not advertise `pushed_authorization_request_endpoint` and did not set `require_pushed_authorization_requests = true`")
+            .with_help("use an atproto-compatible authorization server that supports pushed authorization requests")
+    }
+
     /// Returns true if this error indicates permanent auth failure
     /// (token revoked, refresh_token expired, etc.)
     ///
@@ -428,6 +446,7 @@ pub type Result<T> = core::result::Result<T, RequestError>;
 
 /// Represents the different OAuth token-endpoint request types sent by this crate.
 #[allow(dead_code)]
+#[non_exhaustive]
 pub enum OAuthRequest<'a> {
     /// Standard authorization-code token exchange.
     Token(TokenRequestParameters<&'a str>),
@@ -435,8 +454,13 @@ pub enum OAuthRequest<'a> {
     Refresh(RefreshRequestParameters<&'a str>),
     /// Token revocation request (RFC 7009).
     Revocation(RevocationRequestParameters<&'a str>),
-    /// Token introspection request (RFC 7662).
-    Introspection,
+    /// Reserved for future atproto OAuth token introspection support.
+    ///
+    /// Atproto OAuth does not currently specify or operationally support RFC 7662
+    /// token introspection. This variant is intentionally unconstructible until
+    /// support is added to the atproto OAuth profile.
+    #[doc(hidden)]
+    Introspection(core::convert::Infallible),
     /// Pushed authorization request (RFC 9126) for pre-registering auth parameters.
     PushedAuthorizationRequest(ParParameters<&'a str>),
 }
@@ -448,7 +472,7 @@ impl OAuthRequest<'_> {
             Self::Token(_) => "token",
             Self::Refresh(_) => "refresh",
             Self::Revocation(_) => "revocation",
-            Self::Introspection => "introspection",
+            Self::Introspection(never) => match *never {},
             Self::PushedAuthorizationRequest(_) => "pushed_authorization_request",
         }
     }
@@ -459,7 +483,7 @@ impl OAuthRequest<'_> {
             Self::PushedAuthorizationRequest(_) => StatusCode::CREATED,
             // Unlike https://datatracker.ietf.org/doc/html/rfc7009#section-2.2, oauth-provider seems to return `204`.
             Self::Revocation(_) => StatusCode::NO_CONTENT,
-            _ => unimplemented!(),
+            Self::Introspection(never) => match *never {},
         }
     }
 }
@@ -601,7 +625,7 @@ pub async fn par<
     {
         Err(RequestError::no_endpoint("pushed_authorization_request"))
     } else {
-        todo!("use of PAR is mandatory")
+        Err(RequestError::par_required())
     }
 }
 
@@ -788,7 +812,7 @@ where
         OAuthRequest::PushedAuthorizationRequest(params) => {
             build_oauth_req_body(client_assertions, params)?
         }
-        _ => unimplemented!(),
+        OAuthRequest::Introspection(never) => match *never {},
     };
     let req = Request::builder()
         .uri(url)
@@ -828,10 +852,7 @@ fn endpoint_for_req<'r, S: BosStr>(
             .revocation_endpoint
             .as_ref()
             .map(AsRef::as_ref),
-        OAuthRequest::Introspection => server_metadata
-            .introspection_endpoint
-            .as_ref()
-            .map(AsRef::as_ref),
+        OAuthRequest::Introspection(never) => match *never {},
         OAuthRequest::PushedAuthorizationRequest(_) => server_metadata
             .pushed_authorization_request_endpoint
             .as_ref()
@@ -1059,12 +1080,32 @@ mod tests {
         let mut meta = base_metadata();
         meta.server_metadata.require_pushed_authorization_requests = Some(true);
         meta.server_metadata.pushed_authorization_request_endpoint = None;
-        // require_pushed_authorization_requests is true and no endpoint
+        // require_pushed_authorization_requests is true and no endpoint.
         let err = super::par(&MockClient::default(), None, None, &mut meta, None)
             .await
             .unwrap_err();
         assert!(
             matches!(err.kind(), RequestErrorKind::NoEndpoint(name) if name == "pushed_authorization_request")
+        );
+    }
+
+    #[tokio::test]
+    async fn par_not_advertised_returns_structured_error() {
+        let mut meta = base_metadata();
+        meta.server_metadata.require_pushed_authorization_requests = Some(false);
+        meta.server_metadata.pushed_authorization_request_endpoint = None;
+        let err = super::par(&MockClient::default(), None, None, &mut meta, None)
+            .await
+            .unwrap_err();
+
+        assert!(matches!(err.kind(), RequestErrorKind::ParRequired));
+        assert_eq!(
+            err.context(),
+            Some("atproto OAuth requires pushed authorization requests")
+        );
+        assert!(
+            err.details()
+                .is_some_and(|details| details.contains("pushed_authorization_request_endpoint"))
         );
     }
 

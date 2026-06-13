@@ -181,10 +181,7 @@ pub fn make_ident(s: &str) -> syn::Ident {
 /// compiled as a (broken) doctest.
 pub(super) fn generate_doc_comment(desc: Option<&CowStr>) -> TokenStream {
     if let Some(description) = desc {
-        let lines: Vec<String> = description
-            .lines()
-            .map(|line| format!(" {line}"))
-            .collect();
+        let lines: Vec<String> = description.lines().map(|line| format!(" {line}")).collect();
         quote! {
             #(#[doc = #lines])*
         }

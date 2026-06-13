@@ -217,12 +217,90 @@ fn blob_deserialization() {
 }
 
 #[test]
-#[ignore]
-fn reject_floats() {
-    let json = "42.5"; // float literal
+fn data_borrowed_plain_string_deserialization() {
+    let data: Data<&str> = serde_json::from_str(r#""hello""#).unwrap();
 
-    let result: Result<Data, _> = serde_json::from_str(json);
+    match data {
+        Data::String(AtprotoStr::String(s)) => assert_eq!(s, "hello"),
+        other => panic!("expected borrowed plain string, got {other:?}"),
+    }
+}
+
+#[test]
+fn data_borrowed_nested_object_string_deserialization() {
+    let data: Data<&str> = serde_json::from_str(r#"{"label":"plain nested value"}"#).unwrap();
+
+    let Data::Object(obj) = data else {
+        panic!("expected object");
+    };
+
+    match obj.0.get("label") {
+        Some(Data::String(AtprotoStr::String(s))) => assert_eq!(*s, "plain nested value"),
+        other => panic!("expected nested borrowed plain string, got {other:?}"),
+    }
+}
+
+#[test]
+fn data_integer_bounds_and_float_preservation() {
+    let max: Data = serde_json::from_str("9223372036854775807").unwrap();
+    assert_eq!(max, Data::Integer(i64::MAX));
+
+    assert!(serde_json::from_str::<Data>("9223372036854775808").is_err());
+    assert!(serde_json::from_str::<Data>("18446744073709551615").is_err());
+
+    let float: Data = serde_json::from_str("42.5").unwrap();
+    assert!(matches!(float, Data::InvalidNumber(_)));
+}
+
+#[test]
+fn raw_data_preserves_unsigned_integer_bounds() {
+    let raw: RawData = serde_json::from_str("18446744073709551615").unwrap();
+    assert!(matches!(raw, RawData::UnsignedInt(u64::MAX)));
+}
+
+#[test]
+fn raw_data_to_data_rejects_unsigned_integer_overflow() {
+    let result = Data::<crate::DefaultStr>::try_from(RawData::UnsignedInt(u64::MAX));
     assert!(result.is_err());
+}
+
+#[test]
+fn raw_data_to_data_rejects_invalid_blob_sizes() {
+    let mut negative_size = BTreeMap::new();
+    negative_size.insert(SmolStr::new_static("$type"), RawData::String("blob".into()));
+    negative_size.insert(
+        SmolStr::new_static("ref"),
+        RawData::CidLink(Cid::cow_str(CowStr::Borrowed(
+            "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha",
+        ))),
+    );
+    negative_size.insert(
+        SmolStr::new_static("mimeType"),
+        RawData::String("image/png".into()),
+    );
+    negative_size.insert(SmolStr::new_static("size"), RawData::SignedInt(-1));
+
+    let result = Data::<crate::DefaultStr>::try_from(RawData::Object(negative_size));
+    assert!(result.is_err());
+
+    let mut huge_size = BTreeMap::new();
+    huge_size.insert(SmolStr::new_static("$type"), RawData::String("blob".into()));
+    huge_size.insert(
+        SmolStr::new_static("ref"),
+        RawData::CidLink(Cid::cow_str(CowStr::Borrowed(
+            "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha",
+        ))),
+    );
+    huge_size.insert(
+        SmolStr::new_static("mimeType"),
+        RawData::String("image/png".into()),
+    );
+    huge_size.insert(SmolStr::new_static("size"), RawData::UnsignedInt(u64::MAX));
+
+    if usize::try_from(u64::MAX).is_err() {
+        let result = Data::<crate::DefaultStr>::try_from(RawData::Object(huge_size));
+        assert!(result.is_err());
+    }
 }
 
 #[test]

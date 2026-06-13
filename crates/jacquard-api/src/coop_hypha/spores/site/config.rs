@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Site configuration for spores.garden, including title and subtitle.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -552,7 +552,7 @@ impl<S: BosStr> LexiconSchema for Config<S> {
 
 pub mod config_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -647,10 +647,7 @@ impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
 
 impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
     /// Set the `fontHeading` field (optional)
-    pub fn font_heading(
-        mut self,
-        value: impl Into<Option<ConfigFontHeading<S>>>,
-    ) -> Self {
+    pub fn font_heading(mut self, value: impl Into<Option<ConfigFontHeading<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -663,10 +660,7 @@ impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
 
 impl<St: config_state::State, S: BosStr> ConfigBuilder<St, S> {
     /// Set the `headingFont` field (optional)
-    pub fn heading_font(
-        mut self,
-        value: impl Into<Option<ConfigHeadingFont<S>>>,
-    ) -> Self {
+    pub fn heading_font(mut self, value: impl Into<Option<ConfigHeadingFont<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -734,10 +728,10 @@ where
 }
 
 fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.spores.site.config"),
@@ -746,11 +740,9 @@ fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "Site configuration for spores.garden, including title and subtitle.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Site configuration for spores.garden, including title and subtitle.",
+                    )),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {
@@ -767,9 +759,9 @@ fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("fontBody"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Deprecated legacy key for body font ID"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Deprecated legacy key for body font ID",
+                                    )),
                                     max_length: Some(50usize),
                                     ..Default::default()
                                 }),
@@ -777,11 +769,9 @@ fn lexicon_doc_coop_hypha_spores_site_config() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("fontHeading"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Deprecated legacy key for heading font ID",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Deprecated legacy key for heading font ID",
+                                    )),
                                     max_length: Some(50usize),
                                     ..Default::default()
                                 }),

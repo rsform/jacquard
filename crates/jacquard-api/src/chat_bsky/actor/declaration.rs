@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A declaration of a Bluesky chat account.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -96,8 +96,7 @@ impl<S: BosStr> Serialize for DeclarationAllowGroupInvites<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for DeclarationAllowGroupInvites<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DeclarationAllowGroupInvites<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -123,16 +122,13 @@ where
         match self {
             DeclarationAllowGroupInvites::All => DeclarationAllowGroupInvites::All,
             DeclarationAllowGroupInvites::None => DeclarationAllowGroupInvites::None,
-            DeclarationAllowGroupInvites::Following => {
-                DeclarationAllowGroupInvites::Following
-            }
+            DeclarationAllowGroupInvites::Following => DeclarationAllowGroupInvites::Following,
             DeclarationAllowGroupInvites::Other(v) => {
                 DeclarationAllowGroupInvites::Other(v.into_static())
             }
         }
     }
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DeclarationAllowIncoming<S: BosStr = DefaultStr> {
@@ -183,8 +179,7 @@ impl<S: BosStr> Serialize for DeclarationAllowIncoming<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for DeclarationAllowIncoming<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DeclarationAllowIncoming<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -211,9 +206,7 @@ where
             DeclarationAllowIncoming::All => DeclarationAllowIncoming::All,
             DeclarationAllowIncoming::None => DeclarationAllowIncoming::None,
             DeclarationAllowIncoming::Following => DeclarationAllowIncoming::Following,
-            DeclarationAllowIncoming::Other(v) => {
-                DeclarationAllowIncoming::Other(v.into_static())
-            }
+            DeclarationAllowIncoming::Other(v) => DeclarationAllowIncoming::Other(v.into_static()),
         }
     }
 }
@@ -279,7 +272,7 @@ impl<S: BosStr> LexiconSchema for Declaration<S> {
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -407,10 +400,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Declaration<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Declaration<S> {
         Declaration {
             allow_group_invites: self._fields.0,
             allow_incoming: self._fields.1.unwrap(),
@@ -420,10 +410,10 @@ where
 }
 
 fn lexicon_doc_chat_bsky_actor_declaration() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.actor.declaration"),

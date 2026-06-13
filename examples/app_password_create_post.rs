@@ -37,8 +37,7 @@ async fn main() -> miette::Result<()> {
         Default::default(),
     ));
     let session = CredentialSession::new(store, resolver);
-    let hint =
-        SessionHint::from_optional_input(args.identifier.as_deref());
+    let hint = SessionHint::from_optional_input(args.identifier.as_deref());
 
     let auth = match session.resume(&hint).await? {
         CredentialResumeResult::Resumed(auth) => auth,

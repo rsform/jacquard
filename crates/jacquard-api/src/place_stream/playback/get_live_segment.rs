@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetLiveSegment<S: BosStr = DefaultStr> {
     pub seg: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -27,25 +30,15 @@ pub struct GetLiveSegment<S: BosStr = DefaultStr> {
     pub track: S,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct GetLiveSegmentOutput {
     pub body: Bytes,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum GetLiveSegmentError {
     /// No live window for this streamer on this node.
@@ -56,7 +49,10 @@ pub enum GetLiveSegmentError {
     SegmentNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for GetLiveSegmentError {
@@ -136,7 +132,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLiveSegmentRequest {
 
 pub mod get_live_segment_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -193,10 +189,7 @@ pub mod get_live_segment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetLiveSegmentBuilder<
-    St: get_live_segment_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetLiveSegmentBuilder<St: get_live_segment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,

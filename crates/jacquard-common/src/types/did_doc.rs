@@ -94,7 +94,6 @@ where
             also_known_as: self.also_known_as.into_static(),
             verification_method: self.verification_method.into_static(),
             service: self.service.into_static(),
-            // TODO: re-enable extra data fields
             extra_data: self.extra_data.into_static(),
         }
     }
@@ -198,7 +197,6 @@ where
             r#type: self.r#type.into_static(),
             controller: self.controller.into_static(),
             public_key_multibase: self.public_key_multibase.into_static(),
-            // TODO: re-enable extra data fields
             extra_data: self.extra_data.into_static(),
         }
     }
@@ -237,7 +235,6 @@ where
             id: self.id.into_static(),
             r#type: self.r#type.into_static(),
             service_endpoint: self.service_endpoint.into_static(),
-            // TODO: re-enable extra data fields
             extra_data: self.extra_data.into_static(),
         }
     }
@@ -286,6 +283,59 @@ mod tests {
         let pk = doc.atproto_public_key().unwrap().expect("present");
         assert!(matches!(pk.codec, crate::types::crypto::KeyCodec::Ed25519));
         assert_eq!(pk.bytes.as_ref(), &k);
+    }
+
+    #[test]
+    fn extra_data_is_preserved() {
+        use crate::IntoStatic;
+
+        let raw = r##"{
+            "id": "did:plc:example",
+            "customTopLevel": "top",
+            "verificationMethod": [{
+                "id": "#key-1",
+                "type": "Multikey",
+                "publicKeyMultibase": "zExample",
+                "customVerification": 42
+            }],
+            "service": [{
+                "id": "#pds",
+                "type": "AtprotoPersonalDataServer",
+                "serviceEndpoint": "https://pds.example",
+                "customService": true
+            }]
+        }"##;
+
+        let doc: DidDocument<&str> = serde_json::from_str(raw).expect("parse doc");
+        assert!(matches!(
+            doc.extra_data.get("customTopLevel"),
+            Some(Data::String(AtprotoStr::String(value))) if *value == "top"
+        ));
+        assert!(matches!(
+            doc.verification_method.as_ref().unwrap()[0]
+                .extra_data
+                .get("customVerification"),
+            Some(Data::Integer(42))
+        ));
+        assert!(matches!(
+            doc.service.as_ref().unwrap()[0]
+                .extra_data
+                .get("customService"),
+            Some(Data::Boolean(true))
+        ));
+
+        let doc = doc.into_static();
+        assert!(doc.extra_data.contains_key("customTopLevel"));
+        assert!(
+            doc.verification_method.unwrap()[0]
+                .extra_data
+                .contains_key("customVerification")
+        );
+        assert!(
+            doc.service.unwrap()[0]
+                .extra_data
+                .contains_key("customService")
+        );
     }
 
     #[test]

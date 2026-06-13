@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::social_showcase::ShowcaseItem;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::social_showcase::ShowcaseItem;
+use serde::{Deserialize, Serialize};
 /// User profile record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -169,25 +169,23 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -210,25 +208,23 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp"];
-                let matched = accepted
-                    .iter()
-                    .any(|pattern| {
-                        if *pattern == "*/*" {
-                            true
-                        } else if pattern.ends_with("/*") {
-                            let prefix = &pattern[..pattern.len() - 2];
-                            mime.starts_with(prefix)
-                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                        } else {
-                            mime == *pattern
-                        }
-                    });
+                let matched = accepted.iter().any(|pattern| {
+                    if *pattern == "*/*" {
+                        true
+                    } else if pattern.ends_with("/*") {
+                        let prefix = &pattern[..pattern.len() - 2];
+                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                    } else {
+                        mime == *pattern
+                    }
+                });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
                         accepted: vec![
-                            "image/png".to_string(), "image/jpeg".to_string(),
-                            "image/webp".to_string()
+                            "image/png".to_string(),
+                            "image/jpeg".to_string(),
+                            "image/webp".to_string(),
                         ],
                         actual: mime.to_string(),
                     });
@@ -336,7 +332,7 @@ fn _default_profile_schema_version() -> Option<i64> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -452,22 +448,8 @@ impl ProfileBuilder<profile_state::Empty, DefaultStr> {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -480,22 +462,8 @@ impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None,
             ),
             _type: PhantomData,
         }
@@ -592,10 +560,7 @@ where
     St::Did: profile_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<S>,
-    ) -> ProfileBuilder<profile_state::SetDid<St>, S> {
+    pub fn did(mut self, value: impl Into<S>) -> ProfileBuilder<profile_state::SetDid<St>, S> {
         self._fields.6 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
@@ -789,10 +754,10 @@ where
 }
 
 fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.showcase.profile.profile"),
@@ -804,42 +769,41 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("User profile record")),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("did"), SmolStr::new_static("handle"),
-                                SmolStr::new_static("tags"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("did"),
+                            SmolStr::new_static("handle"),
+                            SmolStr::new_static("tags"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("accentColor"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Custom accent color hex code (e.g. #2e4a6e)",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Custom accent color hex code (e.g. #2e4a6e)",
+                                    )),
                                     max_length: Some(7usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("avatar"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("banner"),
-                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                                LexObjectProperty::Blob(LexBlob {
+                                    ..Default::default()
+                                }),
                             );
                             map.insert(
                                 SmolStr::new_static("bio"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Profile description"),
-                                    ),
+                                    description: Some(CowStr::new_static("Profile description")),
                                     max_length: Some(256usize),
                                     ..Default::default()
                                 }),
@@ -896,9 +860,9 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("showcase"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Featured showcase items"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Featured showcase items",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "social.showcase.defs#showcaseItem",
@@ -912,9 +876,9 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Profile tags for discovery (max 10)"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Profile tags for discovery (max 10)",
+                                    )),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(64usize),
                                         ..Default::default()
@@ -926,9 +890,9 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("theme"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Profile theme preset name"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Profile theme preset name",
+                                    )),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -943,9 +907,7 @@ fn lexicon_doc_social_showcase_profile_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("website"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("External website URL"),
-                                    ),
+                                    description: Some(CowStr::new_static("External website URL")),
                                     format: Some(LexStringFormat::Uri),
                                     max_length: Some(2048usize),
                                     ..Default::default()

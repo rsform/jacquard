@@ -8,21 +8,24 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::app_bsky::richtext::facet::Facet;
+use crate::games_gamesgamesgamesgames::MediaItem;
+use crate::games_gamesgamesgamesgames::Website;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{AtUri, Datetime};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::app_bsky::richtext::facet::Facet;
-use crate::games_gamesgamesgamesgames::MediaItem;
-use crate::games_gamesgamesgamesgames::Website;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PutProfile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -50,7 +53,6 @@ pub struct PutProfile<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum PutProfileStatus<S: BosStr = DefaultStr> {
@@ -141,9 +143,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PutProfileOutput<S: BosStr = DefaultStr> {
     pub cid: S,
     pub uri: AtUri<S>,
@@ -164,9 +168,8 @@ impl jacquard_common::xrpc::XrpcResp for PutProfileResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutProfile<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.org.putProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = PutProfileResponse;
 }
 
@@ -176,9 +179,8 @@ Path: `/xrpc/games.gamesgamesgamesgames.org.putProfile`. The request payload typ
 pub struct PutProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PutProfileRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.org.putProfile";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = PutProfile<S>;
     type Response = PutProfileResponse;
 }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -103,7 +103,7 @@ impl<S: BosStr> LexiconSchema for Entry<S> {
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -194,10 +194,7 @@ where
     St::Book: entry_state::IsUnset,
 {
     /// Set the `book` field (required)
-    pub fn book(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> EntryBuilder<entry_state::SetBook<St>, S> {
+    pub fn book(mut self, value: impl Into<AtUri<S>>) -> EntryBuilder<entry_state::SetBook<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -251,10 +248,10 @@ where
 }
 
 fn lexicon_doc_dev_vielle_guestbook_entry() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.vielle.guestbook.entry"),
@@ -265,11 +262,10 @@ fn lexicon_doc_dev_vielle_guestbook_entry() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("nsid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("book"), SmolStr::new_static("contents")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("book"),
+                            SmolStr::new_static("contents"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

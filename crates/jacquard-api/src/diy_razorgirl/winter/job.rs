@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,20 +24,22 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::diy_razorgirl::winter::job;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::diy_razorgirl::winter::job;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct IntervalSchedule<S: BosStr = DefaultStr> {
     pub seconds: i64,
     pub r#type: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -65,7 +67,6 @@ pub struct Job<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -75,7 +76,6 @@ pub enum JobSchedule<S: BosStr = DefaultStr> {
     #[serde(rename = "diy.razorgirl.winter.job#intervalSchedule")]
     IntervalSchedule(Box<job::IntervalSchedule<S>>),
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JobStatus<S: BosStr = DefaultStr> {
@@ -173,9 +173,11 @@ pub struct JobGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Job<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct OnceSchedule<S: BosStr = DefaultStr> {
     pub run_at: Datetime,
     pub r#type: S,
@@ -285,7 +287,7 @@ impl<S: BosStr> LexiconSchema for OnceSchedule<S> {
 
 pub mod interval_schedule_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -328,10 +330,7 @@ pub mod interval_schedule_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct IntervalScheduleBuilder<
-    St: interval_schedule_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct IntervalScheduleBuilder<St: interval_schedule_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -426,10 +425,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> IntervalSchedule<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> IntervalSchedule<S> {
         IntervalSchedule {
             seconds: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -439,10 +435,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.job"),
@@ -451,9 +447,10 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("intervalSchedule"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("type"), SmolStr::new_static("seconds")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("seconds"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -465,7 +462,9 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -477,14 +476,12 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"),
-                                SmolStr::new_static("instructions"),
-                                SmolStr::new_static("schedule"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("instructions"),
+                            SmolStr::new_static("schedule"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -534,7 +531,7 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
                                 LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("#onceSchedule"),
-                                        CowStr::new_static("#intervalSchedule")
+                                        CowStr::new_static("#intervalSchedule"),
                                     ],
                                     ..Default::default()
                                 }),
@@ -555,9 +552,10 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("onceSchedule"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![SmolStr::new_static("type"), SmolStr::new_static("runAt")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("type"),
+                        SmolStr::new_static("runAt"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -570,7 +568,9 @@ fn lexicon_doc_diy_razorgirl_winter_job() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -589,7 +589,7 @@ fn _default_job_failure_count() -> Option<i64> {
 
 pub mod job_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -878,7 +878,7 @@ where
 
 pub mod once_schedule_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1016,10 +1016,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> OnceSchedule<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OnceSchedule<S> {
         OnceSchedule {
             run_at: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),

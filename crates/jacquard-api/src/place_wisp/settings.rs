@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::place_wisp::settings;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::place_wisp::settings;
+use serde::{Deserialize, Serialize};
 /// Custom HTTP header configuration
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CustomHeader<S: BosStr = DefaultStr> {
     ///HTTP header name (e.g., 'Cache-Control', 'X-Frame-Options')
     pub name: S,
@@ -225,10 +228,10 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
 }
 
 fn lexicon_doc_place_wisp_settings() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.wisp.settings"),
@@ -401,7 +404,7 @@ impl Default for Settings {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -509,18 +512,12 @@ impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
 
 impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `headers` field (optional)
-    pub fn headers(
-        mut self,
-        value: impl Into<Option<Vec<settings::CustomHeader<S>>>>,
-    ) -> Self {
+    pub fn headers(mut self, value: impl Into<Option<Vec<settings::CustomHeader<S>>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `headers` field to an Option value (optional)
-    pub fn maybe_headers(
-        mut self,
-        value: Option<Vec<settings::CustomHeader<S>>>,
-    ) -> Self {
+    pub fn maybe_headers(mut self, value: Option<Vec<settings::CustomHeader<S>>>) -> Self {
         self._fields.3 = value;
         self
     }

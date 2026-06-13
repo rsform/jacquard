@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// A declaration of a measured trees cluster for an organization
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -73,8 +73,7 @@ impl XrpcResp for MeasuredTreesClusterRecord {
     type Err = RecordError;
 }
 
-impl<S: BosStr> From<MeasuredTreesClusterGetRecordOutput<S>>
-for MeasuredTreesCluster<S> {
+impl<S: BosStr> From<MeasuredTreesClusterGetRecordOutput<S>> for MeasuredTreesCluster<S> {
     fn from(output: MeasuredTreesClusterGetRecordOutput<S>) -> Self {
         output.value
     }
@@ -107,7 +106,7 @@ impl<S: BosStr> LexiconSchema for MeasuredTreesCluster<S> {
 
 pub mod measured_trees_cluster_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -161,20 +160,14 @@ pub struct MeasuredTreesClusterBuilder<
 
 impl MeasuredTreesCluster<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> MeasuredTreesClusterBuilder<
-        measured_trees_cluster_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> MeasuredTreesClusterBuilder<measured_trees_cluster_state::Empty, DefaultStr> {
         MeasuredTreesClusterBuilder::new()
     }
 }
 
 impl<S: BosStr> MeasuredTreesCluster<S> {
     /// Create a new builder for this type
-    pub fn builder() -> MeasuredTreesClusterBuilder<
-        measured_trees_cluster_state::Empty,
-        S,
-    > {
+    pub fn builder() -> MeasuredTreesClusterBuilder<measured_trees_cluster_state::Empty, S> {
         MeasuredTreesClusterBuilder::builder()
     }
 }
@@ -266,47 +259,38 @@ where
     }
 }
 
-fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster() -> LexiconDoc<
-    'static,
-> {
+fn lexicon_doc_app_gainforest_organization_observations_measuredTreesCluster() -> LexiconDoc<'static>
+{
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
-        id: CowStr::new_static(
-            "app.gainforest.organization.observations.measuredTreesCluster",
-        ),
+        id: CowStr::new_static("app.gainforest.organization.observations.measuredTreesCluster"),
         defs: {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A declaration of a measured trees cluster for an organization",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A declaration of a measured trees cluster for an organization",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("shapefile"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("shapefile"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The date and time of the creation of the record",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The date and time of the creation of the record",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

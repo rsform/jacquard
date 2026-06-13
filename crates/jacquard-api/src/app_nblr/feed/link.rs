@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// Record linking a resource to a collection.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -107,7 +107,7 @@ impl<S: BosStr> LexiconSchema for Link<S> {
 
 pub mod link_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -250,10 +250,7 @@ where
     St::Uri: link_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(
-        mut self,
-        value: impl Into<UriValue<S>>,
-    ) -> LinkBuilder<link_state::SetUri<St>, S> {
+    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> LinkBuilder<link_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
@@ -291,10 +288,10 @@ where
 }
 
 fn lexicon_doc_app_nblr_feed_link() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.nblr.feed.link"),
@@ -303,29 +300,25 @@ fn lexicon_doc_app_nblr_feed_link() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("Record linking a resource to a collection."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Record linking a resource to a collection.",
+                    )),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("uri"),
-                                SmolStr::new_static("collection"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("uri"),
+                            SmolStr::new_static("collection"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("collection"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The AT URI of the collection being linked to",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The AT URI of the collection being linked to",
+                                    )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -340,11 +333,9 @@ fn lexicon_doc_app_nblr_feed_link() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("uri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "The URI of the linked resource; a web URL or AT URI",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "The URI of the linked resource; a web URL or AT URI",
+                                    )),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

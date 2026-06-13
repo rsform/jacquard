@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
+use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// The Shabaka Stone of the world. It preserves what happened. It cannot be erased. It names who made it. It is the theological text of a world that anyone can read and nobody can alter.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -83,30 +83,18 @@ pub enum LoreCanonicalStatus<S: BosStr = DefaultStr> {
 impl<S: BosStr> LoreCanonicalStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CanonicalStatusOfficial => {
-                "world.ptah.temp.defs#canonicalStatusOfficial"
-            }
-            Self::CanonicalStatusCommunity => {
-                "world.ptah.temp.defs#canonicalStatusCommunity"
-            }
-            Self::CanonicalStatusApocryphal => {
-                "world.ptah.temp.defs#canonicalStatusApocryphal"
-            }
+            Self::CanonicalStatusOfficial => "world.ptah.temp.defs#canonicalStatusOfficial",
+            Self::CanonicalStatusCommunity => "world.ptah.temp.defs#canonicalStatusCommunity",
+            Self::CanonicalStatusApocryphal => "world.ptah.temp.defs#canonicalStatusApocryphal",
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "world.ptah.temp.defs#canonicalStatusOfficial" => {
-                Self::CanonicalStatusOfficial
-            }
-            "world.ptah.temp.defs#canonicalStatusCommunity" => {
-                Self::CanonicalStatusCommunity
-            }
-            "world.ptah.temp.defs#canonicalStatusApocryphal" => {
-                Self::CanonicalStatusApocryphal
-            }
+            "world.ptah.temp.defs#canonicalStatusOfficial" => Self::CanonicalStatusOfficial,
+            "world.ptah.temp.defs#canonicalStatusCommunity" => Self::CanonicalStatusCommunity,
+            "world.ptah.temp.defs#canonicalStatusApocryphal" => Self::CanonicalStatusApocryphal,
             _ => Self::Other(s),
         }
     }
@@ -245,9 +233,7 @@ where
         match self {
             LoreContributionType::Originator => LoreContributionType::Originator,
             LoreContributionType::Community => LoreContributionType::Community,
-            LoreContributionType::Other(v) => {
-                LoreContributionType::Other(v.into_static())
-            }
+            LoreContributionType::Other(v) => LoreContributionType::Other(v.into_static()),
         }
     }
 }
@@ -381,7 +367,7 @@ impl<S: BosStr> LexiconSchema for Lore<S> {
 
 pub mod lore_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -491,7 +477,9 @@ impl LoreBuilder<lore_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         LoreBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -502,7 +490,9 @@ impl<S: BosStr> LoreBuilder<lore_state::Empty, S> {
     pub fn builder() -> Self {
         LoreBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -523,18 +513,12 @@ impl<St: lore_state::State, S: BosStr> LoreBuilder<St, S> {
 
 impl<St: lore_state::State, S: BosStr> LoreBuilder<St, S> {
     /// Set the `canonicalStatus` field (optional)
-    pub fn canonical_status(
-        mut self,
-        value: impl Into<Option<LoreCanonicalStatus<S>>>,
-    ) -> Self {
+    pub fn canonical_status(mut self, value: impl Into<Option<LoreCanonicalStatus<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `canonicalStatus` field to an Option value (optional)
-    pub fn maybe_canonical_status(
-        mut self,
-        value: Option<LoreCanonicalStatus<S>>,
-    ) -> Self {
+    pub fn maybe_canonical_status(mut self, value: Option<LoreCanonicalStatus<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -568,18 +552,12 @@ impl<St: lore_state::State, S: BosStr> LoreBuilder<St, S> {
 
 impl<St: lore_state::State, S: BosStr> LoreBuilder<St, S> {
     /// Set the `contributionType` field (optional)
-    pub fn contribution_type(
-        mut self,
-        value: impl Into<Option<LoreContributionType<S>>>,
-    ) -> Self {
+    pub fn contribution_type(mut self, value: impl Into<Option<LoreContributionType<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `contributionType` field to an Option value (optional)
-    pub fn maybe_contribution_type(
-        mut self,
-        value: Option<LoreContributionType<S>>,
-    ) -> Self {
+    pub fn maybe_contribution_type(mut self, value: Option<LoreContributionType<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -655,10 +633,7 @@ where
     St::Title: lore_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(
-        mut self,
-        value: impl Into<S>,
-    ) -> LoreBuilder<lore_state::SetTitle<St>, S> {
+    pub fn title(mut self, value: impl Into<S>) -> LoreBuilder<lore_state::SetTitle<St>, S> {
         self._fields.9 = Option::Some(value.into());
         LoreBuilder {
             _state: PhantomData,
@@ -732,10 +707,10 @@ where
 }
 
 fn lexicon_doc_world_ptah_temp_lore() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("world.ptah.temp.lore"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,16 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::social_lexical::works::identifiers;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::social_lexical::works::identifiers;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Identifier<S: BosStr = DefaultStr> {
     ///
     pub provider: IdentifierProvider<S>,
@@ -42,7 +45,6 @@ pub struct Identifier<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IdentifierProvider<S: BosStr = DefaultStr> {
@@ -124,7 +126,6 @@ where
         }
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -227,10 +228,10 @@ impl<S: BosStr> LexiconSchema for Identifiers<S> {
 }
 
 fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.lexical.works.identifiers"),
@@ -239,12 +240,10 @@ fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("identifier"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("provider"),
-                            SmolStr::new_static("providerId")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("provider"),
+                        SmolStr::new_static("providerId"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -280,12 +279,10 @@ fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("work"),
-                                SmolStr::new_static("identifiers")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("work"),
+                            SmolStr::new_static("identifiers"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -324,7 +321,7 @@ fn lexicon_doc_social_lexical_works_identifiers() -> LexiconDoc<'static> {
 
 pub mod identifiers_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -462,10 +459,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Identifiers<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Identifiers<S> {
         Identifiers {
             identifiers: self._fields.0.unwrap(),
             work: self._fields.1.unwrap(),
