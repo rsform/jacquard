@@ -18,7 +18,7 @@ use crate::{
 #[cfg(feature = "websocket")]
 use jacquard_common::CowStr;
 #[cfg(feature = "scope-check")]
-use jacquard_common::types::nsid::Nsid;
+use jacquard_common::types::{nsid::Nsid, string::DidService};
 use jacquard_common::{
     AuthorizationToken, IntoStatic,
     bos::BosStr,
@@ -535,7 +535,7 @@ where
             Scope::Include(IncludeScope { nsid, audience }) => {
                 let audience_did = if let Some(aud_str) = audience {
                     let decoded = decode_audience(aud_str)?;
-                    match Did::new_owned(&decoded) {
+                    match DidService::new_owned(&decoded) {
                         Ok(did) => Some(did),
                         Err(_) => {
                             return Err(crate::error::CallbackError::ScopeResolution {

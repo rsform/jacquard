@@ -7,6 +7,7 @@ use jacquard::common::session::SessionHint;
 use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::oauth::types::AuthorizeOptions;
+use jacquard_oauth::scopes::Scopes;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Update Bluesky preferences")]
@@ -32,7 +33,14 @@ async fn main() -> miette::Result<()> {
     let Some(session) = oauth
         .resume_or_login_with_local_server(
             &hint,
-            AuthorizeOptions::default(),
+            AuthorizeOptions::default().with_scopes(
+                Scopes::builder()
+                    .include_aud(
+                        "app.bsky.authFullApp",
+                        "did:web:public.api.bsky.app#bsky_appview",
+                    )?
+                    .build()?,
+            ),
             LoopbackConfig::default(),
         )
         .await?

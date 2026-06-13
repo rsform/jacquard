@@ -19,11 +19,12 @@
 - `Cow<'a, str>` now supported by borrow-or-share pattern traits
 
 **OAuth permission sets, refactored scopes** (`jacquard-oauth`, `jacquard`, `jacquard-lexicon`)
-- Added `Scopes<S>` validated container for space-separated OAuth scope strings, replacing `Vec<Scope<S>>`. Stores a single string buffer with pre-computed byte-range indices, yielding zero-copy `Scope<&str>` views.
+- Added ergonomic `Scope` constructors for common atproto, account, identity, transition, repo, RPC, and permission-set scopes.
+- Added `Scopes::from_scopes()` and `ScopesBuilder` so callers can construct typed scopes programmatically while reusing the same validation, normalization, reduction, and indexing path as string parsing.
+- Added endpoint-aware `Scope::rpc_request::<R: XrpcRequest>()` and collection-aware repo helpers such as `Scope::repo_create_record::<C: Collection>()`.
+- Added `AuthorizeOptions` helpers for setting scopes from a string or typed scope values; builders can be passed through existing `with_scopes()` after `ScopesBuilder::build()`.
 - Added `IncludeScope<S>` scope variant referencing permission set NSIDs with optional `?aud=<did>` audience.
-- Added permission set lexicon types (`LexPermissionSet`, `LexPermission`, `LexPermissionResource`) in jacquard-lexicon.
-- Added `expand_permission_set()` and `resolve_permission_set()` for converting permission set lexicons into concrete scopes.
-- Added `scope-check` feature to jacquard-oauth and jacquard, enabling client-side scope validation and eager resolution of `include:` scopes at session creation.
+- Updated OAuth examples and inline docs to demonstrate typed scope builders and link to the atproto OAuth scope docs and interactive scope-string builder.
 
 **Bootstrap XRPC types** (`jacquard-common`)
 - Added `DidService<S>` validated type for DID audiences with optional service-id fragments (e.g., `did:web:example.com#bsky_appview`).
@@ -146,6 +147,13 @@
 - `DpopDataSource` trait methods return `Option<&str>` (was `Option<CowStr<'_>>`)
 - DPoP proof building uses `&str` for zero-copy JWT construction
 - `build_dpop_proof` takes `&str` parameters, returns `SmolStr`
+
+**OAuth permission sets, refactored scopes** (`jacquard-oauth`, `jacquard`, `jacquard-lexicon`)
+- Added `Scopes<S>` validated container for space-separated OAuth scope strings, replacing `Vec<Scope<S>>`. Stores a single string buffer with pre-computed byte-range indices, yielding zero-copy `Scope<&str>` views.
+- Added `IncludeScope<S>` scope variant referencing permission set NSIDs with optional `?aud=<did>` audience.
+- Added permission set lexicon types (`LexPermissionSet`, `LexPermission`, `LexPermissionResource`) in jacquard-lexicon.
+- Added `expand_permission_set()` and `resolve_permission_set()` for converting permission set lexicons into concrete scopes.
+- Added `scope-check` feature to jacquard-oauth and jacquard, enabling client-side scope validation and eager resolution of `include:` scopes at session creation.
 
 **Identity resolution** (`jacquard-identity`)
 - `IdentityResolver::resolve_handle<S: BosStr + Sync>(&self, handle: &Handle<S>)`: generic over handle backing type

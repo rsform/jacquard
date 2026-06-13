@@ -10,6 +10,7 @@ use jacquard::oauth::client::OAuthClient;
 use jacquard::oauth::client::OAuthResumeOrLogin;
 #[cfg(feature = "loopback")]
 use jacquard::oauth::loopback::LoopbackConfig;
+use jacquard::oauth::scopes::Scopes;
 use jacquard::oauth::types::AuthorizeOptions;
 #[cfg(not(feature = "loopback"))]
 use jacquard::oauth::types::CallbackParams;
@@ -44,12 +45,19 @@ async fn main() -> miette::Result<()> {
     // Build an OAuth client (this is reusable, and can create multiple sessions).
     let oauth = OAuthClient::new(store, client_data, reqwest::Client::new());
     let hint = SessionHint::from_optional_input(args.input.as_deref());
+    // The atproto docs include a scope string builder for choosing permissions:
+    // https://atproto.com/guides/scope-builder. In Jacquard code, use typed
+    // helpers when possible so scope NSIDs stay tied to endpoint types.
+    let timeline_scopes = Scopes::builder()
+        .atproto()
+        .rpc_request_aud::<GetTimeline>("did:web:api.bsky.app#bsky_appview")?
+        .build()?;
 
     #[cfg(feature = "loopback")]
     let session = match oauth
         .resume_or_login_with_local_server(
             &hint,
-            AuthorizeOptions::default(),
+            AuthorizeOptions::default().with_scopes(timeline_scopes.clone()),
             LoopbackConfig::default(),
         )
         .await?
@@ -60,7 +68,7 @@ async fn main() -> miette::Result<()> {
             oauth
                 .login_with_local_server(
                     input,
-                    AuthorizeOptions::default(),
+                    AuthorizeOptions::default().with_scopes(timeline_scopes.clone()),
                     LoopbackConfig::default(),
                 )
                 .await?
@@ -69,7 +77,10 @@ async fn main() -> miette::Result<()> {
 
     #[cfg(not(feature = "loopback"))]
     let session = match oauth
-        .resume_or_start_auth(&hint, AuthorizeOptions::default())
+        .resume_or_start_auth(
+            &hint,
+            AuthorizeOptions::default().with_scopes(timeline_scopes.clone()),
+        )
         .await
     {
         Ok(OAuthResumeOrLogin::Resumed(session)) => session,
@@ -77,7 +88,10 @@ async fn main() -> miette::Result<()> {
         Ok(OAuthResumeOrLogin::NeedsInput) => {
             let input = prompt_login_input(&args.store)?;
             match oauth
-                .resume_or_start_auth_for(input, AuthorizeOptions::default())
+                .resume_or_start_auth_for(
+                    input,
+                    AuthorizeOptions::default().with_scopes(timeline_scopes.clone()),
+                )
                 .await?
             {
                 OAuthResumeOrLogin::Resumed(session) => session,

@@ -4,7 +4,7 @@ mod request;
 mod response;
 mod token;
 
-use crate::scopes::Scopes;
+use crate::scopes::{ParseError, Scope, Scopes};
 
 pub use self::client_metadata::*;
 pub use self::metadata::*;
@@ -107,6 +107,75 @@ impl<S: BosStr + AsRef<str>> AuthorizeOptions<S> {
     pub fn with_scopes(mut self, scopes: Scopes<S>) -> Self {
         self.scopes = scopes;
         self
+    }
+}
+
+impl AuthorizeOptions<DefaultStr> {
+    /// Parse and set OAuth scopes from a space-separated scope string.
+    pub fn with_scope_str(mut self, scopes: impl AsRef<str>) -> Result<Self, ParseError> {
+        self.scopes = Scopes::new(SmolStr::new(scopes.as_ref()))?;
+        Ok(self)
+    }
+
+    /// Set OAuth scopes from one typed scope.
+    pub fn with_scope(self, scope: Scope<SmolStr>) -> Result<Self, ParseError> {
+        self.with_scope_iter([scope])
+    }
+
+    /// Set OAuth scopes from typed scope values.
+    pub fn with_scope_iter<I>(mut self, scopes: I) -> Result<Self, ParseError>
+    where
+        I: IntoIterator<Item = Scope<SmolStr>>,
+    {
+        self.scopes = Scopes::from_scopes(scopes)?;
+        Ok(self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn authorize_options_accept_scope_string() {
+        let opts = AuthorizeOptions::default()
+            .with_scope_str("rpc:* atproto")
+            .unwrap();
+
+        assert_eq!(opts.scopes.to_normalized_string(), "atproto rpc:*");
+    }
+
+    #[test]
+    fn authorize_options_accept_typed_scopes() {
+        let opts = AuthorizeOptions::default()
+            .with_scope_iter([
+                Scope::atproto(),
+                Scope::rpc("app.bsky.feed.getTimeline").unwrap(),
+                Scope::repo_create("app.bsky.feed.post").unwrap(),
+            ])
+            .unwrap();
+
+        assert_eq!(
+            opts.scopes.to_normalized_string(),
+            "atproto repo:app.bsky.feed.post?action=create rpc:app.bsky.feed.getTimeline"
+        );
+    }
+
+    #[test]
+    fn authorize_options_accept_built_scopes() {
+        let scopes = Scopes::builder()
+            .atproto()
+            .transition_generic()
+            .rpc("app.bsky.feed.getTimeline")
+            .unwrap()
+            .build()
+            .unwrap();
+        let opts = AuthorizeOptions::default().with_scopes(scopes);
+
+        assert_eq!(
+            opts.scopes.to_normalized_string(),
+            "atproto rpc:app.bsky.feed.getTimeline transition:generic"
+        );
     }
 }
 

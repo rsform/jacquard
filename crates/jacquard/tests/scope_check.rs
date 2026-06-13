@@ -8,7 +8,7 @@ use http::{Response as HttpResponse, StatusCode};
 use jacquard::client::Agent;
 use jacquard::deps::fluent_uri::Uri;
 use jacquard::types::did::Did;
-use jacquard::types::string::Nsid;
+use jacquard::types::string::{DidService, Nsid};
 use jacquard::xrpc::XrpcClient;
 use jacquard::{BosStr, IntoStatic};
 use jacquard_common::http_client::HttpClient;
@@ -592,7 +592,7 @@ async fn test_realistic_scopes_audience_specific_rpc_permitted() {
     ));
     let mut aud = BTreeSet::new();
     aud.insert(RpcAudience::Did(
-        Did::<SmolStr>::new_static("did:web:api.bsky.app").unwrap(),
+        DidService::<SmolStr>::new_static("did:web:api.bsky.app").unwrap(),
     ));
     let resolved_scopes = Some(vec![Scope::Rpc(RpcScope { lxm, aud })]);
 

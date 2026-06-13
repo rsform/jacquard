@@ -3,7 +3,18 @@
 //! Originally derived from <https://tangled.org/nickgerakines.me/atproto-crates/raw/main/crates/atproto-oauth/src/scopes.rs>, since substantially modified.
 //!
 //! This module provides comprehensive support for AT Protocol OAuth scopes,
-//! including parsing, serialization, normalization, and permission checking.
+//! including parsing, serialization, normalization, programmatic construction,
+//! and permission checking.
+//!
+//! See the AT Protocol OAuth spec's
+//! [authorization scopes](https://atproto.com/specs/oauth#authorization-scopes)
+//! section for the profile-level rules, including the required `atproto` marker
+//! scope and current
+//! [transitional scopes](https://atproto.com/specs/oauth#transitional-scopes).
+//! The AT Protocol docs also provide an interactive
+//! [scope builder](https://atproto.com/guides/scope-builder) for choosing
+//! appropriate scopes before translating them into [`Scope`] constructors or a
+//! [`ScopesBuilder`] chain.
 //!
 //! Scopes in AT Protocol follow a prefix-based format with optional query parameters:
 //! - `account`: Access to account information (email, repo, status)
@@ -11,13 +22,50 @@
 //! - `blob`: Access to blob operations with mime type constraints
 //! - `repo`: Repository operations with collection and action constraints
 //! - `rpc`: RPC method access with lexicon and audience constraints
+//! - `include`: Reference a permission-set NSID, optionally with an audience
 //! - `atproto`: Required scope to indicate that other AT Protocol scopes will be used
-//! - `transition`: Migration operations (generic or email)
+//! - `transition`: Migration operations (generic, email, or chat.bsky)
 //!
 //! Standard OpenID Connect scopes (no suffixes or query parameters):
 //! - `openid`: Required for OpenID Connect authentication
 //! - `profile`: Access to user profile information
 //! - `email`: Access to user email address
+//!
+//! Programmatic construction is available through [`Scope`] constructors,
+//! [`Scopes::from_scopes`], and [`ScopesBuilder`]:
+//!
+//! ```rust
+//! use jacquard_oauth::scopes::{Scope, Scopes};
+//!
+//! let scopes = Scopes::from_scopes([
+//!     Scope::atproto(),
+//!     Scope::transition_generic(),
+//!     Scope::rpc("app.bsky.feed.getTimeline")?,
+//!     Scope::repo_create("app.bsky.feed.post")?,
+//! ])?;
+//!
+//! assert_eq!(
+//!     scopes.to_normalized_string(),
+//!     "atproto repo:app.bsky.feed.post?action=create rpc:app.bsky.feed.getTimeline transition:generic"
+//! );
+//! # Ok::<(), jacquard_oauth::scopes::ParseError>(())
+//! ```
+//!
+//! For fluent construction:
+//!
+//! ```rust
+//! use jacquard_oauth::scopes::Scopes;
+//!
+//! let scopes = Scopes::builder()
+//!     .atproto()
+//!     .transition_generic()
+//!     .rpc("app.bsky.feed.getTimeline")?
+//!     .repo_create("app.bsky.feed.post")?
+//!     .build()?;
+//!
+//! assert!(scopes.grants(&jacquard_oauth::scopes::Scope::atproto()));
+//! # Ok::<(), jacquard_oauth::scopes::ParseError>(())
+//! ```
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
@@ -29,9 +77,11 @@ use jacquard_common::deps::fluent_uri::pct_enc::{
     EStr, EString,
     encoder::{Query, Query as EncQuery},
 };
-use jacquard_common::types::did::Did;
+use jacquard_common::types::collection::Collection;
+use jacquard_common::types::did_service::validate_did_service;
 use jacquard_common::types::nsid::Nsid;
-use jacquard_common::types::string::AtStrError;
+use jacquard_common::types::string::{AtStrError, DidService};
+use jacquard_common::xrpc::XrpcRequest;
 use jacquard_common::{BorrowOrShare, Bos, FromStaticStr, IntoStatic};
 use serde::de::{Error as DeError, Visitor};
 use serde::{Deserialize, Serialize};
@@ -128,6 +178,270 @@ where
             Scope::Email => Scope::Email,
         }
     }
+}
+
+impl Scope<SmolStr> {
+    /// Construct the required AT Protocol marker scope.
+    pub fn atproto() -> Self {
+        Scope::Atproto
+    }
+
+    /// Construct the OpenID Connect `openid` scope.
+    pub fn openid() -> Self {
+        Scope::OpenId
+    }
+
+    /// Construct the OpenID Connect `profile` scope.
+    pub fn profile() -> Self {
+        Scope::Profile
+    }
+
+    /// Construct the OpenID Connect `email` scope.
+    pub fn email() -> Self {
+        Scope::Email
+    }
+
+    /// Construct `identity:handle`.
+    pub fn identity_handle() -> Self {
+        Scope::Identity(IdentityScope::Handle)
+    }
+
+    /// Construct `identity:*`.
+    pub fn identity_all() -> Self {
+        Scope::Identity(IdentityScope::All)
+    }
+
+    /// Construct `transition:generic`.
+    pub fn transition_generic() -> Self {
+        Scope::Transition(TransitionScope::Generic)
+    }
+
+    /// Construct `transition:email`.
+    pub fn transition_email() -> Self {
+        Scope::Transition(TransitionScope::Email)
+    }
+
+    /// Construct `transition:chat.bsky`.
+    pub fn transition_chat_bsky() -> Self {
+        Scope::Transition(TransitionScope::ChatBsky)
+    }
+
+    /// Construct `account:email`.
+    pub fn account_email_read() -> Self {
+        account_scope(AccountResource::Email, AccountAction::Read)
+    }
+
+    /// Construct `account:email?action=manage`.
+    pub fn account_email_manage() -> Self {
+        account_scope(AccountResource::Email, AccountAction::Manage)
+    }
+
+    /// Construct `account:repo`.
+    pub fn account_repo_read() -> Self {
+        account_scope(AccountResource::Repo, AccountAction::Read)
+    }
+
+    /// Construct `account:repo?action=manage`.
+    pub fn account_repo_manage() -> Self {
+        account_scope(AccountResource::Repo, AccountAction::Manage)
+    }
+
+    /// Construct `account:status`.
+    pub fn account_status_read() -> Self {
+        account_scope(AccountResource::Status, AccountAction::Read)
+    }
+
+    /// Construct `account:status?action=manage`.
+    pub fn account_status_manage() -> Self {
+        account_scope(AccountResource::Status, AccountAction::Manage)
+    }
+
+    /// Construct `repo:*` with all repository actions.
+    pub fn repo_all() -> Self {
+        Scope::repo_nsid_actions(None, all_repo_actions())
+    }
+
+    /// Construct a repo scope for all actions on one collection.
+    pub fn repo_collection(collection: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(Scope::repo_nsid_actions(
+            Some(Nsid::new_owned(collection)?),
+            all_repo_actions(),
+        ))
+    }
+
+    /// Construct a repo scope granting create on one collection.
+    pub fn repo_create(collection: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(Scope::repo_nsid_actions(
+            Some(Nsid::new_owned(collection)?),
+            [RepoAction::Create],
+        ))
+    }
+
+    /// Construct a repo scope granting update on one collection.
+    pub fn repo_update(collection: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(Scope::repo_nsid_actions(
+            Some(Nsid::new_owned(collection)?),
+            [RepoAction::Update],
+        ))
+    }
+
+    /// Construct a repo scope granting delete on one collection.
+    pub fn repo_delete(collection: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(Scope::repo_nsid_actions(
+            Some(Nsid::new_owned(collection)?),
+            [RepoAction::Delete],
+        ))
+    }
+
+    /// Construct `rpc:*`.
+    pub fn rpc_all() -> Self {
+        let mut lxm = BTreeSet::new();
+        lxm.insert(RpcLexicon::All);
+        let mut aud = BTreeSet::new();
+        aud.insert(RpcAudience::All);
+        Scope::Rpc(RpcScope { lxm, aud })
+    }
+
+    /// Construct an RPC scope for one XRPC method NSID and all audiences.
+    pub fn rpc(lxm: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(Scope::rpc_nsid(Nsid::new_owned(lxm)?))
+    }
+
+    /// Construct an RPC scope for one XRPC method NSID and one DID audience.
+    pub fn rpc_aud(lxm: impl AsRef<str>, aud: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(Scope::rpc_nsid_aud(
+            Nsid::new_owned(lxm)?,
+            DidService::new_owned(aud)?,
+        ))
+    }
+
+    /// Construct an RPC scope from an XRPC request type.
+    pub fn rpc_request<R: XrpcRequest>() -> Self {
+        Scope::rpc_nsid(unsafe { Nsid::unchecked(SmolStr::new_static(R::NSID)) })
+    }
+
+    /// Construct an RPC scope from an XRPC request type and one DID audience.
+    pub fn rpc_request_aud<R: XrpcRequest>(aud: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(Scope::rpc_nsid_aud(
+            unsafe { Nsid::unchecked(SmolStr::new_static(R::NSID)) },
+            DidService::new_owned(aud)?,
+        ))
+    }
+
+    /// Construct an `include:<nsid>` permission-set scope.
+    pub fn include(nsid: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(Scope::include_nsid(Nsid::new_owned(nsid)?, None))
+    }
+
+    /// Construct an `include:<nsid>?aud=<audience>` permission-set scope.
+    pub fn include_aud(nsid: impl AsRef<str>, aud: impl AsRef<str>) -> Result<Self, ParseError> {
+        let audience = normalize_include_audience(aud.as_ref())?;
+        Ok(Scope::include_nsid(Nsid::new_owned(nsid)?, Some(audience)))
+    }
+
+    /// Construct a repo scope granting create for a record collection type.
+    pub fn repo_create_record<C: Collection>() -> Self {
+        Scope::repo_nsid_actions(Some(collection_nsid::<C>()), [RepoAction::Create])
+    }
+
+    /// Construct a repo scope granting update for a record collection type.
+    pub fn repo_update_record<C: Collection>() -> Self {
+        Scope::repo_nsid_actions(Some(collection_nsid::<C>()), [RepoAction::Update])
+    }
+
+    /// Construct a repo scope granting delete for a record collection type.
+    pub fn repo_delete_record<C: Collection>() -> Self {
+        Scope::repo_nsid_actions(Some(collection_nsid::<C>()), [RepoAction::Delete])
+    }
+
+    /// Construct a repo scope granting all repo actions for a record collection type.
+    pub fn repo_all_record<C: Collection>() -> Self {
+        Scope::repo_nsid_actions(Some(collection_nsid::<C>()), all_repo_actions())
+    }
+}
+
+impl<S: BosStr + Ord> Scope<S> {
+    /// Construct a repo scope for a typed collection NSID and explicit actions.
+    pub fn repo_nsid(collection: Nsid<S>, actions: impl IntoIterator<Item = RepoAction>) -> Self {
+        Self::repo_nsid_actions(Some(collection), actions)
+    }
+
+    fn repo_nsid_actions(
+        collection: Option<Nsid<S>>,
+        actions: impl IntoIterator<Item = RepoAction>,
+    ) -> Self {
+        let mut actions: BTreeSet<_> = actions.into_iter().collect();
+        if actions.is_empty() {
+            actions.extend(all_repo_actions());
+        }
+
+        Scope::Repo(RepoScope {
+            collection: collection.map_or(RepoCollection::All, RepoCollection::Nsid),
+            actions,
+        })
+    }
+
+    /// Construct an RPC scope for a typed XRPC method NSID and all audiences.
+    pub fn rpc_nsid(lxm: Nsid<S>) -> Self {
+        let mut lxm_set = BTreeSet::new();
+        lxm_set.insert(RpcLexicon::Nsid(lxm));
+        let mut aud = BTreeSet::new();
+        aud.insert(RpcAudience::All);
+        Scope::Rpc(RpcScope { lxm: lxm_set, aud })
+    }
+
+    /// Construct an RPC scope for a typed XRPC method NSID and typed DID audience.
+    pub fn rpc_nsid_aud(lxm: Nsid<S>, aud: DidService<S>) -> Self {
+        let mut lxm_set = BTreeSet::new();
+        lxm_set.insert(RpcLexicon::Nsid(lxm));
+        let mut aud_set = BTreeSet::new();
+        aud_set.insert(RpcAudience::Did(aud));
+        Scope::Rpc(RpcScope {
+            lxm: lxm_set,
+            aud: aud_set,
+        })
+    }
+
+    /// Construct an include permission-set scope from a typed NSID and optional audience string.
+    pub fn include_nsid(nsid: Nsid<S>, audience: Option<S>) -> Self {
+        Scope::Include(IncludeScope { nsid, audience })
+    }
+}
+
+fn account_scope(resource: AccountResource, action: AccountAction) -> Scope<SmolStr> {
+    Scope::Account(AccountScope { resource, action })
+}
+
+fn all_repo_actions() -> [RepoAction; 3] {
+    [RepoAction::Create, RepoAction::Update, RepoAction::Delete]
+}
+
+fn collection_nsid<C: Collection>() -> Nsid<SmolStr> {
+    unsafe { Nsid::unchecked(SmolStr::new_static(C::NSID)) }
+}
+
+fn normalize_include_audience(audience: &str) -> Result<SmolStr, ParseError> {
+    if audience.contains('%') {
+        let estr = EStr::<Query>::new(audience).ok_or_else(|| {
+            ParseError::InvalidResource(
+                "include audience has invalid percent-encoding".to_smolstr(),
+            )
+        })?;
+        let decoded = estr.decode().to_string().map_err(|_| {
+            ParseError::InvalidResource(
+                "include audience contains invalid UTF-8 sequence".to_smolstr(),
+            )
+        })?;
+        validate_include_audience(&decoded)?;
+        Ok(SmolStr::new(decoded))
+    } else {
+        validate_include_audience(audience)?;
+        Ok(SmolStr::new(audience))
+    }
+}
+
+fn validate_include_audience(audience: &str) -> Result<(), ParseError> {
+    Ok(validate_did_service(audience)?)
 }
 
 /// Account scope attributes
@@ -458,8 +772,8 @@ where
 pub enum RpcAudience<S: BosStr = DefaultStr> {
     /// All audiences (wildcard)
     All,
-    /// Specific DID
-    Did(Did<S>),
+    /// Specific DID with optional service id fragment
+    Did(DidService<S>),
 }
 
 impl<S: BosStr> RpcAudience<S> {
@@ -805,6 +1119,181 @@ impl Scopes<SmolStr> {
             indices: Vec::new(),
         }
     }
+
+    /// Construct scopes from typed scope values, reusing normal parsing, validation,
+    /// reduction, and indexing.
+    pub fn from_scopes<I>(scopes: I) -> Result<Self, ParseError>
+    where
+        I: IntoIterator<Item = Scope<SmolStr>>,
+    {
+        let mut builder = SmolStrBuilder::new();
+        for (index, scope) in scopes.into_iter().enumerate() {
+            if index > 0 {
+                builder.push(' ');
+            }
+            builder.push_str(&scope.to_string_normalized());
+        }
+        Scopes::new(builder.finish())
+    }
+
+    /// Construct the default atproto marker scope set.
+    pub fn atproto() -> Self {
+        Scopes::new(SmolStr::new_static("atproto")).expect("static atproto scope is valid")
+    }
+
+    /// Construct a conservative local-development scope set.
+    pub fn local_development() -> Self {
+        Scopes::new(SmolStr::new_static("atproto transition:generic"))
+            .expect("static local-development scopes are valid")
+    }
+
+    /// Start a fluent scope builder.
+    pub fn builder() -> ScopesBuilder {
+        ScopesBuilder::new()
+    }
+}
+
+/// Fluent builder for programmatic OAuth scope construction.
+#[derive(Debug, Clone, Default)]
+pub struct ScopesBuilder {
+    scopes: Vec<Scope<SmolStr>>,
+}
+
+impl ScopesBuilder {
+    /// Create an empty builder.
+    pub fn new() -> Self {
+        Self { scopes: Vec::new() }
+    }
+
+    /// Add an already-constructed scope.
+    pub fn scope(mut self, scope: Scope<SmolStr>) -> Self {
+        self.scopes.push(scope);
+        self
+    }
+
+    /// Add `atproto`.
+    pub fn atproto(self) -> Self {
+        self.scope(Scope::atproto())
+    }
+
+    /// Add `openid`.
+    pub fn openid(self) -> Self {
+        self.scope(Scope::openid())
+    }
+
+    /// Add `profile`.
+    pub fn profile(self) -> Self {
+        self.scope(Scope::profile())
+    }
+
+    /// Add `email`.
+    pub fn email(self) -> Self {
+        self.scope(Scope::email())
+    }
+
+    /// Add `transition:generic`.
+    pub fn transition_generic(self) -> Self {
+        self.scope(Scope::transition_generic())
+    }
+
+    /// Add `transition:email`.
+    pub fn transition_email(self) -> Self {
+        self.scope(Scope::transition_email())
+    }
+
+    /// Add `transition:chat.bsky`.
+    pub fn transition_chat_bsky(self) -> Self {
+        self.scope(Scope::transition_chat_bsky())
+    }
+
+    /// Add `identity:handle`.
+    pub fn identity_handle(self) -> Self {
+        self.scope(Scope::identity_handle())
+    }
+
+    /// Add `identity:*`.
+    pub fn identity_all(self) -> Self {
+        self.scope(Scope::identity_all())
+    }
+
+    /// Add `rpc:*`.
+    pub fn rpc_all(self) -> Self {
+        self.scope(Scope::rpc_all())
+    }
+
+    /// Add an RPC scope for one XRPC method NSID.
+    pub fn rpc(self, nsid: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(self.scope(Scope::rpc(nsid)?))
+    }
+
+    /// Add an RPC scope for one XRPC request type.
+    pub fn rpc_request<R: XrpcRequest>(self) -> Self {
+        self.scope(Scope::rpc_request::<R>())
+    }
+
+    /// Add an RPC scope for one XRPC request type.
+    pub fn rpc_request_aud<R: XrpcRequest>(self, aud: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(self.scope(Scope::rpc_request_aud::<R>(aud)?))
+    }
+
+    /// Add a repo create scope for one collection NSID.
+    pub fn repo_create(self, collection: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(self.scope(Scope::repo_create(collection)?))
+    }
+
+    /// Add a repo update scope for one collection NSID.
+    pub fn repo_update(self, collection: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(self.scope(Scope::repo_update(collection)?))
+    }
+
+    /// Add a repo delete scope for one collection NSID.
+    pub fn repo_delete(self, collection: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(self.scope(Scope::repo_delete(collection)?))
+    }
+
+    /// Add a repo all-actions scope for one collection NSID.
+    pub fn repo_collection(self, collection: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(self.scope(Scope::repo_collection(collection)?))
+    }
+
+    /// Add a repo create scope for a collection type.
+    pub fn repo_create_record<C: Collection>(self) -> Self {
+        self.scope(Scope::repo_create_record::<C>())
+    }
+
+    /// Add a repo update scope for a collection type.
+    pub fn repo_update_record<C: Collection>(self) -> Self {
+        self.scope(Scope::repo_update_record::<C>())
+    }
+
+    /// Add a repo delete scope for a collection type.
+    pub fn repo_delete_record<C: Collection>(self) -> Self {
+        self.scope(Scope::repo_delete_record::<C>())
+    }
+
+    /// Add a repo all-actions scope for a collection type.
+    pub fn repo_all_record<C: Collection>(self) -> Self {
+        self.scope(Scope::repo_all_record::<C>())
+    }
+
+    /// Add an include permission-set scope.
+    pub fn include(self, nsid: impl AsRef<str>) -> Result<Self, ParseError> {
+        Ok(self.scope(Scope::include(nsid)?))
+    }
+
+    /// Add an include permission-set scope with an audience.
+    pub fn include_aud(
+        self,
+        nsid: impl AsRef<str>,
+        aud: impl AsRef<str>,
+    ) -> Result<Self, ParseError> {
+        Ok(self.scope(Scope::include_aud(nsid, aud)?))
+    }
+
+    /// Validate, reduce, and build the final scope container.
+    pub fn build(self) -> Result<Scopes<SmolStr>, ParseError> {
+        Scopes::from_scopes(self.scopes)
+    }
 }
 
 impl<S: Bos<str> + AsRef<str> + Default + FromStaticStr> Default for Scopes<S> {
@@ -1142,7 +1631,7 @@ fn parse_rpc_indices(
                             aud.push((start, start + 1));
                         }
                     } else {
-                        jacquard_common::types::did::validate_did(value)?;
+                        validate_did_service(value)?;
                         if let Some(pos) = token.find(value) {
                             let start = base + pos as u16;
                             let end = start + value.len() as u16;
@@ -1173,7 +1662,7 @@ fn parse_rpc_indices(
                                 aud.push((start, start + 1));
                             }
                         } else {
-                            jacquard_common::types::did::validate_did(value)?;
+                            validate_did_service(value)?;
                             if let Some(pos) = token.find(value) {
                                 let start = base + pos as u16;
                                 let end = start + value.len() as u16;
@@ -1253,29 +1742,9 @@ fn parse_include_indices(
                         )
                     })?;
 
-                    // Validate the DID portion (before any #).
-                    let did_part = decoded.split('#').next().unwrap_or("");
-                    jacquard_common::types::did::validate_did(did_part)?;
-                    if decoded.contains('#') {
-                        let frag = decoded.split('#').nth(1).unwrap_or("");
-                        if frag.is_empty() {
-                            return Err(ParseError::InvalidResource(
-                                "include audience fragment cannot be empty".to_smolstr(),
-                            ));
-                        }
-                    }
+                    validate_did_service(&decoded)?;
                 } else {
-                    // Unencoded: validate the DID portion before `#`.
-                    let did_part = aud_value.split('#').next().unwrap_or("");
-                    jacquard_common::types::did::validate_did(did_part)?;
-                    if aud_value.contains('#') {
-                        let frag = aud_value.split('#').nth(1).unwrap_or("");
-                        if frag.is_empty() {
-                            return Err(ParseError::InvalidResource(
-                                "include audience fragment cannot be empty".to_smolstr(),
-                            ));
-                        }
-                    }
+                    validate_did_service(aud_value)?;
                 }
 
                 // Find the audience's byte position in the token.
@@ -1496,7 +1965,7 @@ unsafe fn reconstruct_scope<'a>(buffer: &'a str, indices: &ScopeIndices) -> Scop
                     if s == "*" {
                         aud_set.insert(RpcAudience::All);
                     } else {
-                        aud_set.insert(RpcAudience::Did(unsafe { Did::unchecked(s) }));
+                        aud_set.insert(RpcAudience::Did(unsafe { DidService::unchecked(s) }));
                     }
                 }
             }
@@ -1560,6 +2029,7 @@ impl<S: BosStr + Ord> Scope<S> {
             "rpc",
             "atproto",
             "transition",
+            "include",
             "openid",
             "profile",
             "email",
@@ -1599,6 +2069,7 @@ impl<S: BosStr + Ord> Scope<S> {
             "rpc" => Self::parse_rpc(suffix),
             "atproto" => Self::parse_atproto(suffix),
             "transition" => Self::parse_transition(suffix),
+            "include" => Self::parse_include(suffix),
             "openid" => Self::parse_openid(suffix),
             "profile" => Self::parse_profile(suffix),
             "email" => Self::parse_email(suffix),
@@ -1774,7 +2245,7 @@ impl<S: BosStr + Ord> Scope<S> {
                         if *value == "*" {
                             aud.insert(RpcAudience::All);
                         } else {
-                            aud.insert(RpcAudience::Did(Did::from_str(*value)?));
+                            aud.insert(RpcAudience::Did(DidService::from_str(*value)?));
                         }
                     }
                 }
@@ -1792,7 +2263,7 @@ impl<S: BosStr + Ord> Scope<S> {
                             if *value == "*" {
                                 aud.insert(RpcAudience::All);
                             } else {
-                                aud.insert(RpcAudience::Did(Did::from_str(*value)?));
+                                aud.insert(RpcAudience::Did(DidService::from_str(*value)?));
                             }
                         }
                     }
@@ -1832,6 +2303,43 @@ impl<S: BosStr + Ord> Scope<S> {
         };
 
         Ok(Scope::Transition(scope))
+    }
+
+    fn parse_include<'a>(suffix: Option<&'a str>) -> Result<Self, ParseError>
+    where
+        S: FromStr,
+    {
+        let (nsid_str, params) = match suffix {
+            Some(s) => {
+                if let Some(pos) = s.find('?') {
+                    (&s[..pos], Some(&s[pos + 1..]))
+                } else {
+                    (s, None)
+                }
+            }
+            None => return Err(ParseError::MissingResource),
+        };
+
+        let audience = if let Some(params) = params {
+            let parsed_params = parse_query_string(params);
+            parsed_params
+                .get("aud")
+                .and_then(|values| values.first())
+                .map(|audience| {
+                    let normalized = normalize_include_audience(audience)?;
+                    S::from_str(normalized.as_str()).map_err(|_| {
+                        ParseError::InvalidResource("invalid include audience".to_smolstr())
+                    })
+                })
+                .transpose()?
+        } else {
+            None
+        };
+
+        Ok(Scope::Include(IncludeScope {
+            nsid: Nsid::from_str(nsid_str)?,
+            audience,
+        }))
     }
 
     fn parse_openid(suffix: Option<&str>) -> Result<Self, ParseError> {
@@ -2246,7 +2754,7 @@ impl fmt::Display for ParseError {
 #[cfg(feature = "scope-check")]
 pub fn expand_permission_set(
     perm_set: &jacquard_lexicon::lexicon::LexPermissionSet<'static>,
-    inherited_audience: Option<&Did<SmolStr>>,
+    inherited_audience: Option<&DidService<SmolStr>>,
 ) -> Result<Vec<Scope<SmolStr>>, PermissionSetConversionError> {
     use jacquard_lexicon::lexicon::{LexPermission, LexPermissionResource};
 
@@ -2382,6 +2890,131 @@ mod tests {
     use super::*;
     #[cfg(feature = "scope-check")]
     use jacquard_common::CowStr;
+    use jacquard_common::xrpc::{XrpcMethod, XrpcResp};
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, Serialize, Deserialize)]
+    struct TestRequest;
+
+    #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, thiserror::Error)]
+    #[error("test error")]
+    struct TestError;
+
+    struct TestResponse;
+
+    impl XrpcResp for TestResponse {
+        const NSID: &'static str = "app.bsky.feed.getTimeline";
+        const ENCODING: &'static str = "application/json";
+        type Output<S: BosStr> = ();
+        type Err = TestError;
+    }
+
+    impl XrpcRequest for TestRequest {
+        const NSID: &'static str = "app.bsky.feed.getTimeline";
+        const METHOD: XrpcMethod = XrpcMethod::Query;
+        type Response = TestResponse;
+    }
+
+    struct TestCollection;
+
+    impl Collection for TestCollection {
+        const NSID: &'static str = "app.bsky.feed.post";
+        type Record = TestResponse;
+    }
+
+    #[test]
+    fn test_scope_constructors() {
+        assert_eq!(Scope::atproto().to_string_normalized(), "atproto");
+        assert_eq!(
+            Scope::identity_handle().to_string_normalized(),
+            "identity:handle"
+        );
+        assert_eq!(
+            Scope::account_repo_manage().to_string_normalized(),
+            "account:repo?action=manage"
+        );
+        assert_eq!(Scope::repo_all().to_string_normalized(), "repo:*");
+        assert_eq!(
+            Scope::repo_create("app.bsky.feed.post")
+                .unwrap()
+                .to_string_normalized(),
+            "repo:app.bsky.feed.post?action=create"
+        );
+        assert_eq!(
+            Scope::rpc("app.bsky.feed.getTimeline")
+                .unwrap()
+                .to_string_normalized(),
+            "rpc:app.bsky.feed.getTimeline"
+        );
+        assert_eq!(
+            Scope::rpc_aud(
+                "app.bsky.feed.getTimeline",
+                "did:plc:yfvwmnlztr4dwkb7hwz55r2g"
+            )
+            .unwrap()
+            .to_string_normalized(),
+            "rpc?aud=did:plc:yfvwmnlztr4dwkb7hwz55r2g&lxm=app.bsky.feed.getTimeline"
+        );
+        assert_eq!(
+            Scope::include_aud("app.bsky.authFull", "did:web:example.com#svc")
+                .unwrap()
+                .to_string_normalized(),
+            "include:app.bsky.authFull?aud=did:web:example.com%23svc"
+        );
+    }
+
+    #[test]
+    fn test_endpoint_and_collection_scope_constructors() {
+        assert_eq!(
+            Scope::rpc_request::<TestRequest>().to_string_normalized(),
+            "rpc:app.bsky.feed.getTimeline"
+        );
+        assert_eq!(
+            Scope::repo_create_record::<TestCollection>().to_string_normalized(),
+            "repo:app.bsky.feed.post?action=create"
+        );
+        assert_eq!(
+            Scope::repo_all_record::<TestCollection>().to_string_normalized(),
+            "repo:app.bsky.feed.post"
+        );
+    }
+
+    #[test]
+    fn test_scopes_from_scopes_and_builder() {
+        let scopes = Scopes::from_scopes([
+            Scope::repo_create("app.bsky.feed.post").unwrap(),
+            Scope::repo_all(),
+            Scope::atproto(),
+        ])
+        .unwrap();
+
+        assert_eq!(scopes.to_normalized_string(), "atproto repo:*");
+
+        let built = Scopes::builder()
+            .atproto()
+            .transition_generic()
+            .rpc_request::<TestRequest>()
+            .repo_create_record::<TestCollection>()
+            .include("app.bsky.authFull")
+            .unwrap()
+            .build()
+            .unwrap();
+
+        assert_eq!(
+            built.to_normalized_string(),
+            "atproto include:app.bsky.authFull repo:app.bsky.feed.post?action=create rpc:app.bsky.feed.getTimeline transition:generic"
+        );
+    }
+
+    #[test]
+    fn test_single_scope_include_parsing() {
+        let scope: Scope =
+            Scope::parse("include:app.bsky.authFull?aud=did:web:example.com#svc").unwrap();
+        assert_eq!(
+            scope.to_string_normalized(),
+            "include:app.bsky.authFull?aud=did:web:example.com%23svc"
+        );
+    }
 
     #[test]
     fn test_account_scope_parsing() {
@@ -2512,7 +3145,7 @@ mod tests {
             Nsid::new_owned("com.example.service").unwrap(),
         ));
         aud.insert(RpcAudience::Did(
-            Did::new_owned("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
+            DidService::new_owned("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
         ));
         assert_eq!(scope, Scope::Rpc(RpcScope { lxm, aud }));
 
@@ -2528,7 +3161,7 @@ mod tests {
             Nsid::new_owned("com.example.method2").unwrap(),
         ));
         aud.insert(RpcAudience::Did(
-            Did::new_owned("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
+            DidService::new_owned("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
         ));
         assert_eq!(scope, Scope::Rpc(RpcScope { lxm, aud }));
     }
@@ -4029,7 +4662,7 @@ mod tests {
             permissions: perms,
         };
 
-        let inherited_did = Did::new_static("did:web:example.com").unwrap();
+        let inherited_did = DidService::new_static("did:web:example.com").unwrap();
         let scopes = expand_permission_set(&perm_set, Some(&inherited_did)).unwrap();
         assert_eq!(scopes.len(), 1);
 
@@ -4053,7 +4686,7 @@ mod tests {
         perms.push(LexPermission::Permission {
             resource: LexPermissionResource::Rpc {
                 lxm: vec![Nsid::new_static("app.bsky.feed.getTimeline").unwrap()],
-                aud: Some(Did::new_static("did:web:custom.com").unwrap()),
+                aud: Some(DidService::new_static("did:web:custom.com").unwrap()),
                 inherit_aud: None,
             },
         });

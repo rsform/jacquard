@@ -7,6 +7,7 @@ use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::oauth::types::AuthorizeOptions;
 use jacquard::types::string::Datetime;
 use jacquard_common::deps::fluent_uri::Uri;
+use jacquard_oauth::scopes::Scopes;
 use miette::IntoDiagnostic;
 
 #[derive(Parser, Debug)]
@@ -41,7 +42,9 @@ async fn main() -> miette::Result<()> {
     let Some(session) = oauth
         .resume_or_login_with_local_server(
             &hint,
-            AuthorizeOptions::default(),
+            AuthorizeOptions::default()
+                // repo record creation scoped to the 'com.whtwnd.blog.entry' NSID
+                .with_scopes(Scopes::builder().repo_create_record::<Entry>().build()?),
             LoopbackConfig::default(),
         )
         .await?

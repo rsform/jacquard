@@ -6,10 +6,12 @@ use jacquard_common::{
     CowStr,
     deps::smol_str::SmolStr,
     into_static::IntoStatic,
-    types::blob::MimeType,
-    types::did::Did,
-    types::nsid::Nsid,
-    types::scope_primitives::{AccountAction, RepoAction},
+    types::{
+        blob::MimeType,
+        nsid::Nsid,
+        scope_primitives::{AccountAction, RepoAction},
+        string::DidService,
+    },
 };
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
@@ -455,9 +457,9 @@ pub enum LexPermissionResource<'s> {
         /// Lexicon method NSIDs this permission applies to.
         #[serde(borrow)]
         lxm: Vec<Nsid<CowStr<'s>>>,
-        /// Audience DID for inter-service auth.
+        /// Audience DID with optional service fragment for inter-service auth.
         #[serde(borrow, default)]
-        aud: Option<Did<CowStr<'s>>>,
+        aud: Option<DidService<CowStr<'s>>>,
         /// If true, inherits audience from the include scope's aud parameter.
         #[serde(default, rename = "inheritAud")]
         inherit_aud: Option<bool>,

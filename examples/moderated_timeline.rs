@@ -12,7 +12,8 @@ use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::oauth::types::AuthorizeOptions;
 use jacquard::xrpc::{CallOptions, XrpcClient};
 use jacquard_api::app_bsky::feed::{ReplyRefParent, ReplyRefRoot};
-use jacquard_api::app_bsky::labeler::get_services::GetServicesOutputViewsItem;
+use jacquard_api::app_bsky::labeler::get_services::{GetServices, GetServicesOutputViewsItem};
+use jacquard_oauth::scopes::Scopes;
 use smol_str::ToSmolStr;
 
 // To save having to fetch prefs, etc., we're borrowing some from our test cases.
@@ -71,7 +72,13 @@ async fn main() -> miette::Result<()> {
     let Some(session) = oauth
         .resume_or_login_with_local_server(
             &hint,
-            AuthorizeOptions::default(),
+            AuthorizeOptions::default().with_scopes(
+                Scopes::builder()
+                    .atproto()
+                    .rpc_request_aud::<GetTimeline>("did:web:api.bsky.app#bsky_appview")?
+                    .rpc_request_aud::<GetServices>("did:web:api.bsky.app#bsky_appview")?
+                    .build()?,
+            ),
             LoopbackConfig::default(),
         )
         .await?
@@ -144,17 +151,17 @@ async fn main() -> miette::Result<()> {
                             .ok()
                             .map(|p| p.text.to_string())
                             .unwrap_or_else(|| "<no text>".to_string());
-                        println!("@{}:\n{}", root.author.handle, root_text);
+                        println!("@{}:\n{}\n", root.author.handle, root_text);
                     }
                 }
                 let parent_text = from_data::<Post, _>(&parent.record)
                     .ok()
                     .map(|p| p.text.to_string())
                     .unwrap_or_else(|| "<no text>".to_string());
-                println!("@{}:\n{}", parent.author.handle, parent_text);
+                println!("@{}:\n{}\n", parent.author.handle, parent_text);
             }
         }
-        println!("@{}:\n{}", post.author.handle, text);
+        println!("@{}:\n{}\n", post.author.handle, text);
 
         // Show details for any part with moderation causes
         for (tag, decision) in decisions.iter() {

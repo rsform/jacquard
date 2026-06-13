@@ -45,10 +45,7 @@ use jacquard::{
     client::{Agent, FileAuthStore},
     common::deps::{fluent_uri::Uri, smol_str::SmolStr},
     oauth::{
-        atproto::{AtprotoClientMetadata, GrantType},
-        client::OAuthClient,
-        keyset::Keyset,
-        scopes::Scopes,
+        atproto::AtprotoClientMetadata, client::OAuthClient, keyset::Keyset, scopes::Scopes,
         session::ClientData,
     },
     xrpc::XrpcClient,
@@ -279,21 +276,20 @@ fn hosted_client_metadata(base_url: &str) -> Result<AtprotoClientMetadata<SmolSt
         .map_err(|(err, _)| miette!("invalid client metadata URL: {err}"))?;
     let redirect_uri = Uri::parse(format!("{base_url}/oauth/callback"))
         .map_err(|(err, _)| miette!("invalid OAuth callback URL: {err}"))?;
-    let scopes = Scopes::new(SmolStr::new_static("atproto rpc:*"))
+    // The atproto scope-builder guide can help choose a suitable scope string:
+    // https://atproto.com/guides/scope-builder. The typed builder below is the
+    // Jacquard equivalent for code, and keeps the XRPC NSID tied to the endpoint type.
+    let scopes = Scopes::builder()
+        .atproto()
+        .rpc_request_aud::<GetTimeline>("did:web:public.api.bsky.app#bsky_appview")?
+        .build()
         .map_err(|err| miette!("invalid OAuth scopes: {err}"))?;
 
-    Ok(AtprotoClientMetadata {
+    Ok(AtprotoClientMetadata::new(
+        vec![redirect_uri],
         client_id,
-        client_uri: Some(client_uri),
-        redirect_uris: vec![redirect_uri],
-        grant_types: vec![GrantType::AuthorizationCode, GrantType::RefreshToken],
-        scopes,
-        jwks_uri: None,
-        client_name: Some(SmolStr::new_static("Jacquard Axum OAuth example")),
-        logo_uri: None,
-        tos_uri: None,
-        privacy_policy_uri: None,
-    })
+        Some(scopes),
+    ))
 }
 
 #[derive(Debug)]

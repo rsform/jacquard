@@ -7,6 +7,7 @@ use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::oauth::types::AuthorizeOptions;
 use jacquard::richtext::RichText;
 use jacquard::types::string::Datetime;
+use jacquard_oauth::scopes::Scopes;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -36,7 +37,14 @@ async fn main() -> miette::Result<()> {
     let Some(session) = oauth
         .resume_or_login_with_local_server(
             &hint,
-            AuthorizeOptions::default(),
+            AuthorizeOptions::default().with_scopes(
+                Scopes::builder()
+                    .include_aud(
+                        "app.bsky.authCreatePosts",
+                        "did:web:public.api.bsky.app#bsky_appview",
+                    )?
+                    .build()?,
+            ),
             LoopbackConfig::default(),
         )
         .await?

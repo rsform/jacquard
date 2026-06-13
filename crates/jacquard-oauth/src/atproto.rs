@@ -210,6 +210,24 @@ where
         self
     }
 
+    /// Set the OAuth scopes for this client.
+    pub fn with_scopes(mut self, scopes: Scopes<S>) -> Self {
+        self.scopes = scopes;
+        self
+    }
+
+    /// Set the uri where the client's keys are hosted.
+    pub fn with_jwks_uri(mut self, jwks_uri: Uri<String>) -> Self {
+        self.jwks_uri = Some(jwks_uri);
+        self
+    }
+
+    /// Set the human-readable display name for this client.
+    pub fn with_client_name(mut self, client_name: S) -> Self {
+        self.client_name = Some(client_name);
+        self
+    }
+
     /// Create a default loopback client metadata with the `atproto` and `transition:generic` scopes.
     ///
     /// This is a convenience constructor for local development and CLI tools. The resulting
@@ -223,6 +241,35 @@ where
             .expect("valid scopes")
             .convert();
         Self::new_localhost(None, Some(scopes))
+    }
+
+    /// Create hosted client metadata with optional custom scopes.
+    ///
+    /// When `scopes` is `None`, the `atproto` scope is used.
+    /// Use the builder functions to set fields like the jwks_uri or client name, etc.
+    pub fn new(
+        redirect_uris: Vec<Uri<String>>,
+        client_id: Uri<String>,
+        scopes: Option<Scopes<S>>,
+    ) -> AtprotoClientMetadata<S>
+    where
+        S: From<SmolStr> + AsRef<str>,
+    {
+        let default_scopes: Scopes<S> = Scopes::new(SmolStr::new_static("atproto"))
+            .expect("valid scopes")
+            .convert();
+        AtprotoClientMetadata {
+            client_id: client_id.clone(),
+            client_uri: Some(client_id),
+            redirect_uris: redirect_uris,
+            grant_types: vec![GrantType::AuthorizationCode, GrantType::RefreshToken],
+            scopes: scopes.unwrap_or(default_scopes),
+            jwks_uri: None,
+            client_name: None,
+            logo_uri: None,
+            tos_uri: None,
+            privacy_policy_uri: None,
+        }
     }
 
     /// Create loopback client metadata with optional custom redirect URIs and scopes.

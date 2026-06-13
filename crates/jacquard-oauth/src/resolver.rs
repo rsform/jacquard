@@ -824,7 +824,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
 pub async fn resolve_permission_set<R, S>(
     resolver: &R,
     nsid: &jacquard_common::types::nsid::Nsid<S>,
-    inherited_audience: Option<&jacquard_common::types::did::Did<smol_str::SmolStr>>,
+    inherited_audience: Option<&jacquard_common::types::string::DidService<smol_str::SmolStr>>,
 ) -> Result<Vec<crate::scopes::Scope<smol_str::SmolStr>>>
 where
     R: OAuthResolver + jacquard_identity::lexicon_resolver::LexiconSchemaResolver + Sync,
