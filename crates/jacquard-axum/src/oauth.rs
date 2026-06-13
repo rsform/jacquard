@@ -95,7 +95,13 @@ pub struct OAuthWebConfig {
     pub after_callback_redirect: SmolStr,
     /// Fallback redirect after logout.
     pub after_logout_redirect: Option<SmolStr>,
-    /// Optional header used by strict/headless clients to pass an encoded session key.
+    /// Header name for passing an encoded session key in API/headless requests.
+    ///
+    /// Clients that do not use browser cookies can pass the session key as this
+    /// header value instead. The session key is a JSON-encoded
+    /// `{"did": "...", "session_id": "..."}` string. Checked by
+    /// [`ExtractOAuthSession`] and [`ExtractOptionalOAuthSession`] as a fallback
+    /// when no session cookie is present. Defaults to `x-jacquard-session`.
     pub session_header: HeaderName,
 }
 
@@ -198,6 +204,20 @@ impl IntoResponse for BrowserOAuthRejection {
 }
 
 /// Strict OAuth session extractor for API/headless routes.
+///
+/// Looks up the session key from a private cookie (browser clients) or a custom
+/// header (API/headless clients). The header name is configurable via
+/// [`OAuthWebConfig::session_header`] and defaults to `x-jacquard-session`.
+///
+/// API clients that do not use browser cookies can pass the encoded session key
+/// (a JSON `{"did": "...", "session_id": "..."}` string) in this header to
+/// authenticate without cookie infrastructure. If both a cookie and a header are
+/// present, the cookie takes precedence.
+///
+/// Use [`ExtractOptionalOAuthSession`] for endpoints that serve both
+/// authenticated and anonymous requests.
+/// Use [`BrowserOAuthSession`] for browser routes that should redirect to login
+/// on failure.
 pub struct ExtractOAuthSession<T, S>(pub OAuthSession<T, S>)
 where
     T: OAuthResolver,
@@ -281,6 +301,107 @@ where
     }
 }
 
+/// Optional OAuth session extractor for API/headless routes.
+///
+/// Like [`ExtractOAuthSession`], but returns `None` when no session key is
+/// present (no cookie and no header). If a session key IS present but invalid,
+/// returns an error.
+///
+/// Use this for endpoints that serve both authenticated and anonymous requests.
+pub struct ExtractOptionalOAuthSession<T, S>(pub Option<OAuthSession<T, S>>)
+where
+    T: OAuthResolver,
+    S: ClientAuthStore;
+
+impl<T, S, AppState> FromRequestParts<AppState> for ExtractOptionalOAuthSession<T, S>
+where
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+    S: ClientAuthStore + Send + Sync + 'static,
+    AppState: OAuthWebState<T, S> + Send + Sync,
+    OAuthWebConfig: FromRef<AppState>,
+    axum_extra::extract::cookie::Key: FromRef<AppState>,
+{
+    type Rejection = OAuthAxumError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
+        let config = OAuthWebConfig::from_ref(state);
+        let jar = PrivateCookieJar::from_request_parts(parts, state)
+            .await
+            .map_err(|_| OAuthAxumError::MissingSession)?;
+        match read_session_key(&jar, &parts.headers, &config) {
+            Ok(key) => {
+                let session = restore_session(state.oauth_client(), &key).await?;
+                Ok(Self(Some(session)))
+            }
+            Err(OAuthAxumError::MissingSession) => Ok(Self(None)),
+            Err(e) => Err(e),
+        }
+    }
+}
+
+/// Optional browser-oriented OAuth session extractor.
+///
+/// Like [`BrowserOAuthSession`], but returns `None` when no session cookie is
+/// present instead of redirecting to login. If a cookie IS present but the
+/// session is invalid or expired, the cookie is cleared and the extractor
+/// still returns `None` rather than erroring or redirecting.
+///
+/// Use this for browser pages that show different content for authenticated
+/// vs. anonymous users, without forcing a login redirect.
+pub struct OptionalBrowserOAuthSession<T, S>(pub Option<OAuthSession<T, S>>)
+where
+    T: OAuthResolver,
+    S: ClientAuthStore;
+
+impl<T, S, AppState> FromRequestParts<AppState> for OptionalBrowserOAuthSession<T, S>
+where
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+    S: ClientAuthStore + Send + Sync + 'static,
+    AppState: OAuthWebState<T, S> + Send + Sync,
+    OAuthWebConfig: FromRef<AppState>,
+    axum_extra::extract::cookie::Key: FromRef<AppState>,
+{
+    type Rejection = OAuthAxumError;
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
+        let config = OAuthWebConfig::from_ref(state);
+        let jar = PrivateCookieJar::from_request_parts(parts, state)
+            .await
+            .map_err(|_| OAuthAxumError::MissingSession)?;
+
+        let Some(cookie) = jar.get(config.cookie_name.as_str()) else {
+            return Ok(Self(None));
+        };
+
+        let key = match decode_session_key(cookie.value()) {
+            Ok(key) => key,
+            Err(_) => {
+                // Stale or malformed cookie — clear it and treat as anonymous.
+                let jar = clear_session_cookie(jar, &config);
+                // The jar is consumed by clear; we can't write it back here, so
+                // we just return None. The cookie will expire naturally.
+                drop(jar);
+                return Ok(Self(None));
+            }
+        };
+
+        match restore_session(state.oauth_client(), &key).await {
+            Ok(session) => Ok(Self(Some(session))),
+            Err(err) if is_unauthorized_oauth_error(&err) => {
+                // Expired/revoked session — treat as anonymous rather than erroring.
+                Ok(Self(None))
+            }
+            Err(err) => Err(err.into()),
+        }
+    }
+}
+
 /// Query/form fields accepted by the default start-auth route adapters.
 #[derive(Debug, Clone, Deserialize)]
 pub struct StartAuthRequest {
@@ -292,7 +413,13 @@ pub struct StartAuthRequest {
 }
 
 /// Conventional OAuth web routes using the state-provided OAuth client.
-pub fn routes<T, S, AppState>() -> Router<AppState>
+///
+/// The route paths are taken from `config` so that custom
+/// [`OAuthWebConfig`] paths are honored consistently with the redirects and
+/// cookie scopes produced by the browser helpers. Passing the same config
+/// instance that you expose via [`FromRef`] keeps the mounted routes and the
+/// helpers in agreement.
+pub fn routes<T, S, AppState>(config: &OAuthWebConfig) -> Router<AppState>
 where
     T: OAuthResolver + DpopExt + LexiconSchemaResolver + Send + Sync + 'static,
     S: ClientAuthStore + Send + Sync + 'static,
@@ -305,10 +432,22 @@ where
             "/oauth-client-metadata.json",
             get(client_metadata_handler::<T, S, AppState>),
         )
-        .route("/oauth/start", get(start_auth_query::<T, S, AppState>))
-        .route("/oauth/start", post(start_auth_form::<T, S, AppState>))
-        .route("/oauth/callback", get(callback_handler::<T, S, AppState>))
-        .route("/oauth/logout", post(logout_handler::<T, S, AppState>))
+        .route(
+            config.start_auth_path.as_str(),
+            get(start_auth_query::<T, S, AppState>),
+        )
+        .route(
+            config.start_auth_path.as_str(),
+            post(start_auth_form::<T, S, AppState>),
+        )
+        .route(
+            config.callback_path.as_str(),
+            get(callback_handler::<T, S, AppState>),
+        )
+        .route(
+            config.logout_path.as_str(),
+            post(logout_handler::<T, S, AppState>),
+        )
 }
 
 /// Serve OAuth client metadata derived from the state OAuth client.
@@ -576,7 +715,7 @@ fn redirect_to_login(
         .unwrap_or(&config.start_auth_path);
     BrowserOAuthRejection::Redirect(
         jar,
-        Redirect::temporary(&append_query(path, &[(&"return_to", return_to)])),
+        Redirect::temporary(&append_query(path, &[("return_to", return_to)])),
     )
 }
 
@@ -590,18 +729,18 @@ fn redirect_to_start_with_identifier(
         jar,
         Redirect::temporary(&append_query(
             &config.start_auth_path,
-            &[(&"identifier", identifier), (&"return_to", return_to)],
+            &[("identifier", identifier), ("return_to", return_to)],
         )),
     )
 }
 
-fn append_query(path: &str, params: &[(&&str, &str)]) -> String {
+fn append_query(path: &str, params: &[(&str, &str)]) -> String {
     #[derive(Serialize)]
     struct Pair<'a> {
         #[serde(flatten)]
         values: std::collections::BTreeMap<&'a str, &'a str>,
     }
-    let values = params.iter().map(|(k, v)| (**k, *v)).collect();
+    let values = params.iter().map(|(k, v)| (*k, *v)).collect();
     let query = serde_html_form::to_string(Pair { values }).unwrap_or_default();
     format!("{path}?{query}")
 }

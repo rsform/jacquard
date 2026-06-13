@@ -10,28 +10,25 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Handle, UriValue};
+use jacquard_common::types::string::{Did, Handle, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_shinolabs::pinksea::app_view_defs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_shinolabs::pinksea::app_view_defs;
 /// An author for an oekaki post
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Author<S: BosStr = DefaultStr> {
     ///The DID of the author
     pub did: Did<S>,
@@ -44,10 +41,7 @@ pub struct Author<S: BosStr = DefaultStr> {
 /// A hydrated oekaki post returned from the PinkSea app view.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydratedOekaki<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,10 +67,7 @@ pub struct HydratedOekaki<S: BosStr = DefaultStr> {
 /// A tombstone for a missing oekaki.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OekakiTombstone<S: BosStr = DefaultStr> {
     ///The AT uri of the former oekaki.
     pub former_at: AtUri<S>,
@@ -141,7 +132,7 @@ impl<S: BosStr> LexiconSchema for OekakiTombstone<S> {
 
 pub mod author_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -232,7 +223,10 @@ where
     St::Did: author_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> AuthorBuilder<author_state::SetDid<St>, S> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> AuthorBuilder<author_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AuthorBuilder {
             _state: PhantomData,
@@ -286,10 +280,10 @@ where
 }
 
 fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.shinolabs.pinksea.appViewDefs"),
@@ -298,18 +292,21 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("author"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An author for an oekaki post")),
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("handle"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("An author for an oekaki post"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The DID of the author")),
+                                description: Some(
+                                    CowStr::new_static("The DID of the author"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -317,7 +314,9 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The handle of the author.")),
+                                description: Some(
+                                    CowStr::new_static("The handle of the author."),
+                                ),
                                 format: Some(LexStringFormat::Handle),
                                 ..Default::default()
                             }),
@@ -330,33 +329,39 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("hydratedOekaki"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A hydrated oekaki post returned from the PinkSea app view.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("image"),
-                        SmolStr::new_static("at"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("creationTime"),
-                        SmolStr::new_static("nsfw"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A hydrated oekaki post returned from the PinkSea app view.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("author"), SmolStr::new_static("image"),
+                            SmolStr::new_static("at"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("creationTime"),
+                            SmolStr::new_static("nsfw")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text description of the image, for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("at"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The AT protocol link.")),
+                                description: Some(
+                                    CowStr::new_static("The AT protocol link."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -401,9 +406,9 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "An array of tags this image had.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("An array of tags this image had."),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(640usize),
                                     ..Default::default()
@@ -420,7 +425,9 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("oekakiTombstone"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A tombstone for a missing oekaki.")),
+                    description: Some(
+                        CowStr::new_static("A tombstone for a missing oekaki."),
+                    ),
                     required: Some(vec![SmolStr::new_static("formerAt")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -428,9 +435,9 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("formerAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The AT uri of the former oekaki.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The AT uri of the former oekaki."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -448,7 +455,7 @@ fn lexicon_doc_com_shinolabs_pinksea_appViewDefs() -> LexiconDoc<'static> {
 
 pub mod hydrated_oekaki_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -559,7 +566,10 @@ pub mod hydrated_oekaki_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HydratedOekakiBuilder<St: hydrated_oekaki_state::State, S: BosStr = DefaultStr> {
+pub struct HydratedOekakiBuilder<
+    St: hydrated_oekaki_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -775,7 +785,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HydratedOekaki<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HydratedOekaki<S> {
         HydratedOekaki {
             alt: self._fields.0,
             at: self._fields.1.unwrap(),
@@ -792,7 +805,7 @@ where
 
 pub mod oekaki_tombstone_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -823,7 +836,10 @@ pub mod oekaki_tombstone_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct OekakiTombstoneBuilder<St: oekaki_tombstone_state::State, S: BosStr = DefaultStr> {
+pub struct OekakiTombstoneBuilder<
+    St: oekaki_tombstone_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -897,7 +913,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OekakiTombstone<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OekakiTombstone<S> {
         OekakiTombstone {
             former_at: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_user_intents::demo::declaration;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_user_intents::demo::declaration;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Intent<S: BosStr = DefaultStr> {
     ///indicates user intent for reuse. Note that this field is optional, and thus tri-state (true, false, undefined)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -149,7 +146,7 @@ impl<S: BosStr> LexiconSchema for Declaration<S> {
 
 pub mod intent_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -278,10 +275,10 @@ where
 }
 
 fn lexicon_doc_org_user_intents_demo_declaration() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.user-intents.demo.declaration"),
@@ -373,7 +370,7 @@ fn lexicon_doc_org_user_intents_demo_declaration() -> LexiconDoc<'static> {
 
 pub mod declaration_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -441,7 +438,10 @@ impl<S: BosStr> DeclarationBuilder<declaration_state::Empty, S> {
 
 impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `bulkDataset` field (optional)
-    pub fn bulk_dataset(mut self, value: impl Into<Option<declaration::Intent<S>>>) -> Self {
+    pub fn bulk_dataset(
+        mut self,
+        value: impl Into<Option<declaration::Intent<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -454,12 +454,18 @@ impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
 
 impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
     /// Set the `protocolBridging` field (optional)
-    pub fn protocol_bridging(mut self, value: impl Into<Option<declaration::Intent<S>>>) -> Self {
+    pub fn protocol_bridging(
+        mut self,
+        value: impl Into<Option<declaration::Intent<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `protocolBridging` field to an Option value (optional)
-    pub fn maybe_protocol_bridging(mut self, value: Option<declaration::Intent<S>>) -> Self {
+    pub fn maybe_protocol_bridging(
+        mut self,
+        value: Option<declaration::Intent<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -475,7 +481,10 @@ impl<St: declaration_state::State, S: BosStr> DeclarationBuilder<St, S> {
         self
     }
     /// Set the `publicAccessArchive` field to an Option value (optional)
-    pub fn maybe_public_access_archive(mut self, value: Option<declaration::Intent<S>>) -> Self {
+    pub fn maybe_public_access_archive(
+        mut self,
+        value: Option<declaration::Intent<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -529,7 +538,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Declaration<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Declaration<S> {
         Declaration {
             bulk_dataset: self._fields.0,
             protocol_bridging: self._fields.1,

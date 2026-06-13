@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ToggleListItem<S: BosStr = DefaultStr> {
     ///AT URI of the game record.
     pub game_uri: AtUri<S>,
@@ -31,11 +28,9 @@ pub struct ToggleListItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ToggleListItemOutput<S: BosStr = DefaultStr> {
     ///Whether the game was added to or removed from the list.
     pub action: ToggleListItemOutputAction<S>,
@@ -97,7 +92,8 @@ impl<S: BosStr> Serialize for ToggleListItemOutputAction<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ToggleListItemOutputAction<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ToggleListItemOutputAction<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -143,8 +139,9 @@ impl jacquard_common::xrpc::XrpcResp for ToggleListItemResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ToggleListItem<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.toggleListItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ToggleListItemResponse;
 }
 
@@ -154,15 +151,16 @@ Path: `/xrpc/games.gamesgamesgamesgames.toggleListItem`. The request payload typ
 pub struct ToggleListItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ToggleListItemRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.toggleListItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ToggleListItem<S>;
     type Response = ToggleListItemResponse;
 }
 
 pub mod toggle_list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -205,7 +203,10 @@ pub mod toggle_list_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ToggleListItemBuilder<St: toggle_list_item_state::State, S: BosStr = DefaultStr> {
+pub struct ToggleListItemBuilder<
+    St: toggle_list_item_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -300,7 +301,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ToggleListItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ToggleListItem<S> {
         ToggleListItem {
             game_uri: self._fields.0.unwrap(),
             list_uri: self._fields.1.unwrap(),

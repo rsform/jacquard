@@ -18,6 +18,35 @@
 
 - `Cow<'a, str>` now supported by borrow-or-share pattern traits
 
+**OAuth Permission Sets, refactored scopes** (`jacquard-oauth`, `jacquard`, `jacquard-lexicon`)
+- Added `Scopes<S>` validated container for space-separated OAuth scope strings, replacing `Vec<Scope<S>>`. Stores a single string buffer with pre-computed byte-range indices, yielding zero-copy `Scope<&str>` views.
+- Added `IncludeScope<S>` scope variant referencing permission set NSIDs with optional `?aud=<did>` audience.
+- Added permission set lexicon types (`LexPermissionSet`, `LexPermission`, `LexPermissionResource`) in jacquard-lexicon.
+- Added `expand_permission_set()` and `resolve_permission_set()` for converting permission set lexicons into concrete scopes.
+- Added `scope-check` feature to jacquard-oauth and jacquard, enabling client-side scope validation and eager resolution of `include:` scopes at session creation.
+
+**Bootstrap XRPC types** (`jacquard-common`)
+- Added `DidService<S>` validated type for DID audiences with optional service-id fragments (e.g., `did:web:example.com#bsky_appview`).
+- Added OAuth scope primitive enums (`AccountResource`, `AccountAction`, `RepoAction`) shared between OAuth scopes and permission set lexicons.
+- Added bootstrap types for `com.atproto.repo.createRecord`, `putRecord`, `deleteRecord`, and `uploadBlob`, and `com.atproto.server.createSession`, `getSession`, and `refreshSession`, allowing record helpers and credential sessions to function without depending on the generated API crate.
+
+**Repository high-level API** (`jacquard-repo`)
+- Added `Repository<S, BS>` high-level wrapper with record CRUD methods (`create_record`, `update_record`, `delete_record`, `list_collection`).
+- Added `to_firehose_commit`, `to_repo_ops`, and `to_invertible_op` firehose conversion helpers.
+
+**Lexicon schema resolution** (`jacquard-identity`)
+- Added `LexiconSchemaResolver` trait and `ResolvedLexiconSchema` for runtime lexicon schema fetching and validation.
+- Added `ResolverCaches` and `CacheConfig` for configurable caching.
+
+**Loopback OAuth** (`jacquard-oauth`)
+- Replaced `rouille` dependency with a lightweight raw TCP listener for the localhost callback server.
+- Improved the OAuth callback success page with proper HTML.
+
+**Client** (`jacquard`)
+- Added browser/BFF auth store (`BrowserAuthStore`) and front-end proxy session support for browser-based OAuth flows.
+- Added concrete app-password session helpers: `CredentialSessionSelector`, `resume_or_login`, `login_with_hint`, `restore`, `switch_session`, `logout`.
+- Added `AtpSession::merge_refresh` and `AtpSession::pds_from_data` helpers.
+
 **`jacquard-axum` re-added and overhauled**
 - Reworked XRPC extractor to work with borrow-or-share types. Backing type for the query or body of the input can differ from the handler-visible backing type, to allow for non-overlapping extractor impls for the different backing types so that the potentially borrowed types like `CowStr<'_>` can still be used.
 - Better type enforcement in handler responses by default.
@@ -38,8 +67,16 @@
 - Reduced allocations in the `atproto!()` macro by cleverly allowing use of the `FromStaticStr` constructions method or `SmolStr::new_static()` constructor in keys and values.
 - Improved type inference in the `atproto!()` macro and several other locations by explicitly defaulting to `DefaultStr` more clearly.
 
+**Type cleanup**
+- Migrated `GetRecord` bootstrap type from lifetime-based `CowStr<'a>` to borrow-or-share `GetRecord<S: BosStr>`, consistent with all other bootstrap types.
+- Removed intermediate `OAuthSession` and `OAuthState` serialization structs from `jacquard`; `FileAuthStore` now serializes `ClientSessionData` and `AuthRequestData` directly.
+- Changed credential session methods (`login`, `authenticated`, `restore`, `switch_session`) to take `&str` parameters instead of `CowStr<'_>`, eliminating unnecessary lifetime exposure.
+- Changed `CredentialLoginOptions` from `CredentialLoginOptions<'a>` with `CowStr<'a>` fields to owned `SmolStr` fields.
+- Switched record helpers in `AgentSessionExt` to use bootstrap types from `jacquard-common`, enabling them to work without the `api` feature in some cases.
+
 **Codegen** 
 - Added some improved doc comment creation paths in lexicon-generated code
+- Fixed multi-line doc comment generation to use per-line `#[doc]` attributes, preventing rustdoc from interpreting indented continuation lines as code blocks (which caused broken doctests).
 - **Generated builders now have two entry points:**
   - `Type::new()` picks `DefaultStr` as the backing type. This avoids awkward turbofishes or explicit annotations in many scenarios where the builder couldn't work out what type it needed to be from the immediate surroundings.
   - `Type::builder()` allows the caller to choose, either explicitly via turbofish, or implicitly via inference if possible, the backing type (the previous behaviour).

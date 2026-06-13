@@ -10,7 +10,7 @@ use jacquard_common::{
     BosStr,
     deps::smol_str,
     http_client::HttpClient,
-    types::{cid::Cid, did::Did, string::Nsid},
+    types::{cid::Cid, did::Did, ident::AtIdentifier, string::Nsid, string::RecordKey},
 };
 use smol_str::SmolStr;
 
@@ -485,8 +485,6 @@ impl<C: HttpClient + Sync> LexiconSchemaResolver for crate::JacquardResolver<C> 
         use jacquard_common::xrpc::atproto::GetRecord;
         use jacquard_common::{IntoStatic, xrpc::XrpcExt};
 
-        use jacquard_common::CowStr;
-
         let nsid_str = nsid.as_str();
         let owned_nsid: Nsid = Nsid::new_owned(nsid_str).expect("already validated NSID");
 
@@ -499,7 +497,6 @@ impl<C: HttpClient + Sync> LexiconSchemaResolver for crate::JacquardResolver<C> 
         }
 
         // Perform resolution
-        //#[cfg(feature = "dns")]
         let result = async {
             // 1. Resolve authority DID via DNS
             let authority_did = self.resolve_lexicon_authority(nsid).await?;
@@ -522,13 +519,13 @@ impl<C: HttpClient + Sync> LexiconSchemaResolver for crate::JacquardResolver<C> 
             tracing::trace!("fetching lexicon {} from PDS {}", nsid, pds);
 
             // 3. Fetch lexicon record via XRPC getRecord
-            let collection = Nsid::new("com.atproto.lexicon.schema")
+            let collection = Nsid::new_owned("com.atproto.lexicon.schema")
                 .map_err(|_| LexiconResolutionError::invalid_collection())?;
 
             let request = GetRecord {
-                repo: authority_did.clone().convert::<CowStr<'_>>().into(),
-                collection: collection.convert::<CowStr<'_>>(),
-                rkey: CowStr::from(nsid_str),
+                repo: AtIdentifier::Did(authority_did.clone()),
+                collection,
+                rkey: RecordKey::any_owned(nsid_str).unwrap(),
                 cid: None,
             };
 

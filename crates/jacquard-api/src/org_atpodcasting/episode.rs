@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,18 +25,15 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_atpodcasting::PodcastRef;
-use crate::org_atpodcasting::episode;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_atpodcasting::PodcastRef;
+use crate::org_atpodcasting::episode;
 /// Reference to an externally hosted chapters file.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChaptersRef<S: BosStr = DefaultStr> {
     ///MIME type of the chapters file (e.g. application/json+chapters).
     pub mime_type: S,
@@ -201,10 +198,7 @@ pub struct EpisodeGetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to an externally hosted media file.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MediaRef<S: BosStr = DefaultStr> {
     ///MIME type of the media file (e.g. audio/mpeg, video/mp4).
     pub mime_type: S,
@@ -217,10 +211,7 @@ pub struct MediaRef<S: BosStr = DefaultStr> {
 /// Reference to an externally hosted transcript file.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TranscriptRef<S: BosStr = DefaultStr> {
     ///Language of the transcript (ISO 639-1 two-letter code, e.g. 'en', 'es', 'pt').
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -318,20 +309,25 @@ impl<S: BosStr> LexiconSchema for Episode<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("artwork"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -443,7 +439,7 @@ impl<S: BosStr> LexiconSchema for TranscriptRef<S> {
 
 pub mod chapters_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -581,7 +577,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChaptersRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ChaptersRef<S> {
         ChaptersRef {
             mime_type: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),
@@ -591,10 +590,10 @@ where
 }
 
 fn lexicon_doc_org_atpodcasting_episode() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.atpodcasting.episode"),
@@ -834,29 +833,34 @@ fn lexicon_doc_org_atpodcasting_episode() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("mediaRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to an externally hosted media file.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("url"),
-                        SmolStr::new_static("mimeType"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to an externally hosted media file.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("url"), SmolStr::new_static("mimeType")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("mimeType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MIME type of the media file (e.g. audio/mpeg, video/mp4).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "MIME type of the media file (e.g. audio/mpeg, video/mp4).",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("URL of the media file.")),
+                                description: Some(
+                                    CowStr::new_static("URL of the media file."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -926,7 +930,7 @@ fn lexicon_doc_org_atpodcasting_episode() -> LexiconDoc<'static> {
 
 pub mod episode_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1103,8 +1107,23 @@ impl EpisodeBuilder<episode_state::Empty, DefaultStr> {
         EpisodeBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1117,8 +1136,23 @@ impl<S: BosStr> EpisodeBuilder<episode_state::Empty, S> {
         EpisodeBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1127,12 +1161,18 @@ impl<S: BosStr> EpisodeBuilder<episode_state::Empty, S> {
 
 impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `alternateMedia` field (optional)
-    pub fn alternate_media(mut self, value: impl Into<Option<Vec<episode::MediaRef<S>>>>) -> Self {
+    pub fn alternate_media(
+        mut self,
+        value: impl Into<Option<Vec<episode::MediaRef<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alternateMedia` field to an Option value (optional)
-    pub fn maybe_alternate_media(mut self, value: Option<Vec<episode::MediaRef<S>>>) -> Self {
+    pub fn maybe_alternate_media(
+        mut self,
+        value: Option<Vec<episode::MediaRef<S>>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1153,7 +1193,10 @@ impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
 
 impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `chapters` field (optional)
-    pub fn chapters(mut self, value: impl Into<Option<episode::ChaptersRef<S>>>) -> Self {
+    pub fn chapters(
+        mut self,
+        value: impl Into<Option<episode::ChaptersRef<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -1230,7 +1273,10 @@ impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
 
 impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `episodeType` field (optional)
-    pub fn episode_type(mut self, value: impl Into<Option<EpisodeEpisodeType<S>>>) -> Self {
+    pub fn episode_type(
+        mut self,
+        value: impl Into<Option<EpisodeEpisodeType<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -1362,7 +1408,10 @@ where
     St::Title: episode_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> EpisodeBuilder<episode_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> EpisodeBuilder<episode_state::SetTitle<St>, S> {
         self._fields.15 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
@@ -1374,12 +1423,18 @@ where
 
 impl<St: episode_state::State, S: BosStr> EpisodeBuilder<St, S> {
     /// Set the `transcript` field (optional)
-    pub fn transcript(mut self, value: impl Into<Option<Vec<episode::TranscriptRef<S>>>>) -> Self {
+    pub fn transcript(
+        mut self,
+        value: impl Into<Option<Vec<episode::TranscriptRef<S>>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `transcript` field to an Option value (optional)
-    pub fn maybe_transcript(mut self, value: Option<Vec<episode::TranscriptRef<S>>>) -> Self {
+    pub fn maybe_transcript(
+        mut self,
+        value: Option<Vec<episode::TranscriptRef<S>>>,
+    ) -> Self {
         self._fields.16 = value;
         self
     }
@@ -1446,7 +1501,7 @@ where
 
 pub mod media_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1595,7 +1650,7 @@ where
 
 pub mod transcript_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1638,7 +1693,10 @@ pub mod transcript_ref_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TranscriptRefBuilder<St: transcript_ref_state::State, S: BosStr = DefaultStr> {
+pub struct TranscriptRefBuilder<
+    St: transcript_ref_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Language>, Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
@@ -1747,7 +1805,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TranscriptRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TranscriptRef<S> {
         TranscriptRef {
             language: self._fields.0,
             mime_type: self._fields.1.unwrap(),

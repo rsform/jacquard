@@ -371,9 +371,9 @@ async fn credential_login_and_auto_refresh() {
     // Login using handle; resolves to PDS and persists session
     session
         .login(
-            jacquard::CowStr::from("alice.bsky.social"),
-            jacquard::CowStr::from("apppass"),
-            Some(jacquard::CowStr::from("session")),
+            "alice.bsky.social",
+            "apppass",
+            Some("session"),
             None,
             None,
             None,

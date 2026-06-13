@@ -1,5 +1,4 @@
 use clap::Parser;
-use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::post::Post;
 use jacquard::client::credential_session::{
     CredentialLoginOptions, CredentialResumeResult, CredentialSession,
@@ -14,10 +13,10 @@ use std::sync::Arc;
 #[command(author, version, about = "Create a simple post")]
 struct Args {
     /// Optional handle, DID, or email used to resume or start app-password auth.
-    input: Option<CowStr<'static>>,
+    identifier: Option<String>,
 
     /// App password, required only when no stored credential session matches.
-    password: Option<CowStr<'static>>,
+    password: Option<String>,
 
     /// Post text.
     #[arg(short, long)]
@@ -38,7 +37,8 @@ async fn main() -> miette::Result<()> {
         Default::default(),
     ));
     let session = CredentialSession::new(store, resolver);
-    let hint = SessionHint::from_optional_input(args.input.as_ref().map(|input| input.as_ref()));
+    let hint =
+        SessionHint::from_optional_input(args.identifier.as_deref());
 
     let auth = match session.resume(&hint).await? {
         CredentialResumeResult::Resumed(auth) => auth,
@@ -53,8 +53,8 @@ async fn main() -> miette::Result<()> {
                 .login_from_challenge(
                     challenge,
                     CredentialLoginOptions {
-                        password: password.clone(),
-                        identifier: args.input.clone(),
+                        password: password.clone().into(),
+                        identifier: args.identifier.clone().map(Into::into),
                         allow_takendown: None,
                         auth_factor_token: None,
                         pds: None,

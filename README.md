@@ -129,8 +129,17 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 | `jacquard-lexgen` | Code generation binaries | [![Crates.io](https://img.shields.io/crates/v/jacquard-lexgen.svg)](https://crates.io/crates/jacquard-lexgen) [![Documentation](https://docs.rs/jacquard-lexgen/badge.svg)](https://docs.rs/jacquard-lexgen) |
 | `jacquard-derive` | Macros for lexicon types | [![Crates.io](https://img.shields.io/crates/v/jacquard-derive.svg)](https://crates.io/crates/jacquard-derive) [![Documentation](https://docs.rs/jacquard-derive/badge.svg)](https://docs.rs/jacquard-derive) |
 
-### Session Types
+### Which session type should I use?
 
+| Use case | Recommended path | Notes |
+|---|---|---|
+| Personal script or CLI/TUI where browser login works | Localhost (native/public) OAuth client with loopback helpers | Best default for “I want to log in locally and not think about auth.” |
+| User-facing local CLI/desktop app | Localhost (native/public) OAuth client with loopback helpers | Ensure use of appropriate scopes, NOT 'transition::generic'. |
+| Client-side browser app / SPA | Public OAuth client without localhost helpers | Host client metadata, use browser redirects, and persist auth state in a browser-storage-backed auth/session store. |
+| App server or web app with persistent backend | Confidential OAuth client | Use hosted metadata, stable redirect URIs, server-side secret/session storage, and appropriate scope choices. |
+| Long-running unattended job that must re-authenticate non-interactively | App password / credential session, unless it can operate as a confidential OAuth client | App passwords are appropriate when browser login is not acceptable and the process must recover non-interactively. |
+| Public unauthenticated reads | Stateless `.xrpc(...)` or `BasicClient::unauthenticated()` | None |
+| Custom protocol/session behavior | Lower-level traits and stores | Implement `XrpcClient`, `AgentSession`, `ClientAuthStore`, `SessionStore`, or related traits yourself. |
 
 
 ### Projects using Jacquard

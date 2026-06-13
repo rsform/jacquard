@@ -14,6 +14,7 @@ pub mod get_tag_list;
 pub mod get_tags;
 pub mod tag;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -30,17 +31,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_clippr::actor::ProfileView;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_clippr::actor::ProfileView;
 /// A view of a single bookmark (or 'clip').
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ClipView<S: BosStr = DefaultStr> {
     ///A reference to the actor's profile
     pub author: ProfileView<S>,
@@ -59,10 +57,7 @@ pub struct ClipView<S: BosStr = DefaultStr> {
 /// A view of a single tag.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TagView<S: BosStr = DefaultStr> {
     ///A reference to the actor's profile
     pub author: ProfileView<S>,
@@ -110,7 +105,7 @@ impl<S: BosStr> LexiconSchema for TagView<S> {
 
 pub mod clip_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -378,10 +373,10 @@ where
 }
 
 fn lexicon_doc_social_clippr_feed_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.clippr.feed.defs"),
@@ -390,30 +385,34 @@ fn lexicon_doc_social_clippr_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("clipView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A view of a single bookmark (or 'clip').",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A view of a single bookmark (or 'clip')."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("author"), SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("social.clippr.actor.defs#profileView"),
+                                r#ref: CowStr::new_static(
+                                    "social.clippr.actor.defs#profileView",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The CID of the clip")),
+                                description: Some(
+                                    CowStr::new_static("The CID of the clip"),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -421,9 +420,11 @@ fn lexicon_doc_social_clippr_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("indexedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the tag was first indexed by the AppView",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When the tag was first indexed by the AppView",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -437,7 +438,9 @@ fn lexicon_doc_social_clippr_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The AT-URI of the clip")),
+                                description: Some(
+                                    CowStr::new_static("The AT-URI of the clip"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -451,20 +454,22 @@ fn lexicon_doc_social_clippr_feed_defs() -> LexiconDoc<'static> {
                 SmolStr::new_static("tagView"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A view of a single tag.")),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("author"), SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("social.clippr.actor.defs#profileView"),
+                                r#ref: CowStr::new_static(
+                                    "social.clippr.actor.defs#profileView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -479,9 +484,11 @@ fn lexicon_doc_social_clippr_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("indexedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the tag was first indexed by the AppView",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "When the tag was first indexed by the AppView",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -495,7 +502,9 @@ fn lexicon_doc_social_clippr_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The AT-URI to the tag")),
+                                description: Some(
+                                    CowStr::new_static("The AT-URI to the tag"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -513,7 +522,7 @@ fn lexicon_doc_social_clippr_feed_defs() -> LexiconDoc<'static> {
 
 pub mod tag_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

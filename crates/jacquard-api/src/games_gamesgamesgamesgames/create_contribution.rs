@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateContribution<S: BosStr = DefaultStr> {
     ///A partial object with only changed fields.
     pub changes: Data<S>,
@@ -34,6 +31,7 @@ pub struct CreateContribution<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CreateContributionContributionType<S: BosStr = DefaultStr> {
@@ -84,7 +82,8 @@ impl<S: BosStr> Serialize for CreateContributionContributionType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CreateContributionContributionType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for CreateContributionContributionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -124,11 +123,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateContributionOutput<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -148,8 +145,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateContributionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateContribution<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.createContribution";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateContributionResponse;
 }
 
@@ -159,15 +157,16 @@ Path: `/xrpc/games.gamesgamesgamesgames.createContribution`. The request payload
 pub struct CreateContributionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateContributionRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.createContribution";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateContribution<S>;
     type Response = CreateContributionResponse;
 }
 
 pub mod create_contribution_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -210,7 +209,10 @@ pub mod create_contribution_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateContributionBuilder<St: create_contribution_state::State, S: BosStr = DefaultStr> {
+pub struct CreateContributionBuilder<
+    St: create_contribution_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
@@ -223,7 +225,10 @@ pub struct CreateContributionBuilder<St: create_contribution_state::State, S: Bo
 
 impl CreateContribution<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CreateContributionBuilder<create_contribution_state::Empty, DefaultStr> {
+    pub fn new() -> CreateContributionBuilder<
+        create_contribution_state::Empty,
+        DefaultStr,
+    > {
         CreateContributionBuilder::new()
     }
 }
@@ -285,7 +290,10 @@ where
     pub fn contribution_type(
         mut self,
         value: impl Into<CreateContributionContributionType<S>>,
-    ) -> CreateContributionBuilder<create_contribution_state::SetContributionType<St>, S> {
+    ) -> CreateContributionBuilder<
+        create_contribution_state::SetContributionType<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         CreateContributionBuilder {
             _state: PhantomData,
@@ -338,7 +346,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateContribution<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateContribution<S> {
         CreateContribution {
             changes: self._fields.0.unwrap(),
             contribution_type: self._fields.1.unwrap(),

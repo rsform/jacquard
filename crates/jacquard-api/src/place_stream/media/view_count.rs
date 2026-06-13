@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::place_stream::media::view_count;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::place_stream::media::view_count;
 /// A streamplace node's report of view counts for one place.stream.video over a closed time window. Published in the reporting node's server repo (not the streamer's), so a video served by multiple nodes accumulates multiple records — consumers are expected to sum across trusted reporters. The rkey is conventionally `<windowStart-as-tid>-<video-rkey>` so re-running the aggregator over the same window is idempotent. Counts represent the reporting node's best effort given the data it has; the `tracks` array carries the objective byte / duration totals it observed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -70,10 +70,7 @@ pub struct ViewCountGetRecordOutput<S: BosStr = DefaultStr> {
 /// One row of the tracks array: bytes + duration transferred for a single place.stream.media.track record over the window.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TrackUsage<S: BosStr = DefaultStr> {
     ///Total bytes served from this track over the window. Sum across attributed segment_requests' Range intersections with the track's segment offsets in the metafile.
     pub bytes: i64,
@@ -180,7 +177,7 @@ impl<S: BosStr> LexiconSchema for TrackUsage<S> {
 
 pub mod view_count_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -360,12 +357,18 @@ where
 
 impl<St: view_count_state::State, S: BosStr> ViewCountBuilder<St, S> {
     /// Set the `tracks` field (optional)
-    pub fn tracks(mut self, value: impl Into<Option<Vec<view_count::TrackUsage<S>>>>) -> Self {
+    pub fn tracks(
+        mut self,
+        value: impl Into<Option<Vec<view_count::TrackUsage<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `tracks` field to an Option value (optional)
-    pub fn maybe_tracks(mut self, value: Option<Vec<view_count::TrackUsage<S>>>) -> Self {
+    pub fn maybe_tracks(
+        mut self,
+        value: Option<Vec<view_count::TrackUsage<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -450,7 +453,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewCount<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ViewCount<S> {
         ViewCount {
             count: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),
@@ -464,10 +470,10 @@ where
 }
 
 fn lexicon_doc_place_stream_media_viewCount() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.media.viewCount"),
@@ -622,7 +628,7 @@ fn lexicon_doc_place_stream_media_viewCount() -> LexiconDoc<'static> {
 
 pub mod track_usage_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -795,7 +801,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TrackUsage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TrackUsage<S> {
         TrackUsage {
             bytes: self._fields.0.unwrap(),
             duration_ms: self._fields.1.unwrap(),

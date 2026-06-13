@@ -15,6 +15,7 @@ pub mod skill;
 pub mod style;
 pub mod vote;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -32,13 +33,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpriteSettings<S: BosStr = DefaultStr> {
     ///0=right, 1=back, 2=left, 3=front
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,7 +67,7 @@ impl<S: BosStr> LexiconSchema for SpriteSettings<S> {
 
 pub mod sprite_settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -100,7 +98,10 @@ pub mod sprite_settings_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SpriteSettingsBuilder<St: sprite_settings_state::State, S: BosStr = DefaultStr> {
+pub struct SpriteSettingsBuilder<
+    St: sprite_settings_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Data<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
@@ -202,7 +203,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SpriteSettings<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SpriteSettings<S> {
         SpriteSettings {
             current_anim_direction: self._fields.0,
             part_color_settings: self._fields.1,
@@ -213,10 +217,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.defs"),

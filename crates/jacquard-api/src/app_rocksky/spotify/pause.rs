@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /** Request marker for the `app.rocksky.spotify.pause` procedure.
 
 This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
@@ -34,8 +34,9 @@ impl jacquard_common::xrpc::XrpcResp for PauseResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Pause {
     const NSID: &'static str = "app.rocksky.spotify.pause";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PauseResponse;
 }
 
@@ -45,8 +46,9 @@ Path: `/xrpc/app.rocksky.spotify.pause`. The request payload type is `Pause`; us
 pub struct PauseRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for PauseRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.spotify.pause";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Pause;
     type Response = PauseResponse;
 }

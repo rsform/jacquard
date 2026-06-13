@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,18 +21,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::admin::AccountView;
 use crate::tools_ozone::signature::SigDetail;
 use crate::tools_ozone::signature::find_related_accounts;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FindRelatedAccounts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -43,11 +40,9 @@ pub struct FindRelatedAccounts<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FindRelatedAccountsOutput<S: BosStr = DefaultStr> {
     pub accounts: Vec<find_related_accounts::RelatedAccount<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,11 +51,9 @@ pub struct FindRelatedAccountsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RelatedAccount<S: BosStr = DefaultStr> {
     pub account: AccountView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -118,7 +111,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod find_related_accounts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -160,14 +153,20 @@ pub struct FindRelatedAccountsBuilder<
 
 impl FindRelatedAccounts<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> FindRelatedAccountsBuilder<find_related_accounts_state::Empty, DefaultStr> {
+    pub fn new() -> FindRelatedAccountsBuilder<
+        find_related_accounts_state::Empty,
+        DefaultStr,
+    > {
         FindRelatedAccountsBuilder::new()
     }
 }
 
 impl<S: BosStr> FindRelatedAccounts<S> {
     /// Create a new builder for this type
-    pub fn builder() -> FindRelatedAccountsBuilder<find_related_accounts_state::Empty, S> {
+    pub fn builder() -> FindRelatedAccountsBuilder<
+        find_related_accounts_state::Empty,
+        S,
+    > {
         FindRelatedAccountsBuilder::builder()
     }
 }
@@ -194,7 +193,10 @@ impl<S: BosStr> FindRelatedAccountsBuilder<find_related_accounts_state::Empty, S
     }
 }
 
-impl<St: find_related_accounts_state::State, S: BosStr> FindRelatedAccountsBuilder<St, S> {
+impl<
+    St: find_related_accounts_state::State,
+    S: BosStr,
+> FindRelatedAccountsBuilder<St, S> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -226,7 +228,10 @@ where
     }
 }
 
-impl<St: find_related_accounts_state::State, S: BosStr> FindRelatedAccountsBuilder<St, S> {
+impl<
+    St: find_related_accounts_state::State,
+    S: BosStr,
+> FindRelatedAccountsBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -256,7 +261,7 @@ where
 
 pub mod related_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -287,7 +292,10 @@ pub mod related_account_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RelatedAccountBuilder<St: related_account_state::State, S: BosStr = DefaultStr> {
+pub struct RelatedAccountBuilder<
+    St: related_account_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AccountView<S>>, Option<Vec<SigDetail<S>>>),
     _type: PhantomData<fn() -> S>,
@@ -375,7 +383,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RelatedAccount<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RelatedAccount<S> {
         RelatedAccount {
             account: self._fields.0.unwrap(),
             similarities: self._fields.1,
@@ -385,10 +396,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.signature.findRelatedAccounts"),
@@ -397,34 +408,36 @@ fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> LexiconDoc<'static
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("did")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("did"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("did")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("did"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -438,7 +451,9 @@ fn lexicon_doc_tools_ozone_signature_findRelatedAccounts() -> LexiconDoc<'static
                         map.insert(
                             SmolStr::new_static("account"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("com.atproto.admin.defs#accountView"),
+                                r#ref: CowStr::new_static(
+                                    "com.atproto.admin.defs#accountView",
+                                ),
                                 ..Default::default()
                             }),
                         );

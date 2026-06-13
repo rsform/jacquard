@@ -10,45 +10,46 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyOfNewEntry<S: BosStr = DefaultStr> {
     pub entry_uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyOfNewEntryOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum NotifyOfNewEntryError {
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for NotifyOfNewEntryError {
@@ -78,8 +79,9 @@ impl jacquard_common::xrpc::XrpcResp for NotifyOfNewEntryResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<S> {
     const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = NotifyOfNewEntryResponse;
 }
 
@@ -89,15 +91,16 @@ Path: `/xrpc/com.whtwnd.blog.notifyOfNewEntry`. The request payload type is `Not
 pub struct NotifyOfNewEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfNewEntryRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.notifyOfNewEntry";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = NotifyOfNewEntry<S>;
     type Response = NotifyOfNewEntryResponse;
 }
 
 pub mod notify_of_new_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -128,7 +131,10 @@ pub mod notify_of_new_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotifyOfNewEntryBuilder<St: notify_of_new_entry_state::State, S: BosStr = DefaultStr> {
+pub struct NotifyOfNewEntryBuilder<
+    St: notify_of_new_entry_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -136,7 +142,10 @@ pub struct NotifyOfNewEntryBuilder<St: notify_of_new_entry_state::State, S: BosS
 
 impl NotifyOfNewEntry<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> NotifyOfNewEntryBuilder<notify_of_new_entry_state::Empty, DefaultStr> {
+    pub fn new() -> NotifyOfNewEntryBuilder<
+        notify_of_new_entry_state::Empty,
+        DefaultStr,
+    > {
         NotifyOfNewEntryBuilder::new()
     }
 }
@@ -202,7 +211,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotifyOfNewEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotifyOfNewEntry<S> {
         NotifyOfNewEntry {
             entry_uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

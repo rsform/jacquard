@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_certified::Did;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::SmallBlob;
 use crate::org_hypercerts::Uri;
 use crate::org_hypercerts::context::evaluation;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// An evaluation of a hypercert record (e.g. an activity and its impact).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -67,6 +67,7 @@ pub struct Evaluation<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -91,10 +92,7 @@ pub struct EvaluationGetRecordOutput<S: BosStr = DefaultStr> {
 /// Overall score for an evaluation on a numeric scale.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Score<S: BosStr = DefaultStr> {
     ///Maximum value of the scale, e.g. 5 or 10.
     pub max: i64,
@@ -226,7 +224,7 @@ impl<S: BosStr> LexiconSchema for Score<S> {
 
 pub mod evaluation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -336,12 +334,18 @@ impl<S: BosStr> EvaluationBuilder<evaluation_state::Empty, S> {
 
 impl<St: evaluation_state::State, S: BosStr> EvaluationBuilder<St, S> {
     /// Set the `content` field (optional)
-    pub fn content(mut self, value: impl Into<Option<Vec<EvaluationContentItem<S>>>>) -> Self {
+    pub fn content(
+        mut self,
+        value: impl Into<Option<Vec<EvaluationContentItem<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `content` field to an Option value (optional)
-    pub fn maybe_content(mut self, value: Option<Vec<EvaluationContentItem<S>>>) -> Self {
+    pub fn maybe_content(
+        mut self,
+        value: Option<Vec<EvaluationContentItem<S>>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -478,7 +482,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Evaluation<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Evaluation<S> {
         Evaluation {
             content: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -494,10 +501,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_context_evaluation() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.context.evaluation"),
@@ -626,14 +633,17 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("score"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Overall score for an evaluation on a numeric scale.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("min"),
-                        SmolStr::new_static("max"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Overall score for an evaluation on a numeric scale.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("min"), SmolStr::new_static("max"),
+                            SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -668,7 +678,7 @@ fn lexicon_doc_org_hypercerts_context_evaluation() -> LexiconDoc<'static> {
 
 pub mod score_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -773,7 +783,10 @@ where
     St::Max: score_state::IsUnset,
 {
     /// Set the `max` field (required)
-    pub fn max(mut self, value: impl Into<i64>) -> ScoreBuilder<score_state::SetMax<St>, S> {
+    pub fn max(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScoreBuilder<score_state::SetMax<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ScoreBuilder {
             _state: PhantomData,
@@ -789,7 +802,10 @@ where
     St::Min: score_state::IsUnset,
 {
     /// Set the `min` field (required)
-    pub fn min(mut self, value: impl Into<i64>) -> ScoreBuilder<score_state::SetMin<St>, S> {
+    pub fn min(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScoreBuilder<score_state::SetMin<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ScoreBuilder {
             _state: PhantomData,
@@ -805,7 +821,10 @@ where
     St::Value: score_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(mut self, value: impl Into<i64>) -> ScoreBuilder<score_state::SetValue<St>, S> {
+    pub fn value(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScoreBuilder<score_state::SetValue<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ScoreBuilder {
             _state: PhantomData,

@@ -22,7 +22,7 @@
 //!     keyset: None,  // Will generate ES256 keypair if needed
 //!     config: AtprotoClientMetadata::default_localhost(),
 //! };
-//! let oauth = OAuthClient::new(store, client_data);
+//! let oauth = OAuthClient::new(store, client_data, reqwest::Client::new());
 //!
 //! // Start auth flow (with loopback feature)
 //! let session = oauth.login_with_local_server(

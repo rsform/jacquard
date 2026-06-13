@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::systems_timker::hawlt::note;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::systems_timker::hawlt::note;
 /// An image attachment with alt text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Attachment<S: BosStr = DefaultStr> {
     ///Alt text for the image. Required for accessibility.
     pub alt: S,
@@ -59,7 +56,7 @@ pub struct Note<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attachments: Option<Vec<note::Attachment<S>>>,
     /**The primary note content. Max 3000 graphemes, 30000 bytes
-    Note: large string limit is intentional for diary-style entries.*/
+Note: large string limit is intentional for diary-style entries.*/
     pub content: S,
     ///Content warning label. When present, note content should be hidden by default. Max 100 graphemes, 1000 bytes
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -146,16 +143,19 @@ impl<S: BosStr> LexiconSchema for Attachment<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -289,7 +289,7 @@ impl<S: BosStr> LexiconSchema for Note<S> {
 
 pub mod attachment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -427,7 +427,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Attachment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Attachment<S> {
         Attachment {
             alt: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -437,10 +440,10 @@ where
 }
 
 fn lexicon_doc_systems_timker_hawlt_note() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("systems.timker.hawlt.note"),
@@ -449,20 +452,23 @@ fn lexicon_doc_systems_timker_hawlt_note() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("attachment"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An image attachment with alt text.")),
-                    required: Some(vec![
-                        SmolStr::new_static("image"),
-                        SmolStr::new_static("alt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("An image attachment with alt text."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("image"), SmolStr::new_static("alt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text for the image. Required for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text for the image. Required for accessibility.",
+                                    ),
+                                ),
                                 max_length: Some(10000usize),
                                 max_graphemes: Some(1000usize),
                                 ..Default::default()
@@ -470,9 +476,7 @@ fn lexicon_doc_systems_timker_hawlt_note() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -603,7 +607,7 @@ fn lexicon_doc_systems_timker_hawlt_note() -> LexiconDoc<'static> {
 
 pub mod note_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -697,7 +701,10 @@ impl<S: BosStr> NoteBuilder<note_state::Empty, S> {
 
 impl<St: note_state::State, S: BosStr> NoteBuilder<St, S> {
     /// Set the `attachments` field (optional)
-    pub fn attachments(mut self, value: impl Into<Option<Vec<note::Attachment<S>>>>) -> Self {
+    pub fn attachments(
+        mut self,
+        value: impl Into<Option<Vec<note::Attachment<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -714,7 +721,10 @@ where
     St::Content: note_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(mut self, value: impl Into<S>) -> NoteBuilder<note_state::SetContent<St>, S> {
+    pub fn content(
+        mut self,
+        value: impl Into<S>,
+    ) -> NoteBuilder<note_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,

@@ -20,7 +20,7 @@ name = "axum_server"
 path = "../../examples/axum_server.rs"
 
 [[example]]
-name = "axum_oauth_sesssion"
+name = "axum_oauth_session"
 path = "../../examples/axum_oauth_session.rs"
 
 [dependencies]

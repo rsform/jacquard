@@ -12,9 +12,10 @@ pub mod get_top_releases;
 pub mod get_user_top_artists;
 pub mod get_user_top_releases;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +28,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ArtistView<S: BosStr = DefaultStr> {
     ///MusicBrainz artist ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,11 +46,9 @@ pub struct ArtistView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordingView<S: BosStr = DefaultStr> {
     ///MusicBrainz recording ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,11 +63,9 @@ pub struct RecordingView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReleaseView<S: BosStr = DefaultStr> {
     ///MusicBrainz release ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -132,10 +126,10 @@ impl<S: BosStr> LexiconSchema for ReleaseView<S> {
 }
 
 fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.stats.defs"),
@@ -150,9 +144,11 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MusicBrainz artist ID URI, formatted as mbid:<uuid>",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "MusicBrainz artist ID URI, formatted as mbid:<uuid>",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -184,9 +180,11 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MusicBrainz recording ID URI, formatted as mbid:<uuid>",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "MusicBrainz recording ID URI, formatted as mbid:<uuid>",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -194,7 +192,9 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Recording/track name")),
+                                description: Some(
+                                    CowStr::new_static("Recording/track name"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -218,9 +218,11 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MusicBrainz release ID URI, formatted as mbid:<uuid>",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "MusicBrainz release ID URI, formatted as mbid:<uuid>",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),

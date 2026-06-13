@@ -10,6 +10,7 @@ pub mod get_broadcaster;
 pub mod origin;
 pub mod syndication;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -26,16 +27,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor::ProfileViewBasic;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BroadcastOriginView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -62,7 +60,7 @@ impl<S: BosStr> LexiconSchema for BroadcastOriginView<S> {
 
 pub mod broadcast_origin_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,14 +149,20 @@ pub struct BroadcastOriginViewBuilder<
 
 impl BroadcastOriginView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> BroadcastOriginViewBuilder<broadcast_origin_view_state::Empty, DefaultStr> {
+    pub fn new() -> BroadcastOriginViewBuilder<
+        broadcast_origin_view_state::Empty,
+        DefaultStr,
+    > {
         BroadcastOriginViewBuilder::new()
     }
 }
 
 impl<S: BosStr> BroadcastOriginView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> BroadcastOriginViewBuilder<broadcast_origin_view_state::Empty, S> {
+    pub fn builder() -> BroadcastOriginViewBuilder<
+        broadcast_origin_view_state::Empty,
+        S,
+    > {
         BroadcastOriginViewBuilder::builder()
     }
 }
@@ -280,7 +284,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BroadcastOriginView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BroadcastOriginView<S> {
         BroadcastOriginView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -292,10 +299,10 @@ where
 }
 
 fn lexicon_doc_place_stream_broadcast_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.broadcast.defs"),
@@ -304,19 +311,21 @@ fn lexicon_doc_place_stream_broadcast_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("broadcastOriginView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("record"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("author"), SmolStr::new_static("record")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );

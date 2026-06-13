@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_chronosky::plan::redeem_ticket;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_chronosky::plan::redeem_ticket;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RedeemTicket<S: BosStr = DefaultStr> {
     ///Ticket redemption code
     pub code: S,
@@ -38,11 +35,9 @@ pub struct RedeemTicket<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RedeemTicketOutput<S: BosStr = DefaultStr> {
     pub assignment: redeem_ticket::RedeemedAssignment<S>,
     ///Success message
@@ -51,9 +46,18 @@ pub struct RedeemTicketOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum RedeemTicketError {
     /// Ticket code not found
@@ -67,10 +71,7 @@ pub enum RedeemTicketError {
     TicketExpired(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for RedeemTicketError {
@@ -111,10 +112,7 @@ impl core::fmt::Display for RedeemTicketError {
 /// Redeemed plan assignment.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RedeemedAssignment<S: BosStr = DefaultStr> {
     ///Plan activation timestamp
     pub activated_at: Datetime,
@@ -143,8 +141,9 @@ impl jacquard_common::xrpc::XrpcResp for RedeemTicketResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RedeemTicket<S> {
     const NSID: &'static str = "app.chronosky.plan.redeemTicket";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RedeemTicketResponse;
 }
 
@@ -154,8 +153,9 @@ Path: `/xrpc/app.chronosky.plan.redeemTicket`. The request payload type is `Rede
 pub struct RedeemTicketRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RedeemTicketRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.plan.redeemTicket";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RedeemTicket<S>;
     type Response = RedeemTicketResponse;
 }
@@ -210,7 +210,7 @@ impl<S: BosStr> LexiconSchema for RedeemedAssignment<S> {
 
 pub mod redeemed_assignment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -301,21 +301,21 @@ pub mod redeemed_assignment_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RedeemedAssignmentBuilder<St: redeemed_assignment_state::State, S: BosStr = DefaultStr> {
+pub struct RedeemedAssignmentBuilder<
+    St: redeemed_assignment_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<Datetime>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<Datetime>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl RedeemedAssignment<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> RedeemedAssignmentBuilder<redeemed_assignment_state::Empty, DefaultStr> {
+    pub fn new() -> RedeemedAssignmentBuilder<
+        redeemed_assignment_state::Empty,
+        DefaultStr,
+    > {
         RedeemedAssignmentBuilder::new()
     }
 }
@@ -465,7 +465,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RedeemedAssignment<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RedeemedAssignment<S> {
         RedeemedAssignment {
             activated_at: self._fields.0.unwrap(),
             expires_at: self._fields.1.unwrap(),
@@ -478,10 +481,10 @@ where
 }
 
 fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chronosky.plan.redeemTicket"),
@@ -492,26 +495,28 @@ fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("code")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("code"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Ticket redemption code",
-                                        )),
-                                        min_length: Some(1usize),
-                                        max_length: Some(100usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("code")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("code"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static("Ticket redemption code"),
+                                            ),
+                                            min_length: Some(1usize),
+                                            max_length: Some(100usize),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -521,20 +526,23 @@ fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
                 SmolStr::new_static("redeemedAssignment"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Redeemed plan assignment.")),
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("planId"),
-                        SmolStr::new_static("activatedAt"),
-                        SmolStr::new_static("expiresAt"),
-                        SmolStr::new_static("status"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("planId"),
+                            SmolStr::new_static("activatedAt"),
+                            SmolStr::new_static("expiresAt"),
+                            SmolStr::new_static("status")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("activatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan activation timestamp")),
+                                description: Some(
+                                    CowStr::new_static("Plan activation timestamp"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -543,7 +551,9 @@ fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("expiresAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan expiration timestamp")),
+                                description: Some(
+                                    CowStr::new_static("Plan expiration timestamp"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 max_length: Some(100usize),
                                 ..Default::default()
@@ -568,7 +578,9 @@ fn lexicon_doc_app_chronosky_plan_redeemTicket() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Plan assignment status")),
+                                description: Some(
+                                    CowStr::new_static("Plan assignment status"),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),

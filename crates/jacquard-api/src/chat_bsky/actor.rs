@@ -11,37 +11,35 @@ pub mod delete_account;
 pub mod export_account_data;
 pub mod get_status;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, Handle, UriValue};
+use jacquard_common::types::string::{Did, Handle, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileAssociated;
 use crate::app_bsky::actor::VerificationState;
 use crate::app_bsky::actor::ViewerState;
-use crate::chat_bsky::actor;
 use crate::com_atproto::label::Label;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::chat_bsky::actor;
 /// [NOTE: This is under active development and should be considered unstable while this note is here].
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DirectConvoMember<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -50,10 +48,7 @@ pub struct DirectConvoMember<S: BosStr = DefaultStr> {
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. A current group convo member.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GroupConvoMember<S: BosStr = DefaultStr> {
     ///Who added this member. Only present if the member was added (instead of joining via link).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,6 +58,7 @@ pub struct GroupConvoMember<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum MemberRole<S: BosStr = DefaultStr> {
@@ -138,20 +134,15 @@ where
 /// [NOTE: This is under active development and should be considered unstable while this note is here]. A past group convo member.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PastGroupConvoMember<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated: Option<ProfileAssociated<S>>,
@@ -178,6 +169,7 @@ pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -274,10 +266,10 @@ impl<S: BosStr> LexiconSchema for ProfileViewBasic<S> {
 }
 
 fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.actor.defs"),
@@ -332,9 +324,7 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("memberRole"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("pastGroupConvoMember"),
@@ -470,7 +460,7 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
 
 pub mod group_convo_member_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -501,18 +491,21 @@ pub mod group_convo_member_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GroupConvoMemberBuilder<St: group_convo_member_state::State, S: BosStr = DefaultStr> {
+pub struct GroupConvoMemberBuilder<
+    St: group_convo_member_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<actor::ProfileViewBasic<S>>,
-        Option<actor::MemberRole<S>>,
-    ),
+    _fields: (Option<actor::ProfileViewBasic<S>>, Option<actor::MemberRole<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl GroupConvoMember<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GroupConvoMemberBuilder<group_convo_member_state::Empty, DefaultStr> {
+    pub fn new() -> GroupConvoMemberBuilder<
+        group_convo_member_state::Empty,
+        DefaultStr,
+    > {
         GroupConvoMemberBuilder::new()
     }
 }
@@ -548,7 +541,10 @@ impl<S: BosStr> GroupConvoMemberBuilder<group_convo_member_state::Empty, S> {
 
 impl<St: group_convo_member_state::State, S: BosStr> GroupConvoMemberBuilder<St, S> {
     /// Set the `addedBy` field (optional)
-    pub fn added_by(mut self, value: impl Into<Option<actor::ProfileViewBasic<S>>>) -> Self {
+    pub fn added_by(
+        mut self,
+        value: impl Into<Option<actor::ProfileViewBasic<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -592,7 +588,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GroupConvoMember<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GroupConvoMember<S> {
         GroupConvoMember {
             added_by: self._fields.0,
             role: self._fields.1.unwrap(),
@@ -603,7 +602,7 @@ where
 
 pub mod profile_view_basic_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -646,7 +645,10 @@ pub mod profile_view_basic_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ProfileViewBasicBuilder<St: profile_view_basic_state::State, S: BosStr = DefaultStr> {
+pub struct ProfileViewBasicBuilder<
+    St: profile_view_basic_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileAssociated<S>>,
@@ -666,7 +668,10 @@ pub struct ProfileViewBasicBuilder<St: profile_view_basic_state::State, S: BosSt
 
 impl ProfileViewBasic<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ProfileViewBasicBuilder<profile_view_basic_state::Empty, DefaultStr> {
+    pub fn new() -> ProfileViewBasicBuilder<
+        profile_view_basic_state::Empty,
+        DefaultStr,
+    > {
         ProfileViewBasicBuilder::new()
     }
 }
@@ -683,9 +688,7 @@ impl ProfileViewBasicBuilder<profile_view_basic_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ProfileViewBasicBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -696,9 +699,7 @@ impl<S: BosStr> ProfileViewBasicBuilder<profile_view_basic_state::Empty, S> {
     pub fn builder() -> Self {
         ProfileViewBasicBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -835,7 +836,10 @@ impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St,
 
 impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `verification` field (optional)
-    pub fn verification(mut self, value: impl Into<Option<VerificationState<S>>>) -> Self {
+    pub fn verification(
+        mut self,
+        value: impl Into<Option<VerificationState<S>>>,
+    ) -> Self {
         self._fields.9 = value.into();
         self
     }
@@ -883,7 +887,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileViewBasic<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileViewBasic<S> {
         ProfileViewBasic {
             associated: self._fields.0,
             avatar: self._fields.1,

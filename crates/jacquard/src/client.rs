@@ -36,16 +36,9 @@ use crate::client::credential_session::{CredentialSession, SessionKey};
 use crate::client::vec_update::VecUpdate;
 use core::future::Future;
 pub use error::*;
-#[cfg(feature = "api")]
-use jacquard_api::com_atproto::repo::get_record::GetRecordOutput;
-#[cfg(feature = "api")]
-use jacquard_api::com_atproto::{
-    repo::{
-        create_record::CreateRecordOutput, delete_record::DeleteRecordOutput,
-        get_record::GetRecordResponse, put_record::PutRecordOutput,
-    },
-    server::{create_session::CreateSessionOutput, refresh_session::RefreshSessionOutput},
-};
+// Bootstrap types for com.atproto.repo/server endpoints. These live in
+// jacquard-common to break the circular dependency with jacquard-api, and use
+// plain struct literals instead of builders.
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::error::XrpcResult;
 pub use jacquard_common::error::{ClientError, XrpcResult as ClientResult};
@@ -53,21 +46,22 @@ use jacquard_common::http_client::HttpClient;
 pub use jacquard_common::session::{MemorySessionStore, SessionStore, SessionStoreError};
 use jacquard_common::types::blob::{Blob, MimeType};
 use jacquard_common::types::collection::Collection;
-#[cfg(feature = "api")]
 use jacquard_common::types::did_doc::DidDocument;
-#[cfg(feature = "api")]
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::recordkey::{RecordKey, Rkey};
 use jacquard_common::types::string::AtUri;
-#[cfg(feature = "api")]
 use jacquard_common::types::uri::RecordUri;
 use jacquard_common::xrpc::XrpcResponse;
+use jacquard_common::xrpc::atproto::{
+    CreateRecordOutput, CreateSessionOutput, DeleteRecordOutput, GetRecordOutput,
+    GetRecordResponse, PutRecordOutput, RefreshSessionOutput,
+};
 use jacquard_common::xrpc::{
     CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp,
 };
 use jacquard_common::{AuthorizationToken, xrpc};
 use jacquard_common::{
-    BosStr, CowStr, IntoStatic,
+    BosStr, IntoStatic,
     types::string::{Did, Handle},
 };
 use jacquard_identity::resolver::{
@@ -442,15 +436,13 @@ impl MemoryCredentialSession {
     /// # Example
     /// ```no_run
     /// # use jacquard::client::BasicClient;
-    /// # use jacquard::types::string::AtUri;
     /// # use jacquard::api::app_bsky::feed::post::Post;
     /// # use jacquard::types::string::Datetime;
-    /// # use jacquard::CowStr;
     /// use jacquard::client::MemoryCredentialSession;
     /// use jacquard::client::{Agent, AgentSessionExt};
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// # let (identifier, password, post_text): (CowStr<'_>, CowStr<'_>, CowStr<'_>)  = todo!();
+    /// # let (identifier, password, post_text): (&str, &str, &str) = ("todo", "todo", "todo");
     /// let (session, _) = MemoryCredentialSession::authenticated(identifier, password, None, None).await?;
     /// let agent = Agent::from(session);
     /// let post = Post::new().text(post_text).created_at(Datetime::now()).build();
@@ -459,9 +451,9 @@ impl MemoryCredentialSession {
     /// # }
     /// ```
     pub async fn authenticated(
-        identifier: CowStr<'_>,
-        password: CowStr<'_>,
-        session_id: Option<CowStr<'_>>,
+        identifier: &str,
+        password: &str,
+        session_id: Option<&str>,
         pds: Option<Uri<String>>,
     ) -> ClientResult<(Self, AtpSession)> {
         let session = MemoryCredentialSession::unauthenticated();
@@ -504,7 +496,6 @@ impl AtpSession {
 
     /// Merge a refresh response into this session, preserving the existing PDS unless
     /// the refresh response contains a parseable DID document PDS endpoint.
-    #[cfg(feature = "api")]
     pub fn merge_refresh(&mut self, output: RefreshSessionOutput) {
         let pds = pds_from_data(output.did_doc.as_ref()).or_else(|| self.pds.clone());
         self.access_jwt = output.access_jwt;
@@ -523,7 +514,6 @@ impl IntoStatic for AtpSession {
     }
 }
 
-#[cfg(feature = "api")]
 pub(crate) fn pds_from_data<S: BosStr>(
     data: Option<&jacquard_common::types::value::Data<S>>,
 ) -> Option<Uri<String>> {
@@ -531,7 +521,6 @@ pub(crate) fn pds_from_data<S: BosStr>(
     doc.pds_endpoint().map(|uri| uri.to_owned())
 }
 
-#[cfg(feature = "api")]
 impl From<CreateSessionOutput> for AtpSession {
     fn from(output: CreateSessionOutput) -> Self {
         let pds = pds_from_data(output.did_doc.as_ref());
@@ -545,9 +534,42 @@ impl From<CreateSessionOutput> for AtpSession {
     }
 }
 
-#[cfg(feature = "api")]
 impl From<RefreshSessionOutput> for AtpSession {
     fn from(output: RefreshSessionOutput) -> Self {
+        let pds = pds_from_data(output.did_doc.as_ref());
+        Self {
+            access_jwt: output.access_jwt,
+            refresh_jwt: output.refresh_jwt,
+            did: output.did,
+            handle: output.handle,
+            pds,
+        }
+    }
+}
+
+/// Convert from the generated API `CreateSessionOutput` when the `api` feature is enabled.
+#[cfg(feature = "api")]
+impl From<jacquard_api::com_atproto::server::create_session::CreateSessionOutput> for AtpSession {
+    fn from(
+        output: jacquard_api::com_atproto::server::create_session::CreateSessionOutput,
+    ) -> Self {
+        let pds = pds_from_data(output.did_doc.as_ref());
+        Self {
+            access_jwt: output.access_jwt,
+            refresh_jwt: output.refresh_jwt,
+            did: output.did,
+            handle: output.handle,
+            pds,
+        }
+    }
+}
+
+/// Convert from the generated API `RefreshSessionOutput` when the `api` feature is enabled.
+#[cfg(feature = "api")]
+impl From<jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutput> for AtpSession {
+    fn from(
+        output: jacquard_api::com_atproto::server::refresh_session::RefreshSessionOutput,
+    ) -> Self {
         let pds = pds_from_data(output.did_doc.as_ref());
         Self {
             access_jwt: output.access_jwt,
@@ -639,18 +661,15 @@ type VecUpdatePutError<U> =
 /// # use jacquard::client::BasicClient;
 /// # use jacquard_api::app_bsky::feed::post::Post;
 /// # use jacquard_common::types::string::{AtUri, Datetime};
-/// # use jacquard_common::CowStr;
 /// use jacquard::client::AgentSessionExt;
 /// # #[tokio::main]
 /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// # let agent: BasicClient = todo!();
 /// // Create a post
-/// let post = Post {
-///     text: CowStr::from("Hello from Jacquard!"),
-///     created_at: Datetime::now(),
-///     # embed: None, entities: None, facets: None, labels: None,
-///     # langs: None, reply: None, tags: None, extra_data: Default::default(),
-/// };
+/// let post = Post::new()
+///     .text("Hello from Jacquard!")
+///     .created_at(Datetime::now())
+///     .build();
 /// let output = agent.create_record(post, None).await?;
 ///
 /// // Read it back
@@ -660,7 +679,6 @@ type VecUpdatePutError<U> =
 /// # Ok(())
 /// # }
 /// ```
-#[cfg(feature = "api")]
 pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// Create a new record in the repository.
     ///
@@ -673,23 +691,14 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     /// # use jacquard::client::BasicClient;
     /// # use jacquard_api::app_bsky::feed::post::Post;
     /// # use jacquard_common::types::string::Datetime;
-    /// # use jacquard_common::CowStr;
     /// use jacquard::client::AgentSessionExt;
     /// # #[tokio::main]
     /// # async fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # let agent: BasicClient = todo!();
-    /// let post = Post {
-    ///     text: CowStr::from("Hello world!"),
-    ///     created_at: Datetime::now(),
-    ///     embed: None,
-    ///     entities: None,
-    ///     facets: None,
-    ///     labels: None,
-    ///     langs: None,
-    ///     reply: None,
-    ///     tags: None,
-    ///     extra_data: Default::default(),
-    /// };
+    /// let post = Post::new()
+    ///     .text("Hello world!")
+    ///     .created_at(Datetime::now())
+    ///     .build();
     /// let output = agent.create_record(post, None).await?;
     /// println!("Created record: {}", output.uri);
     /// # Ok(())
@@ -704,9 +713,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
         R: Collection + serde::Serialize,
     {
         async move {
-            use jacquard_api::com_atproto::repo::create_record::CreateRecord;
             use jacquard_common::types::ident::AtIdentifier;
             use jacquard_common::types::value::to_data;
+            use jacquard_common::xrpc::atproto::CreateRecord;
 
             let (did, _) = self
                 .session_info()
@@ -719,12 +728,15 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let data =
                 to_data(&record).map_err(|e| AgentError::sub_operation("serialize record", e))?;
 
-            let request = CreateRecord::new()
-                .repo(AtIdentifier::Did(did))
-                .collection(R::nsid().into_static())
-                .record(data)
-                .rkey(rkey.map(|k| k.clone()))
-                .build();
+            // Bootstrap types use plain struct literals instead of builders.
+            let request = CreateRecord {
+                repo: AtIdentifier::Did(did),
+                collection: R::nsid().into_static(),
+                record: data,
+                rkey: rkey.map(|k| k.clone()),
+                swap_commit: None,
+                validate: None,
+            };
 
             #[cfg(feature = "tracing")]
             _span.exit();
@@ -820,13 +832,14 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             };
 
             // Make stateless XRPC call to that PDS (no auth required for public records).
-            // All fields use SmolStr backing to satisfy the builder's single S type parameter.
-            use jacquard_api::com_atproto::repo::get_record::GetRecord;
-            let request = GetRecord::new()
-                .repo(AtIdentifier::Did(repo_did.clone()))
-                .collection(R::nsid().into_static())
-                .rkey(rkey.into_static())
-                .build();
+            // Bootstrap types use plain struct literals; rkey is required here.
+            use jacquard_common::xrpc::atproto::GetRecord;
+            let request = GetRecord {
+                repo: AtIdentifier::Did(repo_did.clone()),
+                collection: R::nsid().into_static(),
+                rkey: RecordKey(rkey.into_static()),
+                cid: None,
+            };
 
             let response: Response<GetRecordResponse> = {
                 let http_request =
@@ -1036,14 +1049,16 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             #[cfg(feature = "tracing")]
             let _span = tracing::debug_span!("delete_record", collection = %R::nsid()).entered();
 
-            use jacquard_api::com_atproto::repo::delete_record::DeleteRecord;
             use jacquard_common::types::ident::AtIdentifier;
+            use jacquard_common::xrpc::atproto::DeleteRecord;
 
-            let request = DeleteRecord::new()
-                .repo(AtIdentifier::Did(did.clone()))
-                .collection(R::nsid().into_static())
-                .rkey(rkey.into_static())
-                .build();
+            let request = DeleteRecord {
+                repo: AtIdentifier::Did(did.clone()),
+                collection: R::nsid().into_static(),
+                rkey,
+                swap_commit: None,
+                swap_record: None,
+            };
 
             #[cfg(feature = "tracing")]
             _span.exit();
@@ -1076,9 +1091,9 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             #[cfg(feature = "tracing")]
             let _span = tracing::debug_span!("put_record", collection = %R::nsid()).entered();
 
-            use jacquard_api::com_atproto::repo::put_record::PutRecord;
             use jacquard_common::types::ident::AtIdentifier;
             use jacquard_common::types::value::to_data;
+            use jacquard_common::xrpc::atproto::PutRecord;
 
             let (did, _) = self
                 .session_info()
@@ -1088,12 +1103,15 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
             let data =
                 to_data(&record).map_err(|e| AgentError::sub_operation("serialize record", e))?;
 
-            let request = PutRecord::new()
-                .repo(AtIdentifier::Did(did.clone()))
-                .collection(R::nsid().into_static())
-                .rkey(rkey.into_static())
-                .record(data)
-                .build();
+            let request = PutRecord {
+                repo: AtIdentifier::Did(did.clone()),
+                collection: R::nsid().into_static(),
+                rkey,
+                record: data,
+                swap_commit: None,
+                swap_record: None,
+                validate: None,
+            };
 
             #[cfg(feature = "tracing")]
             _span.exit();
@@ -1259,7 +1277,6 @@ pub trait AgentSessionExt: AgentSession + IdentityResolver {
     }
 }
 
-#[cfg(feature = "api")]
 impl<T: AgentSession + IdentityResolver> AgentSessionExt for T {}
 
 impl<S, T, W> AgentSession for CredentialSession<S, T, W>

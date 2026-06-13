@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,14 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::media_ionosphere::Broadcast;
 use crate::media_ionosphere::Credit;
 use crate::media_ionosphere::Genre;
 use crate::media_ionosphere::Membership;
 use crate::media_ionosphere::Recording;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A programme represents an individual piece of media. It does not represent a long-running show.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -68,6 +68,7 @@ pub struct Programme<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -147,16 +148,19 @@ impl<S: BosStr> LexiconSchema for Programme<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
@@ -196,7 +200,7 @@ impl<S: BosStr> LexiconSchema for Programme<S> {
 
 pub mod programme_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -290,9 +294,7 @@ impl ProgrammeBuilder<programme_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ProgrammeBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -303,9 +305,7 @@ impl<S: BosStr> ProgrammeBuilder<programme_state::Empty, S> {
     pub fn builder() -> Self {
         ProgrammeBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -326,12 +326,18 @@ impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
 
 impl<St: programme_state::State, S: BosStr> ProgrammeBuilder<St, S> {
     /// Set the `delivery` field (optional)
-    pub fn delivery(mut self, value: impl Into<Option<Vec<ProgrammeDeliveryItem<S>>>>) -> Self {
+    pub fn delivery(
+        mut self,
+        value: impl Into<Option<Vec<ProgrammeDeliveryItem<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `delivery` field to an Option value (optional)
-    pub fn maybe_delivery(mut self, value: Option<Vec<ProgrammeDeliveryItem<S>>>) -> Self {
+    pub fn maybe_delivery(
+        mut self,
+        value: Option<Vec<ProgrammeDeliveryItem<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -497,7 +503,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Programme<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Programme<S> {
         Programme {
             credits: self._fields.0,
             delivery: self._fields.1,
@@ -516,10 +525,10 @@ where
 }
 
 fn lexicon_doc_media_ionosphere_programme() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("media.ionosphere.programme"),

@@ -860,7 +860,7 @@ fn extract_signing_key(methods: &[VerificationMethod<CowStr<'_>>]) -> Option<Pub
 /// ```no_run
 /// use axum::{Router, routing::get, middleware, Extension};
 /// use jacquard_axum::service_auth::{ServiceAuthConfig, service_auth_middleware};
-/// use jacquard_identity::JacquardResolver;
+/// use jacquard_identity::{PublicResolver, JacquardResolver};
 /// use jacquard_identity::resolver::ResolverOptions;
 /// use jacquard_common::types::string::Did;
 ///
@@ -885,7 +885,7 @@ fn extract_signing_key(methods: &[VerificationMethod<CowStr<'_>>]) -> Option<Pub
 ///         .route("/xrpc/app.bsky.feed.getFeedSkeleton", get(handler))
 ///         .layer(middleware::from_fn_with_state(
 ///             config.clone(),
-///             service_auth_middleware::<ServiceAuthConfig<JacquardResolver>>,
+///             service_auth_middleware::<ServiceAuthConfig<PublicResolver>>,
 ///         ))
 ///         .with_state(config);
 ///

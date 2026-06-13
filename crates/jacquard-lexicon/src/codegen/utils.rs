@@ -172,12 +172,21 @@ pub fn make_ident(s: &str) -> syn::Ident {
     })
 }
 
-/// Generate doc comment from optional description
+/// Generate doc comment from optional description.
+///
+/// Multi-line descriptions are split into separate `#[doc]` attributes so that
+/// pretty-printers render them as `///` line comments rather than `/** ... */`
+/// block comments. Block comments with indented continuation lines cause rustdoc
+/// to interpret the indented text as a Markdown code block, which then gets
+/// compiled as a (broken) doctest.
 pub(super) fn generate_doc_comment(desc: Option<&CowStr>) -> TokenStream {
     if let Some(description) = desc {
-        let desc_str = format!(" {description}");
+        let lines: Vec<String> = description
+            .lines()
+            .map(|line| format!(" {line}"))
+            .collect();
         quote! {
-            #[doc = #desc_str]
+            #(#[doc = #lines])*
         }
     } else {
         quote! {}

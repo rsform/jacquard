@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A book.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -311,6 +308,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -368,6 +366,7 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -429,6 +428,7 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -456,6 +456,7 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -502,6 +503,7 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -511,6 +513,7 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -546,6 +549,7 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -599,6 +603,7 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -655,6 +660,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -688,6 +694,7 @@ pub enum EmbeddedIllustrator<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -695,6 +702,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -729,6 +737,7 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -736,6 +745,7 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -792,6 +802,7 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -799,6 +810,7 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -828,6 +840,7 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -853,6 +866,7 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -862,6 +876,7 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -878,6 +893,7 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -885,6 +901,7 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -898,6 +915,7 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -944,6 +962,7 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -956,6 +975,7 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -977,6 +997,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -984,6 +1005,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1013,6 +1035,7 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1037,6 +1060,7 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1356,6 +1380,7 @@ pub struct Book<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1413,6 +1438,7 @@ pub enum BookAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1474,6 +1500,7 @@ pub enum BookAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1501,6 +1528,7 @@ pub enum BookCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1547,6 +1575,7 @@ pub enum BookContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1556,6 +1585,7 @@ pub enum BookCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1591,6 +1621,7 @@ pub enum BookCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1644,6 +1675,7 @@ pub enum BookEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1700,6 +1732,7 @@ pub enum BookFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1733,6 +1766,7 @@ pub enum BookIllustrator<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1740,6 +1774,7 @@ pub enum BookImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1774,6 +1809,7 @@ pub enum BookIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1781,6 +1817,7 @@ pub enum BookIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1837,6 +1874,7 @@ pub enum BookMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1844,6 +1882,7 @@ pub enum BookMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1873,6 +1912,7 @@ pub enum BookOffers<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1898,6 +1938,7 @@ pub enum BookProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1907,6 +1948,7 @@ pub enum BookProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1923,6 +1965,7 @@ pub enum BookPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1930,6 +1973,7 @@ pub enum BookPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1943,6 +1987,7 @@ pub enum BookRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1989,6 +2034,7 @@ pub enum BookSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2001,6 +2047,7 @@ pub enum BookSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2022,6 +2069,7 @@ pub enum BookSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2029,6 +2077,7 @@ pub enum BookSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2058,6 +2107,7 @@ pub enum BookThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2082,6 +2132,7 @@ pub enum BookTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2197,10 +2248,10 @@ impl<S: BosStr> LexiconSchema for Book<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Book() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Book"),
@@ -5004,7 +5055,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Book() -> LexiconDoc<'static> {
 
 pub mod book_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5182,16 +5233,139 @@ impl BookBuilder<book_state::Empty, DefaultStr> {
         BookBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -5204,16 +5378,139 @@ impl<S: BosStr> BookBuilder<book_state::Empty, S> {
         BookBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -5293,12 +5590,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `accessibilityAPI` field (optional)
-    pub fn accessibility_api(mut self, value: impl Into<Option<BookAccessibilityApi<S>>>) -> Self {
+    pub fn accessibility_api(
+        mut self,
+        value: impl Into<Option<BookAccessibilityApi<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
-    pub fn maybe_accessibility_api(mut self, value: Option<BookAccessibilityApi<S>>) -> Self {
+    pub fn maybe_accessibility_api(
+        mut self,
+        value: Option<BookAccessibilityApi<S>>,
+    ) -> Self {
         self._fields.5 = value;
         self
     }
@@ -5352,7 +5655,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `accessibilityHazard` field to an Option value (optional)
-    pub fn maybe_accessibility_hazard(mut self, value: Option<BookAccessibilityHazard<S>>) -> Self {
+    pub fn maybe_accessibility_hazard(
+        mut self,
+        value: Option<BookAccessibilityHazard<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -5387,7 +5693,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
-    pub fn maybe_accountable_person(mut self, value: Option<BookAccountablePerson<S>>) -> Self {
+    pub fn maybe_accountable_person(
+        mut self,
+        value: Option<BookAccountablePerson<S>>,
+    ) -> Self {
         self._fields.10 = value;
         self
     }
@@ -5403,7 +5712,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `acquireLicensePage` field to an Option value (optional)
-    pub fn maybe_acquire_license_page(mut self, value: Option<BookAcquireLicensePage<S>>) -> Self {
+    pub fn maybe_acquire_license_page(
+        mut self,
+        value: Option<BookAcquireLicensePage<S>>,
+    ) -> Self {
         self._fields.11 = value;
         self
     }
@@ -5411,12 +5723,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<BookAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<BookAdditionalType<S>>>,
+    ) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<BookAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<BookAdditionalType<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
@@ -5424,12 +5742,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<BookAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<BookAggregateRating<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<BookAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<BookAggregateRating<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
@@ -5437,7 +5761,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<BookAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<BookAlternateName<S>>>,
+    ) -> Self {
         self._fields.14 = value.into();
         self
     }
@@ -5458,7 +5785,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `alternativeHeadline` field to an Option value (optional)
-    pub fn maybe_alternative_headline(mut self, value: Option<BookAlternativeHeadline<S>>) -> Self {
+    pub fn maybe_alternative_headline(
+        mut self,
+        value: Option<BookAlternativeHeadline<S>>,
+    ) -> Self {
         self._fields.15 = value;
         self
     }
@@ -5492,12 +5822,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `associatedMedia` field (optional)
-    pub fn associated_media(mut self, value: impl Into<Option<BookAssociatedMedia<S>>>) -> Self {
+    pub fn associated_media(
+        mut self,
+        value: impl Into<Option<BookAssociatedMedia<S>>>,
+    ) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(mut self, value: Option<BookAssociatedMedia<S>>) -> Self {
+    pub fn maybe_associated_media(
+        mut self,
+        value: Option<BookAssociatedMedia<S>>,
+    ) -> Self {
         self._fields.18 = value;
         self
     }
@@ -5635,7 +5971,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `commentCount` field (optional)
-    pub fn comment_count(mut self, value: impl Into<Option<BookCommentCount<S>>>) -> Self {
+    pub fn comment_count(
+        mut self,
+        value: impl Into<Option<BookCommentCount<S>>>,
+    ) -> Self {
         self._fields.29 = value.into();
         self
     }
@@ -5656,7 +5995,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `conditionsOfAccess` field to an Option value (optional)
-    pub fn maybe_conditions_of_access(mut self, value: Option<BookConditionsOfAccess<S>>) -> Self {
+    pub fn maybe_conditions_of_access(
+        mut self,
+        value: Option<BookConditionsOfAccess<S>>,
+    ) -> Self {
         self._fields.30 = value;
         self
     }
@@ -5664,12 +6006,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `contentLocation` field (optional)
-    pub fn content_location(mut self, value: impl Into<Option<BookContentLocation<S>>>) -> Self {
+    pub fn content_location(
+        mut self,
+        value: impl Into<Option<BookContentLocation<S>>>,
+    ) -> Self {
         self._fields.31 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
-    pub fn maybe_content_location(mut self, value: Option<BookContentLocation<S>>) -> Self {
+    pub fn maybe_content_location(
+        mut self,
+        value: Option<BookContentLocation<S>>,
+    ) -> Self {
         self._fields.31 = value;
         self
     }
@@ -5677,7 +6025,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `contentRating` field (optional)
-    pub fn content_rating(mut self, value: impl Into<Option<BookContentRating<S>>>) -> Self {
+    pub fn content_rating(
+        mut self,
+        value: impl Into<Option<BookContentRating<S>>>,
+    ) -> Self {
         self._fields.32 = value.into();
         self
     }
@@ -5722,12 +6073,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `copyrightHolder` field (optional)
-    pub fn copyright_holder(mut self, value: impl Into<Option<BookCopyrightHolder<S>>>) -> Self {
+    pub fn copyright_holder(
+        mut self,
+        value: impl Into<Option<BookCopyrightHolder<S>>>,
+    ) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
-    pub fn maybe_copyright_holder(mut self, value: Option<BookCopyrightHolder<S>>) -> Self {
+    pub fn maybe_copyright_holder(
+        mut self,
+        value: Option<BookCopyrightHolder<S>>,
+    ) -> Self {
         self._fields.35 = value;
         self
     }
@@ -5735,12 +6092,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `copyrightNotice` field (optional)
-    pub fn copyright_notice(mut self, value: impl Into<Option<BookCopyrightNotice<S>>>) -> Self {
+    pub fn copyright_notice(
+        mut self,
+        value: impl Into<Option<BookCopyrightNotice<S>>>,
+    ) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
-    pub fn maybe_copyright_notice(mut self, value: Option<BookCopyrightNotice<S>>) -> Self {
+    pub fn maybe_copyright_notice(
+        mut self,
+        value: Option<BookCopyrightNotice<S>>,
+    ) -> Self {
         self._fields.36 = value;
         self
     }
@@ -5748,7 +6111,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `copyrightYear` field (optional)
-    pub fn copyright_year(mut self, value: impl Into<Option<BookCopyrightYear<S>>>) -> Self {
+    pub fn copyright_year(
+        mut self,
+        value: impl Into<Option<BookCopyrightYear<S>>>,
+    ) -> Self {
         self._fields.37 = value.into();
         self
     }
@@ -5774,12 +6140,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `countryOfOrigin` field (optional)
-    pub fn country_of_origin(mut self, value: impl Into<Option<BookCountryOfOrigin<S>>>) -> Self {
+    pub fn country_of_origin(
+        mut self,
+        value: impl Into<Option<BookCountryOfOrigin<S>>>,
+    ) -> Self {
         self._fields.39 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
-    pub fn maybe_country_of_origin(mut self, value: Option<BookCountryOfOrigin<S>>) -> Self {
+    pub fn maybe_country_of_origin(
+        mut self,
+        value: Option<BookCountryOfOrigin<S>>,
+    ) -> Self {
         self._fields.39 = value;
         self
     }
@@ -5795,7 +6167,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `creativeWorkStatus` field to an Option value (optional)
-    pub fn maybe_creative_work_status(mut self, value: Option<BookCreativeWorkStatus<S>>) -> Self {
+    pub fn maybe_creative_work_status(
+        mut self,
+        value: Option<BookCreativeWorkStatus<S>>,
+    ) -> Self {
         self._fields.40 = value;
         self
     }
@@ -5842,7 +6217,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `dateModified` field (optional)
-    pub fn date_modified(mut self, value: impl Into<Option<BookDateModified<S>>>) -> Self {
+    pub fn date_modified(
+        mut self,
+        value: impl Into<Option<BookDateModified<S>>>,
+    ) -> Self {
         self._fields.44 = value.into();
         self
     }
@@ -5855,7 +6233,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `datePublished` field (optional)
-    pub fn date_published(mut self, value: impl Into<Option<BookDatePublished<S>>>) -> Self {
+    pub fn date_published(
+        mut self,
+        value: impl Into<Option<BookDatePublished<S>>>,
+    ) -> Self {
         self._fields.45 = value.into();
         self
     }
@@ -5889,7 +6270,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
-    pub fn maybe_digital_source_type(mut self, value: Option<BookDigitalSourceType<S>>) -> Self {
+    pub fn maybe_digital_source_type(
+        mut self,
+        value: Option<BookDigitalSourceType<S>>,
+    ) -> Self {
         self._fields.47 = value;
         self
     }
@@ -5916,7 +6300,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `discussionUrl` field (optional)
-    pub fn discussion_url(mut self, value: impl Into<Option<BookDiscussionUrl<S>>>) -> Self {
+    pub fn discussion_url(
+        mut self,
+        value: impl Into<Option<BookDiscussionUrl<S>>>,
+    ) -> Self {
         self._fields.49 = value.into();
         self
     }
@@ -5974,12 +6361,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `educationalLevel` field (optional)
-    pub fn educational_level(mut self, value: impl Into<Option<BookEducationalLevel<S>>>) -> Self {
+    pub fn educational_level(
+        mut self,
+        value: impl Into<Option<BookEducationalLevel<S>>>,
+    ) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
-    pub fn maybe_educational_level(mut self, value: Option<BookEducationalLevel<S>>) -> Self {
+    pub fn maybe_educational_level(
+        mut self,
+        value: Option<BookEducationalLevel<S>>,
+    ) -> Self {
         self._fields.53 = value;
         self
     }
@@ -5987,12 +6380,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `educationalUse` field (optional)
-    pub fn educational_use(mut self, value: impl Into<Option<BookEducationalUse<S>>>) -> Self {
+    pub fn educational_use(
+        mut self,
+        value: impl Into<Option<BookEducationalUse<S>>>,
+    ) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
-    pub fn maybe_educational_use(mut self, value: Option<BookEducationalUse<S>>) -> Self {
+    pub fn maybe_educational_use(
+        mut self,
+        value: Option<BookEducationalUse<S>>,
+    ) -> Self {
         self._fields.54 = value;
         self
     }
@@ -6013,12 +6412,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `encodingFormat` field (optional)
-    pub fn encoding_format(mut self, value: impl Into<Option<BookEncodingFormat<S>>>) -> Self {
+    pub fn encoding_format(
+        mut self,
+        value: impl Into<Option<BookEncodingFormat<S>>>,
+    ) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
-    pub fn maybe_encoding_format(mut self, value: Option<BookEncodingFormat<S>>) -> Self {
+    pub fn maybe_encoding_format(
+        mut self,
+        value: Option<BookEncodingFormat<S>>,
+    ) -> Self {
         self._fields.56 = value;
         self
     }
@@ -6039,7 +6444,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `exampleOfWork` field (optional)
-    pub fn example_of_work(mut self, value: impl Into<Option<BookExampleOfWork<S>>>) -> Self {
+    pub fn example_of_work(
+        mut self,
+        value: impl Into<Option<BookExampleOfWork<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
@@ -6222,7 +6630,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
-    pub fn maybe_interactivity_type(mut self, value: Option<BookInteractivityType<S>>) -> Self {
+    pub fn maybe_interactivity_type(
+        mut self,
+        value: Option<BookInteractivityType<S>>,
+    ) -> Self {
         self._fields.71 = value;
         self
     }
@@ -6238,7 +6649,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `interpretedAsClaim` field to an Option value (optional)
-    pub fn maybe_interpreted_as_claim(mut self, value: Option<BookInterpretedAsClaim<S>>) -> Self {
+    pub fn maybe_interpreted_as_claim(
+        mut self,
+        value: Option<BookInterpretedAsClaim<S>>,
+    ) -> Self {
         self._fields.72 = value;
         self
     }
@@ -6278,7 +6692,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `isBasedOnUrl` field (optional)
-    pub fn is_based_on_url(mut self, value: impl Into<Option<BookIsBasedOnUrl<S>>>) -> Self {
+    pub fn is_based_on_url(
+        mut self,
+        value: impl Into<Option<BookIsBasedOnUrl<S>>>,
+    ) -> Self {
         self._fields.75 = value.into();
         self
     }
@@ -6291,12 +6708,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `isFamilyFriendly` field (optional)
-    pub fn is_family_friendly(mut self, value: impl Into<Option<BookIsFamilyFriendly<S>>>) -> Self {
+    pub fn is_family_friendly(
+        mut self,
+        value: impl Into<Option<BookIsFamilyFriendly<S>>>,
+    ) -> Self {
         self._fields.76 = value.into();
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
-    pub fn maybe_is_family_friendly(mut self, value: Option<BookIsFamilyFriendly<S>>) -> Self {
+    pub fn maybe_is_family_friendly(
+        mut self,
+        value: Option<BookIsFamilyFriendly<S>>,
+    ) -> Self {
         self._fields.76 = value;
         self
     }
@@ -6375,12 +6798,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `locationCreated` field (optional)
-    pub fn location_created(mut self, value: impl Into<Option<BookLocationCreated<S>>>) -> Self {
+    pub fn location_created(
+        mut self,
+        value: impl Into<Option<BookLocationCreated<S>>>,
+    ) -> Self {
         self._fields.82 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
-    pub fn maybe_location_created(mut self, value: Option<BookLocationCreated<S>>) -> Self {
+    pub fn maybe_location_created(
+        mut self,
+        value: Option<BookLocationCreated<S>>,
+    ) -> Self {
         self._fields.82 = value;
         self
     }
@@ -6409,7 +6838,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<BookMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<BookMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.84 = value;
         self
     }
@@ -6443,12 +6875,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `materialExtent` field (optional)
-    pub fn material_extent(mut self, value: impl Into<Option<BookMaterialExtent<S>>>) -> Self {
+    pub fn material_extent(
+        mut self,
+        value: impl Into<Option<BookMaterialExtent<S>>>,
+    ) -> Self {
         self._fields.87 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
-    pub fn maybe_material_extent(mut self, value: Option<BookMaterialExtent<S>>) -> Self {
+    pub fn maybe_material_extent(
+        mut self,
+        value: Option<BookMaterialExtent<S>>,
+    ) -> Self {
         self._fields.87 = value;
         self
     }
@@ -6482,7 +6920,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `numberOfPages` field (optional)
-    pub fn number_of_pages(mut self, value: impl Into<Option<BookNumberOfPages<S>>>) -> Self {
+    pub fn number_of_pages(
+        mut self,
+        value: impl Into<Option<BookNumberOfPages<S>>>,
+    ) -> Self {
         self._fields.90 = value.into();
         self
     }
@@ -6534,12 +6975,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<BookPotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<BookPotentialAction<S>>>,
+    ) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<BookPotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<BookPotentialAction<S>>,
+    ) -> Self {
         self._fields.94 = value;
         self
     }
@@ -6599,12 +7046,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `publisherImprint` field (optional)
-    pub fn publisher_imprint(mut self, value: impl Into<Option<BookPublisherImprint<S>>>) -> Self {
+    pub fn publisher_imprint(
+        mut self,
+        value: impl Into<Option<BookPublisherImprint<S>>>,
+    ) -> Self {
         self._fields.99 = value.into();
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
-    pub fn maybe_publisher_imprint(mut self, value: Option<BookPublisherImprint<S>>) -> Self {
+    pub fn maybe_publisher_imprint(
+        mut self,
+        value: Option<BookPublisherImprint<S>>,
+    ) -> Self {
         self._fields.99 = value;
         self
     }
@@ -6644,7 +7097,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `releasedEvent` field (optional)
-    pub fn released_event(mut self, value: impl Into<Option<BookReleasedEvent<S>>>) -> Self {
+    pub fn released_event(
+        mut self,
+        value: impl Into<Option<BookReleasedEvent<S>>>,
+    ) -> Self {
         self._fields.102 = value.into();
         self
     }
@@ -6696,7 +7152,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `schemaVersion` field (optional)
-    pub fn schema_version(mut self, value: impl Into<Option<BookSchemaVersion<S>>>) -> Self {
+    pub fn schema_version(
+        mut self,
+        value: impl Into<Option<BookSchemaVersion<S>>>,
+    ) -> Self {
         self._fields.106 = value.into();
         self
     }
@@ -6709,12 +7168,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `sdDatePublished` field (optional)
-    pub fn sd_date_published(mut self, value: impl Into<Option<BookSdDatePublished<S>>>) -> Self {
+    pub fn sd_date_published(
+        mut self,
+        value: impl Into<Option<BookSdDatePublished<S>>>,
+    ) -> Self {
         self._fields.107 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
-    pub fn maybe_sd_date_published(mut self, value: Option<BookSdDatePublished<S>>) -> Self {
+    pub fn maybe_sd_date_published(
+        mut self,
+        value: Option<BookSdDatePublished<S>>,
+    ) -> Self {
         self._fields.107 = value;
         self
     }
@@ -6769,7 +7234,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
-    pub fn maybe_source_organization(mut self, value: Option<BookSourceOrganization<S>>) -> Self {
+    pub fn maybe_source_organization(
+        mut self,
+        value: Option<BookSourceOrganization<S>>,
+    ) -> Self {
         self._fields.111 = value;
         self
     }
@@ -6790,12 +7258,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `spatialCoverage` field (optional)
-    pub fn spatial_coverage(mut self, value: impl Into<Option<BookSpatialCoverage<S>>>) -> Self {
+    pub fn spatial_coverage(
+        mut self,
+        value: impl Into<Option<BookSpatialCoverage<S>>>,
+    ) -> Self {
         self._fields.113 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
-    pub fn maybe_spatial_coverage(mut self, value: Option<BookSpatialCoverage<S>>) -> Self {
+    pub fn maybe_spatial_coverage(
+        mut self,
+        value: Option<BookSpatialCoverage<S>>,
+    ) -> Self {
         self._fields.113 = value;
         self
     }
@@ -6855,12 +7329,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `temporalCoverage` field (optional)
-    pub fn temporal_coverage(mut self, value: impl Into<Option<BookTemporalCoverage<S>>>) -> Self {
+    pub fn temporal_coverage(
+        mut self,
+        value: impl Into<Option<BookTemporalCoverage<S>>>,
+    ) -> Self {
         self._fields.118 = value.into();
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
-    pub fn maybe_temporal_coverage(mut self, value: Option<BookTemporalCoverage<S>>) -> Self {
+    pub fn maybe_temporal_coverage(
+        mut self,
+        value: Option<BookTemporalCoverage<S>>,
+    ) -> Self {
         self._fields.118 = value;
         self
     }
@@ -6894,7 +7374,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `thumbnailUrl` field (optional)
-    pub fn thumbnail_url(mut self, value: impl Into<Option<BookThumbnailUrl<S>>>) -> Self {
+    pub fn thumbnail_url(
+        mut self,
+        value: impl Into<Option<BookThumbnailUrl<S>>>,
+    ) -> Self {
         self._fields.121 = value.into();
         self
     }
@@ -6907,7 +7390,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `timeRequired` field (optional)
-    pub fn time_required(mut self, value: impl Into<Option<BookTimeRequired<S>>>) -> Self {
+    pub fn time_required(
+        mut self,
+        value: impl Into<Option<BookTimeRequired<S>>>,
+    ) -> Self {
         self._fields.122 = value.into();
         self
     }
@@ -6928,7 +7414,10 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
-    pub fn maybe_translation_of_work(mut self, value: Option<BookTranslationOfWork<S>>) -> Self {
+    pub fn maybe_translation_of_work(
+        mut self,
+        value: Option<BookTranslationOfWork<S>>,
+    ) -> Self {
         self._fields.123 = value;
         self
     }
@@ -6949,12 +7438,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `typicalAgeRange` field (optional)
-    pub fn typical_age_range(mut self, value: impl Into<Option<BookTypicalAgeRange<S>>>) -> Self {
+    pub fn typical_age_range(
+        mut self,
+        value: impl Into<Option<BookTypicalAgeRange<S>>>,
+    ) -> Self {
         self._fields.125 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
-    pub fn maybe_typical_age_range(mut self, value: Option<BookTypicalAgeRange<S>>) -> Self {
+    pub fn maybe_typical_age_range(
+        mut self,
+        value: Option<BookTypicalAgeRange<S>>,
+    ) -> Self {
         self._fields.125 = value;
         self
     }
@@ -7040,12 +7535,18 @@ impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
 
 impl<St: book_state::State, S: BosStr> BookBuilder<St, S> {
     /// Set the `workTranslation` field (optional)
-    pub fn work_translation(mut self, value: impl Into<Option<BookWorkTranslation<S>>>) -> Self {
+    pub fn work_translation(
+        mut self,
+        value: impl Into<Option<BookWorkTranslation<S>>>,
+    ) -> Self {
         self._fields.132 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
-    pub fn maybe_work_translation(mut self, value: Option<BookWorkTranslation<S>>) -> Self {
+    pub fn maybe_work_translation(
+        mut self,
+        value: Option<BookWorkTranslation<S>>,
+    ) -> Self {
         self._fields.132 = value;
         self
     }

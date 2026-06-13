@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,20 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::com_deckbelcher::CardRef;
-use crate::com_deckbelcher::collection::list;
-use crate::com_deckbelcher::richtext::Document;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_deckbelcher::CardRef;
+use crate::com_deckbelcher::richtext::Document;
+use crate::com_deckbelcher::collection::list;
 /// A card saved to the list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardItem<S: BosStr = DefaultStr> {
     ///Timestamp when this item was added to the list.
     pub added_at: Datetime,
@@ -50,10 +47,7 @@ pub struct CardItem<S: BosStr = DefaultStr> {
 /// A deck saved to the list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeckItem<S: BosStr = DefaultStr> {
     ///Timestamp when this item was added to the list.
     pub added_at: Datetime,
@@ -88,6 +82,7 @@ pub struct List<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -214,7 +209,7 @@ impl<S: BosStr> LexiconSchema for List<S> {
 
 pub mod card_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -362,10 +357,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.collection.list"),
@@ -375,19 +370,20 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                 SmolStr::new_static("cardItem"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A card saved to the list.")),
-                    required: Some(vec![
-                        SmolStr::new_static("ref"),
-                        SmolStr::new_static("addedAt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("ref"), SmolStr::new_static("addedAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Timestamp when this item was added to the list.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Timestamp when this item was added to the list.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -408,19 +404,20 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                 SmolStr::new_static("deckItem"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A deck saved to the list.")),
-                    required: Some(vec![
-                        SmolStr::new_static("ref"),
-                        SmolStr::new_static("addedAt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("ref"), SmolStr::new_static("addedAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Timestamp when this item was added to the list.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Timestamp when this item was added to the list.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -440,23 +437,26 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A curated list of cards and/or decks.")),
+                    description: Some(
+                        CowStr::new_static("A curated list of cards and/or decks."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("items"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("items"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the list was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the list was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -464,7 +464,9 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::Ref(LexRef {
-                                    r#ref: CowStr::new_static("com.deckbelcher.richtext#document"),
+                                    r#ref: CowStr::new_static(
+                                        "com.deckbelcher.richtext#document",
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -475,7 +477,7 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                                     items: LexArrayItem::Union(LexRefUnion {
                                         refs: vec![
                                             CowStr::new_static("#cardItem"),
-                                            CowStr::new_static("#deckItem"),
+                                            CowStr::new_static("#deckItem")
                                         ],
                                         ..Default::default()
                                     }),
@@ -494,9 +496,11 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the list was last updated.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the list was last updated.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -516,7 +520,7 @@ fn lexicon_doc_com_deckbelcher_collection_list() -> LexiconDoc<'static> {
 
 pub mod deck_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -665,7 +669,7 @@ where
 
 pub mod list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -827,7 +831,10 @@ where
     St::Name: list_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> ListBuilder<list_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ListBuilder<list_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,

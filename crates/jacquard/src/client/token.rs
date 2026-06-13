@@ -1,239 +1,34 @@
 use jacquard_common::IntoStatic;
 use jacquard_common::bos::BosStr;
-use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::session::{
     FileTokenStore, SessionHint, SessionKey, SessionSelector, SessionStore, SessionStoreError,
 };
-use jacquard_common::types::string::{Datetime, Did};
-use jacquard_oauth::scopes::Scopes;
-use jacquard_oauth::session::{AuthRequestData, ClientSessionData, DpopClientData, DpopReqData};
-use jacquard_oauth::types::OAuthTokenType;
-use jose_jwk::Key;
-use serde::{Deserialize, Serialize};
-use smol_str::SmolStr;
+use jacquard_common::types::string::Did;
+use jacquard_oauth::session::{AuthRequestData, ClientSessionData};
+use smol_str::{SmolStr, format_smolstr};
 
 /// On-disk session records for app-password and OAuth flows, sharing a single JSON map.
+///
+/// The OAuth variants store [`ClientSessionData`] and [`AuthRequestData`] directly, rather
+/// than through a separate serialization shim. With the default `SmolStr` backing these types
+/// satisfy `DeserializeOwned`, so they can be (de)serialized as-is.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum StoredSession {
-    /// App-password session
+    /// App-password session.
     Atp(StoredAtSession),
-    /// OAuth client session
-    OAuth(OAuthSession),
-    /// OAuth authorization request state
-    OAuthState(OAuthState),
+    /// OAuth client session.
+    ClientSession(ClientSessionData),
+    /// OAuth authorization request state.
+    AuthRequest(AuthRequestData),
 }
 
 /// Persisted representation of an app-password session plus its store-local session id.
 #[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct StoredAtSession {
     /// Session id label (e.g., "session")
-    pub session_id: String,
+    pub session_id: SmolStr,
     /// Stored app-password session.
     pub session: crate::client::AtpSession,
-}
-
-/// Persisted OAuth client session (on-disk format).
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-pub struct OAuthSession {
-    /// Account DID
-    account_did: String,
-    /// Client-generated session id (usually auth `state`)
-    session_id: String,
-
-    /// Base URL of the resource server (PDS)
-    host_url: Uri<String>,
-
-    /// Base URL of the authorization server (PDS or entryway)
-    authserver_url: String,
-
-    /// Full token endpoint URL
-    authserver_token_endpoint: String,
-
-    /// Full revocation endpoint URL, if available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    authserver_revocation_endpoint: Option<String>,
-
-    /// Granted scopes (space-separated, normalized).
-    scopes: String,
-
-    /// Client DPoP key material
-    pub dpop_key: Key,
-    /// Current auth server DPoP nonce
-    pub dpop_authserver_nonce: String,
-    /// Current resource server (PDS) DPoP nonce
-    pub dpop_host_nonce: String,
-
-    /// Token response issuer
-    pub iss: String,
-    /// Token subject (DID)
-    pub sub: String,
-    /// Token audience (verified PDS URL)
-    pub aud: String,
-    /// Token scopes (raw) if provided
-    pub scope: Option<String>,
-
-    /// Refresh token
-    pub refresh_token: Option<String>,
-    /// Access token
-    pub access_token: String,
-    /// Token type (e.g., DPoP)
-    pub token_type: OAuthTokenType,
-
-    /// Expiration timestamp
-    pub expires_at: Option<Datetime>,
-}
-
-impl<S: jacquard_common::bos::BosStr + Ord> From<ClientSessionData<S>> for OAuthSession {
-    fn from(data: ClientSessionData<S>) -> Self {
-        OAuthSession {
-            account_did: AsRef::<str>::as_ref(&data.account_did).to_owned(),
-            session_id: AsRef::<str>::as_ref(&data.session_id).to_owned(),
-            host_url: data.host_url.clone(),
-            authserver_url: AsRef::<str>::as_ref(&data.authserver_url).to_owned(),
-            authserver_token_endpoint: AsRef::<str>::as_ref(&data.authserver_token_endpoint)
-                .to_owned(),
-            authserver_revocation_endpoint: data
-                .authserver_revocation_endpoint
-                .map(|s| AsRef::<str>::as_ref(&s).to_owned()),
-            scopes: String::from(data.scopes.to_normalized_string()),
-            dpop_key: data.dpop_data.dpop_key,
-            dpop_authserver_nonce: AsRef::<str>::as_ref(&data.dpop_data.dpop_authserver_nonce)
-                .to_owned(),
-            dpop_host_nonce: AsRef::<str>::as_ref(&data.dpop_data.dpop_host_nonce).to_owned(),
-            iss: AsRef::<str>::as_ref(&data.token_set.iss).to_owned(),
-            sub: AsRef::<str>::as_ref(&data.token_set.sub).to_owned(),
-            aud: AsRef::<str>::as_ref(&data.token_set.aud).to_owned(),
-            scope: data
-                .token_set
-                .scope
-                .map(|s| AsRef::<str>::as_ref(&s).to_owned()),
-            refresh_token: data
-                .token_set
-                .refresh_token
-                .map(|s| AsRef::<str>::as_ref(&s).to_owned()),
-            access_token: AsRef::<str>::as_ref(&data.token_set.access_token).to_owned(),
-            token_type: data.token_set.token_type,
-            expires_at: data.token_set.expires_at,
-        }
-    }
-}
-
-impl From<OAuthSession> for ClientSessionData {
-    fn from(session: OAuthSession) -> Self {
-        ClientSessionData {
-            account_did: Did::new_owned(session.account_did).expect("stored DID should be valid"),
-            session_id: SmolStr::from(session.session_id),
-            host_url: session.host_url,
-            authserver_url: SmolStr::from(session.authserver_url),
-            authserver_token_endpoint: SmolStr::from(session.authserver_token_endpoint),
-            authserver_revocation_endpoint: session
-                .authserver_revocation_endpoint
-                .map(SmolStr::from),
-            scopes: Scopes::new(SmolStr::from(session.scopes.as_str()))
-                .expect("stored scopes should be valid"),
-            dpop_data: DpopClientData {
-                dpop_key: session.dpop_key,
-                dpop_authserver_nonce: SmolStr::from(session.dpop_authserver_nonce),
-                dpop_host_nonce: SmolStr::from(session.dpop_host_nonce),
-            },
-            token_set: jacquard_oauth::types::TokenSet {
-                iss: SmolStr::from(session.iss),
-                sub: Did::new_owned(session.sub).expect("stored DID should be valid"),
-                aud: SmolStr::from(session.aud),
-                scope: session.scope.map(SmolStr::from),
-                refresh_token: session.refresh_token.map(SmolStr::from),
-                access_token: SmolStr::from(session.access_token),
-                token_type: session.token_type,
-                expires_at: session.expires_at,
-            },
-            resolved_scopes: None,
-        }
-    }
-}
-
-/// Persisted OAuth authorization request state.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct OAuthState {
-    /// Random identifier generated for the authorization flow (`state`)
-    pub state: String,
-
-    /// Base URL of the authorization server (PDS or entryway)
-    pub authserver_url: Uri<String>,
-
-    /// Optional pre-known account DID
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub account_did: Option<String>,
-
-    /// Requested scopes (space-separated, normalized).
-    pub scopes: String,
-
-    /// Request URI for the authorization step
-    pub request_uri: String,
-
-    /// Full token endpoint URL
-    pub authserver_token_endpoint: String,
-
-    /// Full revocation endpoint URL, if available
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub authserver_revocation_endpoint: Option<String>,
-
-    /// PKCE verifier
-    pub pkce_verifier: String,
-
-    /// Client DPoP key material
-    pub dpop_key: Key,
-    /// Auth server DPoP nonce at PAR time
-    #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub dpop_authserver_nonce: Option<String>,
-}
-
-impl<S: jacquard_common::bos::BosStr + Ord> TryFrom<AuthRequestData<S>> for OAuthState {
-    type Error = jacquard_common::deps::fluent_uri::ParseError;
-
-    fn try_from(value: AuthRequestData<S>) -> Result<Self, Self::Error> {
-        Ok(OAuthState {
-            authserver_url: Uri::parse(value.authserver_url.as_ref())?.to_owned(),
-            account_did: value
-                .account_did
-                .map(|s| AsRef::<str>::as_ref(&s).to_owned()),
-            scopes: String::from(value.scopes.to_normalized_string()),
-            request_uri: AsRef::<str>::as_ref(&value.request_uri).to_owned(),
-            authserver_token_endpoint: AsRef::<str>::as_ref(&value.authserver_token_endpoint)
-                .to_owned(),
-            authserver_revocation_endpoint: value
-                .authserver_revocation_endpoint
-                .map(|s| AsRef::<str>::as_ref(&s).to_owned()),
-            pkce_verifier: AsRef::<str>::as_ref(&value.pkce_verifier).to_owned(),
-            dpop_key: value.dpop_data.dpop_key,
-            dpop_authserver_nonce: value
-                .dpop_data
-                .dpop_authserver_nonce
-                .map(|s| AsRef::<str>::as_ref(&s).to_owned()),
-            state: AsRef::<str>::as_ref(&value.state).to_owned(),
-        })
-    }
-}
-
-impl From<OAuthState> for AuthRequestData {
-    fn from(value: OAuthState) -> Self {
-        AuthRequestData {
-            authserver_url: SmolStr::from(value.authserver_url.as_str()),
-            state: SmolStr::from(value.state),
-            account_did: value
-                .account_did
-                .map(|s| Did::new_owned(s).expect("stored DID should be valid")),
-            authserver_revocation_endpoint: value.authserver_revocation_endpoint.map(SmolStr::from),
-            scopes: Scopes::new(SmolStr::from(value.scopes.as_str()))
-                .expect("stored scopes should be valid"),
-            request_uri: SmolStr::from(value.request_uri),
-            authserver_token_endpoint: SmolStr::from(value.authserver_token_endpoint),
-            pkce_verifier: SmolStr::from(value.pkce_verifier),
-            dpop_data: DpopReqData {
-                dpop_key: value.dpop_key,
-                dpop_authserver_nonce: value.dpop_authserver_nonce.map(SmolStr::from),
-            },
-        }
-    }
 }
 
 /// Convenience wrapper over `FileTokenStore` offering unified storage across auth modes.
@@ -259,16 +54,16 @@ impl FileAuthStore {
         Self(FileTokenStore::new(path))
     }
 
-    fn atp_key(key: &SessionKey) -> String {
-        format!("atp:{}", key)
+    fn atp_key(key: &SessionKey) -> SmolStr {
+        format_smolstr!("atp:{}", key)
     }
 
-    fn oauth_key(key: &SessionKey) -> String {
-        format!("oauth:{}", key)
+    fn oauth_key(key: &SessionKey) -> SmolStr {
+        format_smolstr!("oauth:{}", key)
     }
 
-    fn oauth_state_key(state: &str) -> String {
-        format!("oauth-state:{}", state)
+    fn oauth_state_key(state: &str) -> SmolStr {
+        format_smolstr!("oauth-state:{}", state)
     }
 }
 
@@ -282,8 +77,8 @@ impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
         let Some(value) = self.0.get_value(&Self::oauth_key(&key))? else {
             return Ok(None);
         };
-        if let StoredSession::OAuth(session) = serde_json::from_value(value)? {
-            Ok(Some(session.into()))
+        if let StoredSession::ClientSession(session) = serde_json::from_value(value)? {
+            Ok(Some(session))
         } else {
             Ok(None)
         }
@@ -293,7 +88,7 @@ impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
         let key = SessionKey::new(session.account_did.clone(), session.session_id.clone());
         self.0.set_value(
             Self::oauth_key(&key),
-            serde_json::to_value(StoredSession::OAuth(session.into()))?,
+            serde_json::to_value(StoredSession::ClientSession(session))?,
         )?;
         Ok(())
     }
@@ -315,8 +110,8 @@ impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
         let Some(value) = self.0.get_value(&key)? else {
             return Ok(None);
         };
-        if let StoredSession::OAuthState(auth_req) = serde_json::from_value(value)? {
-            Ok(Some(auth_req.into()))
+        if let StoredSession::AuthRequest(auth_req) = serde_json::from_value(value)? {
+            Ok(Some(auth_req))
         } else {
             Ok(None)
         }
@@ -326,14 +121,11 @@ impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
         &self,
         auth_req_info: &AuthRequestData,
     ) -> Result<(), SessionStoreError> {
-        let key = Self::oauth_state_key(&auth_req_info.state);
-        let state = auth_req_info.clone().try_into().map_err(
-            |e: jacquard_common::deps::fluent_uri::ParseError| {
-                SessionStoreError::Other(Box::new(e))
-            },
+        let key = Self::oauth_state_key(auth_req_info.state.as_ref());
+        self.0.set_value(
+            key,
+            serde_json::to_value(StoredSession::AuthRequest(auth_req_info.clone()))?,
         )?;
-        self.0
-            .set_value(key, serde_json::to_value(StoredSession::OAuthState(state))?)?;
         Ok(())
     }
 
@@ -345,13 +137,10 @@ impl jacquard_oauth::authstore::ClientAuthStore for FileAuthStore {
     async fn list_session_keys(&self) -> Result<Vec<SessionKey>, SessionStoreError> {
         let mut keys = Vec::new();
         for (_key, value) in self.0.entries()? {
-            if let Ok(StoredSession::OAuth(session)) =
+            if let Ok(StoredSession::ClientSession(session)) =
                 serde_json::from_value::<StoredSession>(value)
             {
-                keys.push(SessionKey::new(
-                    Did::new_owned(session.account_did).expect("stored DID should be valid"),
-                    session.session_id,
-                ));
+                keys.push(SessionKey::new(session.account_did, session.session_id));
             }
         }
         Ok(keys)
@@ -374,7 +163,7 @@ impl SessionStore<SessionKey, crate::client::AtpSession> for FileAuthStore {
         session: crate::client::AtpSession,
     ) -> Result<(), jacquard_common::session::SessionStoreError> {
         let stored = StoredAtSession {
-            session_id: key.session_id.to_string(),
+            session_id: key.session_id.clone(),
             session,
         };
         self.0.set_value(
@@ -517,7 +306,11 @@ mod tests {
     use super::*;
     use crate::client::AtpSession;
     use crate::client::credential_session::SessionKey;
+    use jacquard_common::deps::fluent_uri::Uri;
     use jacquard_common::types::string::{Did, Handle};
+    use jacquard_oauth::scopes::Scopes;
+    use jacquard_oauth::session::DpopClientData;
+    use jacquard_oauth::types::OAuthTokenType;
     use std::fs;
     use std::path::PathBuf;
 

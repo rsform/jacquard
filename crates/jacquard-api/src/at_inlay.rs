@@ -17,12 +17,13 @@ pub mod placeholder;
 pub mod slot;
 pub mod throw;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,17 +34,14 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::at_inlay;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay;
 /// Cache lifetime and invalidation tags returned by XRPC components.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CachePolicy<S: BosStr = DefaultStr> {
     ///How frequently the underlying data changes
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -142,6 +140,7 @@ where
     }
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -155,10 +154,7 @@ pub enum CachePolicyTagsItem<S: BosStr = DefaultStr> {
 /// A renderable Inlay element.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Element<S: BosStr = DefaultStr> {
     ///Stable key that identifies the component among its siblings.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -175,10 +171,7 @@ pub struct Element<S: BosStr = DefaultStr> {
 /// Standard response from a component render call.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Response<S: BosStr = DefaultStr> {
     ///Cache lifetime and invalidation tags
     pub cache: at_inlay::CachePolicy<S>,
@@ -191,10 +184,7 @@ pub struct Response<S: BosStr = DefaultStr> {
 /// Cache tag: depend on backlink relationships to a subject.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TagLink<S: BosStr = DefaultStr> {
     ///Collection NSID of the linking records. Omit for any collection.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -208,10 +198,7 @@ pub struct TagLink<S: BosStr = DefaultStr> {
 /// Cache tag: depend on a specific record, collection, or identity.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TagRecord<S: BosStr = DefaultStr> {
     ///AT URI at record, collection, or identity granularity
     pub uri: AtUri<S>,
@@ -219,11 +206,9 @@ pub struct TagRecord<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViaValtown<S: BosStr = DefaultStr> {
     ///Val Town val UUID
     pub val_id: S,
@@ -353,10 +338,10 @@ impl<S: BosStr> LexiconSchema for ViaValtown<S> {
 }
 
 fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.inlay.defs"),
@@ -365,18 +350,22 @@ fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cachePolicy"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Cache lifetime and invalidation tags returned by XRPC components.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Cache lifetime and invalidation tags returned by XRPC components.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("life"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "How frequently the underlying data changes",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "How frequently the underlying data changes",
+                                    ),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -384,13 +373,15 @@ fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Data dependencies for cache invalidation",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Data dependencies for cache invalidation",
+                                    ),
+                                ),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("#tagRecord"),
-                                        CowStr::new_static("#tagLink"),
+                                        CowStr::new_static("#tagLink")
                                     ],
                                     ..Default::default()
                                 }),
@@ -413,9 +404,11 @@ fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("key"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Stable key that identifies the component among its siblings.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Stable key that identifies the component among its siblings.",
+                                    ),
+                                ),
                                 max_length: Some(256usize),
                                 ..Default::default()
                             }),
@@ -429,9 +422,9 @@ fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "NSID of the component to render.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("NSID of the component to render."),
+                                ),
                                 format: Some(LexStringFormat::Nsid),
                                 ..Default::default()
                             }),
@@ -444,13 +437,14 @@ fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("response"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Standard response from a component render call.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("node"),
-                        SmolStr::new_static("cache"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Standard response from a component render call.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("node"), SmolStr::new_static("cache")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -515,9 +509,11 @@ fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tagRecord"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Cache tag: depend on a specific record, collection, or identity.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Cache tag: depend on a specific record, collection, or identity.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -525,9 +521,11 @@ fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT URI at record, collection, or identity granularity",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT URI at record, collection, or identity granularity",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -565,7 +563,7 @@ fn lexicon_doc_at_inlay_defs() -> LexiconDoc<'static> {
 
 pub mod element_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -710,7 +708,7 @@ where
 
 pub mod response_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -755,10 +753,7 @@ pub mod response_state {
 /// Builder for constructing an instance of this type.
 pub struct ResponseBuilder<St: response_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<at_inlay::CachePolicy<S>>,
-        Option<at_inlay::Element<S>>,
-    ),
+    _fields: (Option<at_inlay::CachePolicy<S>>, Option<at_inlay::Element<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -862,7 +857,7 @@ where
 
 pub mod tag_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -992,7 +987,7 @@ where
 
 pub mod tag_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1097,7 +1092,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TagRecord<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TagRecord<S> {
         TagRecord {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

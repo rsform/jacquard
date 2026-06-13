@@ -213,6 +213,8 @@ pub use websocket::{
     WsText, tungstenite_client::TungsteniteClient,
 };
 
+pub use smol_str::{SmolStr, ToSmolStr, format_smolstr};
+
 pub use types::value::*;
 
 /// Authorization token types for XRPC requests.

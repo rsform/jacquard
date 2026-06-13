@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,23 +24,21 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_tophhie::profile;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_tophhie::profile;
 /// Granular communication consent flags.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CommunicationPreferences<S: BosStr = DefaultStr> {
     ///True if the user consents to receive marketing communications.
     pub marketing: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -77,10 +75,7 @@ pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
 /// Granular PDS preference consent flags.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PdsPreferences<S: BosStr = DefaultStr> {
     ///True if the user participates in accessibility scoring.
     pub accessibility_scoring: bool,
@@ -170,7 +165,7 @@ impl<S: BosStr> LexiconSchema for PdsPreferences<S> {
 
 pub mod communication_preferences_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -212,20 +207,28 @@ pub struct CommunicationPreferencesBuilder<
 
 impl CommunicationPreferences<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> CommunicationPreferencesBuilder<communication_preferences_state::Empty, DefaultStr> {
+    pub fn new() -> CommunicationPreferencesBuilder<
+        communication_preferences_state::Empty,
+        DefaultStr,
+    > {
         CommunicationPreferencesBuilder::new()
     }
 }
 
 impl<S: BosStr> CommunicationPreferences<S> {
     /// Create a new builder for this type
-    pub fn builder() -> CommunicationPreferencesBuilder<communication_preferences_state::Empty, S> {
+    pub fn builder() -> CommunicationPreferencesBuilder<
+        communication_preferences_state::Empty,
+        S,
+    > {
         CommunicationPreferencesBuilder::builder()
     }
 }
 
-impl CommunicationPreferencesBuilder<communication_preferences_state::Empty, DefaultStr> {
+impl CommunicationPreferencesBuilder<
+    communication_preferences_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         CommunicationPreferencesBuilder {
@@ -236,7 +239,9 @@ impl CommunicationPreferencesBuilder<communication_preferences_state::Empty, Def
     }
 }
 
-impl<S: BosStr> CommunicationPreferencesBuilder<communication_preferences_state::Empty, S> {
+impl<
+    S: BosStr,
+> CommunicationPreferencesBuilder<communication_preferences_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         CommunicationPreferencesBuilder {
@@ -256,7 +261,10 @@ where
     pub fn marketing(
         mut self,
         value: impl Into<bool>,
-    ) -> CommunicationPreferencesBuilder<communication_preferences_state::SetMarketing<St>, S> {
+    ) -> CommunicationPreferencesBuilder<
+        communication_preferences_state::SetMarketing<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         CommunicationPreferencesBuilder {
             _state: PhantomData,
@@ -291,10 +299,10 @@ where
 }
 
 fn lexicon_doc_social_tophhie_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.tophhie.profile"),
@@ -303,7 +311,9 @@ fn lexicon_doc_social_tophhie_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("communicationPreferences"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Granular communication consent flags.")),
+                    description: Some(
+                        CowStr::new_static("Granular communication consent flags."),
+                    ),
                     required: Some(vec![SmolStr::new_static("marketing")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -325,11 +335,13 @@ fn lexicon_doc_social_tophhie_profile() -> LexiconDoc<'static> {
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         description: Some(CowStr::new_static("Tophhie profile record")),
-                        required: Some(vec![
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("pdsPreferences"),
-                            SmolStr::new_static("communicationPreferences"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("pdsPreferences"),
+                                SmolStr::new_static("communicationPreferences")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -343,9 +355,11 @@ fn lexicon_doc_social_tophhie_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "ISO 8601 timestamp when this profile record was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "ISO 8601 timestamp when this profile record was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -360,9 +374,11 @@ fn lexicon_doc_social_tophhie_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "ISO 8601 timestamp when this profile record was updated.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "ISO 8601 timestamp when this profile record was updated.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -377,11 +393,15 @@ fn lexicon_doc_social_tophhie_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pdsPreferences"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Granular PDS preference consent flags.")),
-                    required: Some(vec![
-                        SmolStr::new_static("showOnHomepage"),
-                        SmolStr::new_static("accessibilityScoring"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Granular PDS preference consent flags."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("showOnHomepage"),
+                            SmolStr::new_static("accessibilityScoring")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -410,7 +430,7 @@ fn lexicon_doc_social_tophhie_profile() -> LexiconDoc<'static> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -615,7 +635,7 @@ where
 
 pub mod pds_preferences_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -658,7 +678,10 @@ pub mod pds_preferences_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PdsPreferencesBuilder<St: pds_preferences_state::State, S: BosStr = DefaultStr> {
+pub struct PdsPreferencesBuilder<
+    St: pds_preferences_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<bool>),
     _type: PhantomData<fn() -> S>,
@@ -753,7 +776,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PdsPreferences<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PdsPreferences<S> {
         PdsPreferences {
             accessibility_scoring: self._fields.0.unwrap(),
             show_on_homepage: self._fields.1.unwrap(),

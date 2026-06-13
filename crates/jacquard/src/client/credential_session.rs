@@ -1,10 +1,8 @@
 use std::sync::Arc;
 
-use jacquard_api::com_atproto::server::{
-    create_session::CreateSession, refresh_session::RefreshSession,
-};
+use jacquard_common::xrpc::atproto::{CreateSession, RefreshSession};
 use jacquard_common::{
-    AuthorizationToken, CowStr, IntoStatic,
+    AuthorizationToken, IntoStatic,
     bos::BosStr,
     deps::fluent_uri::Uri,
     error::{AuthError, ClientError, XrpcResult},
@@ -20,9 +18,12 @@ use tokio::sync::RwLock;
 
 use crate::client::AtpSession;
 #[cfg(feature = "websocket")]
-use jacquard_common::websocket::{WebSocketClient, WebSocketConnection};
-#[cfg(feature = "websocket")]
 use jacquard_common::xrpc::XrpcSubscription;
+#[cfg(feature = "websocket")]
+use jacquard_common::{
+    CowStr,
+    websocket::{WebSocketClient, WebSocketConnection},
+};
 use jacquard_identity::resolver::{
     DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
 };
@@ -58,15 +59,15 @@ pub struct CredentialLoginChallenge {
 
 /// Options for hint/challenge-based app-password login helpers.
 #[derive(Debug, Clone)]
-pub struct CredentialLoginOptions<'a> {
+pub struct CredentialLoginOptions {
     /// App-password or account password.
-    pub password: CowStr<'a>,
+    pub password: SmolStr,
     /// Login identifier override, required when the challenge has no identifier.
-    pub identifier: Option<CowStr<'a>>,
+    pub identifier: Option<SmolStr>,
     /// Whether taken-down accounts are allowed.
     pub allow_takendown: Option<bool>,
     /// Optional auth factor token.
-    pub auth_factor_token: Option<CowStr<'a>>,
+    pub auth_factor_token: Option<SmolStr>,
     /// Explicit PDS/entryway endpoint to use for login.
     pub pds: Option<Uri<String>>,
 }
@@ -194,15 +195,15 @@ fn credential_challenge_from_hint<S: BosStr>(hint: &SessionHint<S>) -> Credentia
             session_id: None,
         },
         SessionHint::Did(did) => CredentialLoginChallenge {
-            identifier: Some(did.as_str().to_smolstr()),
+            identifier: Some(did.to_smolstr()),
             session_id: None,
         },
         SessionHint::Handle(handle) => CredentialLoginChallenge {
-            identifier: Some(handle.as_str().to_smolstr()),
+            identifier: Some(handle.to_smolstr()),
             session_id: None,
         },
         SessionHint::Key(key) => CredentialLoginChallenge {
-            identifier: Some(key.did.as_str().to_smolstr()),
+            identifier: Some(key.did.to_smolstr()),
             session_id: Some(key.session_id.clone()),
         },
         SessionHint::Identifier(identifier) => CredentialLoginChallenge {
@@ -377,11 +378,11 @@ where
     /// - Persists and activates the session, and updates the base endpoint to the user's PDS.
     pub async fn login(
         &self,
-        identifier: CowStr<'_>,
-        password: CowStr<'_>,
-        session_id: Option<CowStr<'_>>,
+        identifier: &str,
+        password: &str,
+        session_id: Option<&str>,
         allow_takendown: Option<bool>,
-        auth_factor_token: Option<CowStr<'_>>,
+        auth_factor_token: Option<&str>,
         pds: Option<Uri<String>>,
     ) -> std::result::Result<AtpSession, ClientError> {
         #[cfg(feature = "tracing")]
@@ -391,17 +392,15 @@ where
         // Resolve PDS base
         let pds = if let Some(pds) = pds {
             pds
-        } else if identifier.as_ref().starts_with("http://")
-            || identifier.as_ref().starts_with("https://")
-        {
-            Uri::parse(identifier.as_ref())
+        } else if identifier.starts_with("http://") || identifier.starts_with("https://") {
+            Uri::parse(identifier)
                 .map_err(|e| {
                     ClientError::from(e)
                         .with_help("identifier should be a valid https:// URL, handle, or DID")
                 })?
                 .to_owned()
-        } else if identifier.as_ref().starts_with("did:") {
-            let did = Did::new(identifier.as_ref()).map_err(|e| {
+        } else if identifier.starts_with("did:") {
+            let did = Did::new(identifier).map_err(|e| {
                 ClientError::invalid_request(format!("invalid did: {:?}", e))
                     .with_help("DID format should be did:method:identifier (e.g., did:plc:abc123)")
             })?;
@@ -415,7 +414,7 @@ where
                     ClientError::invalid_request("missing PDS endpoint")
                         .with_help("DID document must include a PDS service endpoint")
                 })?
-        } else if identifier.as_ref().contains("@") && !identifier.as_ref().starts_with("@") {
+        } else if identifier.contains('@') && !identifier.starts_with('@') {
             // we're going to assume its an email
             pds.ok_or_else(|| {
                 ClientError::invalid_request("missing PDS endpoint")
@@ -423,11 +422,10 @@ where
             })?
         } else {
             // treat as handle
-            let handle =
-                jacquard_common::types::string::Handle::new(identifier.as_ref()).map_err(|e| {
-                    ClientError::invalid_request(format!("invalid handle: {:?}", e))
-                        .with_help("handle format should be domain.tld (e.g., alice.bsky.social)")
-                })?;
+            let handle = jacquard_common::types::string::Handle::new(identifier).map_err(|e| {
+                ClientError::invalid_request(format!("invalid handle: {:?}", e))
+                    .with_help("handle format should be domain.tld (e.g., alice.bsky.social)")
+            })?;
             let did = self.client.resolve_handle(&handle).await.map_err(|e| {
                 ClientError::from(e).with_context("handle resolution failed during login")
             })?;
@@ -446,10 +444,9 @@ where
         // Build and send createSession
         let req = CreateSession {
             allow_takendown,
-            auth_factor_token,
-            identifier: identifier.clone().into_static(),
-            password: password.into_static(),
-            extra_data: None,
+            auth_factor_token: auth_factor_token.map(SmolStr::from),
+            identifier: SmolStr::from(identifier),
+            password: SmolStr::from(password),
         };
 
         let resp = self
@@ -468,8 +465,8 @@ where
             session.pds = Some(jacquard_common::xrpc::normalize_base_uri(pds.clone()));
         }
 
-        let sid = session_id.unwrap_or_else(|| CowStr::new_static("session"));
-        let key = SessionKey::new(session.did.clone().convert::<SmolStr>(), SmolStr::from(sid));
+        let sid = SmolStr::from(session_id.unwrap_or("session"));
+        let key = SessionKey::new(session.did.clone().convert::<SmolStr>(), sid);
         self.store
             .set(key.clone(), session.clone())
             .await
@@ -540,12 +537,13 @@ where
     pub async fn login_from_challenge(
         &self,
         challenge: CredentialLoginChallenge,
-        options: CredentialLoginOptions<'_>,
+        options: CredentialLoginOptions,
     ) -> Result<AtpSession, ClientError> {
         let identifier = challenge
             .identifier
-            .map(CowStr::from)
-            .or(options.identifier)
+            .as_ref()
+            .map(|s| s.as_str())
+            .or(options.identifier.as_deref())
             .ok_or_else(|| {
                 ClientError::invalid_request("missing login identifier").with_help(
                     "provide CredentialLoginOptions::identifier for an Any resume challenge",
@@ -553,10 +551,10 @@ where
             })?;
         self.login(
             identifier,
-            options.password,
-            challenge.session_id.map(CowStr::from),
+            &options.password,
+            challenge.session_id.as_deref(),
             options.allow_takendown,
-            options.auth_factor_token,
+            options.auth_factor_token.as_deref(),
             options.pds,
         )
         .await
@@ -566,7 +564,7 @@ where
     pub async fn login_with_hint<Str: BosStr>(
         &self,
         hint: &SessionHint<Str>,
-        options: CredentialLoginOptions<'_>,
+        options: CredentialLoginOptions,
     ) -> Result<AtpSession, ClientError> {
         self.login_from_challenge(credential_challenge_from_hint(hint), options)
             .await
@@ -576,7 +574,7 @@ where
     pub async fn resume_or_login<Str: BosStr + Send + Sync>(
         &self,
         hint: &SessionHint<Str>,
-        options: CredentialLoginOptions<'_>,
+        options: CredentialLoginOptions,
     ) -> Result<AtpSession, ClientError>
     where
         S: SessionSelector<CredentialSessionMatch, Error = ClientError>,
@@ -593,7 +591,7 @@ where
     pub async fn restore(
         &self,
         did: Did,
-        session_id: CowStr<'_>,
+        session_id: &str,
     ) -> std::result::Result<(), ClientError> {
         #[cfg(feature = "tracing")]
         let _span =
@@ -611,7 +609,7 @@ where
     pub async fn switch_session(
         &self,
         did: Did,
-        session_id: CowStr<'_>,
+        session_id: &str,
     ) -> std::result::Result<(), ClientError> {
         let key = SessionKey::new(did, SmolStr::from(session_id));
         let Some(sess) = self.store.get(&key).await else {

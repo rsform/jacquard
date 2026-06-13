@@ -29,9 +29,11 @@ use jacquard_common::deps::fluent_uri::pct_enc::{
     EStr, EString,
     encoder::{Query, Query as EncQuery},
 };
+use jacquard_common::types::collection::Collection;
 use jacquard_common::types::did::Did;
 use jacquard_common::types::nsid::Nsid;
 use jacquard_common::types::string::AtStrError;
+use jacquard_common::xrpc::XrpcRequest;
 use jacquard_common::{BorrowOrShare, Bos, FromStaticStr, IntoStatic};
 use serde::de::{Error as DeError, Visitor};
 use serde::{Deserialize, Serialize};

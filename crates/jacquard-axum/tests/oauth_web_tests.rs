@@ -269,7 +269,8 @@ async fn metadata_route_serves_client_metadata_from_state_oauth_client() {
     )
     .unwrap();
     let expected = serde_json::to_value(expected).unwrap();
-    let app = routes::<MockClient, MemoryAuthStore, AppState>().with_state(state);
+    let app = routes::<MockClient, MemoryAuthStore, AppState>(&OAuthWebConfig::default())
+        .with_state(state);
     let server = TestServer::new(app).unwrap();
 
     let response = server.get("/oauth-client-metadata.json").await;
@@ -413,7 +414,7 @@ async fn start_auth_query_redirects_to_authorization_endpoint() {
                 .unwrap(),
         )
         .await;
-    let app = routes::<MockClient, MemoryAuthStore, AppState>().with_state(state);
+    let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
     let server = TestServer::new(app).unwrap();
 
     let response = server
@@ -429,7 +430,7 @@ async fn start_auth_query_redirects_to_authorization_endpoint() {
 #[tokio::test]
 async fn callback_rejects_unknown_state() {
     let (state, _) = app_state();
-    let app = routes::<MockClient, MemoryAuthStore, AppState>().with_state(state);
+    let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
     let server = TestServer::new(app).unwrap();
 
     server
@@ -525,7 +526,7 @@ async fn callback_success_sets_session_cookie() {
         )
         .await
         .unwrap();
-    let app = routes::<MockClient, MemoryAuthStore, AppState>()
+    let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config)
         .route("/protected", get(strict_handler))
         .with_state(state);
     let server = TestServer::builder().save_cookies().build(app).unwrap();
@@ -613,7 +614,7 @@ fn state_from_return_cookie(response: &axum_test::TestResponse, prefix: &str) ->
 #[tokio::test]
 async fn start_auth_return_to_callback_redirects_back_and_cookie_states_do_not_conflict() {
     let (state, client) = app_state();
-    let app = routes::<MockClient, MemoryAuthStore, AppState>().with_state(state.clone());
+    let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state.clone());
     let server = TestServer::builder().save_cookies().build(app).unwrap();
 
     queue_par_response(&client, "urn:par:first").await;
@@ -693,4 +694,53 @@ async fn logout_deletes_session_and_clears_cookie() {
             .is_none()
     );
     server.get("/protected").await.assert_status_unauthorized();
+}
+
+#[tokio::test]
+async fn custom_config_paths_are_honored_by_routes() {
+    // Custom paths must differ from the defaults so the assertions are
+    // meaningful: the default paths should 404 while the custom ones work.
+    let mut config = OAuthWebConfig::default();
+    config.start_auth_path = SmolStr::new_static("/auth/begin");
+    config.callback_path = SmolStr::new_static("/auth/done");
+    config.logout_path = SmolStr::new_static("/auth/exit");
+
+    let (mut state, client) = app_state();
+    state.config = config.clone();
+
+    // The start route needs a PAR response before it can redirect.
+    queue_par_response(&client, "urn:par:custom").await;
+    let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
+    let server = TestServer::new(app).unwrap();
+
+    // The custom start path issues a redirect to the authorization endpoint.
+    let response = server
+        .get("/auth/begin?identifier=alice.bsky.social")
+        .await;
+    response.assert_status(StatusCode::TEMPORARY_REDIRECT);
+    let location = response.header("location");
+    assert!(location.to_str().unwrap().starts_with("https://issuer/authorize?"));
+
+    // The callback route exists at its custom path (unknown state still 400s,
+    // which proves the route is mounted and handled rather than 404).
+    server
+        .get("/auth/done?code=abc&state=missing&iss=https%3A%2F%2Fissuer")
+        .await
+        .assert_status_bad_request();
+
+    // The default start path is no longer mounted.
+    server
+        .get("/oauth/start?identifier=alice.bsky.social")
+        .await
+        .assert_status_not_found();
+}
+
+#[tokio::test]
+async fn default_config_metadata_route_remains_fixed() {
+    // The client-metadata route is intentionally not configurable.
+    let (state, _) = app_state();
+    let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
+    let server = TestServer::new(app).unwrap();
+
+    server.get("/oauth-client-metadata.json").await.assert_status_ok();
 }

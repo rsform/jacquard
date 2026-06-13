@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::harvest::minigame;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::harvest::minigame;
 /// A record of a harvest minigame round played by a user
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -101,10 +101,7 @@ pub struct MinigameGetRecordOutput<S: BosStr = DefaultStr> {
 /// Count of each rarity level collected
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RarityBreakdown<S: BosStr = DefaultStr> {
     ///Number of common (triangle) shapes collected
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -355,7 +352,7 @@ impl<S: BosStr> LexiconSchema for RarityBreakdown<S> {
 
 pub mod minigame_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -490,8 +487,23 @@ impl MinigameBuilder<minigame_state::Empty, DefaultStr> {
         MinigameBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -504,8 +516,23 @@ impl<S: BosStr> MinigameBuilder<minigame_state::Empty, S> {
         MinigameBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -696,7 +723,10 @@ impl<St: minigame_state::State, S: BosStr> MinigameBuilder<St, S> {
         self
     }
     /// Set the `rarityBreakdown` field to an Option value (optional)
-    pub fn maybe_rarity_breakdown(mut self, value: Option<minigame::RarityBreakdown<S>>) -> Self {
+    pub fn maybe_rarity_breakdown(
+        mut self,
+        value: Option<minigame::RarityBreakdown<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
@@ -824,10 +854,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_harvest_minigame() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.harvest.minigame"),
@@ -999,7 +1029,9 @@ fn lexicon_doc_net_anisota_harvest_minigame() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rarityBreakdown"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Count of each rarity level collected")),
+                    description: Some(
+                        CowStr::new_static("Count of each rarity level collected"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

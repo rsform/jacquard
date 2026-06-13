@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_impactindexer::link::attestation;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_impactindexer::link::attestation;
 /// The EIP-712 typed data message structure
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Eip712Message<S: BosStr = DefaultStr> {
     ///The chain ID as a string (for bigint compatibility, max uint256)
     pub chain_id: S,
@@ -127,7 +124,8 @@ impl<S: BosStr> Serialize for AttestationSignatureType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AttestationSignatureType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for AttestationSignatureType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -154,7 +152,9 @@ where
             AttestationSignatureType::Eoa => AttestationSignatureType::Eoa,
             AttestationSignatureType::Erc1271 => AttestationSignatureType::Erc1271,
             AttestationSignatureType::Erc6492 => AttestationSignatureType::Erc6492,
-            AttestationSignatureType::Other(v) => AttestationSignatureType::Other(v.into_static()),
+            AttestationSignatureType::Other(v) => {
+                AttestationSignatureType::Other(v.into_static())
+            }
         }
     }
 }
@@ -365,10 +365,10 @@ impl<S: BosStr> LexiconSchema for Attestation<S> {
 }
 
 fn lexicon_doc_org_impactindexer_link_attestation() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.impactindexer.link.attestation"),
@@ -558,7 +558,7 @@ fn lexicon_doc_org_impactindexer_link_attestation() -> LexiconDoc<'static> {
 
 pub mod attestation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -855,7 +855,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Attestation<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Attestation<S> {
         Attestation {
             address: self._fields.0.unwrap(),
             chain_id: self._fields.1.unwrap(),
