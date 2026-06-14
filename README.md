@@ -87,7 +87,7 @@ If you have `just` installed, you can run the [examples](https://tangled.org/non
 ### 0.12 Release Highlights:
 
 #### Borrow-or-share
-Jacquard 0.12 swaps from lifetime-based CowStr<'_>-backed string types to the "borrow-or-share" pattern. Jacquard generated types are now generic over their string backing type, as opposed to having a lifetime, where that backing type is one that implements the requisite traits for the pattern. The default backing type, aliased `DefaultStr`, is `SmolStr`, but any of `CowStr<'_>`, `String`, `&str`, and `Cow<'_, str>` can be used currently. Defaulting to `SmolStr` maintains the niceties it added to `CowStr<'_>`, such as non-allocating construction from static string slices regardless of length, and inlining small strings in all cases while vastly simplifying the common cases where you don't want to deal with lifetimes.
+Jacquard 0.12 swaps from lifetime-based `CowStr<'_>`-backed string types to the "borrow-or-share" pattern. Jacquard generated types are now generic over their string backing type, as opposed to having a lifetime, where that backing type is one that implements the requisite traits for the pattern. The default backing type, aliased `DefaultStr`, is `SmolStr`, but any of `CowStr<'_>`, `String`, `&str`, and `Cow<'_, str>` can be used currently. Defaulting to `SmolStr` maintains the niceties it added to `CowStr<'_>`, such as non-allocating construction from static string slices regardless of length, and inlining small strings in all cases while vastly simplifying the common cases where you don't want to deal with lifetimes.
 
 **Type updates**
 - Jacquard types backed by owned string types can now meet `DeserializeOwned` trait bounds. 

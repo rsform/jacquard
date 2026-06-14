@@ -9,6 +9,22 @@ pre-commit-all:
 test *ARGS:
     cargo nextest run {{ ARGS }}
 
+publish:
+    @echo "Running tests..."
+    test-all
+    check-wasm
+    @echo "Publishing..."
+    cargo publish -p jacquard-common
+    cargo publish -p jacquard-lexicon
+    cargo publish -p jacquard-derive
+    cargo publish -p jacquard-identity
+    cargo publish -p jacquard-lexgen
+    cargo publish -p jacquard-api
+    cargo publish -p jacquard-repo
+    cargo publish -p jacquard-oauth
+    cargo publish -p jacquard
+    cargo publish -p jacquard-axum
+
 # Run tests across the full feature matrix
 test-all:
     @echo "── default ──"
