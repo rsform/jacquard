@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A coffee bean variety tracked by the user
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -42,7 +42,7 @@ pub struct Bean<S: BosStr = DefaultStr> {
     pub closed: Option<bool>,
     ///Timestamp when the bean record was created
     pub created_at: Datetime,
-    ///Additional notes about the beans
+    ///Public roaster description or tasting notes for the beans
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
     ///Optional product, vendor, or information URL for the beans
@@ -50,6 +50,9 @@ pub struct Bean<S: BosStr = DefaultStr> {
     pub link: Option<UriValue<S>>,
     ///Name of the coffee bean (e.g., 'Ethiopian Yirgacheffe', 'Morning Blend')
     pub name: S,
+    ///Personal notes about the beans
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub notes: Option<S>,
     ///Geographic origin of the beans (e.g., 'Ethiopia', 'Colombia')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub origin: Option<S>,
@@ -59,6 +62,9 @@ pub struct Bean<S: BosStr = DefaultStr> {
     ///User rating of the bean (1-10 scale, optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rating: Option<i64>,
+    ///Optional date when the beans were roasted (YYYY-MM-DD)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub roast_date: Option<S>,
     ///Roast level (e.g., 'Light', 'Medium', 'Dark')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub roast_level: Option<S>,
@@ -161,6 +167,16 @@ impl<S: BosStr> LexiconSchema for Bean<S> {
                 });
             }
         }
+        if let Some(ref value) = self.notes {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 2000usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("notes"),
+                    max: 2000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         if let Some(ref value) = self.origin {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 200usize {
@@ -199,6 +215,16 @@ impl<S: BosStr> LexiconSchema for Bean<S> {
                 });
             }
         }
+        if let Some(ref value) = self.roast_date {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 10usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("roast_date"),
+                    max: 10usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         if let Some(ref value) = self.roast_level {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {
@@ -225,7 +251,7 @@ impl<S: BosStr> LexiconSchema for Bean<S> {
 
 pub mod bean_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -278,7 +304,9 @@ pub struct BeanBuilder<St: bean_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<S>,
         Option<S>,
+        Option<S>,
         Option<i64>,
+        Option<S>,
         Option<S>,
         Option<AtUri<S>>,
         Option<AtUri<S>>,
@@ -307,7 +335,20 @@ impl BeanBuilder<bean_state::Empty, DefaultStr> {
         BeanBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -320,7 +361,20 @@ impl<S: BosStr> BeanBuilder<bean_state::Empty, S> {
         BeanBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -391,7 +445,10 @@ where
     St::Name: bean_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> BeanBuilder<bean_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> BeanBuilder<bean_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         BeanBuilder {
             _state: PhantomData,
@@ -402,14 +459,27 @@ where
 }
 
 impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
+    /// Set the `notes` field (optional)
+    pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `notes` field to an Option value (optional)
+    pub fn maybe_notes(mut self, value: Option<S>) -> Self {
+        self._fields.5 = value;
+        self
+    }
+}
+
+impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
     /// Set the `origin` field (optional)
     pub fn origin(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `origin` field to an Option value (optional)
     pub fn maybe_origin(mut self, value: Option<S>) -> Self {
-        self._fields.5 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -417,12 +487,12 @@ impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
 impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
     /// Set the `process` field (optional)
     pub fn process(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `process` field to an Option value (optional)
     pub fn maybe_process(mut self, value: Option<S>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -430,12 +500,25 @@ impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
 impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
     pub fn maybe_rating(mut self, value: Option<i64>) -> Self {
-        self._fields.7 = value;
+        self._fields.8 = value;
+        self
+    }
+}
+
+impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
+    /// Set the `roastDate` field (optional)
+    pub fn roast_date(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.9 = value.into();
+        self
+    }
+    /// Set the `roastDate` field to an Option value (optional)
+    pub fn maybe_roast_date(mut self, value: Option<S>) -> Self {
+        self._fields.9 = value;
         self
     }
 }
@@ -443,12 +526,12 @@ impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
 impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
     /// Set the `roastLevel` field (optional)
     pub fn roast_level(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `roastLevel` field to an Option value (optional)
     pub fn maybe_roast_level(mut self, value: Option<S>) -> Self {
-        self._fields.8 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -456,12 +539,12 @@ impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
 impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
     /// Set the `roasterRef` field (optional)
     pub fn roaster_ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `roasterRef` field to an Option value (optional)
     pub fn maybe_roaster_ref(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.9 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -469,12 +552,12 @@ impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
 impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
     /// Set the `sourceRef` field (optional)
     pub fn source_ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.10 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `sourceRef` field to an Option value (optional)
     pub fn maybe_source_ref(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.10 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -482,12 +565,12 @@ impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
 impl<St: bean_state::State, S: BosStr> BeanBuilder<St, S> {
     /// Set the `variety` field (optional)
     pub fn variety(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.11 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `variety` field to an Option value (optional)
     pub fn maybe_variety(mut self, value: Option<S>) -> Self {
-        self._fields.11 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -506,13 +589,15 @@ where
             description: self._fields.2,
             link: self._fields.3,
             name: self._fields.4.unwrap(),
-            origin: self._fields.5,
-            process: self._fields.6,
-            rating: self._fields.7,
-            roast_level: self._fields.8,
-            roaster_ref: self._fields.9,
-            source_ref: self._fields.10,
-            variety: self._fields.11,
+            notes: self._fields.5,
+            origin: self._fields.6,
+            process: self._fields.7,
+            rating: self._fields.8,
+            roast_date: self._fields.9,
+            roast_level: self._fields.10,
+            roaster_ref: self._fields.11,
+            source_ref: self._fields.12,
+            variety: self._fields.13,
             extra_data: Default::default(),
         }
     }
@@ -524,23 +609,25 @@ where
             description: self._fields.2,
             link: self._fields.3,
             name: self._fields.4.unwrap(),
-            origin: self._fields.5,
-            process: self._fields.6,
-            rating: self._fields.7,
-            roast_level: self._fields.8,
-            roaster_ref: self._fields.9,
-            source_ref: self._fields.10,
-            variety: self._fields.11,
+            notes: self._fields.5,
+            origin: self._fields.6,
+            process: self._fields.7,
+            rating: self._fields.8,
+            roast_date: self._fields.9,
+            roast_level: self._fields.10,
+            roaster_ref: self._fields.11,
+            source_ref: self._fields.12,
+            variety: self._fields.13,
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_social_arabica_alpha_bean() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.arabica.alpha.bean"),
@@ -585,7 +672,9 @@ fn lexicon_doc_social_arabica_alpha_bean() -> LexiconDoc<'static> {
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
-                                        CowStr::new_static("Additional notes about the beans"),
+                                        CowStr::new_static(
+                                            "Public roaster description or tasting notes for the beans",
+                                        ),
                                     ),
                                     max_length: Some(1000usize),
                                     ..Default::default()
@@ -613,6 +702,16 @@ fn lexicon_doc_social_arabica_alpha_bean() -> LexiconDoc<'static> {
                                         ),
                                     ),
                                     max_length: Some(200usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("notes"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static("Personal notes about the beans"),
+                                    ),
+                                    max_length: Some(2000usize),
                                     ..Default::default()
                                 }),
                             );
@@ -645,6 +744,18 @@ fn lexicon_doc_social_arabica_alpha_bean() -> LexiconDoc<'static> {
                                 LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(1i64),
                                     maximum: Some(10i64),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("roastDate"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Optional date when the beans were roasted (YYYY-MM-DD)",
+                                        ),
+                                    ),
+                                    max_length: Some(10usize),
                                     ..Default::default()
                                 }),
                             );

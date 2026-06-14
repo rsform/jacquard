@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::uk_skyblur::preference;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::uk_skyblur::preference;
 /// A declaration of a Skyblur account.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -54,11 +54,9 @@ pub struct PreferenceGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Preference<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MyPage<S: BosStr = DefaultStr> {
     ///Define the description displayed on MyPage.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -156,7 +154,7 @@ impl<S: BosStr> LexiconSchema for MyPage<S> {
 
 pub mod preference_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -261,7 +259,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Preference<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Preference<S> {
         Preference {
             my_page: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -270,10 +271,10 @@ where
 }
 
 fn lexicon_doc_uk_skyblur_preference() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("uk.skyblur.preference"),
@@ -282,7 +283,9 @@ fn lexicon_doc_uk_skyblur_preference() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A declaration of a Skyblur account.")),
+                    description: Some(
+                        CowStr::new_static("A declaration of a Skyblur account."),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("myPage")]),
@@ -292,7 +295,9 @@ fn lexicon_doc_uk_skyblur_preference() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("myPage"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    refs: vec![CowStr::new_static("uk.skyblur.preference#myPage")],
+                                    refs: vec![
+                                        CowStr::new_static("uk.skyblur.preference#myPage")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
@@ -313,9 +318,11 @@ fn lexicon_doc_uk_skyblur_preference() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Define the description displayed on MyPage.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Define the description displayed on MyPage.",
+                                    ),
+                                ),
                                 max_length: Some(10000usize),
                                 max_graphemes: Some(100000usize),
                                 ..Default::default()
@@ -340,7 +347,7 @@ fn lexicon_doc_uk_skyblur_preference() -> LexiconDoc<'static> {
 
 pub mod my_page_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

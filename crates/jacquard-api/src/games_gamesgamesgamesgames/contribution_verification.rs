@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A permanent record crediting a contributor for an accepted contribution. Never deleted.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -47,6 +47,7 @@ pub struct ContributionVerification<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ContributionVerificationAcceptedBy<S: BosStr = DefaultStr> {
@@ -97,7 +98,8 @@ impl<S: BosStr> Serialize for ContributionVerificationAcceptedBy<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContributionVerificationAcceptedBy<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ContributionVerificationAcceptedBy<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -121,15 +123,22 @@ where
     type Output = ContributionVerificationAcceptedBy<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ContributionVerificationAcceptedBy::Mod => ContributionVerificationAcceptedBy::Mod,
-            ContributionVerificationAcceptedBy::Owner => ContributionVerificationAcceptedBy::Owner,
-            ContributionVerificationAcceptedBy::Both => ContributionVerificationAcceptedBy::Both,
+            ContributionVerificationAcceptedBy::Mod => {
+                ContributionVerificationAcceptedBy::Mod
+            }
+            ContributionVerificationAcceptedBy::Owner => {
+                ContributionVerificationAcceptedBy::Owner
+            }
+            ContributionVerificationAcceptedBy::Both => {
+                ContributionVerificationAcceptedBy::Both
+            }
             ContributionVerificationAcceptedBy::Other(v) => {
                 ContributionVerificationAcceptedBy::Other(v.into_static())
             }
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ContributionVerificationContributionType<S: BosStr = DefaultStr> {
@@ -181,8 +190,7 @@ impl<S: BosStr> Serialize for ContributionVerificationContributionType<S> {
 }
 
 impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-    for ContributionVerificationContributionType<S>
-{
+for ContributionVerificationContributionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -198,7 +206,8 @@ impl<S: BosStr + Default> Default for ContributionVerificationContributionType<S
     }
 }
 
-impl<S: BosStr> jacquard_common::IntoStatic for ContributionVerificationContributionType<S>
+impl<S: BosStr> jacquard_common::IntoStatic
+for ContributionVerificationContributionType<S>
 where
     S: BosStr + jacquard_common::IntoStatic,
     S::Output: BosStr,
@@ -234,7 +243,9 @@ pub struct ContributionVerificationGetRecordOutput<S: BosStr = DefaultStr> {
 }
 
 impl<S: BosStr> ContributionVerification<S> {
-    pub fn uri(uri: S) -> Result<RecordUri<S, ContributionVerificationRecord>, UriError> {
+    pub fn uri(
+        uri: S,
+    ) -> Result<RecordUri<S, ContributionVerificationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
@@ -250,7 +261,8 @@ impl XrpcResp for ContributionVerificationRecord {
     type Err = RecordError;
 }
 
-impl<S: BosStr> From<ContributionVerificationGetRecordOutput<S>> for ContributionVerification<S> {
+impl<S: BosStr> From<ContributionVerificationGetRecordOutput<S>>
+for ContributionVerification<S> {
     fn from(output: ContributionVerificationGetRecordOutput<S>) -> Self {
         output.value
     }
@@ -283,7 +295,7 @@ impl<S: BosStr> LexiconSchema for ContributionVerification<S> {
 
 pub mod contribution_verification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -412,20 +424,28 @@ pub struct ContributionVerificationBuilder<
 
 impl ContributionVerification<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> ContributionVerificationBuilder<contribution_verification_state::Empty, DefaultStr> {
+    pub fn new() -> ContributionVerificationBuilder<
+        contribution_verification_state::Empty,
+        DefaultStr,
+    > {
         ContributionVerificationBuilder::new()
     }
 }
 
 impl<S: BosStr> ContributionVerification<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ContributionVerificationBuilder<contribution_verification_state::Empty, S> {
+    pub fn builder() -> ContributionVerificationBuilder<
+        contribution_verification_state::Empty,
+        S,
+    > {
         ContributionVerificationBuilder::builder()
     }
 }
 
-impl ContributionVerificationBuilder<contribution_verification_state::Empty, DefaultStr> {
+impl ContributionVerificationBuilder<
+    contribution_verification_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         ContributionVerificationBuilder {
@@ -436,7 +456,9 @@ impl ContributionVerificationBuilder<contribution_verification_state::Empty, Def
     }
 }
 
-impl<S: BosStr> ContributionVerificationBuilder<contribution_verification_state::Empty, S> {
+impl<
+    S: BosStr,
+> ContributionVerificationBuilder<contribution_verification_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         ContributionVerificationBuilder {
@@ -456,8 +478,10 @@ where
     pub fn accepted_by(
         mut self,
         value: impl Into<ContributionVerificationAcceptedBy<S>>,
-    ) -> ContributionVerificationBuilder<contribution_verification_state::SetAcceptedBy<St>, S>
-    {
+    ) -> ContributionVerificationBuilder<
+        contribution_verification_state::SetAcceptedBy<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         ContributionVerificationBuilder {
             _state: PhantomData,
@@ -476,8 +500,10 @@ where
     pub fn contribution(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ContributionVerificationBuilder<contribution_verification_state::SetContribution<St>, S>
-    {
+    ) -> ContributionVerificationBuilder<
+        contribution_verification_state::SetContribution<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         ContributionVerificationBuilder {
             _state: PhantomData,
@@ -496,8 +522,10 @@ where
     pub fn contribution_type(
         mut self,
         value: impl Into<ContributionVerificationContributionType<S>>,
-    ) -> ContributionVerificationBuilder<contribution_verification_state::SetContributionType<St>, S>
-    {
+    ) -> ContributionVerificationBuilder<
+        contribution_verification_state::SetContributionType<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         ContributionVerificationBuilder {
             _state: PhantomData,
@@ -516,8 +544,10 @@ where
     pub fn contributor(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ContributionVerificationBuilder<contribution_verification_state::SetContributor<St>, S>
-    {
+    ) -> ContributionVerificationBuilder<
+        contribution_verification_state::SetContributor<St>,
+        S,
+    > {
         self._fields.3 = Option::Some(value.into());
         ContributionVerificationBuilder {
             _state: PhantomData,
@@ -536,7 +566,10 @@ where
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ContributionVerificationBuilder<contribution_verification_state::SetCreatedAt<St>, S> {
+    ) -> ContributionVerificationBuilder<
+        contribution_verification_state::SetCreatedAt<St>,
+        S,
+    > {
         self._fields.4 = Option::Some(value.into());
         ContributionVerificationBuilder {
             _state: PhantomData,
@@ -555,7 +588,10 @@ where
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ContributionVerificationBuilder<contribution_verification_state::SetSubject<St>, S> {
+    ) -> ContributionVerificationBuilder<
+        contribution_verification_state::SetSubject<St>,
+        S,
+    > {
         self._fields.5 = Option::Some(value.into());
         ContributionVerificationBuilder {
             _state: PhantomData,
@@ -604,11 +640,13 @@ where
     }
 }
 
-fn lexicon_doc_games_gamesgamesgamesgames_contributionVerification() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
+fn lexicon_doc_games_gamesgamesgamesgames_contributionVerification() -> LexiconDoc<
+    'static,
+> {
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.contributionVerification"),

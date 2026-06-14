@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::slice::get_job_logs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::slice::get_job_logs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LogEntry<S: BosStr = DefaultStr> {
     ///When the log entry was created
     pub created_at: Datetime,
@@ -58,11 +55,9 @@ pub struct LogEntry<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJobLogs<S: BosStr = DefaultStr> {
     pub job_id: S,
     /// Defaults to `100`. Min: 1. Max: 1000.
@@ -71,11 +66,9 @@ pub struct GetJobLogs<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetJobLogsOutput<S: BosStr = DefaultStr> {
     pub logs: Vec<get_job_logs::LogEntry<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -127,7 +120,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetJobLogsRequest {
 
 pub mod log_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -295,7 +288,10 @@ where
     St::Id: log_entry_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<i64>) -> LogEntryBuilder<log_entry_state::SetId<St>, S> {
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> LogEntryBuilder<log_entry_state::SetId<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LogEntryBuilder {
             _state: PhantomData,
@@ -456,10 +452,10 @@ where
 }
 
 fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.slice.getJobLogs"),
@@ -468,22 +464,22 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logEntry"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("logType"),
-                        SmolStr::new_static("level"),
-                        SmolStr::new_static("message"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("logType"), SmolStr::new_static("level"),
+                            SmolStr::new_static("message")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the log entry was created",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the log entry was created"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -497,9 +493,9 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("jobId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "UUID of related job if applicable",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("UUID of related job if applicable"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -533,18 +529,18 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("sliceUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of related slice if applicable",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of related slice if applicable"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID of related user if applicable",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("DID of related user if applicable"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -557,28 +553,32 @@ fn lexicon_doc_network_slices_slice_getJobLogs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("jobId")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("jobId"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("UUID of the sync job")),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("jobId")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("jobId"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("UUID of the sync job"),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -594,7 +594,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_job_logs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

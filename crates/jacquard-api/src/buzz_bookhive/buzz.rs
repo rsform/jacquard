@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// Record containing a Bookhive comment.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -133,7 +133,7 @@ impl<S: BosStr> LexiconSchema for Buzz<S> {
 
 pub mod buzz_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -208,12 +208,7 @@ pub mod buzz_state {
 /// Builder for constructing an instance of this type.
 pub struct BuzzBuilder<St: buzz_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<StrongRef<S>>,
-        Option<S>,
-        Option<Datetime>,
-        Option<StrongRef<S>>,
-    ),
+    _fields: (Option<StrongRef<S>>, Option<S>, Option<Datetime>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -278,7 +273,10 @@ where
     St::Comment: buzz_state::IsUnset,
 {
     /// Set the `comment` field (required)
-    pub fn comment(mut self, value: impl Into<S>) -> BuzzBuilder<buzz_state::SetComment<St>, S> {
+    pub fn comment(
+        mut self,
+        value: impl Into<S>,
+    ) -> BuzzBuilder<buzz_state::SetComment<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
@@ -357,10 +355,10 @@ where
 }
 
 fn lexicon_doc_buzz_bookhive_buzz() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("buzz.bookhive.buzz"),

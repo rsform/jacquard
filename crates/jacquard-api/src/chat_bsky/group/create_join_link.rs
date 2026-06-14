@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::group::JoinLinkView;
-use crate::chat_bsky::group::JoinRule;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::group::JoinLinkView;
+use crate::chat_bsky::group::JoinRule;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateJoinLink<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub join_rule: JoinRule<S>,
@@ -34,20 +31,27 @@ pub struct CreateJoinLink<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateJoinLinkOutput<S: BosStr = DefaultStr> {
     pub join_link: JoinLinkView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CreateJoinLinkError {
     #[serde(rename = "EnabledJoinLinkAlreadyExists")]
@@ -58,10 +62,7 @@ pub enum CreateJoinLinkError {
     InsufficientRole(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CreateJoinLinkError {
@@ -112,8 +113,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateJoinLinkResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateJoinLink<S> {
     const NSID: &'static str = "chat.bsky.group.createJoinLink";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateJoinLinkResponse;
 }
 
@@ -123,8 +125,9 @@ Path: `/xrpc/chat.bsky.group.createJoinLink`. The request payload type is `Creat
 pub struct CreateJoinLinkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateJoinLinkRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.group.createJoinLink";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateJoinLink<S>;
     type Response = CreateJoinLinkResponse;
 }
@@ -135,7 +138,7 @@ fn _default_create_join_link_require_approval() -> Option<bool> {
 
 pub mod create_join_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -178,7 +181,10 @@ pub mod create_join_link_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateJoinLinkBuilder<St: create_join_link_state::State, S: BosStr = DefaultStr> {
+pub struct CreateJoinLinkBuilder<
+    St: create_join_link_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<JoinRule<S>>, Option<bool>),
     _type: PhantomData<fn() -> S>,
@@ -287,7 +293,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateJoinLink<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateJoinLink<S> {
         CreateJoinLink {
             convo_id: self._fields.0.unwrap(),
             join_rule: self._fields.1.unwrap(),

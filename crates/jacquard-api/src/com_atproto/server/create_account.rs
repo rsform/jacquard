@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateAccount<S: BosStr = DefaultStr> {
     ///Pre-existing atproto DID, being imported to a new account.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,11 +46,9 @@ pub struct CreateAccount<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateAccountOutput<S: BosStr = DefaultStr> {
     pub access_jwt: S,
     ///The DID of the new account.
@@ -67,9 +62,18 @@ pub struct CreateAccountOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CreateAccountError {
     #[serde(rename = "InvalidHandle")]
@@ -88,10 +92,7 @@ pub enum CreateAccountError {
     IncompatibleDidDoc(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CreateAccountError {
@@ -170,8 +171,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateAccountResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateAccount<S> {
     const NSID: &'static str = "com.atproto.server.createAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateAccountResponse;
 }
 
@@ -181,15 +183,16 @@ Path: `/xrpc/com.atproto.server.createAccount`. The request payload type is `Cre
 pub struct CreateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateAccount<S>;
     type Response = CreateAccountResponse;
 }
 
 pub mod create_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -220,7 +223,10 @@ pub mod create_account_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateAccountBuilder<St: create_account_state::State, S: BosStr = DefaultStr> {
+pub struct CreateAccountBuilder<
+    St: create_account_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
@@ -416,7 +422,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateAccount<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateAccount<S> {
         CreateAccount {
             did: self._fields.0,
             email: self._fields.1,

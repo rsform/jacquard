@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,17 +20,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blog_pckt::theme;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blog_pckt::theme;
 /// Theme configuration for a blog publication
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Theme<S: BosStr = DefaultStr> {
     ///Dark mode color palette
     pub dark: theme::Palette<S>,
@@ -49,10 +46,7 @@ pub struct Theme<S: BosStr = DefaultStr> {
 /// Color palette with CSS hex values
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Palette<S: BosStr = DefaultStr> {
     ///Accent color (hex value)
     pub accent: S,
@@ -183,7 +177,7 @@ impl<S: BosStr> LexiconSchema for Palette<S> {
 
 pub mod theme_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -366,10 +360,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.theme"),
@@ -378,13 +372,12 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Theme configuration for a blog publication",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("light"),
-                        SmolStr::new_static("dark"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Theme configuration for a blog publication"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("light"), SmolStr::new_static("dark")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -398,9 +391,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("font"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Font family name (optional)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Font family name (optional)"),
+                                ),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -428,21 +421,26 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("palette"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Color palette with CSS hex values")),
-                    required: Some(vec![
-                        SmolStr::new_static("link"),
-                        SmolStr::new_static("text"),
-                        SmolStr::new_static("accent"),
-                        SmolStr::new_static("background"),
-                        SmolStr::new_static("surfaceHover"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Color palette with CSS hex values"),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("link"), SmolStr::new_static("text"),
+                            SmolStr::new_static("accent"),
+                            SmolStr::new_static("background"),
+                            SmolStr::new_static("surfaceHover")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("accent"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Accent color (hex value)")),
+                                description: Some(
+                                    CowStr::new_static("Accent color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),
@@ -450,9 +448,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("background"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Background color (hex value)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Background color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),
@@ -460,7 +458,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("link"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Link color (hex value)")),
+                                description: Some(
+                                    CowStr::new_static("Link color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),
@@ -468,9 +468,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("surfaceHover"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Surface hover color (hex value)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Surface hover color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),
@@ -478,9 +478,9 @@ fn lexicon_doc_blog_pckt_theme() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Primary text color (hex value)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Primary text color (hex value)"),
+                                ),
                                 max_length: Some(7usize),
                                 ..Default::default()
                             }),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,10 +25,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_certified::Did;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_certified::Did;
 /// Defines a badge that can be awarded via badge award records to users, projects, or activity claims.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -172,25 +172,31 @@ impl<S: BosStr> LexiconSchema for Definition<S> {
             let value = &self.icon;
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp", "image/svg+xml"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/webp",
+                    "image/svg+xml",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("icon"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
-                            "image/svg+xml".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string(), "image/svg+xml".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -214,7 +220,7 @@ impl<S: BosStr> LexiconSchema for Definition<S> {
 
 pub mod definition_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -459,7 +465,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Definition<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Definition<S> {
         Definition {
             allowed_issuers: self._fields.0,
             badge_type: self._fields.1.unwrap(),
@@ -473,10 +482,10 @@ where
 }
 
 fn lexicon_doc_app_certified_badge_definition() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.badge.definition"),

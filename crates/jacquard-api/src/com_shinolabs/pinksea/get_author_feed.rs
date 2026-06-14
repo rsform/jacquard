@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorFeed<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     /// Defaults to `50`. Min: 1. Max: 50.
@@ -34,11 +31,9 @@ pub struct GetAuthorFeed<S: BosStr = DefaultStr> {
     pub since: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAuthorFeedOutput<S: BosStr = DefaultStr> {
     pub oekaki: Vec<HydratedOekaki<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -79,7 +74,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_author_feed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -110,7 +105,10 @@ pub mod get_author_feed_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetAuthorFeedBuilder<St: get_author_feed_state::State, S: BosStr = DefaultStr> {
+pub struct GetAuthorFeedBuilder<
+    St: get_author_feed_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,

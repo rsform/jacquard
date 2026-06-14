@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,27 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_gamesgamesgamesgames::get_user_lists;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::get_user_lists;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ListPreviewItem<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub media: Option<Data<S>>,
+    pub name: S,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub slug: Option<S>,
+    pub uri: AtUri<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUserLists<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -43,11 +54,9 @@ pub struct GetUserLists<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUserListsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -56,11 +65,9 @@ pub struct GetUserListsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UserListView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,9 +76,26 @@ pub struct UserListView<S: BosStr = DefaultStr> {
     pub has_game: Option<bool>,
     pub item_count: i64,
     pub name: S,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub preview_items: Option<Vec<get_user_lists::ListPreviewItem<S>>>,
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+impl<S: BosStr> LexiconSchema for ListPreviewItem<S> {
+    fn nsid() -> &'static str {
+        "games.gamesgamesgamesgames.getUserLists"
+    }
+    fn def_name() -> &'static str {
+        "listPreviewItem"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_games_gamesgamesgamesgames_getUserLists()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
 }
 
 /** Response marker for the `games.gamesgamesgamesgames.getUserLists` query.
@@ -113,7 +137,368 @@ impl<S: BosStr> LexiconSchema for UserListView<S> {
         lexicon_doc_games_gamesgamesgamesgames_getUserLists()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.preview_items {
+            #[allow(unused_comparisons)]
+            if value.len() > 4usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("preview_items"),
+                    max: 4usize,
+                    actual: value.len(),
+                });
+            }
+        }
         Ok(())
+    }
+}
+
+pub mod list_preview_item_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Uri;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Uri = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Name = Set<members::name>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct ListPreviewItemBuilder<
+    St: list_preview_item_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<Data<S>>, Option<S>, Option<S>, Option<AtUri<S>>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl ListPreviewItem<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> ListPreviewItemBuilder<list_preview_item_state::Empty, DefaultStr> {
+        ListPreviewItemBuilder::new()
+    }
+}
+
+impl<S: BosStr> ListPreviewItem<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> ListPreviewItemBuilder<list_preview_item_state::Empty, S> {
+        ListPreviewItemBuilder::builder()
+    }
+}
+
+impl ListPreviewItemBuilder<list_preview_item_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        ListPreviewItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> ListPreviewItemBuilder<list_preview_item_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        ListPreviewItemBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_preview_item_state::State, S: BosStr> ListPreviewItemBuilder<St, S> {
+    /// Set the `media` field (optional)
+    pub fn media(mut self, value: impl Into<Option<Data<S>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `media` field to an Option value (optional)
+    pub fn maybe_media(mut self, value: Option<Data<S>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ListPreviewItemBuilder<St, S>
+where
+    St: list_preview_item_state::State,
+    St::Name: list_preview_item_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> ListPreviewItemBuilder<list_preview_item_state::SetName<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        ListPreviewItemBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: list_preview_item_state::State, S: BosStr> ListPreviewItemBuilder<St, S> {
+    /// Set the `slug` field (optional)
+    pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `slug` field to an Option value (optional)
+    pub fn maybe_slug(mut self, value: Option<S>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> ListPreviewItemBuilder<St, S>
+where
+    St: list_preview_item_state::State,
+    St::Uri: list_preview_item_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> ListPreviewItemBuilder<list_preview_item_state::SetUri<St>, S> {
+        self._fields.3 = Option::Some(value.into());
+        ListPreviewItemBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> ListPreviewItemBuilder<St, S>
+where
+    St: list_preview_item_state::State,
+    St::Name: list_preview_item_state::IsSet,
+    St::Uri: list_preview_item_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> ListPreviewItem<S> {
+        ListPreviewItem {
+            media: self._fields.0,
+            name: self._fields.1.unwrap(),
+            slug: self._fields.2,
+            uri: self._fields.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ListPreviewItem<S> {
+        ListPreviewItem {
+            media: self._fields.0,
+            name: self._fields.1.unwrap(),
+            slug: self._fields.2,
+            uri: self._fields.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+fn lexicon_doc_games_gamesgamesgamesgames_getUserLists() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("games.gamesgamesgamesgames.getUserLists"),
+        defs: {
+            let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("listPreviewItem"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("name")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("media"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("slug"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("main"),
+                LexUserType::XrpcQuery(LexXrpcQuery {
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("did")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("did"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "The DID of the user whose lists to retrieve.",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("gameUri"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "If provided, each list includes a hasGame boolean indicating whether this game is in the list.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("userListView"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("name"),
+                            SmolStr::new_static("itemCount"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("createdAt"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("description"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("hasGame"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("itemCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("previewItems"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#listPreviewItem"),
+                                    ..Default::default()
+                                }),
+                                max_length: Some(4usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                format: Some(LexStringFormat::AtUri),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map
+        },
+        ..Default::default()
     }
 }
 
@@ -123,7 +508,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_user_lists_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -272,7 +657,7 @@ where
 
 pub mod user_list_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -353,6 +738,7 @@ pub struct UserListViewBuilder<St: user_list_view_state::State, S: BosStr = Defa
         Option<bool>,
         Option<i64>,
         Option<S>,
+        Option<Vec<get_user_lists::ListPreviewItem<S>>>,
         Option<AtUri<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -377,7 +763,7 @@ impl UserListViewBuilder<user_list_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         UserListViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -388,7 +774,7 @@ impl<S: BosStr> UserListViewBuilder<user_list_view_state::Empty, S> {
     pub fn builder() -> Self {
         UserListViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -477,6 +863,25 @@ where
     }
 }
 
+impl<St: user_list_view_state::State, S: BosStr> UserListViewBuilder<St, S> {
+    /// Set the `previewItems` field (optional)
+    pub fn preview_items(
+        mut self,
+        value: impl Into<Option<Vec<get_user_lists::ListPreviewItem<S>>>>,
+    ) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `previewItems` field to an Option value (optional)
+    pub fn maybe_preview_items(
+        mut self,
+        value: Option<Vec<get_user_lists::ListPreviewItem<S>>>,
+    ) -> Self {
+        self._fields.5 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> UserListViewBuilder<St, S>
 where
     St: user_list_view_state::State,
@@ -487,7 +892,7 @@ where
         mut self,
         value: impl Into<AtUri<S>>,
     ) -> UserListViewBuilder<user_list_view_state::SetUri<St>, S> {
-        self._fields.5 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         UserListViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -512,143 +917,25 @@ where
             has_game: self._fields.2,
             item_count: self._fields.3.unwrap(),
             name: self._fields.4.unwrap(),
-            uri: self._fields.5.unwrap(),
+            preview_items: self._fields.5,
+            uri: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UserListView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UserListView<S> {
         UserListView {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
             has_game: self._fields.2,
             item_count: self._fields.3.unwrap(),
             name: self._fields.4.unwrap(),
-            uri: self._fields.5.unwrap(),
+            preview_items: self._fields.5,
+            uri: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
-    }
-}
-
-fn lexicon_doc_games_gamesgamesgamesgames_getUserLists() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
-    #[allow(unused_imports)]
-    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
-    use jacquard_lexicon::lexicon::*;
-    LexiconDoc {
-        lexicon: Lexicon::Lexicon1,
-        id: CowStr::new_static("games.gamesgamesgamesgames.getUserLists"),
-        defs: {
-            let mut map = BTreeMap::new();
-            map.insert(
-                SmolStr::new_static("main"),
-                LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(
-                        LexXrpcQueryParameter::Params(LexXrpcParameters {
-                            required: Some(vec![SmolStr::new_static("did")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("cursor"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("did"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "The DID of the user whose lists to retrieve.",
-                                            ),
-                                        ),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("gameUri"),
-                                    LexXrpcParametersProperty::String(LexString {
-                                        description: Some(
-                                            CowStr::new_static(
-                                                "If provided, each list includes a hasGame boolean indicating whether this game is in the list.",
-                                            ),
-                                        ),
-                                        format: Some(LexStringFormat::AtUri),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("limit"),
-                                    LexXrpcParametersProperty::Integer(LexInteger {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        }),
-                    ),
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("userListView"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("itemCount"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("createdAt"),
-                            LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::Datetime),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("hasGame"),
-                            LexObjectProperty::Boolean(LexBoolean {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("itemCount"),
-                            LexObjectProperty::Integer(LexInteger {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("uri"),
-                            LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::AtUri),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map
-        },
-        ..Default::default()
     }
 }

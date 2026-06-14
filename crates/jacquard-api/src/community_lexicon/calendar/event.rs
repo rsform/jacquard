@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::community_lexicon::calendar::event;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::community_lexicon::location::address::Address;
 use crate::community_lexicon::location::fsq::Fsq;
 use crate::community_lexicon::location::geo::Geo;
 use crate::community_lexicon::location::hthree::Hthree;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::community_lexicon::calendar::event;
 /// The event has been cancelled.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -104,6 +104,7 @@ pub struct Event<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -144,7 +145,9 @@ pub enum Mode<S: BosStr = DefaultStr> {
 impl<S: BosStr> Mode<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CommunityLexiconCalendarEventHybrid => "community.lexicon.calendar.event#hybrid",
+            Self::CommunityLexiconCalendarEventHybrid => {
+                "community.lexicon.calendar.event#hybrid"
+            }
             Self::CommunityLexiconCalendarEventInperson => {
                 "community.lexicon.calendar.event#inperson"
             }
@@ -157,7 +160,9 @@ impl<S: BosStr> Mode<S> {
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "community.lexicon.calendar.event#hybrid" => Self::CommunityLexiconCalendarEventHybrid,
+            "community.lexicon.calendar.event#hybrid" => {
+                Self::CommunityLexiconCalendarEventHybrid
+            }
             "community.lexicon.calendar.event#inperson" => {
                 Self::CommunityLexiconCalendarEventInperson
             }
@@ -208,7 +213,9 @@ where
     type Output = Mode<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            Mode::CommunityLexiconCalendarEventHybrid => Mode::CommunityLexiconCalendarEventHybrid,
+            Mode::CommunityLexiconCalendarEventHybrid => {
+                Mode::CommunityLexiconCalendarEventHybrid
+            }
             Mode::CommunityLexiconCalendarEventInperson => {
                 Mode::CommunityLexiconCalendarEventInperson
             }
@@ -378,10 +385,7 @@ where
 /// A URI associated with the event.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Uri<S: BosStr = DefaultStr> {
     ///The display name of the URI.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -466,7 +470,7 @@ impl<S: BosStr> LexiconSchema for Uri<S> {
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -609,7 +613,10 @@ impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
 
 impl<St: event_state::State, S: BosStr> EventBuilder<St, S> {
     /// Set the `locations` field (optional)
-    pub fn locations(mut self, value: impl Into<Option<Vec<EventLocationsItem<S>>>>) -> Self {
+    pub fn locations(
+        mut self,
+        value: impl Into<Option<Vec<EventLocationsItem<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -639,7 +646,10 @@ where
     St::Name: event_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> EventBuilder<event_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> EventBuilder<event_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
@@ -742,10 +752,10 @@ where
 }
 
 fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("community.lexicon.calendar.event"),
@@ -753,21 +763,15 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("cancelled"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("hybrid"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("inperson"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("main"),
@@ -775,19 +779,23 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A calendar event.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("name"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("name")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Client-declared timestamp when the event was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Client-declared timestamp when the event was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -795,18 +803,20 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The description of the event.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The description of the event."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("endsAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Client-declared timestamp when the event ends.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Client-declared timestamp when the event ends.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -814,20 +824,18 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("locations"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "The locations where the event takes place.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The locations where the event takes place.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Union(LexRefUnion {
                                         refs: vec![
-                                            CowStr::new_static(
-                                                "community.lexicon.calendar.event#uri",
-                                            ),
-                                            CowStr::new_static(
-                                                "community.lexicon.location.address",
-                                            ),
+                                            CowStr::new_static("community.lexicon.calendar.event#uri"),
+                                            CowStr::new_static("community.lexicon.location.address"),
                                             CowStr::new_static("community.lexicon.location.fsq"),
                                             CowStr::new_static("community.lexicon.location.geo"),
-                                            CowStr::new_static("community.lexicon.location.hthree"),
+                                            CowStr::new_static("community.lexicon.location.hthree")
                                         ],
                                         ..Default::default()
                                     }),
@@ -846,7 +854,9 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The name of the event.")),
+                                    description: Some(
+                                        CowStr::new_static("The name of the event."),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -859,9 +869,11 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("startsAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Client-declared timestamp when the event starts.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Client-declared timestamp when the event starts.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -878,9 +890,9 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("uris"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "URIs associated with the event.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URIs associated with the event."),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "community.lexicon.calendar.event#uri",
@@ -906,27 +918,19 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("planned"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("postponed"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("rescheduled"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("scheduled"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("status"),
@@ -938,7 +942,9 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("uri"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A URI associated with the event.")),
+                    description: Some(
+                        CowStr::new_static("A URI associated with the event."),
+                    ),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -946,9 +952,9 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The display name of the URI.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The display name of the URI."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -966,9 +972,7 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("virtual"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },
@@ -978,7 +982,7 @@ fn lexicon_doc_community_lexicon_calendar_event() -> LexiconDoc<'static> {
 
 pub mod uri_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1070,7 +1074,10 @@ where
     St::Uri: uri_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> UriBuilder<uri_state::SetUri<St>, S> {
+    pub fn uri(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> UriBuilder<uri_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UriBuilder {
             _state: PhantomData,

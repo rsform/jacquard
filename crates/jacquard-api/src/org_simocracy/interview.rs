@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::org_simocracy::interview;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::org_simocracy::interview;
 /// An interview transcript for a sim — captures voice answers and value positions to derive the sim's constitution and speaking style.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -65,10 +65,7 @@ pub struct InterviewGetRecordOutput<S: BosStr = DefaultStr> {
 /// A single open-ended interview answer.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OpenAnswer<S: BosStr = DefaultStr> {
     ///The transcribed voice answer
     pub answer: S,
@@ -81,10 +78,7 @@ pub struct OpenAnswer<S: BosStr = DefaultStr> {
 /// A yes/no response to a value statement.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ValueResponse<S: BosStr = DefaultStr> {
     ///Whether the interviewee agreed (true) or disagreed (false)
     pub answer: bool,
@@ -220,7 +214,7 @@ impl<S: BosStr> LexiconSchema for ValueResponse<S> {
 
 pub mod interview_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -435,7 +429,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Interview<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Interview<S> {
         Interview {
             created_at: self._fields.0.unwrap(),
             open_answers: self._fields.1.unwrap(),
@@ -447,10 +444,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.interview"),
@@ -534,20 +531,24 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("openAnswer"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A single open-ended interview answer.")),
-                    required: Some(vec![
-                        SmolStr::new_static("question"),
-                        SmolStr::new_static("answer"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A single open-ended interview answer."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("question"),
+                            SmolStr::new_static("answer")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("answer"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The transcribed voice answer",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The transcribed voice answer"),
+                                ),
                                 max_length: Some(30000usize),
                                 max_graphemes: Some(3000usize),
                                 ..Default::default()
@@ -556,9 +557,9 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("question"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The interview question that was asked",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The interview question that was asked"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -571,13 +572,15 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("valueResponse"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A yes/no response to a value statement.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("statement"),
-                        SmolStr::new_static("answer"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A yes/no response to a value statement."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("statement"),
+                            SmolStr::new_static("answer")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -590,9 +593,9 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("statement"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The value statement presented",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The value statement presented"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -610,7 +613,7 @@ fn lexicon_doc_org_simocracy_interview() -> LexiconDoc<'static> {
 
 pub mod value_response_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -653,7 +656,10 @@ pub mod value_response_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ValueResponseBuilder<St: value_response_state::State, S: BosStr = DefaultStr> {
+pub struct ValueResponseBuilder<
+    St: value_response_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -748,7 +754,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ValueResponse<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ValueResponse<S> {
         ValueResponse {
             answer: self._fields.0.unwrap(),
             statement: self._fields.1.unwrap(),

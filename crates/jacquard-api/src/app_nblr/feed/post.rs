@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_nblr::feed::post;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_nblr::feed::post;
 /// width:height represents an aspect ratio. It may be approximate, and may not correspond to absolute dimensions in any given unit.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
@@ -201,16 +198,19 @@ impl<S: BosStr> LexiconSchema for Post<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -248,7 +248,7 @@ impl<S: BosStr> LexiconSchema for Post<S> {
 
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -386,7 +386,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -396,10 +399,10 @@ where
 }
 
 fn lexicon_doc_app_nblr_feed_post() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.nblr.feed.post"),
@@ -441,7 +444,9 @@ fn lexicon_doc_app_nblr_feed_post() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("Record containing a nblr post.")),
+                    description: Some(
+                        CowStr::new_static("Record containing a nblr post."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("createdAt")]),
@@ -465,9 +470,9 @@ fn lexicon_doc_app_nblr_feed_post() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional description for the post",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional description for the post"),
+                                    ),
                                     max_length: Some(2560usize),
                                     max_graphemes: Some(256usize),
                                     ..Default::default()
@@ -475,16 +480,14 @@ fn lexicon_doc_app_nblr_feed_post() -> LexiconDoc<'static> {
                             );
                             map.insert(
                                 SmolStr::new_static("image"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional title for the post",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional title for the post"),
+                                    ),
                                     max_length: Some(640usize),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
@@ -493,9 +496,11 @@ fn lexicon_doc_app_nblr_feed_post() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("uri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The URI of the linked resource; a web URL or AT URI",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The URI of the linked resource; a web URL or AT URI",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -515,7 +520,7 @@ fn lexicon_doc_app_nblr_feed_post() -> LexiconDoc<'static> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -597,7 +602,10 @@ impl<S: BosStr> PostBuilder<post_state::Empty, S> {
 
 impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<post::AspectRatio<S>>>) -> Self {
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<post::AspectRatio<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }

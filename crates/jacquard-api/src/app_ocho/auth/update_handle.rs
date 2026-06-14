@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Handle;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateHandle<S: BosStr = DefaultStr> {
     ///The new handle.
     pub handle: Handle<S>,
@@ -42,8 +39,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateHandleResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateHandle<S> {
     const NSID: &'static str = "app.ocho.auth.updateHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateHandleResponse;
 }
 
@@ -53,15 +51,16 @@ Path: `/xrpc/app.ocho.auth.updateHandle`. The request payload type is `UpdateHan
 pub struct UpdateHandleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateHandleRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.updateHandle";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateHandle<S>;
     type Response = UpdateHandleResponse;
 }
 
 pub mod update_handle_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -166,7 +165,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateHandle<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateHandle<S> {
         UpdateHandle {
             handle: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeactivateAccount<S: BosStr = DefaultStr> {
     ///A recommendation to server as to how long they should hold onto the deactivated account before deleting.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,8 +40,9 @@ impl jacquard_common::xrpc::XrpcResp for DeactivateAccountResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeactivateAccount<S> {
     const NSID: &'static str = "com.atproto.server.deactivateAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeactivateAccountResponse;
 }
 
@@ -54,8 +52,9 @@ Path: `/xrpc/com.atproto.server.deactivateAccount`. The request payload type is 
 pub struct DeactivateAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeactivateAccountRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.deactivateAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeactivateAccount<S>;
     type Response = DeactivateAccountResponse;
 }

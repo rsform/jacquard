@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::report::ReportView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::report::ReportView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReassignQueue<S: BosStr = DefaultStr> {
     ///Optional moderator-only note recorded on the resulting queueActivity as internalNote.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -34,20 +31,27 @@ pub struct ReassignQueue<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReassignQueueOutput<S: BosStr = DefaultStr> {
     pub report: ReportView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ReassignQueueError {
     /// No report exists with the given reportId
@@ -67,10 +71,7 @@ pub enum ReassignQueueError {
     QueueDisabled(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ReassignQueueError {
@@ -135,8 +136,9 @@ impl jacquard_common::xrpc::XrpcResp for ReassignQueueResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ReassignQueue<S> {
     const NSID: &'static str = "tools.ozone.report.reassignQueue";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ReassignQueueResponse;
 }
 
@@ -146,15 +148,16 @@ Path: `/xrpc/tools.ozone.report.reassignQueue`. The request payload type is `Rea
 pub struct ReassignQueueRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReassignQueueRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.report.reassignQueue";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ReassignQueue<S>;
     type Response = ReassignQueueResponse;
 }
 
 pub mod reassign_queue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -197,7 +200,10 @@ pub mod reassign_queue_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReassignQueueBuilder<St: reassign_queue_state::State, S: BosStr = DefaultStr> {
+pub struct ReassignQueueBuilder<
+    St: reassign_queue_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -306,7 +312,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReassignQueue<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReassignQueue<S> {
         ReassignQueue {
             comment: self._fields.0,
             queue_id: self._fields.1.unwrap(),

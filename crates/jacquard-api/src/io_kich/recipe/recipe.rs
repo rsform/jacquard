@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::io_kich::recipe::recipe;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::io_kich::recipe::recipe;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Ingredient<S: BosStr = DefaultStr> {
     ///[Deprecated] Amount needed in grams. Use measuredAmount/measuredUnit instead.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,11 +71,9 @@ pub struct Ingredient<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InstructionStep<S: BosStr = DefaultStr> {
     ///Unique identifier for this instruction step
     pub id: S,
@@ -87,6 +82,7 @@ pub struct InstructionStep<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -164,11 +160,9 @@ pub struct RecipeGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Recipe<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Tag<S: BosStr = DefaultStr> {
     ///Tag identifier
     pub id: S,
@@ -290,10 +284,10 @@ fn _default_ingredient_is_optional() -> Option<bool> {
 }
 
 fn lexicon_doc_io_kich_recipe_recipe() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.kich.recipe.recipe"),
@@ -404,19 +398,20 @@ fn lexicon_doc_io_kich_recipe_recipe() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("instructionStep"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("value")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Unique identifier for this instruction step",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Unique identifier for this instruction step",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -623,7 +618,9 @@ fn lexicon_doc_io_kich_recipe_recipe() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tag"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("id"), SmolStr::new_static("name")]),
+                    required: Some(
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("name")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -662,7 +659,7 @@ fn _default_recipe_servings() -> i64 {
 
 pub mod recipe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -764,8 +761,24 @@ impl RecipeBuilder<recipe_state::Empty, DefaultStr> {
         RecipeBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -778,8 +791,24 @@ impl<S: BosStr> RecipeBuilder<recipe_state::Empty, S> {
         RecipeBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -885,12 +914,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `ingredients` field (optional)
-    pub fn ingredients(mut self, value: impl Into<Option<Vec<recipe::Ingredient<S>>>>) -> Self {
+    pub fn ingredients(
+        mut self,
+        value: impl Into<Option<Vec<recipe::Ingredient<S>>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `ingredients` field to an Option value (optional)
-    pub fn maybe_ingredients(mut self, value: Option<Vec<recipe::Ingredient<S>>>) -> Self {
+    pub fn maybe_ingredients(
+        mut self,
+        value: Option<Vec<recipe::Ingredient<S>>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }
@@ -906,7 +941,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `instructions` field to an Option value (optional)
-    pub fn maybe_instructions(mut self, value: Option<Vec<recipe::InstructionStep<S>>>) -> Self {
+    pub fn maybe_instructions(
+        mut self,
+        value: Option<Vec<recipe::InstructionStep<S>>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -931,7 +969,10 @@ where
     St::Name: recipe_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> RecipeBuilder<recipe_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> RecipeBuilder<recipe_state::SetName<St>, S> {
         self._fields.10 = Option::Some(value.into());
         RecipeBuilder {
             _state: PhantomData,

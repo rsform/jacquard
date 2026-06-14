@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -118,7 +118,7 @@ impl<S: BosStr> LexiconSchema for Test<S> {
 
 pub mod test_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -257,7 +257,10 @@ where
     St::End: test_state::IsUnset,
 {
     /// Set the `end` field (required)
-    pub fn end(mut self, value: impl Into<Datetime>) -> TestBuilder<test_state::SetEnd<St>, S> {
+    pub fn end(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> TestBuilder<test_state::SetEnd<St>, S> {
         self._fields.2 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
@@ -286,7 +289,10 @@ where
     St::Start: test_state::IsUnset,
 {
     /// Set the `start` field (required)
-    pub fn start(mut self, value: impl Into<Datetime>) -> TestBuilder<test_state::SetStart<St>, S> {
+    pub fn start(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> TestBuilder<test_state::SetStart<St>, S> {
         self._fields.4 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
@@ -302,7 +308,10 @@ where
     St::Title: test_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> TestBuilder<test_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> TestBuilder<test_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
@@ -361,10 +370,10 @@ where
 }
 
 fn lexicon_doc_org_devcon_event_test() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.devcon.event.test"),
@@ -375,11 +384,12 @@ fn lexicon_doc_org_devcon_event_test() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("start"),
-                            SmolStr::new_static("end"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("start"),
+                                SmolStr::new_static("end")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -393,16 +403,18 @@ fn lexicon_doc_org_devcon_event_test() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Description of the event",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Description of the event"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("end"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("End time of the event")),
+                                    description: Some(
+                                        CowStr::new_static("End time of the event"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -410,16 +422,18 @@ fn lexicon_doc_org_devcon_event_test() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("location"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Location of the event")),
+                                    description: Some(
+                                        CowStr::new_static("Location of the event"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("start"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Start time of the event",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Start time of the event"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

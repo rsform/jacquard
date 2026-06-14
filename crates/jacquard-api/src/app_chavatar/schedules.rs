@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,8 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_chavatar::settings::RotationSchedule;
 /// The collection of rotation schedules defined by a user.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,7 +39,7 @@ use serde::{Deserialize, Serialize};
 )]
 pub struct Schedules<S: BosStr = DefaultStr> {
     ///Ordered list of rotation schedules. Active schedule is selected by kind specificity: timed(2) > period(1) > default(0). Ties broken lexicographically by id.
-    pub schedules: Vec<Data<S>>,
+    pub schedules: Vec<RotationSchedule<S>>,
     ///The timestamp when this record was last updated.
     pub updated_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -106,7 +107,7 @@ impl<S: BosStr> LexiconSchema for Schedules<S> {
 
 pub mod schedules_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,7 +152,7 @@ pub mod schedules_state {
 /// Builder for constructing an instance of this type.
 pub struct SchedulesBuilder<St: schedules_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<Data<S>>>, Option<Datetime>),
+    _fields: (Option<Vec<RotationSchedule<S>>>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -199,7 +200,7 @@ where
     /// Set the `schedules` field (required)
     pub fn schedules(
         mut self,
-        value: impl Into<Vec<Data<S>>>,
+        value: impl Into<Vec<RotationSchedule<S>>>,
     ) -> SchedulesBuilder<schedules_state::SetSchedules<St>, S> {
         self._fields.0 = Option::Some(value.into());
         SchedulesBuilder {
@@ -244,7 +245,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Schedules<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Schedules<S> {
         Schedules {
             schedules: self._fields.0.unwrap(),
             updated_at: self._fields.1.unwrap(),
@@ -254,10 +258,10 @@ where
 }
 
 fn lexicon_doc_app_chavatar_schedules() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.schedules"),

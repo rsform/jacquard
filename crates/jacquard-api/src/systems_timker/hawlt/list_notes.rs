@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,17 +22,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::systems_timker::hawlt::list_notes;
-use crate::systems_timker::hawlt::note::Note;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::systems_timker::hawlt::note::Note;
+use crate::systems_timker::hawlt::list_notes;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotes<S: BosStr = DefaultStr> {
     /// (max length: 100)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,11 +40,9 @@ pub struct ListNotes<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -59,10 +54,7 @@ pub struct ListNotesOutput<S: BosStr = DefaultStr> {
 /// A note record with its AT URI, CID, and server-side index timestamp.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NoteView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub indexed_at: Datetime,
@@ -117,7 +109,7 @@ impl<S: BosStr> LexiconSchema for NoteView<S> {
 
 pub mod list_notes_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -252,7 +244,7 @@ where
 
 pub mod note_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -327,12 +319,7 @@ pub mod note_view_state {
 /// Builder for constructing an instance of this type.
 pub struct NoteViewBuilder<St: note_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Cid<S>>,
-        Option<Datetime>,
-        Option<AtUri<S>>,
-        Option<Note<S>>,
-    ),
+    _fields: (Option<Cid<S>>, Option<Datetime>, Option<AtUri<S>>, Option<Note<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -479,10 +466,10 @@ where
 }
 
 fn lexicon_doc_systems_timker_hawlt_listNotes() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("systems.timker.hawlt.listNotes"),
@@ -491,50 +478,55 @@ fn lexicon_doc_systems_timker_hawlt_listNotes() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("repo")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    max_length: Some(100usize),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repo"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    format: Some(LexStringFormat::AtIdentifier),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("repo")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        max_length: Some(100usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repo"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        format: Some(LexStringFormat::AtIdentifier),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("noteView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A note record with its AT URI, CID, and server-side index timestamp.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("value"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A note record with its AT URI, CID, and server-side index timestamp.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("value"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

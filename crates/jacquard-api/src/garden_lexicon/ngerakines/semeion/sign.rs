@@ -10,18 +10,19 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
 pub struct Sign {
     pub body: Bytes,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -61,16 +62,22 @@ impl jacquard_common::xrpc::XrpcResp for SignResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for Sign {
     const NSID: &'static str = "garden.lexicon.ngerakines.semeion.Sign";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Response = SignResponse;
-    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
+    fn encode_body(
+        &self,
+        buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,
     {
         Ok(buffer.copy_from_slice(self.body.as_ref()))
     }
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Self, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
@@ -86,8 +93,9 @@ Path: `/xrpc/garden.lexicon.ngerakines.semeion.Sign`. The request payload type i
 pub struct SignRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SignRequest {
     const PATH: &'static str = "/xrpc/garden.lexicon.ngerakines.semeion.Sign";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("*/*");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "*/*",
+    );
     type Request<S: BosStr> = Sign;
     type Response = SignResponse;
 }

@@ -6,3 +6,4 @@
 //! Generated bindings for the `pub.leaflet.theme` Lexicon namespace/module.
 pub mod background_image;
 pub mod color;
+pub mod wordmark;

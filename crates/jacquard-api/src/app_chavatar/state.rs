@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Current execution state of rotation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,7 +37,10 @@ use serde::{Deserialize, Serialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct State<S: BosStr = DefaultStr> {
-    ///TID (ID) of the currently active avatar in the settings array.
+    ///TID of the currently active avatarSet from settings.avatarSets. Undefined when in fallback state or when avatarSets is not configured.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub active_set_id: Option<S>,
+    ///TID (ID) of the currently active avatar within the active set.
     pub cursor: S,
     ///When the avatar was last rotated.
     pub last_updated: Datetime,
@@ -100,6 +103,16 @@ impl<S: BosStr> LexiconSchema for State<S> {
         lexicon_doc_app_chavatar_state()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.active_set_id {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 13usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("active_set_id"),
+                    max: 13usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.cursor;
             #[allow(unused_comparisons)]
@@ -117,7 +130,7 @@ impl<S: BosStr> LexiconSchema for State<S> {
 
 pub mod state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -162,7 +175,7 @@ pub mod state_state {
 /// Builder for constructing an instance of this type.
 pub struct StateBuilder<St: state_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Datetime>),
+    _fields: (Option<S>, Option<S>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -185,7 +198,7 @@ impl StateBuilder<state_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         StateBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -196,9 +209,22 @@ impl<S: BosStr> StateBuilder<state_state::Empty, S> {
     pub fn builder() -> Self {
         StateBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `activeSetId` field (optional)
+    pub fn active_set_id(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `activeSetId` field to an Option value (optional)
+    pub fn maybe_active_set_id(mut self, value: Option<S>) -> Self {
+        self._fields.0 = value;
+        self
     }
 }
 
@@ -208,8 +234,11 @@ where
     St::Cursor: state_state::IsUnset,
 {
     /// Set the `cursor` field (required)
-    pub fn cursor(mut self, value: impl Into<S>) -> StateBuilder<state_state::SetCursor<St>, S> {
-        self._fields.0 = Option::Some(value.into());
+    pub fn cursor(
+        mut self,
+        value: impl Into<S>,
+    ) -> StateBuilder<state_state::SetCursor<St>, S> {
+        self._fields.1 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -228,7 +257,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StateBuilder<state_state::SetLastUpdated<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -246,26 +275,28 @@ where
     /// Build the final struct.
     pub fn build(self) -> State<S> {
         State {
-            cursor: self._fields.0.unwrap(),
-            last_updated: self._fields.1.unwrap(),
+            active_set_id: self._fields.0,
+            cursor: self._fields.1.unwrap(),
+            last_updated: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> State<S> {
         State {
-            cursor: self._fields.0.unwrap(),
-            last_updated: self._fields.1.unwrap(),
+            active_set_id: self._fields.0,
+            cursor: self._fields.1.unwrap(),
+            last_updated: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_app_chavatar_state() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.state"),
@@ -289,11 +320,23 @@ fn lexicon_doc_app_chavatar_state() -> LexiconDoc<'static> {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
+                                SmolStr::new_static("activeSetId"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "TID of the currently active avatarSet from settings.avatarSets. Undefined when in fallback state or when avatarSets is not configured.",
+                                        ),
+                                    ),
+                                    max_length: Some(13usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("cursor"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
                                         CowStr::new_static(
-                                            "TID (ID) of the currently active avatar in the settings array.",
+                                            "TID (ID) of the currently active avatar within the active set.",
                                         ),
                                     ),
                                     max_length: Some(13usize),

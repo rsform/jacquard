@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_weaver::collab::CollaborationStateView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::collab::CollaborationStateView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetCollaborationState<S: BosStr = DefaultStr> {
     pub resource: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetCollaborationStateOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: CollaborationStateView<S>,
@@ -69,7 +64,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetCollaborationStateRequest {
 
 pub mod get_collaboration_state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -111,14 +106,20 @@ pub struct GetCollaborationStateBuilder<
 
 impl GetCollaborationState<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetCollaborationStateBuilder<get_collaboration_state_state::Empty, DefaultStr> {
+    pub fn new() -> GetCollaborationStateBuilder<
+        get_collaboration_state_state::Empty,
+        DefaultStr,
+    > {
         GetCollaborationStateBuilder::new()
     }
 }
 
 impl<S: BosStr> GetCollaborationState<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetCollaborationStateBuilder<get_collaboration_state_state::Empty, S> {
+    pub fn builder() -> GetCollaborationStateBuilder<
+        get_collaboration_state_state::Empty,
+        S,
+    > {
         GetCollaborationStateBuilder::builder()
     }
 }
@@ -154,7 +155,10 @@ where
     pub fn resource(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetCollaborationStateBuilder<get_collaboration_state_state::SetResource<St>, S> {
+    ) -> GetCollaborationStateBuilder<
+        get_collaboration_state_state::SetResource<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         GetCollaborationStateBuilder {
             _state: PhantomData,

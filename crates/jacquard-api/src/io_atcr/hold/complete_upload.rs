@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::io_atcr::hold::complete_upload;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::hold::complete_upload;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CompleteUpload<S: BosStr = DefaultStr> {
     ///Final blob digest (e.g., sha256:abc123...)
     pub digest: S,
@@ -41,11 +38,9 @@ pub struct CompleteUpload<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CompleteUploadOutput<S: BosStr = DefaultStr> {
     ///The digest of the completed blob
     pub digest: S,
@@ -55,9 +50,18 @@ pub struct CompleteUploadOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CompleteUploadError {
     #[serde(rename = "InvalidUploadId")]
@@ -70,10 +74,7 @@ pub enum CompleteUploadError {
     CompletionFailed(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CompleteUploadError {
@@ -121,10 +122,7 @@ impl core::fmt::Display for CompleteUploadError {
 /// Information about a completed upload part
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PartInfo<S: BosStr = DefaultStr> {
     ///ETag returned when the part was uploaded
     pub etag: S,
@@ -147,8 +145,9 @@ impl jacquard_common::xrpc::XrpcResp for CompleteUploadResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CompleteUpload<S> {
     const NSID: &'static str = "io.atcr.hold.completeUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CompleteUploadResponse;
 }
 
@@ -158,8 +157,9 @@ Path: `/xrpc/io.atcr.hold.completeUpload`. The request payload type is `Complete
 pub struct CompleteUploadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.completeUpload";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CompleteUpload<S>;
     type Response = CompleteUploadResponse;
 }
@@ -202,7 +202,7 @@ impl<S: BosStr> LexiconSchema for PartInfo<S> {
 
 pub mod complete_upload_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -259,13 +259,12 @@ pub mod complete_upload_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CompleteUploadBuilder<St: complete_upload_state::State, S: BosStr = DefaultStr> {
+pub struct CompleteUploadBuilder<
+    St: complete_upload_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Vec<complete_upload::PartInfo<S>>>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<Vec<complete_upload::PartInfo<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -379,7 +378,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CompleteUpload<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CompleteUpload<S> {
         CompleteUpload {
             digest: self._fields.0.unwrap(),
             parts: self._fields.1.unwrap(),
@@ -391,7 +393,7 @@ where
 
 pub mod part_info_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -482,7 +484,10 @@ where
     St::Etag: part_info_state::IsUnset,
 {
     /// Set the `etag` field (required)
-    pub fn etag(mut self, value: impl Into<S>) -> PartInfoBuilder<part_info_state::SetEtag<St>, S> {
+    pub fn etag(
+        mut self,
+        value: impl Into<S>,
+    ) -> PartInfoBuilder<part_info_state::SetEtag<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PartInfoBuilder {
             _state: PhantomData,
@@ -536,10 +541,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_hold_completeUpload() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.completeUpload"),
@@ -550,52 +555,59 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![
-                                SmolStr::new_static("uploadId"),
-                                SmolStr::new_static("digest"),
-                                SmolStr::new_static("parts"),
-                            ]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("digest"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Final blob digest (e.g., sha256:abc123...)",
-                                        )),
-                                        max_length: Some(128usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("parts"),
-                                    LexObjectProperty::Array(LexArray {
-                                        description: Some(CowStr::new_static(
-                                            "List of uploaded parts with their ETags",
-                                        )),
-                                        items: LexArrayItem::Ref(LexRef {
-                                            r#ref: CowStr::new_static("#partInfo"),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(
+                                    vec![
+                                        SmolStr::new_static("uploadId"),
+                                        SmolStr::new_static("digest"), SmolStr::new_static("parts")
+                                    ],
+                                ),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("digest"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "Final blob digest (e.g., sha256:abc123...)",
+                                                ),
+                                            ),
+                                            max_length: Some(128usize),
                                             ..Default::default()
                                         }),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("uploadId"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Upload session ID from initiateUpload",
-                                        )),
-                                        max_length: Some(256usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("parts"),
+                                        LexObjectProperty::Array(LexArray {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "List of uploaded parts with their ETags",
+                                                ),
+                                            ),
+                                            items: LexArrayItem::Ref(LexRef {
+                                                r#ref: CowStr::new_static("#partInfo"),
+                                                ..Default::default()
+                                            }),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("uploadId"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static("Upload session ID from initiateUpload"),
+                                            ),
+                                            max_length: Some(256usize),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -604,22 +616,26 @@ fn lexicon_doc_io_atcr_hold_completeUpload() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("partInfo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Information about a completed upload part",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("partNumber"),
-                        SmolStr::new_static("etag"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Information about a completed upload part"),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("partNumber"),
+                            SmolStr::new_static("etag")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("etag"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "ETag returned when the part was uploaded",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "ETag returned when the part was uploaded",
+                                    ),
+                                ),
                                 max_length: Some(256usize),
                                 ..Default::default()
                             }),

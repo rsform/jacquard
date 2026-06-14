@@ -124,6 +124,10 @@
         "showPageBackground": {
           "type": "boolean",
           "default": false
+        },
+        "wordmark": {
+          "type": "ref",
+          "ref": "pub.leaflet.theme.wordmark"
         }
       }
     }

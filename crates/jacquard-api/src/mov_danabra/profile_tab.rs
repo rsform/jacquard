@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileTab<S: BosStr = DefaultStr> {
     /// Defaults to `10`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -33,6 +30,7 @@ pub struct ProfileTab<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ProfileTabTab<S: BosStr = DefaultStr> {
@@ -111,11 +109,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileTabOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -136,8 +132,9 @@ impl jacquard_common::xrpc::XrpcResp for ProfileTabResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ProfileTab<S> {
     const NSID: &'static str = "mov.danabra.ProfileTab";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ProfileTabResponse;
 }
 
@@ -147,8 +144,9 @@ Path: `/xrpc/mov.danabra.ProfileTab`. The request payload type is `ProfileTab<S>
 pub struct ProfileTabRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
     const PATH: &'static str = "/xrpc/mov.danabra.ProfileTab";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ProfileTab<S>;
     type Response = ProfileTabResponse;
 }
@@ -159,7 +157,7 @@ fn _default_profile_tab_limit() -> Option<i64> {
 
 pub mod profile_tab_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -292,7 +290,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileTab<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileTab<S> {
         ProfileTab {
             limit: self._fields.0.or_else(|| Some(10i64)),
             tab: self._fields.1,

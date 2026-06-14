@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Any offered product or service. For example: a pair of shoes; a concert ticket; the rental of a car; a haircut; or an episode of a TV show streamed online.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_property: Option<EmbeddedAdditionalProperty<S>>,
@@ -187,6 +184,7 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -237,6 +235,7 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -254,6 +253,7 @@ pub enum EmbeddedColorSwatch<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -368,6 +368,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -381,6 +382,7 @@ pub enum EmbeddedIsAccessoryOrSparePartFor<S: BosStr = DefaultStr> {
     Embedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -388,6 +390,7 @@ pub enum EmbeddedIsConsumableFor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -402,6 +405,7 @@ pub enum EmbeddedIsRelatedTo<S: BosStr = DefaultStr> {
     Embedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -409,6 +413,7 @@ pub enum EmbeddedIsSimilarTo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -433,6 +438,7 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -446,6 +452,7 @@ pub enum EmbeddedManufacturer<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -453,6 +460,7 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -491,6 +499,7 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -564,6 +573,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -734,6 +744,7 @@ pub struct Product<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -784,6 +795,7 @@ pub enum ProductBrand<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -801,6 +813,7 @@ pub enum ProductColorSwatch<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -915,6 +928,7 @@ pub enum ProductImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -928,6 +942,7 @@ pub enum ProductIsAccessoryOrSparePartFor<S: BosStr = DefaultStr> {
     Embedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -935,6 +950,7 @@ pub enum ProductIsConsumableFor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -949,6 +965,7 @@ pub enum ProductIsRelatedTo<S: BosStr = DefaultStr> {
     Embedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -956,6 +973,7 @@ pub enum ProductIsSimilarTo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -980,6 +998,7 @@ pub enum ProductLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -993,6 +1012,7 @@ pub enum ProductManufacturer<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1000,6 +1020,7 @@ pub enum ProductMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1038,6 +1059,7 @@ pub enum ProductOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1111,6 +1133,7 @@ pub enum ProductSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1201,10 +1224,10 @@ impl<S: BosStr> LexiconSchema for Product<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Product"),
@@ -2750,7 +2773,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Product() -> LexiconDoc<'static> {
 
 pub mod product_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2866,11 +2889,76 @@ impl ProductBuilder<product_state::Empty, DefaultStr> {
         ProductBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -2884,11 +2972,76 @@ impl<S: BosStr> ProductBuilder<product_state::Empty, S> {
         ProductBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -2917,12 +3070,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<ProductAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<ProductAdditionalType<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<ProductAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<ProductAdditionalType<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -2930,12 +3089,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<ProductAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<ProductAggregateRating<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<ProductAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<ProductAggregateRating<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2943,12 +3108,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<ProductAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<ProductAlternateName<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(mut self, value: Option<ProductAlternateName<S>>) -> Self {
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<ProductAlternateName<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -3047,7 +3218,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `colorSwatch` field (optional)
-    pub fn color_swatch(mut self, value: impl Into<Option<ProductColorSwatch<S>>>) -> Self {
+    pub fn color_swatch(
+        mut self,
+        value: impl Into<Option<ProductColorSwatch<S>>>,
+    ) -> Self {
         self._fields.11 = value.into();
         self
     }
@@ -3068,7 +3242,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
         self
     }
     /// Set the `countryOfAssembly` field to an Option value (optional)
-    pub fn maybe_country_of_assembly(mut self, value: Option<ProductCountryOfAssembly<S>>) -> Self {
+    pub fn maybe_country_of_assembly(
+        mut self,
+        value: Option<ProductCountryOfAssembly<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
@@ -3103,7 +3280,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
-    pub fn maybe_country_of_origin(mut self, value: Option<ProductCountryOfOrigin<S>>) -> Self {
+    pub fn maybe_country_of_origin(
+        mut self,
+        value: Option<ProductCountryOfOrigin<S>>,
+    ) -> Self {
         self._fields.14 = value;
         self
     }
@@ -3124,7 +3304,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<ProductDescription<S>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<ProductDescription<S>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
@@ -3261,7 +3444,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
-    pub fn maybe_has_certification(mut self, value: Option<ProductHasCertification<S>>) -> Self {
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<ProductHasCertification<S>>,
+    ) -> Self {
         self._fields.25 = value;
         self
     }
@@ -3307,12 +3493,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `hasMeasurement` field (optional)
-    pub fn has_measurement(mut self, value: impl Into<Option<ProductHasMeasurement<S>>>) -> Self {
+    pub fn has_measurement(
+        mut self,
+        value: impl Into<Option<ProductHasMeasurement<S>>>,
+    ) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `hasMeasurement` field to an Option value (optional)
-    pub fn maybe_has_measurement(mut self, value: Option<ProductHasMeasurement<S>>) -> Self {
+    pub fn maybe_has_measurement(
+        mut self,
+        value: Option<ProductHasMeasurement<S>>,
+    ) -> Self {
         self._fields.28 = value;
         self
     }
@@ -3443,7 +3635,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
         self
     }
     /// Set the `isConsumableFor` field to an Option value (optional)
-    pub fn maybe_is_consumable_for(mut self, value: Option<ProductIsConsumableFor<S>>) -> Self {
+    pub fn maybe_is_consumable_for(
+        mut self,
+        value: Option<ProductIsConsumableFor<S>>,
+    ) -> Self {
         self._fields.36 = value;
         self
     }
@@ -3459,7 +3654,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
-    pub fn maybe_is_family_friendly(mut self, value: Option<ProductIsFamilyFriendly<S>>) -> Self {
+    pub fn maybe_is_family_friendly(
+        mut self,
+        value: Option<ProductIsFamilyFriendly<S>>,
+    ) -> Self {
         self._fields.37 = value;
         self
     }
@@ -3467,7 +3665,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `isRelatedTo` field (optional)
-    pub fn is_related_to(mut self, value: impl Into<Option<ProductIsRelatedTo<S>>>) -> Self {
+    pub fn is_related_to(
+        mut self,
+        value: impl Into<Option<ProductIsRelatedTo<S>>>,
+    ) -> Self {
         self._fields.38 = value.into();
         self
     }
@@ -3480,7 +3681,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `isSimilarTo` field (optional)
-    pub fn is_similar_to(mut self, value: impl Into<Option<ProductIsSimilarTo<S>>>) -> Self {
+    pub fn is_similar_to(
+        mut self,
+        value: impl Into<Option<ProductIsSimilarTo<S>>>,
+    ) -> Self {
         self._fields.39 = value.into();
         self
     }
@@ -3493,7 +3697,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `isVariantOf` field (optional)
-    pub fn is_variant_of(mut self, value: impl Into<Option<ProductIsVariantOf<S>>>) -> Self {
+    pub fn is_variant_of(
+        mut self,
+        value: impl Into<Option<ProductIsVariantOf<S>>>,
+    ) -> Self {
         self._fields.40 = value.into();
         self
     }
@@ -3506,12 +3713,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `itemCondition` field (optional)
-    pub fn item_condition(mut self, value: impl Into<Option<ProductItemCondition<S>>>) -> Self {
+    pub fn item_condition(
+        mut self,
+        value: impl Into<Option<ProductItemCondition<S>>>,
+    ) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `itemCondition` field to an Option value (optional)
-    pub fn maybe_item_condition(mut self, value: Option<ProductItemCondition<S>>) -> Self {
+    pub fn maybe_item_condition(
+        mut self,
+        value: Option<ProductItemCondition<S>>,
+    ) -> Self {
         self._fields.41 = value;
         self
     }
@@ -3553,7 +3766,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<ProductMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<ProductMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.44 = value;
         self
     }
@@ -3561,7 +3777,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `manufacturer` field (optional)
-    pub fn manufacturer(mut self, value: impl Into<Option<ProductManufacturer<S>>>) -> Self {
+    pub fn manufacturer(
+        mut self,
+        value: impl Into<Option<ProductManufacturer<S>>>,
+    ) -> Self {
         self._fields.45 = value.into();
         self
     }
@@ -3639,12 +3858,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `negativeNotes` field (optional)
-    pub fn negative_notes(mut self, value: impl Into<Option<ProductNegativeNotes<S>>>) -> Self {
+    pub fn negative_notes(
+        mut self,
+        value: impl Into<Option<ProductNegativeNotes<S>>>,
+    ) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `negativeNotes` field to an Option value (optional)
-    pub fn maybe_negative_notes(mut self, value: Option<ProductNegativeNotes<S>>) -> Self {
+    pub fn maybe_negative_notes(
+        mut self,
+        value: Option<ProductNegativeNotes<S>>,
+    ) -> Self {
         self._fields.51 = value;
         self
     }
@@ -3691,12 +3916,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `positiveNotes` field (optional)
-    pub fn positive_notes(mut self, value: impl Into<Option<ProductPositiveNotes<S>>>) -> Self {
+    pub fn positive_notes(
+        mut self,
+        value: impl Into<Option<ProductPositiveNotes<S>>>,
+    ) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `positiveNotes` field to an Option value (optional)
-    pub fn maybe_positive_notes(mut self, value: Option<ProductPositiveNotes<S>>) -> Self {
+    pub fn maybe_positive_notes(
+        mut self,
+        value: Option<ProductPositiveNotes<S>>,
+    ) -> Self {
         self._fields.55 = value;
         self
     }
@@ -3704,12 +3935,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<ProductPotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<ProductPotentialAction<S>>>,
+    ) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<ProductPotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<ProductPotentialAction<S>>,
+    ) -> Self {
         self._fields.56 = value;
         self
     }
@@ -3730,12 +3967,18 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `productionDate` field (optional)
-    pub fn production_date(mut self, value: impl Into<Option<ProductProductionDate<S>>>) -> Self {
+    pub fn production_date(
+        mut self,
+        value: impl Into<Option<ProductProductionDate<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `productionDate` field to an Option value (optional)
-    pub fn maybe_production_date(mut self, value: Option<ProductProductionDate<S>>) -> Self {
+    pub fn maybe_production_date(
+        mut self,
+        value: Option<ProductProductionDate<S>>,
+    ) -> Self {
         self._fields.58 = value;
         self
     }
@@ -3743,7 +3986,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `purchaseDate` field (optional)
-    pub fn purchase_date(mut self, value: impl Into<Option<ProductPurchaseDate<S>>>) -> Self {
+    pub fn purchase_date(
+        mut self,
+        value: impl Into<Option<ProductPurchaseDate<S>>>,
+    ) -> Self {
         self._fields.59 = value.into();
         self
     }
@@ -3756,7 +4002,10 @@ impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
 
 impl<St: product_state::State, S: BosStr> ProductBuilder<St, S> {
     /// Set the `releaseDate` field (optional)
-    pub fn release_date(mut self, value: impl Into<Option<ProductReleaseDate<S>>>) -> Self {
+    pub fn release_date(
+        mut self,
+        value: impl Into<Option<ProductReleaseDate<S>>>,
+    ) -> Self {
         self._fields.60 = value.into();
         self
     }

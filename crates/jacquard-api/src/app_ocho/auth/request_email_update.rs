@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RequestEmailUpdateOutput<S: BosStr = DefaultStr> {
     pub token_required: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -46,8 +43,9 @@ impl jacquard_common::xrpc::XrpcResp for RequestEmailUpdateResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for RequestEmailUpdate {
     const NSID: &'static str = "app.ocho.auth.requestEmailUpdate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RequestEmailUpdateResponse;
 }
 
@@ -57,8 +55,9 @@ Path: `/xrpc/app.ocho.auth.requestEmailUpdate`. The request payload type is `Req
 pub struct RequestEmailUpdateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailUpdateRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.requestEmailUpdate";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RequestEmailUpdate;
     type Response = RequestEmailUpdateResponse;
 }

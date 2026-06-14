@@ -16,12 +16,13 @@ pub mod get_edit_tree;
 pub mod list_drafts;
 pub mod root;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,23 +33,21 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::edit;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DocRef<S: BosStr = DefaultStr> {
     pub value: DocRefValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,11 +61,9 @@ pub enum DocRefValue<S: BosStr = DefaultStr> {
     DraftRef(Box<edit::DraftRef<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftRef<S: BosStr = DefaultStr> {
     pub draft_key: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -76,10 +73,7 @@ pub struct DraftRef<S: BosStr = DefaultStr> {
 /// A branch/fork in edit history (for when collaborators diverge).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EditBranchView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     ///Common ancestor if this is a fork
@@ -100,10 +94,7 @@ pub struct EditBranchView<S: BosStr = DefaultStr> {
 /// Summary of an edit (root or diff) for history queries.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EditHistoryEntry<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
@@ -121,6 +112,7 @@ pub struct EditHistoryEntry<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EditHistoryEntryType<S: BosStr = DefaultStr> {
@@ -194,7 +186,9 @@ where
         match self {
             EditHistoryEntryType::Root => EditHistoryEntryType::Root,
             EditHistoryEntryType::Diff => EditHistoryEntryType::Diff,
-            EditHistoryEntryType::Other(v) => EditHistoryEntryType::Other(v.into_static()),
+            EditHistoryEntryType::Other(v) => {
+                EditHistoryEntryType::Other(v.into_static())
+            }
         }
     }
 }
@@ -202,10 +196,7 @@ where
 /// Full tree structure showing all branches for a resource.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EditTreeView<S: BosStr = DefaultStr> {
     pub branches: Vec<edit::EditBranchView<S>>,
     ///Diffs where branches diverge
@@ -220,22 +211,18 @@ pub struct EditTreeView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EntryRef<S: BosStr = DefaultStr> {
     pub entry: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotebookRef<S: BosStr = DefaultStr> {
     pub notebook: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -360,7 +347,7 @@ impl<S: BosStr> LexiconSchema for NotebookRef<S> {
 
 pub mod doc_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -474,10 +461,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_edit_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.edit.defs"),
@@ -496,7 +483,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#notebookRef"),
                                     CowStr::new_static("#entryRef"),
-                                    CowStr::new_static("#draftRef"),
+                                    CowStr::new_static("#draftRef")
                                 ],
                                 ..Default::default()
                             }),
@@ -528,22 +515,27 @@ fn lexicon_doc_sh_weaver_edit_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("editBranchView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A branch/fork in edit history (for when collaborators diverge).",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("head"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("length"),
-                        SmolStr::new_static("lastUpdated"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A branch/fork in edit history (for when collaborators diverge).",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("head"), SmolStr::new_static("author"),
+                            SmolStr::new_static("length"),
+                            SmolStr::new_static("lastUpdated")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -595,23 +587,27 @@ fn lexicon_doc_sh_weaver_edit_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("editHistoryEntry"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Summary of an edit (root or diff) for history queries.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("type"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Summary of an edit (root or diff) for history queries.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("author"),
+                            SmolStr::new_static("createdAt"), SmolStr::new_static("type")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("sh.weaver.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "sh.weaver.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -658,9 +654,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -677,13 +671,17 @@ fn lexicon_doc_sh_weaver_edit_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("editTreeView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Full tree structure showing all branches for a resource.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("resource"),
-                        SmolStr::new_static("branches"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Full tree structure showing all branches for a resource.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("resource"),
+                            SmolStr::new_static("branches")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -700,9 +698,9 @@ fn lexicon_doc_sh_weaver_edit_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("conflictPoints"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Diffs where branches diverge",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Diffs where branches diverge"),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
                                     ..Default::default()
@@ -781,7 +779,7 @@ fn lexicon_doc_sh_weaver_edit_defs() -> LexiconDoc<'static> {
 
 pub mod edit_branch_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -854,7 +852,10 @@ pub mod edit_branch_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EditBranchViewBuilder<St: edit_branch_view_state::State, S: BosStr = DefaultStr> {
+pub struct EditBranchViewBuilder<
+    St: edit_branch_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
@@ -1041,7 +1042,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EditBranchView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EditBranchView<S> {
         EditBranchView {
             author: self._fields.0.unwrap(),
             diverges_from: self._fields.1,
@@ -1057,7 +1061,7 @@ where
 
 pub mod edit_history_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1148,7 +1152,10 @@ pub mod edit_history_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EditHistoryEntryBuilder<St: edit_history_entry_state::State, S: BosStr = DefaultStr> {
+pub struct EditHistoryEntryBuilder<
+    St: edit_history_entry_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
@@ -1166,7 +1173,10 @@ pub struct EditHistoryEntryBuilder<St: edit_history_entry_state::State, S: BosSt
 
 impl EditHistoryEntry<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> EditHistoryEntryBuilder<edit_history_entry_state::Empty, DefaultStr> {
+    pub fn new() -> EditHistoryEntryBuilder<
+        edit_history_entry_state::Empty,
+        DefaultStr,
+    > {
         EditHistoryEntryBuilder::new()
     }
 }
@@ -1372,7 +1382,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EditHistoryEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EditHistoryEntry<S> {
         EditHistoryEntry {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -1390,7 +1403,7 @@ where
 
 pub mod edit_tree_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1502,7 +1515,10 @@ where
 
 impl<St: edit_tree_view_state::State, S: BosStr> EditTreeViewBuilder<St, S> {
     /// Set the `conflictPoints` field (optional)
-    pub fn conflict_points(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
+    pub fn conflict_points(
+        mut self,
+        value: impl Into<Option<Vec<StrongRef<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -1528,7 +1544,10 @@ impl<St: edit_tree_view_state::State, S: BosStr> EditTreeViewBuilder<St, S> {
 
 impl<St: edit_tree_view_state::State, S: BosStr> EditTreeViewBuilder<St, S> {
     /// Set the `mainBranch` field (optional)
-    pub fn main_branch(mut self, value: impl Into<Option<edit::EditBranchView<S>>>) -> Self {
+    pub fn main_branch(
+        mut self,
+        value: impl Into<Option<edit::EditBranchView<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -1576,7 +1595,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EditTreeView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EditTreeView<S> {
         EditTreeView {
             branches: self._fields.0.unwrap(),
             conflict_points: self._fields.1,
@@ -1590,7 +1612,7 @@ where
 
 pub mod entry_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1705,7 +1727,7 @@ where
 
 pub mod notebook_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1810,7 +1832,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotebookRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotebookRef<S> {
         NotebookRef {
             notebook: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

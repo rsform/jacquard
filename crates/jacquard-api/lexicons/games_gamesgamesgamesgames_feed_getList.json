@@ -1,0 +1,93 @@
+{
+  "lexicon": 1,
+  "id": "games.gamesgamesgamesgames.feed.getList",
+  "defs": {
+    "creatorView": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "unknown"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "handle": {
+          "type": "string"
+        }
+      }
+    },
+    "listDetailView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name",
+        "itemCount",
+        "createdAt",
+        "creator"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "creator": {
+          "type": "ref",
+          "ref": "#creatorView"
+        },
+        "description": {
+          "type": "string"
+        },
+        "itemCount": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Get a single list by its AT-URI, including creator profile info.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "uri"
+        ],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "description": "The AT-URI of the list record.",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "list"
+          ],
+          "properties": {
+            "list": {
+              "type": "ref",
+              "ref": "#listDetailView"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -8,18 +8,19 @@
 //! Generated bindings for the `app.chavatar.settings` Lexicon namespace/module.
 pub mod executor;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,20 +28,141 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_chavatar::settings;
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::community_lexicon::location::geo::Geo;
+use crate::app_chavatar::settings;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AvatarItem<S: BosStr = DefaultStr> {
     pub id: S,
     pub image: StrongRef<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// A date range condition. The 'type' field is the discriminator.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct DateRange<S: BosStr = DefaultStr> {
+    ///Absolute end datetime (ISO 8601). Omit for open-ended. Applies when type='absolute'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_at: Option<Datetime>,
+    ///End day of month (1-31). Required when type='annual'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_day: Option<i64>,
+    ///End month (1=Jan, 12=Dec). Required when type='annual'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_month: Option<i64>,
+    ///Absolute start datetime (ISO 8601). Required when type='absolute'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_at: Option<Datetime>,
+    ///Start day of month (1-31). Required when type='annual'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_day: Option<i64>,
+    ///Start month (1=Jan, 12=Dec). Required when type='annual'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_month: Option<i64>,
+    ///Kind of date range. 'annual' recurs every year; 'absolute' is a one-time range.
+    pub r#type: DateRangeType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Kind of date range. 'annual' recurs every year; 'absolute' is a one-time range.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DateRangeType<S: BosStr = DefaultStr> {
+    Annual,
+    Absolute,
+    Other(S),
+}
+
+impl<S: BosStr> DateRangeType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Annual => "annual",
+            Self::Absolute => "absolute",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "annual" => Self::Annual,
+            "absolute" => Self::Absolute,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for DateRangeType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for DateRangeType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for DateRangeType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DateRangeType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for DateRangeType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for DateRangeType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = DateRangeType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DateRangeType::Annual => DateRangeType::Annual,
+            DateRangeType::Absolute => DateRangeType::Absolute,
+            DateRangeType::Other(v) => DateRangeType::Other(v.into_static()),
+        }
+    }
+}
+
+/// Geographic and timezone context used for schedule evaluation and solar event calculation.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct GeoContext<S: BosStr = DefaultStr> {
+    ///WGS84 geographic location. Required for sunrise/sunset/solar-noon time references.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub location: Option<Geo<S>>,
+    ///IANA timezone identifier (e.g. 'Asia/Tokyo'). Required for timeWindow and daysOfWeek schedule evaluation.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timezone: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -55,13 +177,19 @@ pub struct AvatarItem<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Settings<S: BosStr = DefaultStr> {
-    ///List of avatar items to rotate through.
+    ///Backward-compatible flat list of avatar items. Used as an always-active default when schedules is absent.
     pub avatars: Vec<settings::AvatarItem<S>>,
     ///Whether avatar rotation feature is enabled.
     pub enabled: bool,
+    ///TID of the avatar to display when no schedule matches the current time. Omit to skip rotation when no schedule is active.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub fallback_avatar_id: Option<S>,
+    ///Geographic and timezone context for schedule evaluation. Required when any schedule uses time-based or solar schedules.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub geo_context: Option<settings::GeoContext<S>>,
     ///The interval at which avatar rotation should occur.
     pub interval: SettingsInterval<S>,
-    ///The rotation mode to use for avatar selection.
+    ///The default rotation mode used when a schedule does not specify its own mode.
     pub mode: SettingsMode<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -166,7 +294,7 @@ where
     }
 }
 
-/// The rotation mode to use for avatar selection.
+/// The default rotation mode used when a schedule does not specify its own mode.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SettingsMode<S: BosStr = DefaultStr> {
@@ -256,6 +384,451 @@ pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Settings<S>,
 }
 
+/// An ordered list of avatar items with optional rotation mode and interval overrides.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct RotationList<S: BosStr = DefaultStr> {
+    ///Ordered list of avatar items.
+    pub avatars: Vec<settings::AvatarItem<S>>,
+    ///Rotation interval override for this list. Falls back to the top-level settings.interval when absent. Not applicable to TimeWindow lists (which use one-shot execution at window boundaries).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub interval: Option<RotationListInterval<S>>,
+    ///Rotation mode override. Falls back to the top-level settings.mode when absent.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub mode: Option<RotationListMode<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Rotation interval override for this list. Falls back to the top-level settings.interval when absent. Not applicable to TimeWindow lists (which use one-shot execution at window boundaries).
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RotationListInterval<S: BosStr = DefaultStr> {
+    _1h,
+    _3h,
+    _6h,
+    _12h,
+    _1d,
+    _1w,
+    _1mo,
+    Other(S),
+}
+
+impl<S: BosStr> RotationListInterval<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_1h => "1h",
+            Self::_3h => "3h",
+            Self::_6h => "6h",
+            Self::_12h => "12h",
+            Self::_1d => "1d",
+            Self::_1w => "1w",
+            Self::_1mo => "1mo",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "1h" => Self::_1h,
+            "3h" => Self::_3h,
+            "6h" => Self::_6h,
+            "12h" => Self::_12h,
+            "1d" => Self::_1d,
+            "1w" => Self::_1w,
+            "1mo" => Self::_1mo,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for RotationListInterval<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for RotationListInterval<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for RotationListInterval<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RotationListInterval<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for RotationListInterval<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for RotationListInterval<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RotationListInterval<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RotationListInterval::_1h => RotationListInterval::_1h,
+            RotationListInterval::_3h => RotationListInterval::_3h,
+            RotationListInterval::_6h => RotationListInterval::_6h,
+            RotationListInterval::_12h => RotationListInterval::_12h,
+            RotationListInterval::_1d => RotationListInterval::_1d,
+            RotationListInterval::_1w => RotationListInterval::_1w,
+            RotationListInterval::_1mo => RotationListInterval::_1mo,
+            RotationListInterval::Other(v) => {
+                RotationListInterval::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Rotation mode override. Falls back to the top-level settings.mode when absent.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RotationListMode<S: BosStr = DefaultStr> {
+    Sequential,
+    Random,
+    Other(S),
+}
+
+impl<S: BosStr> RotationListMode<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Sequential => "sequential",
+            Self::Random => "random",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "sequential" => Self::Sequential,
+            "random" => Self::Random,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for RotationListMode<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for RotationListMode<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for RotationListMode<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RotationListMode<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for RotationListMode<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for RotationListMode<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RotationListMode<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RotationListMode::Sequential => RotationListMode::Sequential,
+            RotationListMode::Random => RotationListMode::Random,
+            RotationListMode::Other(v) => RotationListMode::Other(v.into_static()),
+        }
+    }
+}
+
+/// A named rotation schedule with an optional activation condition.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct RotationSchedule<S: BosStr = DefaultStr> {
+    ///TID-format unique identifier for this schedule.
+    pub id: S,
+    ///Schedule kind. 'default' is always active. 'period' uses date/day-of-week timing. 'timed' uses time-of-day windows.
+    pub kind: RotationScheduleKind<S>,
+    ///Avatar list for 'default' and 'period' kinds.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list: Option<settings::RotationList<S>>,
+    ///Display name for this schedule.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
+    ///Activation timing for 'period' kind. Omit to make always active within the period kind.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timing: Option<settings::Timing<S>>,
+    ///Time-of-day windows for 'timed' kind. The schedule is active when the current time falls within any window.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub windows: Option<Vec<settings::TimeWindow<S>>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Schedule kind. 'default' is always active. 'period' uses date/day-of-week timing. 'timed' uses time-of-day windows.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RotationScheduleKind<S: BosStr = DefaultStr> {
+    Default,
+    Period,
+    Timed,
+    Other(S),
+}
+
+impl<S: BosStr> RotationScheduleKind<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Default => "default",
+            Self::Period => "period",
+            Self::Timed => "timed",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "default" => Self::Default,
+            "period" => Self::Period,
+            "timed" => Self::Timed,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for RotationScheduleKind<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for RotationScheduleKind<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for RotationScheduleKind<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RotationScheduleKind<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for RotationScheduleKind<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for RotationScheduleKind<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RotationScheduleKind<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RotationScheduleKind::Default => RotationScheduleKind::Default,
+            RotationScheduleKind::Period => RotationScheduleKind::Period,
+            RotationScheduleKind::Timed => RotationScheduleKind::Timed,
+            RotationScheduleKind::Other(v) => {
+                RotationScheduleKind::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// A time reference for schedule boundaries. The 'type' field is the discriminator.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct TimeReference<S: BosStr = DefaultStr> {
+    ///Offset in minutes from the solar event. Negative values are before the event. Applies to sunrise/sunset/solar-noon.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset_min: Option<i64>,
+    ///Wall-clock time in 'HH:MM' format interpreted in geoContext.timezone. Required when type='fixed'.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time: Option<S>,
+    ///Kind of time reference. 'fixed' requires the 'time' field; solar types use geoContext.location.
+    pub r#type: TimeReferenceType<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Kind of time reference. 'fixed' requires the 'time' field; solar types use geoContext.location.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TimeReferenceType<S: BosStr = DefaultStr> {
+    Fixed,
+    Sunrise,
+    Sunset,
+    SolarNoon,
+    Other(S),
+}
+
+impl<S: BosStr> TimeReferenceType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Fixed => "fixed",
+            Self::Sunrise => "sunrise",
+            Self::Sunset => "sunset",
+            Self::SolarNoon => "solar-noon",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "fixed" => Self::Fixed,
+            "sunrise" => Self::Sunrise,
+            "sunset" => Self::Sunset,
+            "solar-noon" => Self::SolarNoon,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for TimeReferenceType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for TimeReferenceType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for TimeReferenceType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for TimeReferenceType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for TimeReferenceType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for TimeReferenceType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = TimeReferenceType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TimeReferenceType::Fixed => TimeReferenceType::Fixed,
+            TimeReferenceType::Sunrise => TimeReferenceType::Sunrise,
+            TimeReferenceType::Sunset => TimeReferenceType::Sunset,
+            TimeReferenceType::SolarNoon => TimeReferenceType::SolarNoon,
+            TimeReferenceType::Other(v) => TimeReferenceType::Other(v.into_static()),
+        }
+    }
+}
+
+/// A time window defined by start and end time references, with its own avatar list.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct TimeWindow<S: BosStr = DefaultStr> {
+    ///Window end time reference. Omit for open-ended windows.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end: Option<settings::TimeReference<S>>,
+    ///Avatar list for this window.
+    pub list: settings::RotationList<S>,
+    ///Window start time reference.
+    pub start: settings::TimeReference<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Activation timing for a period schedule. All fields are optional; specified conditions are evaluated with AND semantics.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct Timing<S: BosStr = DefaultStr> {
+    ///Date range condition.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub date_range: Option<settings::DateRange<S>>,
+    ///Active days of week. Omit to match all days.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub days_of_week: Option<Vec<i64>>,
+    ///Seconds after dateRange.endAt before automatically reverting to the next active schedule.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ttl_sec: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 impl<S: BosStr> Settings<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
@@ -284,6 +857,36 @@ impl<S: BosStr> LexiconSchema for AvatarItem<S> {
                 });
             }
         }
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for DateRange<S> {
+    fn nsid() -> &'static str {
+        "app.chavatar.settings"
+    }
+    fn def_name() -> &'static str {
+        "dateRange"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_app_chavatar_settings()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for GeoContext<S> {
+    fn nsid() -> &'static str {
+        "app.chavatar.settings"
+    }
+    fn def_name() -> &'static str {
+        "geoContext"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_app_chavatar_settings()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
         Ok(())
     }
 }
@@ -326,6 +929,16 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
         lexicon_doc_app_chavatar_settings()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.fallback_avatar_id {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 13usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("fallback_avatar_id"),
+                    max: 13usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.interval;
             #[allow(unused_comparisons)]
@@ -352,9 +965,136 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
     }
 }
 
+impl<S: BosStr> LexiconSchema for RotationList<S> {
+    fn nsid() -> &'static str {
+        "app.chavatar.settings"
+    }
+    fn def_name() -> &'static str {
+        "rotationList"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_app_chavatar_settings()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.interval {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 6usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("interval"),
+                    max: 6usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.mode {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("mode"),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for RotationSchedule<S> {
+    fn nsid() -> &'static str {
+        "app.chavatar.settings"
+    }
+    fn def_name() -> &'static str {
+        "rotationSchedule"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_app_chavatar_settings()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        {
+            let value = &self.id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 13usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("id"),
+                    max: 13usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.kind;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 16usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("kind"),
+                    max: 16usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.name {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("name"),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for TimeReference<S> {
+    fn nsid() -> &'static str {
+        "app.chavatar.settings"
+    }
+    fn def_name() -> &'static str {
+        "timeReference"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_app_chavatar_settings()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for TimeWindow<S> {
+    fn nsid() -> &'static str {
+        "app.chavatar.settings"
+    }
+    fn def_name() -> &'static str {
+        "timeWindow"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_app_chavatar_settings()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for Timing<S> {
+    fn nsid() -> &'static str {
+        "app.chavatar.settings"
+    }
+    fn def_name() -> &'static str {
+        "timing"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_app_chavatar_settings()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
 pub mod avatar_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -445,7 +1185,10 @@ where
     St::Id: avatar_item_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> AvatarItemBuilder<avatar_item_state::SetId<St>, S> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> AvatarItemBuilder<avatar_item_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AvatarItemBuilder {
             _state: PhantomData,
@@ -489,7 +1232,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AvatarItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AvatarItem<S> {
         AvatarItem {
             id: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -499,10 +1245,10 @@ where
 }
 
 fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.settings"),
@@ -511,10 +1257,9 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("avatarItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("image"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("image")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -538,26 +1283,143 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("dateRange"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A date range condition. The 'type' field is the discriminator.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("type")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("endAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Absolute end datetime (ISO 8601). Omit for open-ended. Applies when type='absolute'.",
+                                    ),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("endDay"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("endMonth"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("startAt"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Absolute start datetime (ISO 8601). Required when type='absolute'.",
+                                    ),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("startDay"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("startMonth"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Kind of date range. 'annual' recurs every year; 'absolute' is a one-time range.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("geoContext"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Geographic and timezone context used for schedule evaluation and solar event calculation.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("location"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static(
+                                    "community.lexicon.location.geo#main",
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("timezone"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "IANA timezone identifier (e.g. 'Asia/Tokyo'). Required for timeWindow and daysOfWeek schedule evaluation.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("Rotation configuration for a user.")),
+                    description: Some(
+                        CowStr::new_static("Rotation configuration for a user."),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("enabled"),
-                            SmolStr::new_static("interval"),
-                            SmolStr::new_static("mode"),
-                            SmolStr::new_static("avatars"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("enabled"),
+                                SmolStr::new_static("interval"),
+                                SmolStr::new_static("mode"), SmolStr::new_static("avatars")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("avatars"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "List of avatar items to rotate through.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Backward-compatible flat list of avatar items. Used as an always-active default when schedules is absent.",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#avatarItem"),
                                         ..Default::default()
@@ -572,11 +1434,32 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
                                 }),
                             );
                             map.insert(
+                                SmolStr::new_static("fallbackAvatarId"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "TID of the avatar to display when no schedule matches the current time. Omit to skip rotation when no schedule is active.",
+                                        ),
+                                    ),
+                                    max_length: Some(13usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("geoContext"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#geoContext"),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("interval"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The interval at which avatar rotation should occur.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The interval at which avatar rotation should occur.",
+                                        ),
+                                    ),
                                     max_length: Some(6usize),
                                     ..Default::default()
                                 }),
@@ -584,9 +1467,11 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("mode"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The rotation mode to use for avatar selection.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The default rotation mode used when a schedule does not specify its own mode.",
+                                        ),
+                                    ),
                                     max_length: Some(20usize),
                                     ..Default::default()
                                 }),
@@ -598,6 +1483,270 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
                     ..Default::default()
                 }),
             );
+            map.insert(
+                SmolStr::new_static("rotationList"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "An ordered list of avatar items with optional rotation mode and interval overrides.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("avatars")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("avatars"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static("Ordered list of avatar items."),
+                                ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#avatarItem"),
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("interval"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Rotation interval override for this list. Falls back to the top-level settings.interval when absent. Not applicable to TimeWindow lists (which use one-shot execution at window boundaries).",
+                                    ),
+                                ),
+                                max_length: Some(6usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("mode"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Rotation mode override. Falls back to the top-level settings.mode when absent.",
+                                    ),
+                                ),
+                                max_length: Some(20usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("rotationSchedule"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A named rotation schedule with an optional activation condition.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("kind")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("id"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "TID-format unique identifier for this schedule.",
+                                    ),
+                                ),
+                                max_length: Some(13usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("kind"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Schedule kind. 'default' is always active. 'period' uses date/day-of-week timing. 'timed' uses time-of-day windows.",
+                                    ),
+                                ),
+                                max_length: Some(16usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("list"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#rotationList"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Display name for this schedule."),
+                                ),
+                                max_length: Some(64usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("timing"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#timing"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("windows"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Time-of-day windows for 'timed' kind. The schedule is active when the current time falls within any window.",
+                                    ),
+                                ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#timeWindow"),
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("timeReference"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A time reference for schedule boundaries. The 'type' field is the discriminator.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("type")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("offsetMin"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("time"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Wall-clock time in 'HH:MM' format interpreted in geoContext.timezone. Required when type='fixed'.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("type"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Kind of time reference. 'fixed' requires the 'time' field; solar types use geoContext.location.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("timeWindow"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "A time window defined by start and end time references, with its own avatar list.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("start"), SmolStr::new_static("list")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("end"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#timeReference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("list"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#rotationList"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("start"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#timeReference"),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("timing"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Activation timing for a period schedule. All fields are optional; specified conditions are evaluated with AND semantics.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("dateRange"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#dateRange"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("daysOfWeek"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Active days of week. Omit to match all days.",
+                                    ),
+                                ),
+                                items: LexArrayItem::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("ttlSec"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
             map
         },
         ..Default::default()
@@ -606,7 +1755,7 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -684,6 +1833,8 @@ pub struct SettingsBuilder<St: settings_state::State, S: BosStr = DefaultStr> {
     _fields: (
         Option<Vec<settings::AvatarItem<S>>>,
         Option<bool>,
+        Option<S>,
+        Option<settings::GeoContext<S>>,
         Option<SettingsInterval<S>>,
         Option<SettingsMode<S>>,
     ),
@@ -709,7 +1860,7 @@ impl SettingsBuilder<settings_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -720,7 +1871,7 @@ impl<S: BosStr> SettingsBuilder<settings_state::Empty, S> {
     pub fn builder() -> Self {
         SettingsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -764,6 +1915,35 @@ where
     }
 }
 
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
+    /// Set the `fallbackAvatarId` field (optional)
+    pub fn fallback_avatar_id(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `fallbackAvatarId` field to an Option value (optional)
+    pub fn maybe_fallback_avatar_id(mut self, value: Option<S>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
+    /// Set the `geoContext` field (optional)
+    pub fn geo_context(
+        mut self,
+        value: impl Into<Option<settings::GeoContext<S>>>,
+    ) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `geoContext` field to an Option value (optional)
+    pub fn maybe_geo_context(mut self, value: Option<settings::GeoContext<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
@@ -774,7 +1954,7 @@ where
         mut self,
         value: impl Into<SettingsInterval<S>>,
     ) -> SettingsBuilder<settings_state::SetInterval<St>, S> {
-        self._fields.2 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -793,7 +1973,7 @@ where
         mut self,
         value: impl Into<SettingsMode<S>>,
     ) -> SettingsBuilder<settings_state::SetMode<St>, S> {
-        self._fields.3 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -815,8 +1995,10 @@ where
         Settings {
             avatars: self._fields.0.unwrap(),
             enabled: self._fields.1.unwrap(),
-            interval: self._fields.2.unwrap(),
-            mode: self._fields.3.unwrap(),
+            fallback_avatar_id: self._fields.2,
+            geo_context: self._fields.3,
+            interval: self._fields.4.unwrap(),
+            mode: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -825,8 +2007,336 @@ where
         Settings {
             avatars: self._fields.0.unwrap(),
             enabled: self._fields.1.unwrap(),
-            interval: self._fields.2.unwrap(),
-            mode: self._fields.3.unwrap(),
+            fallback_avatar_id: self._fields.2,
+            geo_context: self._fields.3,
+            interval: self._fields.4.unwrap(),
+            mode: self._fields.5.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod rotation_list_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Avatars;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Avatars = Unset;
+    }
+    ///State transition - sets the `avatars` field to Set
+    pub struct SetAvatars<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAvatars<St> {}
+    impl<St: State> State for SetAvatars<St> {
+        type Avatars = Set<members::avatars>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `avatars` field
+        pub struct avatars(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct RotationListBuilder<St: rotation_list_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<Vec<settings::AvatarItem<S>>>,
+        Option<RotationListInterval<S>>,
+        Option<RotationListMode<S>>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl RotationList<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RotationListBuilder<rotation_list_state::Empty, DefaultStr> {
+        RotationListBuilder::new()
+    }
+}
+
+impl<S: BosStr> RotationList<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RotationListBuilder<rotation_list_state::Empty, S> {
+        RotationListBuilder::builder()
+    }
+}
+
+impl RotationListBuilder<rotation_list_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        RotationListBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> RotationListBuilder<rotation_list_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RotationListBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RotationListBuilder<St, S>
+where
+    St: rotation_list_state::State,
+    St::Avatars: rotation_list_state::IsUnset,
+{
+    /// Set the `avatars` field (required)
+    pub fn avatars(
+        mut self,
+        value: impl Into<Vec<settings::AvatarItem<S>>>,
+    ) -> RotationListBuilder<rotation_list_state::SetAvatars<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        RotationListBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: rotation_list_state::State, S: BosStr> RotationListBuilder<St, S> {
+    /// Set the `interval` field (optional)
+    pub fn interval(
+        mut self,
+        value: impl Into<Option<RotationListInterval<S>>>,
+    ) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `interval` field to an Option value (optional)
+    pub fn maybe_interval(mut self, value: Option<RotationListInterval<S>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: rotation_list_state::State, S: BosStr> RotationListBuilder<St, S> {
+    /// Set the `mode` field (optional)
+    pub fn mode(mut self, value: impl Into<Option<RotationListMode<S>>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `mode` field to an Option value (optional)
+    pub fn maybe_mode(mut self, value: Option<RotationListMode<S>>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> RotationListBuilder<St, S>
+where
+    St: rotation_list_state::State,
+    St::Avatars: rotation_list_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> RotationList<S> {
+        RotationList {
+            avatars: self._fields.0.unwrap(),
+            interval: self._fields.1,
+            mode: self._fields.2,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RotationList<S> {
+        RotationList {
+            avatars: self._fields.0.unwrap(),
+            interval: self._fields.1,
+            mode: self._fields.2,
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+pub mod time_window_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type List;
+        type Start;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type List = Unset;
+        type Start = Unset;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetList<St> {}
+    impl<St: State> State for SetList<St> {
+        type List = Set<members::list>;
+        type Start = St::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStart<St> {}
+    impl<St: State> State for SetStart<St> {
+        type List = St::List;
+        type Start = Set<members::start>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `list` field
+        pub struct list(());
+        ///Marker type for the `start` field
+        pub struct start(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct TimeWindowBuilder<St: time_window_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<settings::TimeReference<S>>,
+        Option<settings::RotationList<S>>,
+        Option<settings::TimeReference<S>>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl TimeWindow<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> TimeWindowBuilder<time_window_state::Empty, DefaultStr> {
+        TimeWindowBuilder::new()
+    }
+}
+
+impl<S: BosStr> TimeWindow<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> TimeWindowBuilder<time_window_state::Empty, S> {
+        TimeWindowBuilder::builder()
+    }
+}
+
+impl TimeWindowBuilder<time_window_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        TimeWindowBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> TimeWindowBuilder<time_window_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        TimeWindowBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: time_window_state::State, S: BosStr> TimeWindowBuilder<St, S> {
+    /// Set the `end` field (optional)
+    pub fn end(mut self, value: impl Into<Option<settings::TimeReference<S>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `end` field to an Option value (optional)
+    pub fn maybe_end(mut self, value: Option<settings::TimeReference<S>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> TimeWindowBuilder<St, S>
+where
+    St: time_window_state::State,
+    St::List: time_window_state::IsUnset,
+{
+    /// Set the `list` field (required)
+    pub fn list(
+        mut self,
+        value: impl Into<settings::RotationList<S>>,
+    ) -> TimeWindowBuilder<time_window_state::SetList<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        TimeWindowBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TimeWindowBuilder<St, S>
+where
+    St: time_window_state::State,
+    St::Start: time_window_state::IsUnset,
+{
+    /// Set the `start` field (required)
+    pub fn start(
+        mut self,
+        value: impl Into<settings::TimeReference<S>>,
+    ) -> TimeWindowBuilder<time_window_state::SetStart<St>, S> {
+        self._fields.2 = Option::Some(value.into());
+        TimeWindowBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> TimeWindowBuilder<St, S>
+where
+    St: time_window_state::State,
+    St::List: time_window_state::IsSet,
+    St::Start: time_window_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> TimeWindow<S> {
+        TimeWindow {
+            end: self._fields.0,
+            list: self._fields.1.unwrap(),
+            start: self._fields.2.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TimeWindow<S> {
+        TimeWindow {
+            end: self._fields.0,
+            list: self._fields.1.unwrap(),
+            start: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }

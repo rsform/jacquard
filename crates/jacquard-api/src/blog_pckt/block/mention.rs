@@ -23,13 +23,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Mention<S: BosStr = DefaultStr> {
     ///The DID of the mentioned user (e.g., did:plc:abc123xyz). This is the canonical reference that persists even if the user changes their handle, following app.bsky.richtext.facet#mention
     pub did: Did<S>,
@@ -67,7 +64,7 @@ impl<S: BosStr> LexiconSchema for Mention<S> {
 
 pub mod mention_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -158,7 +155,10 @@ where
     St::Did: mention_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> MentionBuilder<mention_state::SetDid<St>, S> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> MentionBuilder<mention_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MentionBuilder {
             _state: PhantomData,
@@ -212,10 +212,10 @@ where
 }
 
 fn lexicon_doc_blog_pckt_block_mention() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.mention"),

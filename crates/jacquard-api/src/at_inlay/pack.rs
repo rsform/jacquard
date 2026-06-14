@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Nsid};
+use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::at_inlay::pack;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::pack;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Export<S: BosStr = DefaultStr> {
     ///AT-URI of the component record
     pub component: AtUri<S>,
@@ -150,7 +147,7 @@ impl<S: BosStr> LexiconSchema for Pack<S> {
 
 pub mod export_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -298,10 +295,10 @@ where
 }
 
 fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("at.inlay.pack"),
@@ -310,19 +307,20 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("export"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("component"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("type"), SmolStr::new_static("component")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("component"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the component record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the component record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -330,9 +328,9 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "NSID of the type being exported",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("NSID of the type being exported"),
+                                ),
                                 format: Some(LexStringFormat::Nsid),
                                 ..Default::default()
                             }),
@@ -345,13 +343,16 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A list of type to component exports")),
+                    description: Some(
+                        CowStr::new_static("A list of type to component exports"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("exports"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("exports")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -365,9 +366,9 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("exports"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Type to component mappings",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Type to component mappings"),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#export"),
                                         ..Default::default()
@@ -378,9 +379,11 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Short slug for the pack (e.g. \"core\", \"ui\")",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Short slug for the pack (e.g. \"core\", \"ui\")",
+                                        ),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -400,7 +403,7 @@ fn lexicon_doc_at_inlay_pack() -> LexiconDoc<'static> {
 
 pub mod pack_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -523,7 +526,10 @@ where
     St::Name: pack_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> PackBuilder<pack_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> PackBuilder<pack_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,

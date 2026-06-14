@@ -11,7 +11,7 @@ pub mod deltarune;
 pub mod site;
 pub mod state;
 
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 /// Identifies as female.
 pub type GenderFemale<S = DefaultStr> = S;
 /// Identifies as male.

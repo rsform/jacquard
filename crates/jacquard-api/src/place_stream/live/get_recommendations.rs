@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::place_stream::live::get_recommendations;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::live::get_recommendations;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LivestreamRecommendation<S: BosStr = DefaultStr> {
     ///The DID of the recommended streamer
     pub did: Did<S>,
@@ -40,20 +37,16 @@ pub struct LivestreamRecommendation<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecommendations<S: BosStr = DefaultStr> {
     pub user_did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRecommendationsOutput<S: BosStr = DefaultStr> {
     ///Ordered list of recommendations
     pub recommendations: Vec<get_recommendations::LivestreamRecommendation<S>>,
@@ -109,7 +102,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendationsRequest {
 
 pub mod livestream_recommendation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -163,20 +156,28 @@ pub struct LivestreamRecommendationBuilder<
 
 impl LivestreamRecommendation<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> LivestreamRecommendationBuilder<livestream_recommendation_state::Empty, DefaultStr> {
+    pub fn new() -> LivestreamRecommendationBuilder<
+        livestream_recommendation_state::Empty,
+        DefaultStr,
+    > {
         LivestreamRecommendationBuilder::new()
     }
 }
 
 impl<S: BosStr> LivestreamRecommendation<S> {
     /// Create a new builder for this type
-    pub fn builder() -> LivestreamRecommendationBuilder<livestream_recommendation_state::Empty, S> {
+    pub fn builder() -> LivestreamRecommendationBuilder<
+        livestream_recommendation_state::Empty,
+        S,
+    > {
         LivestreamRecommendationBuilder::builder()
     }
 }
 
-impl LivestreamRecommendationBuilder<livestream_recommendation_state::Empty, DefaultStr> {
+impl LivestreamRecommendationBuilder<
+    livestream_recommendation_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         LivestreamRecommendationBuilder {
@@ -187,7 +188,9 @@ impl LivestreamRecommendationBuilder<livestream_recommendation_state::Empty, Def
     }
 }
 
-impl<S: BosStr> LivestreamRecommendationBuilder<livestream_recommendation_state::Empty, S> {
+impl<
+    S: BosStr,
+> LivestreamRecommendationBuilder<livestream_recommendation_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         LivestreamRecommendationBuilder {
@@ -207,7 +210,10 @@ where
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> LivestreamRecommendationBuilder<livestream_recommendation_state::SetDid<St>, S> {
+    ) -> LivestreamRecommendationBuilder<
+        livestream_recommendation_state::SetDid<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         LivestreamRecommendationBuilder {
             _state: PhantomData,
@@ -226,7 +232,10 @@ where
     pub fn source(
         mut self,
         value: impl Into<S>,
-    ) -> LivestreamRecommendationBuilder<livestream_recommendation_state::SetSource<St>, S> {
+    ) -> LivestreamRecommendationBuilder<
+        livestream_recommendation_state::SetSource<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         LivestreamRecommendationBuilder {
             _state: PhantomData,
@@ -264,10 +273,10 @@ where
 }
 
 fn lexicon_doc_place_stream_live_getRecommendations() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.live.getRecommendations"),
@@ -276,19 +285,18 @@ fn lexicon_doc_place_stream_live_getRecommendations() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("livestreamRecommendation"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("source"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("did"), SmolStr::new_static("source")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the recommended streamer",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The DID of the recommended streamer"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -296,9 +304,9 @@ fn lexicon_doc_place_stream_live_getRecommendations() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("source"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Source of the recommendation",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Source of the recommendation"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -310,25 +318,29 @@ fn lexicon_doc_place_stream_live_getRecommendations() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("userDID")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("userDID"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The DID of the user whose recommendations to fetch",
-                                    )),
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("userDID")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("userDID"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "The DID of the user whose recommendations to fetch",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -340,7 +352,7 @@ fn lexicon_doc_place_stream_live_getRecommendations() -> LexiconDoc<'static> {
 
 pub mod get_recommendations_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -371,7 +383,10 @@ pub mod get_recommendations_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetRecommendationsBuilder<St: get_recommendations_state::State, S: BosStr = DefaultStr> {
+pub struct GetRecommendationsBuilder<
+    St: get_recommendations_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -379,7 +394,10 @@ pub struct GetRecommendationsBuilder<St: get_recommendations_state::State, S: Bo
 
 impl GetRecommendations<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetRecommendationsBuilder<get_recommendations_state::Empty, DefaultStr> {
+    pub fn new() -> GetRecommendationsBuilder<
+        get_recommendations_state::Empty,
+        DefaultStr,
+    > {
         GetRecommendationsBuilder::new()
     }
 }

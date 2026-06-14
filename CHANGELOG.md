@@ -1,8 +1,8 @@
 # Changelog
 
-## [0.12.0-rc.1] - 2026-06-07
+## [0.12.0] - 2026-06-013
 
-### Breaking changes
+### Breaking changes (in addition to those from the beta!)
 
 **Session resume rework** (`jacquard`, `jacquard-common`, `jacquard-oauth`)
 - Reworked session storage primitives somewhat, moving toward a shared `SessionKey` type
@@ -31,20 +31,11 @@
 - Added OAuth scope primitive enums (`AccountResource`, `AccountAction`, `RepoAction`) shared between OAuth scopes and permission set lexicons.
 - Added bootstrap types for `com.atproto.repo.createRecord`, `putRecord`, `deleteRecord`, and `uploadBlob`, and `com.atproto.server.createSession`, `getSession`, and `refreshSession`, allowing record helpers and credential sessions to function without depending on the generated API crate.
 
-**Repository high-level API** (`jacquard-repo`)
-- Added `Repository<S, BS>` high-level wrapper with record CRUD methods (`create_record`, `update_record`, `delete_record`, `list_collection`).
-- Added `to_firehose_commit`, `to_repo_ops`, and `to_invertible_op` firehose conversion helpers.
-
-**Lexicon schema resolution** (`jacquard-identity`)
-- Added `LexiconSchemaResolver` trait and `ResolvedLexiconSchema` for runtime lexicon schema fetching and validation.
-- Added `ResolverCaches` and `CacheConfig` for configurable caching.
-
 **Loopback OAuth** (`jacquard-oauth`)
 - Replaced `rouille` dependency with a lightweight raw TCP listener for the localhost callback server.
 - Improved the OAuth callback success page with proper HTML.
 
 **Client** (`jacquard`)
-- Added browser/BFF auth store (`BrowserAuthStore`) and front-end proxy session support for browser-based OAuth flows.
 - Added concrete app-password session helpers: `CredentialSessionSelector`, `resume_or_login`, `login_with_hint`, `restore`, `switch_session`, `logout`.
 - Added `AtpSession::merge_refresh` and `AtpSession::pds_from_data` helpers.
 

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -186,7 +186,7 @@ fn _default_post_published() -> Option<bool> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -299,7 +299,10 @@ where
     St::Content: post_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetContent<St>, S> {
+    pub fn content(
+        mut self,
+        value: impl Into<S>,
+    ) -> PostBuilder<post_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -373,7 +376,10 @@ where
     St::Title: post_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> PostBuilder<post_state::SetTitle<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -432,10 +438,10 @@ where
 }
 
 fn lexicon_doc_com_crabdance_nandi_post() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.crabdance.nandi.post"),
@@ -446,20 +452,24 @@ fn lexicon_doc_com_crabdance_nandi_post() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("content"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The main content of the blog post in markdown",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The main content of the blog post in markdown",
+                                        ),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(10000usize),
                                     ..Default::default()
@@ -481,9 +491,9 @@ fn lexicon_doc_com_crabdance_nandi_post() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("summary"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional summary/excerpt of the post",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional summary/excerpt of the post"),
+                                    ),
                                     max_length: Some(500usize),
                                     ..Default::default()
                                 }),
@@ -491,9 +501,9 @@ fn lexicon_doc_com_crabdance_nandi_post() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Tags for categorizing the post",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Tags for categorizing the post"),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(50usize),
                                         ..Default::default()
@@ -505,9 +515,9 @@ fn lexicon_doc_com_crabdance_nandi_post() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("title"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The title of the blog post",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The title of the blog post"),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(200usize),
                                     ..Default::default()

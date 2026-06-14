@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::queue::QueueView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::queue::QueueView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateQueue<S: BosStr = DefaultStr> {
     ///Collection name for record subjects. Required if subjectTypes includes 'record'.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,20 +37,27 @@ pub struct CreateQueue<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateQueueOutput<S: BosStr = DefaultStr> {
     pub queue: QueueView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CreateQueueError {
     /// The queue configuration conflicts with an existing queue
@@ -61,10 +65,7 @@ pub enum CreateQueueError {
     ConflictingQueue(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CreateQueueError {
@@ -101,8 +102,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateQueueResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateQueue<S> {
     const NSID: &'static str = "tools.ozone.queue.createQueue";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateQueueResponse;
 }
 
@@ -112,15 +114,16 @@ Path: `/xrpc/tools.ozone.queue.createQueue`. The request payload type is `Create
 pub struct CreateQueueRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateQueueRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.queue.createQueue";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateQueue<S>;
     type Response = CreateQueueResponse;
 }
 
 pub mod create_queue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,13 +182,7 @@ pub mod create_queue_state {
 /// Builder for constructing an instance of this type.
 pub struct CreateQueueBuilder<St: create_queue_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Nsid<S>>,
-        Option<S>,
-        Option<S>,
-        Option<Vec<S>>,
-        Option<Vec<S>>,
-    ),
+    _fields: (Option<Nsid<S>>, Option<S>, Option<S>, Option<Vec<S>>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -327,7 +324,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateQueue<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateQueue<S> {
         CreateQueue {
             collection: self._fields.0,
             description: self._fields.1,

@@ -40,6 +40,9 @@
         },
         {
           "name": "InsufficientRole"
+        },
+        {
+          "name": "ConvoLockedByModeration"
         }
       ]
     }

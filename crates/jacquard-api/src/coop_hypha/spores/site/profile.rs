@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Custom profile information for spores.garden sites
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -130,25 +130,31 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
         if let Some(ref value) = self.avatar {
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp", "image/gif"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/webp",
+                    "image/gif",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
-                            "image/gif".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string(), "image/gif".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -170,25 +176,31 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
         if let Some(ref value) = self.banner {
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/webp", "image/gif"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/webp",
+                    "image/gif",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("banner"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/webp".to_string(),
-                            "image/gif".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/webp".to_string(), "image/gif".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -245,7 +257,7 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
 
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -421,10 +433,10 @@ where
 }
 
 fn lexicon_doc_coop_hypha_spores_site_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.spores.site.profile"),
@@ -433,9 +445,11 @@ fn lexicon_doc_coop_hypha_spores_site_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Custom profile information for spores.garden sites",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Custom profile information for spores.garden sites",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {
@@ -443,15 +457,11 @@ fn lexicon_doc_coop_hypha_spores_site_profile() -> LexiconDoc<'static> {
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("avatar"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("banner"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
@@ -464,9 +474,9 @@ fn lexicon_doc_coop_hypha_spores_site_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Profile description/bio",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Profile description/bio"),
+                                    ),
                                     max_length: Some(50000usize),
                                     max_graphemes: Some(5000usize),
                                     ..Default::default()
@@ -484,7 +494,9 @@ fn lexicon_doc_coop_hypha_spores_site_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Last update timestamp")),
+                                    description: Some(
+                                        CowStr::new_static("Last update timestamp"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

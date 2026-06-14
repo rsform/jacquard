@@ -21,6 +21,8 @@ A suite of Rust crates intended to make it much easier to get started with atpro
    - All the building blocks of the convenient abstractions are available
    - Use as much or as little from the crates as you need
 
+> [!WARNING]
+> Jacquard 0.12 includes **many** breaking changes from 0.11. The most notable and far-reaching is the borrow-or-share rewrite, but it is *far* from the only API to have changed. Please read the release highlights and the changelog carefully, as well as the documentation. Please report any such issues on Tangled, particularly any regressions in functionality.
 
 ## Example
 
@@ -78,14 +80,11 @@ async fn main() -> miette::Result<()> {
 
 If you have `just` installed, you can run the [examples](https://tangled.org/nonbinary.computer/jacquard/tree/main/examples) using `just example {example-name} {ARGS}` or `just examples` to see what's available.
 
-> [!WARNING]
-> Jacquard 0.12 includes **many** breaking changes from 0.11. The most notable and far-reaching is the borrow-or-share rewrite, but it is *far* from the only API to have changed. Please read the release highlights and the changelog carefully, as well as the documentation. There may also be regressions not yet fixed. Please report any such issues on Tangled.
-
-### Changelog
+## Changelog
 
 [CHANGELOG.md](./CHANGELOG.md)
 
-#### 0.12 Release Highlights:
+### 0.12 Release Highlights:
 
 #### Borrow-or-share
 Jacquard 0.12 swaps from lifetime-based CowStr<'_>-backed string types to the "borrow-or-share" pattern. Jacquard generated types are now generic over their string backing type, as opposed to having a lifetime, where that backing type is one that implements the requisite traits for the pattern. The default backing type, aliased `DefaultStr`, is `SmolStr`, but any of `CowStr<'_>`, `String`, `&str`, and `Cow<'_, str>` can be used currently. Defaulting to `SmolStr` maintains the niceties it added to `CowStr<'_>`, such as non-allocating construction from static string slices regardless of length, and inlining small strings in all cases while vastly simplifying the common cases where you don't want to deal with lifetimes.
@@ -102,7 +101,7 @@ Jacquard 0.12 swaps from lifetime-based CowStr<'_>-backed string types to the "b
 **Generated API types** (`jacquard-api`, `jacquard-lexicon`)
 - All generated structs/enums: `Foo<S: BosStr = DefaultStr>` with `#[serde(bound(deserialize = "S: Deserialize<'de> + BosStr"))]`
 - `#[serde(borrow)]` removed from all generated code
-- String field defaults use `FromStaticStr::from_static()` for zero-alloc construction
+- String field defaults use `FromStaticStr::from_static()` for zero-alloc construction when using `SmolStr` or `CowStr<'_>`
 - Error enums: `SmolStr` message fields, no lifetime parameters
 - **Generated builders now have two entry points:**
   - `Type::new()` picks `DefaultStr` as the backing type. This avoids awkward turbofishes or explicit annotations in many scenarios where the builder couldn't work out what type it needed to be from the immediate surroundings.
@@ -110,7 +109,31 @@ Jacquard 0.12 swaps from lifetime-based CowStr<'_>-backed string types to the "b
 
 **Note:** `RawData<'a>` currently remains lifetime-based, as do a few other mostly internal types.
 
-#### Jacquard-axum
+#### Sessions and OAuth scopes
+
+The internals of sessions have been reworked fairly substantially, with an eye toward making it easier to resume a session. There are also a number of public API changes here, and a series of helpers for both OAuth and app password sessions to make it easier to either resume a session from available information (for file-based sessions, this can include picking up the first available session, if none is specified) or kick to login. Examples demonstrate the use of these helpers.
+
+OAuth scopes have also been substantially refactored to borrow from an internal buffer as much as possible. Jacquard OAuth scopes also now finally support permission sets. A builder has been added, to allow easy construction of scopes from types, including XrpcRequest and Collection types. Examples have again been updated to use correct, minimal scopes and the occasional permission set. Additions to the lexgen tool to provide lexicon and permission set authoring and publishing, lexicon json validation, and similar are pending in a future update.
+
+
+#### `jacquard-axum`
+
+Reworked XRPC extractor to work with borrow-or-share types. Backing type for the query or body of the input can differ from the handler-visible backing type, to allow for non-overlapping extractor impls for the different backing types so that the potentially borrowed types like `CowStr<'_>` can still be used.
+
+**Service auth**
+  - Improved service auth extractor to properly handle 'did:web:for.some.reason.still.blueskyweb.xyz#bsky_appview'-type service ids (thanks @pds.dad)
+  - Added default replay protection for `jti` using a `ReplayStore` trait, default-implemented using a `mini-moka` in-memory cache.
+
+**OAuth web helpers**
+  - Added OAuth client counterparts to the service auth extractors.
+  - API-oriented extractor provides a useful error on auth failure, if auth is required.
+  - Browser-oriented extractor redirects unauthenticated users to a configured URL, while passing state to allow returning to the original URL after login.
+  - Configurable routes and handlers for common oauth paths
+
+
+#### Bootstrap types
+
+A number of manual implementations of critical atproto types have been added to `jacquard-common`. This mostly reduces semi-circular internal dependencies that made certain types of updates a pain in the ass (and also reduces dependence on `jacquard-api` in general so you can disable it more easily if you need to), but *does* affect the types used by, among other things, the `AgentSessionExt` extension trait methods and `CredentialSession` internals. They are no longer the same as the `jacquard-api` types.
 
 ## Component crates
 
@@ -149,6 +172,7 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 - [Weaver](https://weaver.sh/) - [tangled repository](https://tangled.org/nonbinary.computer/weaver)
 - [wisp.place CLI tool](https://docs.wisp.place/cli/) - formerly
 - [PDS MOOver](https://pdsmoover.com/) - [tangled repository](https://tangled.org/baileytownsend.dev/pds-moover)
+- Downloaded 117k times apparently!?
 
 ### Testimonials
 

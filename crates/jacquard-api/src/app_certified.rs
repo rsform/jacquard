@@ -10,6 +10,7 @@ pub mod actor;
 pub mod badge;
 pub mod location;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -27,14 +28,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A Decentralized Identifier (DID) string.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Did<S: BosStr = DefaultStr> {
     ///The DID string value.
     pub did: jacquard_common::types::string::Did<S>,
@@ -70,7 +68,7 @@ impl<S: BosStr> LexiconSchema for Did<S> {
 
 pub mod did_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -184,10 +182,10 @@ where
 }
 
 fn lexicon_doc_app_certified_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.certified.defs"),
@@ -196,9 +194,9 @@ fn lexicon_doc_app_certified_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("did"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A Decentralized Identifier (DID) string.",
-                    )),
+                    description: Some(
+                        CowStr::new_static("A Decentralized Identifier (DID) string."),
+                    ),
                     required: Some(vec![SmolStr::new_static("did")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -206,7 +204,9 @@ fn lexicon_doc_app_certified_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The DID string value.")),
+                                description: Some(
+                                    CowStr::new_static("The DID string value."),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 max_length: Some(256usize),
                                 ..Default::default()

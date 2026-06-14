@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,18 +21,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::science_alt::dataset::entry::ShardChecksum;
-use crate::science_alt::dataset::storage_s3;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::entry::ShardChecksum;
+use crate::science_alt::dataset::storage_s3;
 /// S3 or S3-compatible storage for WebDataset tar archives. Supports custom endpoints for MinIO, Cloudflare R2, and other S3-compatible services.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StorageS3<S: BosStr = DefaultStr> {
     ///S3 bucket name
     pub bucket: S,
@@ -51,10 +48,7 @@ pub struct StorageS3<S: BosStr = DefaultStr> {
 /// A single S3 object shard with integrity checksum
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ShardEntry<S: BosStr = DefaultStr> {
     ///Content hash for integrity verification
     pub checksum: ShardChecksum<S>,
@@ -149,7 +143,7 @@ impl<S: BosStr> LexiconSchema for ShardEntry<S> {
 
 pub mod storage_s3_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -320,7 +314,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StorageS3<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StorageS3<S> {
         StorageS3 {
             bucket: self._fields.0.unwrap(),
             endpoint: self._fields.1,
@@ -332,10 +329,10 @@ where
 }
 
 fn lexicon_doc_science_alt_dataset_storageS3() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.storageS3"),
@@ -414,13 +411,14 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("shardEntry"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single S3 object shard with integrity checksum",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("key"),
-                        SmolStr::new_static("checksum"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A single S3 object shard with integrity checksum",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("key"), SmolStr::new_static("checksum")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -436,9 +434,11 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("key"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "S3 object key for this WebDataset tar shard",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "S3 object key for this WebDataset tar shard",
+                                    ),
+                                ),
                                 max_length: Some(1024usize),
                                 ..Default::default()
                             }),
@@ -456,7 +456,7 @@ fn lexicon_doc_science_alt_dataset_storageS3() -> LexiconDoc<'static> {
 
 pub mod shard_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -594,7 +594,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ShardEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ShardEntry<S> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,14 +23,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A cryptographic signature attesting to a claim
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Signature<S: BosStr = DefaultStr> {
     ///The cryptographic signature (base64-encoded).
     pub attestation: S,
@@ -81,7 +78,7 @@ impl<S: BosStr> LexiconSchema for Signature<S> {
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -260,7 +257,10 @@ where
     St::Kid: signature_state::IsUnset,
 {
     /// Set the `kid` field (required)
-    pub fn kid(mut self, value: impl Into<S>) -> SignatureBuilder<signature_state::SetKid<St>, S> {
+    pub fn kid(
+        mut self,
+        value: impl Into<S>,
+    ) -> SignatureBuilder<signature_state::SetKid<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
@@ -363,7 +363,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Signature<S> {
         Signature {
             attestation: self._fields.0.unwrap(),
             comment: self._fields.1,
@@ -378,10 +381,10 @@ where
 }
 
 fn lexicon_doc_dev_keytrace_signature() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.keytrace.signature"),

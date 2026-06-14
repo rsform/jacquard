@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -19,13 +19,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CodeBlock<S: BosStr = DefaultStr> {
     ///Programming language for syntax highlighting
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,10 +59,10 @@ impl<S: BosStr> LexiconSchema for CodeBlock<S> {
 }
 
 fn lexicon_doc_blog_pckt_block_codeBlock() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.codeBlock"),
@@ -81,9 +78,11 @@ fn lexicon_doc_blog_pckt_block_codeBlock() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("language"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Programming language for syntax highlighting",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Programming language for syntax highlighting",
+                                    ),
+                                ),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),

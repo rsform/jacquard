@@ -23,12 +23,13 @@ pub mod request_join;
 pub mod update_join_requests_read;
 pub mod withdraw_join_request;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,24 +40,42 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::chat_bsky::actor::ProfileViewBasic;
 use crate::chat_bsky::convo::ConvoView;
 use crate::chat_bsky::group;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+/// Preview for a disabled join link. Carries only the code so clients can correlate with the input and render a disabled state.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct DisabledJoinLinkPreviewView<S: BosStr = DefaultStr> {
+    pub code: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Preview for a join link code that does not map to an existing link. Carries only the code so clients can correlate with the input and render an invalid state.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct InvalidJoinLinkPreviewView<S: BosStr = DefaultStr> {
+    pub code: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Preview that can be shown in feeds, including to unauthenticated viewers.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinLinkPreviewView<S: BosStr = DefaultStr> {
     pub code: S,
     ///Present only if the request is authenticated and the user is a member of the group.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub convo: Option<ConvoView<S>>,
-    pub enabled_status: group::LinkEnabledStatus<S>,
+    pub convo_id: S,
     pub join_rule: group::JoinRule<S>,
     pub member_count: i64,
     pub member_limit: i64,
@@ -69,11 +88,10 @@ pub struct JoinLinkPreviewView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Join link view to be used within a group view, so the convo is surrounding, not specified inside this view.
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinLinkView<S: BosStr = DefaultStr> {
     pub code: S,
     pub created_at: Datetime,
@@ -84,11 +102,9 @@ pub struct JoinLinkView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinLinkViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub requested_at: Option<Datetime>,
@@ -99,26 +115,22 @@ pub struct JoinLinkViewerState<S: BosStr = DefaultStr> {
 /// A join request from the perspective of the requester, including enough group context to render the request in a list (e.g. group name, owner, member count).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinRequestConvoView<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub member_count: i64,
     pub member_limit: i64,
     pub name: S,
     pub owner: ProfileViewBasic<S>,
-    pub requested_at: Datetime,
+    pub viewer: group::JoinLinkViewerState<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// A join request from the perspective of the group owner.
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinRequestView<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub requested_at: Datetime,
@@ -126,6 +138,7 @@ pub struct JoinRequestView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JoinRule<S: BosStr = DefaultStr> {
@@ -198,6 +211,7 @@ where
     }
 }
 
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LinkEnabledStatus<S: BosStr = DefaultStr> {
     Enabled,
@@ -266,6 +280,36 @@ where
             LinkEnabledStatus::Disabled => LinkEnabledStatus::Disabled,
             LinkEnabledStatus::Other(v) => LinkEnabledStatus::Other(v.into_static()),
         }
+    }
+}
+
+impl<S: BosStr> LexiconSchema for DisabledJoinLinkPreviewView<S> {
+    fn nsid() -> &'static str {
+        "chat.bsky.group.defs"
+    }
+    fn def_name() -> &'static str {
+        "disabledJoinLinkPreviewView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_chat_bsky_group_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for InvalidJoinLinkPreviewView<S> {
+    fn nsid() -> &'static str {
+        "chat.bsky.group.defs"
+    }
+    fn def_name() -> &'static str {
+        "invalidJoinLinkPreviewView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_chat_bsky_group_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
     }
 }
 
@@ -344,476 +388,82 @@ impl<S: BosStr> LexiconSchema for JoinRequestView<S> {
     }
 }
 
-pub mod join_link_preview_view_state {
-
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Code;
-        type EnabledStatus;
-        type JoinRule;
-        type MemberCount;
-        type MemberLimit;
-        type Name;
-        type Owner;
-        type RequireApproval;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Code = Unset;
-        type EnabledStatus = Unset;
-        type JoinRule = Unset;
-        type MemberCount = Unset;
-        type MemberLimit = Unset;
-        type Name = Unset;
-        type Owner = Unset;
-        type RequireApproval = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCode<St> {}
-    impl<St: State> State for SetCode<St> {
-        type Code = Set<members::code>;
-        type EnabledStatus = St::EnabledStatus;
-        type JoinRule = St::JoinRule;
-        type MemberCount = St::MemberCount;
-        type MemberLimit = St::MemberLimit;
-        type Name = St::Name;
-        type Owner = St::Owner;
-        type RequireApproval = St::RequireApproval;
-    }
-    ///State transition - sets the `enabled_status` field to Set
-    pub struct SetEnabledStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEnabledStatus<St> {}
-    impl<St: State> State for SetEnabledStatus<St> {
-        type Code = St::Code;
-        type EnabledStatus = Set<members::enabled_status>;
-        type JoinRule = St::JoinRule;
-        type MemberCount = St::MemberCount;
-        type MemberLimit = St::MemberLimit;
-        type Name = St::Name;
-        type Owner = St::Owner;
-        type RequireApproval = St::RequireApproval;
-    }
-    ///State transition - sets the `join_rule` field to Set
-    pub struct SetJoinRule<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetJoinRule<St> {}
-    impl<St: State> State for SetJoinRule<St> {
-        type Code = St::Code;
-        type EnabledStatus = St::EnabledStatus;
-        type JoinRule = Set<members::join_rule>;
-        type MemberCount = St::MemberCount;
-        type MemberLimit = St::MemberLimit;
-        type Name = St::Name;
-        type Owner = St::Owner;
-        type RequireApproval = St::RequireApproval;
-    }
-    ///State transition - sets the `member_count` field to Set
-    pub struct SetMemberCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMemberCount<St> {}
-    impl<St: State> State for SetMemberCount<St> {
-        type Code = St::Code;
-        type EnabledStatus = St::EnabledStatus;
-        type JoinRule = St::JoinRule;
-        type MemberCount = Set<members::member_count>;
-        type MemberLimit = St::MemberLimit;
-        type Name = St::Name;
-        type Owner = St::Owner;
-        type RequireApproval = St::RequireApproval;
-    }
-    ///State transition - sets the `member_limit` field to Set
-    pub struct SetMemberLimit<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMemberLimit<St> {}
-    impl<St: State> State for SetMemberLimit<St> {
-        type Code = St::Code;
-        type EnabledStatus = St::EnabledStatus;
-        type JoinRule = St::JoinRule;
-        type MemberCount = St::MemberCount;
-        type MemberLimit = Set<members::member_limit>;
-        type Name = St::Name;
-        type Owner = St::Owner;
-        type RequireApproval = St::RequireApproval;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Code = St::Code;
-        type EnabledStatus = St::EnabledStatus;
-        type JoinRule = St::JoinRule;
-        type MemberCount = St::MemberCount;
-        type MemberLimit = St::MemberLimit;
-        type Name = Set<members::name>;
-        type Owner = St::Owner;
-        type RequireApproval = St::RequireApproval;
-    }
-    ///State transition - sets the `owner` field to Set
-    pub struct SetOwner<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOwner<St> {}
-    impl<St: State> State for SetOwner<St> {
-        type Code = St::Code;
-        type EnabledStatus = St::EnabledStatus;
-        type JoinRule = St::JoinRule;
-        type MemberCount = St::MemberCount;
-        type MemberLimit = St::MemberLimit;
-        type Name = St::Name;
-        type Owner = Set<members::owner>;
-        type RequireApproval = St::RequireApproval;
-    }
-    ///State transition - sets the `require_approval` field to Set
-    pub struct SetRequireApproval<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRequireApproval<St> {}
-    impl<St: State> State for SetRequireApproval<St> {
-        type Code = St::Code;
-        type EnabledStatus = St::EnabledStatus;
-        type JoinRule = St::JoinRule;
-        type MemberCount = St::MemberCount;
-        type MemberLimit = St::MemberLimit;
-        type Name = St::Name;
-        type Owner = St::Owner;
-        type RequireApproval = Set<members::require_approval>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
-        ///Marker type for the `enabled_status` field
-        pub struct enabled_status(());
-        ///Marker type for the `join_rule` field
-        pub struct join_rule(());
-        ///Marker type for the `member_count` field
-        pub struct member_count(());
-        ///Marker type for the `member_limit` field
-        pub struct member_limit(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `owner` field
-        pub struct owner(());
-        ///Marker type for the `require_approval` field
-        pub struct require_approval(());
-    }
-}
-
-/// Builder for constructing an instance of this type.
-pub struct JoinLinkPreviewViewBuilder<
-    St: join_link_preview_view_state::State,
-    S: BosStr = DefaultStr,
-> {
-    _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<ConvoView<S>>,
-        Option<group::LinkEnabledStatus<S>>,
-        Option<group::JoinRule<S>>,
-        Option<i64>,
-        Option<i64>,
-        Option<S>,
-        Option<ProfileViewBasic<S>>,
-        Option<bool>,
-        Option<group::JoinLinkViewerState<S>>,
-    ),
-    _type: PhantomData<fn() -> S>,
-}
-
-impl JoinLinkPreviewView<DefaultStr> {
-    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::Empty, DefaultStr> {
-        JoinLinkPreviewViewBuilder::new()
-    }
-}
-
-impl<S: BosStr> JoinLinkPreviewView<S> {
-    /// Create a new builder for this type
-    pub fn builder() -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::Empty, S> {
-        JoinLinkPreviewViewBuilder::builder()
-    }
-}
-
-impl JoinLinkPreviewViewBuilder<join_link_preview_view_state::Empty, DefaultStr> {
-    /// Create a new builder with all fields unset, using the default string type, if needed
-    pub fn new() -> Self {
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None),
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<S: BosStr> JoinLinkPreviewViewBuilder<join_link_preview_view_state::Empty, S> {
-    /// Create a new builder with all fields unset
-    pub fn builder() -> Self {
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None),
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::Code: join_link_preview_view_state::IsUnset,
-{
-    /// Set the `code` field (required)
-    pub fn code(
-        mut self,
-        value: impl Into<S>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetCode<St>, S> {
-        self._fields.0 = Option::Some(value.into());
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St: join_link_preview_view_state::State, S: BosStr> JoinLinkPreviewViewBuilder<St, S> {
-    /// Set the `convo` field (optional)
-    pub fn convo(mut self, value: impl Into<Option<ConvoView<S>>>) -> Self {
-        self._fields.1 = value.into();
-        self
-    }
-    /// Set the `convo` field to an Option value (optional)
-    pub fn maybe_convo(mut self, value: Option<ConvoView<S>>) -> Self {
-        self._fields.1 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::EnabledStatus: join_link_preview_view_state::IsUnset,
-{
-    /// Set the `enabledStatus` field (required)
-    pub fn enabled_status(
-        mut self,
-        value: impl Into<group::LinkEnabledStatus<S>>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetEnabledStatus<St>, S> {
-        self._fields.2 = Option::Some(value.into());
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::JoinRule: join_link_preview_view_state::IsUnset,
-{
-    /// Set the `joinRule` field (required)
-    pub fn join_rule(
-        mut self,
-        value: impl Into<group::JoinRule<S>>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetJoinRule<St>, S> {
-        self._fields.3 = Option::Some(value.into());
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::MemberCount: join_link_preview_view_state::IsUnset,
-{
-    /// Set the `memberCount` field (required)
-    pub fn member_count(
-        mut self,
-        value: impl Into<i64>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetMemberCount<St>, S> {
-        self._fields.4 = Option::Some(value.into());
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::MemberLimit: join_link_preview_view_state::IsUnset,
-{
-    /// Set the `memberLimit` field (required)
-    pub fn member_limit(
-        mut self,
-        value: impl Into<i64>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetMemberLimit<St>, S> {
-        self._fields.5 = Option::Some(value.into());
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::Name: join_link_preview_view_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetName<St>, S> {
-        self._fields.6 = Option::Some(value.into());
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::Owner: join_link_preview_view_state::IsUnset,
-{
-    /// Set the `owner` field (required)
-    pub fn owner(
-        mut self,
-        value: impl Into<ProfileViewBasic<S>>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetOwner<St>, S> {
-        self._fields.7 = Option::Some(value.into());
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::RequireApproval: join_link_preview_view_state::IsUnset,
-{
-    /// Set the `requireApproval` field (required)
-    pub fn require_approval(
-        mut self,
-        value: impl Into<bool>,
-    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetRequireApproval<St>, S> {
-        self._fields.8 = Option::Some(value.into());
-        JoinLinkPreviewViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St: join_link_preview_view_state::State, S: BosStr> JoinLinkPreviewViewBuilder<St, S> {
-    /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<group::JoinLinkViewerState<S>>>) -> Self {
-        self._fields.9 = value.into();
-        self
-    }
-    /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<group::JoinLinkViewerState<S>>) -> Self {
-        self._fields.9 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
-where
-    St: join_link_preview_view_state::State,
-    St::Code: join_link_preview_view_state::IsSet,
-    St::EnabledStatus: join_link_preview_view_state::IsSet,
-    St::JoinRule: join_link_preview_view_state::IsSet,
-    St::MemberCount: join_link_preview_view_state::IsSet,
-    St::MemberLimit: join_link_preview_view_state::IsSet,
-    St::Name: join_link_preview_view_state::IsSet,
-    St::Owner: join_link_preview_view_state::IsSet,
-    St::RequireApproval: join_link_preview_view_state::IsSet,
-{
-    /// Build the final struct.
-    pub fn build(self) -> JoinLinkPreviewView<S> {
-        JoinLinkPreviewView {
-            code: self._fields.0.unwrap(),
-            convo: self._fields.1,
-            enabled_status: self._fields.2.unwrap(),
-            join_rule: self._fields.3.unwrap(),
-            member_count: self._fields.4.unwrap(),
-            member_limit: self._fields.5.unwrap(),
-            name: self._fields.6.unwrap(),
-            owner: self._fields.7.unwrap(),
-            require_approval: self._fields.8.unwrap(),
-            viewer: self._fields.9,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JoinLinkPreviewView<S> {
-        JoinLinkPreviewView {
-            code: self._fields.0.unwrap(),
-            convo: self._fields.1,
-            enabled_status: self._fields.2.unwrap(),
-            join_rule: self._fields.3.unwrap(),
-            member_count: self._fields.4.unwrap(),
-            member_limit: self._fields.5.unwrap(),
-            name: self._fields.6.unwrap(),
-            owner: self._fields.7.unwrap(),
-            require_approval: self._fields.8.unwrap(),
-            viewer: self._fields.9,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
 fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.group.defs"),
         defs: {
             let mut map = BTreeMap::new();
             map.insert(
-                SmolStr::new_static("joinLinkPreviewView"),
+                SmolStr::new_static("disabledJoinLinkPreviewView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("code"),
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("owner"),
-                        SmolStr::new_static("memberCount"),
-                        SmolStr::new_static("memberLimit"),
-                        SmolStr::new_static("requireApproval"),
-                        SmolStr::new_static("joinRule"),
-                        SmolStr::new_static("enabledStatus"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Preview for a disabled join link. Carries only the code so clients can correlate with the input and render a disabled state.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("code")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("code"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("invalidJoinLinkPreviewView"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Preview for a join link code that does not map to an existing link. Carries only the code so clients can correlate with the input and render an invalid state.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("code")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("code"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("joinLinkPreviewView"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Preview that can be shown in feeds, including to unauthenticated viewers.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("convoId"), SmolStr::new_static("code"),
+                            SmolStr::new_static("name"), SmolStr::new_static("owner"),
+                            SmolStr::new_static("memberCount"),
+                            SmolStr::new_static("memberLimit"),
+                            SmolStr::new_static("requireApproval"),
+                            SmolStr::new_static("joinRule")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("code"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("convo"),
@@ -823,11 +473,8 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
-                            SmolStr::new_static("enabledStatus"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#linkEnabledStatus"),
-                                ..Default::default()
-                            }),
+                            SmolStr::new_static("convoId"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("joinRule"),
@@ -850,14 +497,14 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("owner"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("chat.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "chat.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -882,21 +529,26 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("joinLinkView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("code"),
-                        SmolStr::new_static("enabledStatus"),
-                        SmolStr::new_static("requireApproval"),
-                        SmolStr::new_static("joinRule"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Join link view to be used within a group view, so the convo is surrounding, not specified inside this view.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("code"),
+                            SmolStr::new_static("enabledStatus"),
+                            SmolStr::new_static("requireApproval"),
+                            SmolStr::new_static("joinRule"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("code"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
@@ -962,7 +614,7 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
                             SmolStr::new_static("owner"),
                             SmolStr::new_static("memberCount"),
                             SmolStr::new_static("memberLimit"),
-                            SmolStr::new_static("requestedAt")
+                            SmolStr::new_static("viewer")
                         ],
                     ),
                     properties: {
@@ -998,9 +650,9 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
-                            SmolStr::new_static("requestedAt"),
-                            LexObjectProperty::String(LexString {
-                                format: Some(LexStringFormat::Datetime),
+                            SmolStr::new_static("viewer"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#joinLinkViewerState"),
                                 ..Default::default()
                             }),
                         );
@@ -1012,19 +664,24 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("joinRequestView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("convoId"),
-                        SmolStr::new_static("requestedBy"),
-                        SmolStr::new_static("requestedAt"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A join request from the perspective of the group owner.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("convoId"),
+                            SmolStr::new_static("requestedBy"),
+                            SmolStr::new_static("requestedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("requestedAt"),
@@ -1036,7 +693,9 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("requestedBy"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("chat.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "chat.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1047,15 +706,11 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("joinRule"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkEnabledStatus"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map
         },
@@ -1063,9 +718,475 @@ fn lexicon_doc_chat_bsky_group_defs() -> LexiconDoc<'static> {
     }
 }
 
+pub mod join_link_preview_view_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Code;
+        type ConvoId;
+        type JoinRule;
+        type MemberCount;
+        type MemberLimit;
+        type Name;
+        type Owner;
+        type RequireApproval;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Code = Unset;
+        type ConvoId = Unset;
+        type JoinRule = Unset;
+        type MemberCount = Unset;
+        type MemberLimit = Unset;
+        type Name = Unset;
+        type Owner = Unset;
+        type RequireApproval = Unset;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCode<St> {}
+    impl<St: State> State for SetCode<St> {
+        type Code = Set<members::code>;
+        type ConvoId = St::ConvoId;
+        type JoinRule = St::JoinRule;
+        type MemberCount = St::MemberCount;
+        type MemberLimit = St::MemberLimit;
+        type Name = St::Name;
+        type Owner = St::Owner;
+        type RequireApproval = St::RequireApproval;
+    }
+    ///State transition - sets the `convo_id` field to Set
+    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetConvoId<St> {}
+    impl<St: State> State for SetConvoId<St> {
+        type Code = St::Code;
+        type ConvoId = Set<members::convo_id>;
+        type JoinRule = St::JoinRule;
+        type MemberCount = St::MemberCount;
+        type MemberLimit = St::MemberLimit;
+        type Name = St::Name;
+        type Owner = St::Owner;
+        type RequireApproval = St::RequireApproval;
+    }
+    ///State transition - sets the `join_rule` field to Set
+    pub struct SetJoinRule<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetJoinRule<St> {}
+    impl<St: State> State for SetJoinRule<St> {
+        type Code = St::Code;
+        type ConvoId = St::ConvoId;
+        type JoinRule = Set<members::join_rule>;
+        type MemberCount = St::MemberCount;
+        type MemberLimit = St::MemberLimit;
+        type Name = St::Name;
+        type Owner = St::Owner;
+        type RequireApproval = St::RequireApproval;
+    }
+    ///State transition - sets the `member_count` field to Set
+    pub struct SetMemberCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMemberCount<St> {}
+    impl<St: State> State for SetMemberCount<St> {
+        type Code = St::Code;
+        type ConvoId = St::ConvoId;
+        type JoinRule = St::JoinRule;
+        type MemberCount = Set<members::member_count>;
+        type MemberLimit = St::MemberLimit;
+        type Name = St::Name;
+        type Owner = St::Owner;
+        type RequireApproval = St::RequireApproval;
+    }
+    ///State transition - sets the `member_limit` field to Set
+    pub struct SetMemberLimit<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMemberLimit<St> {}
+    impl<St: State> State for SetMemberLimit<St> {
+        type Code = St::Code;
+        type ConvoId = St::ConvoId;
+        type JoinRule = St::JoinRule;
+        type MemberCount = St::MemberCount;
+        type MemberLimit = Set<members::member_limit>;
+        type Name = St::Name;
+        type Owner = St::Owner;
+        type RequireApproval = St::RequireApproval;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Code = St::Code;
+        type ConvoId = St::ConvoId;
+        type JoinRule = St::JoinRule;
+        type MemberCount = St::MemberCount;
+        type MemberLimit = St::MemberLimit;
+        type Name = Set<members::name>;
+        type Owner = St::Owner;
+        type RequireApproval = St::RequireApproval;
+    }
+    ///State transition - sets the `owner` field to Set
+    pub struct SetOwner<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOwner<St> {}
+    impl<St: State> State for SetOwner<St> {
+        type Code = St::Code;
+        type ConvoId = St::ConvoId;
+        type JoinRule = St::JoinRule;
+        type MemberCount = St::MemberCount;
+        type MemberLimit = St::MemberLimit;
+        type Name = St::Name;
+        type Owner = Set<members::owner>;
+        type RequireApproval = St::RequireApproval;
+    }
+    ///State transition - sets the `require_approval` field to Set
+    pub struct SetRequireApproval<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRequireApproval<St> {}
+    impl<St: State> State for SetRequireApproval<St> {
+        type Code = St::Code;
+        type ConvoId = St::ConvoId;
+        type JoinRule = St::JoinRule;
+        type MemberCount = St::MemberCount;
+        type MemberLimit = St::MemberLimit;
+        type Name = St::Name;
+        type Owner = St::Owner;
+        type RequireApproval = Set<members::require_approval>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `code` field
+        pub struct code(());
+        ///Marker type for the `convo_id` field
+        pub struct convo_id(());
+        ///Marker type for the `join_rule` field
+        pub struct join_rule(());
+        ///Marker type for the `member_count` field
+        pub struct member_count(());
+        ///Marker type for the `member_limit` field
+        pub struct member_limit(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `owner` field
+        pub struct owner(());
+        ///Marker type for the `require_approval` field
+        pub struct require_approval(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct JoinLinkPreviewViewBuilder<
+    St: join_link_preview_view_state::State,
+    S: BosStr = DefaultStr,
+> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<S>,
+        Option<ConvoView<S>>,
+        Option<S>,
+        Option<group::JoinRule<S>>,
+        Option<i64>,
+        Option<i64>,
+        Option<S>,
+        Option<ProfileViewBasic<S>>,
+        Option<bool>,
+        Option<group::JoinLinkViewerState<S>>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl JoinLinkPreviewView<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::Empty,
+        DefaultStr,
+    > {
+        JoinLinkPreviewViewBuilder::new()
+    }
+}
+
+impl<S: BosStr> JoinLinkPreviewView<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::Empty,
+        S,
+    > {
+        JoinLinkPreviewViewBuilder::builder()
+    }
+}
+
+impl JoinLinkPreviewViewBuilder<join_link_preview_view_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> JoinLinkPreviewViewBuilder<join_link_preview_view_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::Code: join_link_preview_view_state::IsUnset,
+{
+    /// Set the `code` field (required)
+    pub fn code(
+        mut self,
+        value: impl Into<S>,
+    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetCode<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: join_link_preview_view_state::State,
+    S: BosStr,
+> JoinLinkPreviewViewBuilder<St, S> {
+    /// Set the `convo` field (optional)
+    pub fn convo(mut self, value: impl Into<Option<ConvoView<S>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `convo` field to an Option value (optional)
+    pub fn maybe_convo(mut self, value: Option<ConvoView<S>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::ConvoId: join_link_preview_view_state::IsUnset,
+{
+    /// Set the `convoId` field (required)
+    pub fn convo_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetConvoId<St>, S> {
+        self._fields.2 = Option::Some(value.into());
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::JoinRule: join_link_preview_view_state::IsUnset,
+{
+    /// Set the `joinRule` field (required)
+    pub fn join_rule(
+        mut self,
+        value: impl Into<group::JoinRule<S>>,
+    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetJoinRule<St>, S> {
+        self._fields.3 = Option::Some(value.into());
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::MemberCount: join_link_preview_view_state::IsUnset,
+{
+    /// Set the `memberCount` field (required)
+    pub fn member_count(
+        mut self,
+        value: impl Into<i64>,
+    ) -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::SetMemberCount<St>,
+        S,
+    > {
+        self._fields.4 = Option::Some(value.into());
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::MemberLimit: join_link_preview_view_state::IsUnset,
+{
+    /// Set the `memberLimit` field (required)
+    pub fn member_limit(
+        mut self,
+        value: impl Into<i64>,
+    ) -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::SetMemberLimit<St>,
+        S,
+    > {
+        self._fields.5 = Option::Some(value.into());
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::Name: join_link_preview_view_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetName<St>, S> {
+        self._fields.6 = Option::Some(value.into());
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::Owner: join_link_preview_view_state::IsUnset,
+{
+    /// Set the `owner` field (required)
+    pub fn owner(
+        mut self,
+        value: impl Into<ProfileViewBasic<S>>,
+    ) -> JoinLinkPreviewViewBuilder<join_link_preview_view_state::SetOwner<St>, S> {
+        self._fields.7 = Option::Some(value.into());
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::RequireApproval: join_link_preview_view_state::IsUnset,
+{
+    /// Set the `requireApproval` field (required)
+    pub fn require_approval(
+        mut self,
+        value: impl Into<bool>,
+    ) -> JoinLinkPreviewViewBuilder<
+        join_link_preview_view_state::SetRequireApproval<St>,
+        S,
+    > {
+        self._fields.8 = Option::Some(value.into());
+        JoinLinkPreviewViewBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<
+    St: join_link_preview_view_state::State,
+    S: BosStr,
+> JoinLinkPreviewViewBuilder<St, S> {
+    /// Set the `viewer` field (optional)
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<group::JoinLinkViewerState<S>>>,
+    ) -> Self {
+        self._fields.9 = value.into();
+        self
+    }
+    /// Set the `viewer` field to an Option value (optional)
+    pub fn maybe_viewer(mut self, value: Option<group::JoinLinkViewerState<S>>) -> Self {
+        self._fields.9 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> JoinLinkPreviewViewBuilder<St, S>
+where
+    St: join_link_preview_view_state::State,
+    St::Code: join_link_preview_view_state::IsSet,
+    St::ConvoId: join_link_preview_view_state::IsSet,
+    St::JoinRule: join_link_preview_view_state::IsSet,
+    St::MemberCount: join_link_preview_view_state::IsSet,
+    St::MemberLimit: join_link_preview_view_state::IsSet,
+    St::Name: join_link_preview_view_state::IsSet,
+    St::Owner: join_link_preview_view_state::IsSet,
+    St::RequireApproval: join_link_preview_view_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> JoinLinkPreviewView<S> {
+        JoinLinkPreviewView {
+            code: self._fields.0.unwrap(),
+            convo: self._fields.1,
+            convo_id: self._fields.2.unwrap(),
+            join_rule: self._fields.3.unwrap(),
+            member_count: self._fields.4.unwrap(),
+            member_limit: self._fields.5.unwrap(),
+            name: self._fields.6.unwrap(),
+            owner: self._fields.7.unwrap(),
+            require_approval: self._fields.8.unwrap(),
+            viewer: self._fields.9,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JoinLinkPreviewView<S> {
+        JoinLinkPreviewView {
+            code: self._fields.0.unwrap(),
+            convo: self._fields.1,
+            convo_id: self._fields.2.unwrap(),
+            join_rule: self._fields.3.unwrap(),
+            member_count: self._fields.4.unwrap(),
+            member_limit: self._fields.5.unwrap(),
+            name: self._fields.6.unwrap(),
+            owner: self._fields.7.unwrap(),
+            require_approval: self._fields.8.unwrap(),
+            viewer: self._fields.9,
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
 pub mod join_link_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1320,7 +1441,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JoinLinkView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JoinLinkView<S> {
         JoinLinkView {
             code: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -1334,7 +1458,7 @@ where
 
 pub mod join_request_convo_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1347,7 +1471,7 @@ pub mod join_request_convo_view_state {
         type MemberLimit;
         type Name;
         type Owner;
-        type RequestedAt;
+        type Viewer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -1358,7 +1482,7 @@ pub mod join_request_convo_view_state {
         type MemberLimit = Unset;
         type Name = Unset;
         type Owner = Unset;
-        type RequestedAt = Unset;
+        type Viewer = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
     pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
@@ -1369,7 +1493,7 @@ pub mod join_request_convo_view_state {
         type MemberLimit = St::MemberLimit;
         type Name = St::Name;
         type Owner = St::Owner;
-        type RequestedAt = St::RequestedAt;
+        type Viewer = St::Viewer;
     }
     ///State transition - sets the `member_count` field to Set
     pub struct SetMemberCount<St: State = Empty>(PhantomData<fn() -> St>);
@@ -1380,7 +1504,7 @@ pub mod join_request_convo_view_state {
         type MemberLimit = St::MemberLimit;
         type Name = St::Name;
         type Owner = St::Owner;
-        type RequestedAt = St::RequestedAt;
+        type Viewer = St::Viewer;
     }
     ///State transition - sets the `member_limit` field to Set
     pub struct SetMemberLimit<St: State = Empty>(PhantomData<fn() -> St>);
@@ -1391,7 +1515,7 @@ pub mod join_request_convo_view_state {
         type MemberLimit = Set<members::member_limit>;
         type Name = St::Name;
         type Owner = St::Owner;
-        type RequestedAt = St::RequestedAt;
+        type Viewer = St::Viewer;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
@@ -1402,7 +1526,7 @@ pub mod join_request_convo_view_state {
         type MemberLimit = St::MemberLimit;
         type Name = Set<members::name>;
         type Owner = St::Owner;
-        type RequestedAt = St::RequestedAt;
+        type Viewer = St::Viewer;
     }
     ///State transition - sets the `owner` field to Set
     pub struct SetOwner<St: State = Empty>(PhantomData<fn() -> St>);
@@ -1413,18 +1537,18 @@ pub mod join_request_convo_view_state {
         type MemberLimit = St::MemberLimit;
         type Name = St::Name;
         type Owner = Set<members::owner>;
-        type RequestedAt = St::RequestedAt;
+        type Viewer = St::Viewer;
     }
-    ///State transition - sets the `requested_at` field to Set
-    pub struct SetRequestedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRequestedAt<St> {}
-    impl<St: State> State for SetRequestedAt<St> {
+    ///State transition - sets the `viewer` field to Set
+    pub struct SetViewer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetViewer<St> {}
+    impl<St: State> State for SetViewer<St> {
         type ConvoId = St::ConvoId;
         type MemberCount = St::MemberCount;
         type MemberLimit = St::MemberLimit;
         type Name = St::Name;
         type Owner = St::Owner;
-        type RequestedAt = Set<members::requested_at>;
+        type Viewer = Set<members::viewer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -1439,8 +1563,8 @@ pub mod join_request_convo_view_state {
         pub struct name(());
         ///Marker type for the `owner` field
         pub struct owner(());
-        ///Marker type for the `requested_at` field
-        pub struct requested_at(());
+        ///Marker type for the `viewer` field
+        pub struct viewer(());
     }
 }
 
@@ -1456,21 +1580,27 @@ pub struct JoinRequestConvoViewBuilder<
         Option<i64>,
         Option<S>,
         Option<ProfileViewBasic<S>>,
-        Option<Datetime>,
+        Option<group::JoinLinkViewerState<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
 
 impl JoinRequestConvoView<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> JoinRequestConvoViewBuilder<join_request_convo_view_state::Empty, DefaultStr> {
+    pub fn new() -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::Empty,
+        DefaultStr,
+    > {
         JoinRequestConvoViewBuilder::new()
     }
 }
 
 impl<S: BosStr> JoinRequestConvoView<S> {
     /// Create a new builder for this type
-    pub fn builder() -> JoinRequestConvoViewBuilder<join_request_convo_view_state::Empty, S> {
+    pub fn builder() -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::Empty,
+        S,
+    > {
         JoinRequestConvoViewBuilder::builder()
     }
 }
@@ -1525,7 +1655,10 @@ where
     pub fn member_count(
         mut self,
         value: impl Into<i64>,
-    ) -> JoinRequestConvoViewBuilder<join_request_convo_view_state::SetMemberCount<St>, S> {
+    ) -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::SetMemberCount<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         JoinRequestConvoViewBuilder {
             _state: PhantomData,
@@ -1544,7 +1677,10 @@ where
     pub fn member_limit(
         mut self,
         value: impl Into<i64>,
-    ) -> JoinRequestConvoViewBuilder<join_request_convo_view_state::SetMemberLimit<St>, S> {
+    ) -> JoinRequestConvoViewBuilder<
+        join_request_convo_view_state::SetMemberLimit<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         JoinRequestConvoViewBuilder {
             _state: PhantomData,
@@ -1595,13 +1731,13 @@ where
 impl<St, S: BosStr> JoinRequestConvoViewBuilder<St, S>
 where
     St: join_request_convo_view_state::State,
-    St::RequestedAt: join_request_convo_view_state::IsUnset,
+    St::Viewer: join_request_convo_view_state::IsUnset,
 {
-    /// Set the `requestedAt` field (required)
-    pub fn requested_at(
+    /// Set the `viewer` field (required)
+    pub fn viewer(
         mut self,
-        value: impl Into<Datetime>,
-    ) -> JoinRequestConvoViewBuilder<join_request_convo_view_state::SetRequestedAt<St>, S> {
+        value: impl Into<group::JoinLinkViewerState<S>>,
+    ) -> JoinRequestConvoViewBuilder<join_request_convo_view_state::SetViewer<St>, S> {
         self._fields.5 = Option::Some(value.into());
         JoinRequestConvoViewBuilder {
             _state: PhantomData,
@@ -1619,7 +1755,7 @@ where
     St::MemberLimit: join_request_convo_view_state::IsSet,
     St::Name: join_request_convo_view_state::IsSet,
     St::Owner: join_request_convo_view_state::IsSet,
-    St::RequestedAt: join_request_convo_view_state::IsSet,
+    St::Viewer: join_request_convo_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> JoinRequestConvoView<S> {
@@ -1629,7 +1765,7 @@ where
             member_limit: self._fields.2.unwrap(),
             name: self._fields.3.unwrap(),
             owner: self._fields.4.unwrap(),
-            requested_at: self._fields.5.unwrap(),
+            viewer: self._fields.5.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1644,7 +1780,7 @@ where
             member_limit: self._fields.2.unwrap(),
             name: self._fields.3.unwrap(),
             owner: self._fields.4.unwrap(),
-            requested_at: self._fields.5.unwrap(),
+            viewer: self._fields.5.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -1652,7 +1788,7 @@ where
 
 pub mod join_request_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1709,7 +1845,10 @@ pub mod join_request_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct JoinRequestViewBuilder<St: join_request_view_state::State, S: BosStr = DefaultStr> {
+pub struct JoinRequestViewBuilder<
+    St: join_request_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<ProfileViewBasic<S>>),
     _type: PhantomData<fn() -> S>,
@@ -1825,7 +1964,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JoinRequestView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JoinRequestView<S> {
         JoinRequestView {
             convo_id: self._fields.0.unwrap(),
             requested_at: self._fields.1.unwrap(),

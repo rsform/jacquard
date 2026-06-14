@@ -8,5 +8,6 @@ pub mod create_profile;
 pub mod credit;
 pub mod game;
 pub mod get_profile;
+pub mod get_taste_profile;
 pub mod profile;
 pub mod put_profile;

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A book in the user's library
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -146,7 +146,7 @@ impl<S: BosStr> LexiconSchema for Book<S> {
 
 pub mod book_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -205,12 +205,7 @@ pub mod book_state {
 /// Builder for constructing an instance of this type.
 pub struct BookBuilder<St: book_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Datetime>,
-        Option<Vec<AtUri<S>>>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<Vec<AtUri<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -256,7 +251,10 @@ where
     St::Authors: book_state::IsUnset,
 {
     /// Set the `authors` field (required)
-    pub fn authors(mut self, value: impl Into<S>) -> BookBuilder<book_state::SetAuthors<St>, S> {
+    pub fn authors(
+        mut self,
+        value: impl Into<S>,
+    ) -> BookBuilder<book_state::SetAuthors<St>, S> {
         self._fields.0 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
@@ -304,7 +302,10 @@ where
     St::Title: book_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> BookBuilder<book_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> BookBuilder<book_state::SetTitle<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
@@ -344,10 +345,10 @@ where
 }
 
 fn lexicon_doc_bond_biblio_book() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("bond.biblio.book"),

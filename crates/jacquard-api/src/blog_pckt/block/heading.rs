@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -17,16 +17,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blog_pckt::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blog_pckt::richtext::facet::Facet;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Heading<S: BosStr = DefaultStr> {
     ///Facets for text formatting and features
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,10 +71,10 @@ impl<S: BosStr> LexiconSchema for Heading<S> {
 }
 
 fn lexicon_doc_blog_pckt_block_heading() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blog.pckt.block.heading"),
@@ -93,9 +90,11 @@ fn lexicon_doc_blog_pckt_block_heading() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("facets"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Facets for text formatting and features",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Facets for text formatting and features",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("blog.pckt.richtext.facet"),
                                     ..Default::default()
@@ -114,9 +113,9 @@ fn lexicon_doc_blog_pckt_block_heading() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("plaintext"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The plain text content of the heading",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The plain text content of the heading"),
+                                ),
                                 ..Default::default()
                             }),
                         );

@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_gamesgamesgamesgames::get_contribution;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::get_contribution;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContributionView<S: BosStr = DefaultStr> {
     pub changes: Data<S>,
     pub cid: S,
@@ -54,6 +51,7 @@ pub struct ContributionView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ContributionViewContributionType<S: BosStr = DefaultStr> {
@@ -104,7 +102,8 @@ impl<S: BosStr> Serialize for ContributionViewContributionType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContributionViewContributionType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ContributionViewContributionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -134,7 +133,9 @@ where
             ContributionViewContributionType::Addition => {
                 ContributionViewContributionType::Addition
             }
-            ContributionViewContributionType::NewGame => ContributionViewContributionType::NewGame,
+            ContributionViewContributionType::NewGame => {
+                ContributionViewContributionType::NewGame
+            }
             ContributionViewContributionType::Other(v) => {
                 ContributionViewContributionType::Other(v.into_static())
             }
@@ -142,31 +143,25 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetContribution<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetContributionOutput<S: BosStr = DefaultStr> {
     pub contribution: get_contribution::ContributionView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PatchView<S: BosStr = DefaultStr> {
     pub changes: Data<S>,
     pub created_at: Datetime,
@@ -176,11 +171,9 @@ pub struct PatchView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReviewView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -191,6 +184,7 @@ pub struct ReviewView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReviewViewStatus<S: BosStr = DefaultStr> {
@@ -273,11 +267,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationView<S: BosStr = DefaultStr> {
     pub accepted_by: VerificationViewAcceptedBy<S>,
     pub contributor: Did<S>,
@@ -286,6 +278,7 @@ pub struct VerificationView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum VerificationViewAcceptedBy<S: BosStr = DefaultStr> {
@@ -336,7 +329,8 @@ impl<S: BosStr> Serialize for VerificationViewAcceptedBy<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VerificationViewAcceptedBy<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for VerificationViewAcceptedBy<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -460,7 +454,7 @@ impl<S: BosStr> LexiconSchema for VerificationView<S> {
 
 pub mod contribution_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -571,7 +565,10 @@ pub mod contribution_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributionViewBuilder<St: contribution_view_state::State, S: BosStr = DefaultStr> {
+pub struct ContributionViewBuilder<
+    St: contribution_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
@@ -610,7 +607,18 @@ impl ContributionViewBuilder<contribution_view_state::Empty, DefaultStr> {
         ContributionViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -623,7 +631,18 @@ impl<S: BosStr> ContributionViewBuilder<contribution_view_state::Empty, S> {
         ContributionViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -740,7 +759,10 @@ impl<St: contribution_view_state::State, S: BosStr> ContributionViewBuilder<St, 
 
 impl<St: contribution_view_state::State, S: BosStr> ContributionViewBuilder<St, S> {
     /// Set the `patch` field (optional)
-    pub fn patch(mut self, value: impl Into<Option<get_contribution::PatchView<S>>>) -> Self {
+    pub fn patch(
+        mut self,
+        value: impl Into<Option<get_contribution::PatchView<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -753,12 +775,18 @@ impl<St: contribution_view_state::State, S: BosStr> ContributionViewBuilder<St, 
 
 impl<St: contribution_view_state::State, S: BosStr> ContributionViewBuilder<St, S> {
     /// Set the `review` field (optional)
-    pub fn review(mut self, value: impl Into<Option<get_contribution::ReviewView<S>>>) -> Self {
+    pub fn review(
+        mut self,
+        value: impl Into<Option<get_contribution::ReviewView<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `review` field to an Option value (optional)
-    pub fn maybe_review(mut self, value: Option<get_contribution::ReviewView<S>>) -> Self {
+    pub fn maybe_review(
+        mut self,
+        value: Option<get_contribution::ReviewView<S>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }
@@ -857,7 +885,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContributionView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContributionView<S> {
         ContributionView {
             changes: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -877,10 +908,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.getContribution"),
@@ -889,14 +920,15 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
             map.insert(
                 SmolStr::new_static("contributionView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("contributorDid"),
-                        SmolStr::new_static("contributionType"),
-                        SmolStr::new_static("changes"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("contributorDid"),
+                            SmolStr::new_static("contributionType"),
+                            SmolStr::new_static("changes"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -908,15 +940,11 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("contributionType"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("contributorDid"),
@@ -934,9 +962,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
                         );
                         map.insert(
                             SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("patch"),
@@ -962,9 +988,11 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
                         map.insert(
                             SmolStr::new_static("subjectName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Resolved name of the subject entity for display.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Resolved name of the subject entity for display.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -990,34 +1018,37 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("uri")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("uri"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    format: Some(LexStringFormat::AtUri),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("uri")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("uri"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("patchView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("subject"),
-                        SmolStr::new_static("changes"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("subject"),
+                            SmolStr::new_static("changes"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1056,12 +1087,13 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
             map.insert(
                 SmolStr::new_static("reviewView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("status"),
-                        SmolStr::new_static("reviewedBy"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("status"),
+                            SmolStr::new_static("reviewedBy"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1074,9 +1106,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
                         );
                         map.insert(
                             SmolStr::new_static("reason"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("reviewedBy"),
@@ -1087,9 +1117,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
                         );
                         map.insert(
                             SmolStr::new_static("status"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -1106,20 +1134,20 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
             map.insert(
                 SmolStr::new_static("verificationView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("contributor"),
-                        SmolStr::new_static("acceptedBy"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"),
+                            SmolStr::new_static("contributor"),
+                            SmolStr::new_static("acceptedBy"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("acceptedBy"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("contributor"),
@@ -1155,7 +1183,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_getContribution() -> LexiconDoc<'stati
 
 pub mod get_contribution_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1186,7 +1214,10 @@ pub mod get_contribution_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetContributionBuilder<St: get_contribution_state::State, S: BosStr = DefaultStr> {
+pub struct GetContributionBuilder<
+    St: get_contribution_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -1262,7 +1293,7 @@ where
 
 pub mod patch_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1337,12 +1368,7 @@ pub mod patch_view_state {
 /// Builder for constructing an instance of this type.
 pub struct PatchViewBuilder<St: patch_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Data<S>>,
-        Option<Datetime>,
-        Option<AtUri<S>>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<Data<S>>, Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1477,7 +1503,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PatchView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PatchView<S> {
         PatchView {
             changes: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -1490,7 +1519,7 @@ where
 
 pub mod review_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1720,7 +1749,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReviewView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReviewView<S> {
         ReviewView {
             created_at: self._fields.0.unwrap(),
             reason: self._fields.1,
@@ -1734,7 +1766,7 @@ where
 
 pub mod verification_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1807,7 +1839,10 @@ pub mod verification_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct VerificationViewBuilder<St: verification_view_state::State, S: BosStr = DefaultStr> {
+pub struct VerificationViewBuilder<
+    St: verification_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<VerificationViewAcceptedBy<S>>,
@@ -1949,7 +1984,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VerificationView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> VerificationView<S> {
         VerificationView {
             accepted_by: self._fields.0.unwrap(),
             contributor: self._fields.1.unwrap(),

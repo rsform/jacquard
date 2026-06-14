@@ -2,6 +2,28 @@
   "lexicon": 1,
   "id": "games.gamesgamesgamesgames.getUserLists",
   "defs": {
+    "listPreviewItem": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "media": {
+          "type": "unknown"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
     "main": {
       "type": "query",
       "description": "Get a user's lists with item counts. Optionally check which lists contain a specific game.",
@@ -77,6 +99,14 @@
         },
         "name": {
           "type": "string"
+        },
+        "previewItems": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#listPreviewItem"
+          },
+          "maxLength": 4
         },
         "uri": {
           "type": "string",

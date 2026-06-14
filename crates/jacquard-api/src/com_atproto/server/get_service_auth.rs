@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetServiceAuth<S: BosStr = DefaultStr> {
     pub aud: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -30,20 +27,27 @@ pub struct GetServiceAuth<S: BosStr = DefaultStr> {
     pub lxm: Option<Nsid<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetServiceAuthOutput<S: BosStr = DefaultStr> {
     pub token: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetServiceAuthError {
     /// Indicates that the requested expiration date is not a valid. May be in the past or may be reliant on the requested scopes.
@@ -51,10 +55,7 @@ pub enum GetServiceAuthError {
     BadExpiration(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetServiceAuthError {
@@ -108,7 +109,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetServiceAuthRequest {
 
 pub mod get_service_auth_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -139,7 +140,10 @@ pub mod get_service_auth_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetServiceAuthBuilder<St: get_service_auth_state::State, S: BosStr = DefaultStr> {
+pub struct GetServiceAuthBuilder<
+    St: get_service_auth_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<Nsid<S>>),
     _type: PhantomData<fn() -> S>,

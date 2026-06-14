@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteFolderParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
@@ -45,8 +42,9 @@ impl jacquard_common::xrpc::XrpcResp for DeleteFolderResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for DeleteFolder {
     const NSID: &'static str = "app.blebbit.authr.folder.deleteFolder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteFolderResponse;
 }
 
@@ -56,15 +54,16 @@ Path: `/xrpc/app.blebbit.authr.folder.deleteFolder`. The request payload type is
 pub struct DeleteFolderRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteFolderRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.folder.deleteFolder";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteFolder;
     type Response = DeleteFolderResponse;
 }
 
 pub mod delete_folder_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -82,8 +81,10 @@ pub mod delete_folder_params_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteFolderParamsBuilder<St: delete_folder_params_state::State, S: BosStr = DefaultStr>
-{
+pub struct DeleteFolderParamsBuilder<
+    St: delete_folder_params_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -91,7 +92,10 @@ pub struct DeleteFolderParamsBuilder<St: delete_folder_params_state::State, S: B
 
 impl DeleteFolderParams<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> DeleteFolderParamsBuilder<delete_folder_params_state::Empty, DefaultStr> {
+    pub fn new() -> DeleteFolderParamsBuilder<
+        delete_folder_params_state::Empty,
+        DefaultStr,
+    > {
         DeleteFolderParamsBuilder::new()
     }
 }
@@ -144,6 +148,8 @@ where
 {
     /// Build the final struct.
     pub fn build(self) -> DeleteFolderParams<S> {
-        DeleteFolderParams { id: self._fields.0 }
+        DeleteFolderParams {
+            id: self._fields.0,
+        }
     }
 }

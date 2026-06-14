@@ -13,6 +13,7 @@ pub mod get_branch;
 pub mod get_commit;
 pub mod get_diff;
 pub mod get_entity;
+pub mod get_entry;
 pub mod get_head;
 pub mod get_tag;
 pub mod get_tree;
@@ -21,12 +22,13 @@ pub mod list_commits;
 pub mod list_languages;
 pub mod list_tags;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,36 +39,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::git::temp;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
-/// blob metadata. This object doesn't include the blob content
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
-pub struct Blob<S: BosStr = DefaultStr> {
-    pub last_commit: temp::Commit<S>,
-    pub mode: S,
-    ///The file name
-    pub name: S,
-    ///File size in bytes
-    pub size: i64,
-    ///Submodule information if path is a submodule
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub submodule: Option<temp::Submodule<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
-    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Branch<S: BosStr = DefaultStr> {
     ///hydrated commit object
     pub commit: temp::Commit<S>,
@@ -76,11 +55,9 @@ pub struct Branch<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Commit<S: BosStr = DefaultStr> {
     pub author: temp::Signature<S>,
     pub committer: temp::Signature<S>,
@@ -94,10 +71,7 @@ pub struct Commit<S: BosStr = DefaultStr> {
 pub type Hash<S = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Signature<S: BosStr = DefaultStr> {
     ///Person email
     pub email: S,
@@ -109,11 +83,9 @@ pub struct Signature<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Submodule<S: BosStr = DefaultStr> {
     ///Branch to track in the submodule
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -126,11 +98,9 @@ pub struct Submodule<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Tag<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
@@ -140,21 +110,6 @@ pub struct Tag<S: BosStr = DefaultStr> {
     pub target: Data<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
-}
-
-impl<S: BosStr> LexiconSchema for Blob<S> {
-    fn nsid() -> &'static str {
-        "sh.tangled.git.temp.defs"
-    }
-    fn def_name() -> &'static str {
-        "blob"
-    }
-    fn lexicon_doc() -> LexiconDoc<'static> {
-        lexicon_doc_sh_tangled_git_temp_defs()
-    }
-    fn validate(&self) -> Result<(), ConstraintError> {
-        Ok(())
-    }
 }
 
 impl<S: BosStr> LexiconSchema for Branch<S> {
@@ -232,518 +187,9 @@ impl<S: BosStr> LexiconSchema for Tag<S> {
     }
 }
 
-pub mod blob_state {
-
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type LastCommit;
-        type Mode;
-        type Name;
-        type Size;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type LastCommit = Unset;
-        type Mode = Unset;
-        type Name = Unset;
-        type Size = Unset;
-    }
-    ///State transition - sets the `last_commit` field to Set
-    pub struct SetLastCommit<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLastCommit<St> {}
-    impl<St: State> State for SetLastCommit<St> {
-        type LastCommit = Set<members::last_commit>;
-        type Mode = St::Mode;
-        type Name = St::Name;
-        type Size = St::Size;
-    }
-    ///State transition - sets the `mode` field to Set
-    pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMode<St> {}
-    impl<St: State> State for SetMode<St> {
-        type LastCommit = St::LastCommit;
-        type Mode = Set<members::mode>;
-        type Name = St::Name;
-        type Size = St::Size;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type LastCommit = St::LastCommit;
-        type Mode = St::Mode;
-        type Name = Set<members::name>;
-        type Size = St::Size;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSize<St> {}
-    impl<St: State> State for SetSize<St> {
-        type LastCommit = St::LastCommit;
-        type Mode = St::Mode;
-        type Name = St::Name;
-        type Size = Set<members::size>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `last_commit` field
-        pub struct last_commit(());
-        ///Marker type for the `mode` field
-        pub struct mode(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `size` field
-        pub struct size(());
-    }
-}
-
-/// Builder for constructing an instance of this type.
-pub struct BlobBuilder<St: blob_state::State, S: BosStr = DefaultStr> {
-    _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<temp::Commit<S>>,
-        Option<S>,
-        Option<S>,
-        Option<i64>,
-        Option<temp::Submodule<S>>,
-    ),
-    _type: PhantomData<fn() -> S>,
-}
-
-impl Blob<DefaultStr> {
-    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> BlobBuilder<blob_state::Empty, DefaultStr> {
-        BlobBuilder::new()
-    }
-}
-
-impl<S: BosStr> Blob<S> {
-    /// Create a new builder for this type
-    pub fn builder() -> BlobBuilder<blob_state::Empty, S> {
-        BlobBuilder::builder()
-    }
-}
-
-impl BlobBuilder<blob_state::Empty, DefaultStr> {
-    /// Create a new builder with all fields unset, using the default string type, if needed
-    pub fn new() -> Self {
-        BlobBuilder {
-            _state: PhantomData,
-            _fields: (None, None, None, None, None),
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<S: BosStr> BlobBuilder<blob_state::Empty, S> {
-    /// Create a new builder with all fields unset
-    pub fn builder() -> Self {
-        BlobBuilder {
-            _state: PhantomData,
-            _fields: (None, None, None, None, None),
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> BlobBuilder<St, S>
-where
-    St: blob_state::State,
-    St::LastCommit: blob_state::IsUnset,
-{
-    /// Set the `lastCommit` field (required)
-    pub fn last_commit(
-        mut self,
-        value: impl Into<temp::Commit<S>>,
-    ) -> BlobBuilder<blob_state::SetLastCommit<St>, S> {
-        self._fields.0 = Option::Some(value.into());
-        BlobBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> BlobBuilder<St, S>
-where
-    St: blob_state::State,
-    St::Mode: blob_state::IsUnset,
-{
-    /// Set the `mode` field (required)
-    pub fn mode(mut self, value: impl Into<S>) -> BlobBuilder<blob_state::SetMode<St>, S> {
-        self._fields.1 = Option::Some(value.into());
-        BlobBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> BlobBuilder<St, S>
-where
-    St: blob_state::State,
-    St::Name: blob_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> BlobBuilder<blob_state::SetName<St>, S> {
-        self._fields.2 = Option::Some(value.into());
-        BlobBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> BlobBuilder<St, S>
-where
-    St: blob_state::State,
-    St::Size: blob_state::IsUnset,
-{
-    /// Set the `size` field (required)
-    pub fn size(mut self, value: impl Into<i64>) -> BlobBuilder<blob_state::SetSize<St>, S> {
-        self._fields.3 = Option::Some(value.into());
-        BlobBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St: blob_state::State, S: BosStr> BlobBuilder<St, S> {
-    /// Set the `submodule` field (optional)
-    pub fn submodule(mut self, value: impl Into<Option<temp::Submodule<S>>>) -> Self {
-        self._fields.4 = value.into();
-        self
-    }
-    /// Set the `submodule` field to an Option value (optional)
-    pub fn maybe_submodule(mut self, value: Option<temp::Submodule<S>>) -> Self {
-        self._fields.4 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> BlobBuilder<St, S>
-where
-    St: blob_state::State,
-    St::LastCommit: blob_state::IsSet,
-    St::Mode: blob_state::IsSet,
-    St::Name: blob_state::IsSet,
-    St::Size: blob_state::IsSet,
-{
-    /// Build the final struct.
-    pub fn build(self) -> Blob<S> {
-        Blob {
-            last_commit: self._fields.0.unwrap(),
-            mode: self._fields.1.unwrap(),
-            name: self._fields.2.unwrap(),
-            size: self._fields.3.unwrap(),
-            submodule: self._fields.4,
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Blob<S> {
-        Blob {
-            last_commit: self._fields.0.unwrap(),
-            mode: self._fields.1.unwrap(),
-            name: self._fields.2.unwrap(),
-            size: self._fields.3.unwrap(),
-            submodule: self._fields.4,
-            extra_data: Some(extra_data),
-        }
-    }
-}
-
-fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
-    #[allow(unused_imports)]
-    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
-    use jacquard_lexicon::lexicon::*;
-    LexiconDoc {
-        lexicon: Lexicon::Lexicon1,
-        id: CowStr::new_static("sh.tangled.git.temp.defs"),
-        defs: {
-            let mut map = BTreeMap::new();
-            map.insert(
-                SmolStr::new_static("blob"),
-                LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "blob metadata. This object doesn't include the blob content",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("mode"),
-                        SmolStr::new_static("size"),
-                        SmolStr::new_static("lastCommit"),
-                    ]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("lastCommit"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#commit"),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("mode"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The file name")),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("size"),
-                            LexObjectProperty::Integer(LexInteger {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("submodule"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#submodule"),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("branch"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("commit"),
-                    ]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("commit"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#commit"),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("branch name")),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("commit"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("hash"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("committer"),
-                        SmolStr::new_static("message"),
-                        SmolStr::new_static("tree"),
-                    ]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("author"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#signature"),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("committer"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#signature"),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("hash"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#hash"),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("tree"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#hash"),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("hash"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("signature"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("email"),
-                        SmolStr::new_static("when"),
-                    ]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("email"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Person email")),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Person name")),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("when"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Timestamp of the signature")),
-                                format: Some(LexStringFormat::Datetime),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("submodule"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("url"),
-                    ]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("branch"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Branch to track in the submodule",
-                                )),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Submodule name")),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("url"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Submodule repository URL")),
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map.insert(
-                SmolStr::new_static("tag"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("tagger"),
-                        SmolStr::new_static("target"),
-                    ]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("tag name")),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("tagger"),
-                            LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("#signature"),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("target"),
-                            LexObjectProperty::Unknown(LexUnknown {
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map
-        },
-        ..Default::default()
-    }
-}
-
 pub mod branch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -853,7 +299,10 @@ where
     St::Name: branch_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> BranchBuilder<branch_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> BranchBuilder<branch_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BranchBuilder {
             _state: PhantomData,
@@ -887,9 +336,228 @@ where
     }
 }
 
+fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("sh.tangled.git.temp.defs"),
+        defs: {
+            let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("branch"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("commit")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("commit"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#commit"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("branch name")),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("commit"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("hash"), SmolStr::new_static("author"),
+                            SmolStr::new_static("committer"),
+                            SmolStr::new_static("message"), SmolStr::new_static("tree")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("author"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#signature"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("committer"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#signature"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("hash"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#hash"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("message"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("tree"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#hash"),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("hash"),
+                LexUserType::String(LexString { ..Default::default() }),
+            );
+            map.insert(
+                SmolStr::new_static("signature"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("email"),
+                            SmolStr::new_static("when")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("email"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Person email")),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Person name")),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("when"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Timestamp of the signature"),
+                                ),
+                                format: Some(LexStringFormat::Datetime),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("submodule"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("url")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("branch"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Branch to track in the submodule"),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("Submodule name")),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("url"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("Submodule repository URL"),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("tag"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("tagger"),
+                            SmolStr::new_static("target")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("message"),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("name"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static("tag name")),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("tagger"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#signature"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("target"),
+                            LexObjectProperty::Unknown(LexUnknown {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map
+        },
+        ..Default::default()
+    }
+}
+
 pub mod commit_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1158,7 +826,7 @@ where
 
 pub mod signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1331,7 +999,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Signature<S> {
         Signature {
             email: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1343,7 +1014,7 @@ where
 
 pub mod tag_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1402,12 +1073,7 @@ pub mod tag_state {
 /// Builder for constructing an instance of this type.
 pub struct TagBuilder<St: tag_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<temp::Signature<S>>,
-        Option<Data<S>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<temp::Signature<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1501,7 +1167,10 @@ where
     St::Target: tag_state::IsUnset,
 {
     /// Set the `target` field (required)
-    pub fn target(mut self, value: impl Into<Data<S>>) -> TagBuilder<tag_state::SetTarget<St>, S> {
+    pub fn target(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> TagBuilder<tag_state::SetTarget<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,

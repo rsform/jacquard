@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateAccountPassword<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub password: S,
@@ -42,8 +39,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountPasswordResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountPassword<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountPasswordResponse;
 }
 
@@ -53,15 +51,16 @@ Path: `/xrpc/com.atproto.admin.updateAccountPassword`. The request payload type 
 pub struct UpdateAccountPasswordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountPasswordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountPassword";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateAccountPassword<S>;
     type Response = UpdateAccountPasswordResponse;
 }
 
 pub mod update_account_password_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,14 +114,20 @@ pub struct UpdateAccountPasswordBuilder<
 
 impl UpdateAccountPassword<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UpdateAccountPasswordBuilder<update_account_password_state::Empty, DefaultStr> {
+    pub fn new() -> UpdateAccountPasswordBuilder<
+        update_account_password_state::Empty,
+        DefaultStr,
+    > {
         UpdateAccountPasswordBuilder::new()
     }
 }
 
 impl<S: BosStr> UpdateAccountPassword<S> {
     /// Create a new builder for this type
-    pub fn builder() -> UpdateAccountPasswordBuilder<update_account_password_state::Empty, S> {
+    pub fn builder() -> UpdateAccountPasswordBuilder<
+        update_account_password_state::Empty,
+        S,
+    > {
         UpdateAccountPasswordBuilder::builder()
     }
 }
@@ -177,7 +182,10 @@ where
     pub fn password(
         mut self,
         value: impl Into<S>,
-    ) -> UpdateAccountPasswordBuilder<update_account_password_state::SetPassword<St>, S> {
+    ) -> UpdateAccountPasswordBuilder<
+        update_account_password_state::SetPassword<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         UpdateAccountPasswordBuilder {
             _state: PhantomData,

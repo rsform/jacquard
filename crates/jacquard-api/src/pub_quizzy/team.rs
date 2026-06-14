@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A quiz team
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -122,20 +122,25 @@ impl<S: BosStr> LexiconSchema for Team<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -215,7 +220,7 @@ impl<S: BosStr> LexiconSchema for Team<S> {
 
 pub mod team_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -260,12 +265,7 @@ pub mod team_state {
 /// Builder for constructing an instance of this type.
 pub struct TeamBuilder<St: team_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<BlobRef<S>>,
-        Option<S>,
-        Option<Vec<Did<S>>>,
-        Option<S>,
-    ),
+    _fields: (Option<BlobRef<S>>, Option<S>, Option<Vec<Did<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -356,7 +356,10 @@ where
     St::Name: team_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> TeamBuilder<team_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> TeamBuilder<team_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TeamBuilder {
             _state: PhantomData,
@@ -395,10 +398,10 @@ where
 }
 
 fn lexicon_doc_pub_quizzy_team() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.quizzy.team"),
@@ -410,18 +413,17 @@ fn lexicon_doc_pub_quizzy_team() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A quiz team")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("members"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("name"), SmolStr::new_static("members")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("avatar"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("avatarAlt"),
@@ -434,7 +436,9 @@ fn lexicon_doc_pub_quizzy_team() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("members"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static("DIDs of team members")),
+                                    description: Some(
+                                        CowStr::new_static("DIDs of team members"),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         format: Some(LexStringFormat::Did),
                                         ..Default::default()

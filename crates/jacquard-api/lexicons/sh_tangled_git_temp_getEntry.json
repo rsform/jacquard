@@ -1,0 +1,91 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.git.temp.getEntry",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "get metadata of blob by ref and path",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "path"
+        ],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "path of the entity"
+          },
+          "ref": {
+            "type": "string",
+            "description": "Git revision (branch, tag, or commit id)",
+            "default": "HEAD"
+          },
+          "repo": {
+            "type": "string",
+            "description": "DID of the repository",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "name",
+            "mode",
+            "oid"
+          ],
+          "properties": {
+            "lastCommit": {
+              "type": "ref",
+              "ref": "sh.tangled.git.temp.defs#commit"
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "0040000",
+                "0100644",
+                "0100664",
+                "0100755",
+                "0120000",
+                "0160000"
+              ]
+            },
+            "name": {
+              "type": "string",
+              "description": "The file name"
+            },
+            "oid": {
+              "type": "string"
+            },
+            "submodule": {
+              "type": "ref",
+              "description": "Submodule information if path is a submodule",
+              "ref": "sh.tangled.git.temp.defs#submodule"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Repository not found or access denied",
+          "name": "RepoNotFound"
+        },
+        {
+          "description": "Git reference not found",
+          "name": "RefNotFound"
+        },
+        {
+          "description": "Entry not found",
+          "name": "EntryNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

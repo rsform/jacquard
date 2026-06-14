@@ -11,9 +11,10 @@ pub mod get_apikeys;
 pub mod remove_apikey;
 pub mod update_apikey;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,13 +27,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ApiKeyView<S: BosStr = DefaultStr> {
     ///The date and time when the API key was created.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -66,10 +64,10 @@ impl<S: BosStr> LexiconSchema for ApiKeyView<S> {
 }
 
 fn lexicon_doc_app_rocksky_apikey_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.apikey.defs"),
@@ -84,9 +82,11 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The date and time when the API key was created.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The date and time when the API key was created.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -94,25 +94,27 @@ fn lexicon_doc_app_rocksky_apikey_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "A description for the API key.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("A description for the API key."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of the API key.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The unique identifier of the API key."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The name of the API key.")),
+                                description: Some(
+                                    CowStr::new_static("The name of the API key."),
+                                ),
                                 ..Default::default()
                             }),
                         );

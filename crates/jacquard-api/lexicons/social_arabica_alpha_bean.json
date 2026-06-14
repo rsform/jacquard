@@ -24,7 +24,7 @@
           },
           "description": {
             "type": "string",
-            "description": "Additional notes about the beans",
+            "description": "Public roaster description or tasting notes for the beans",
             "maxLength": 1000
           },
           "link": {
@@ -37,6 +37,11 @@
             "type": "string",
             "description": "Name of the coffee bean (e.g., 'Ethiopian Yirgacheffe', 'Morning Blend')",
             "maxLength": 200
+          },
+          "notes": {
+            "type": "string",
+            "description": "Personal notes about the beans",
+            "maxLength": 2000
           },
           "origin": {
             "type": "string",
@@ -53,6 +58,11 @@
             "description": "User rating of the bean (1-10 scale, optional)",
             "minimum": 1,
             "maximum": 10
+          },
+          "roastDate": {
+            "type": "string",
+            "description": "Optional date when the beans were roasted (YYYY-MM-DD)",
+            "maxLength": 10
           },
           "roastLevel": {
             "type": "string",

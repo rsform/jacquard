@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Setting Post based auto labeling.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -114,7 +114,7 @@ impl<S: BosStr> LexiconSchema for Post<S> {
 
 pub mod post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -207,14 +207,7 @@ pub mod post_state {
 /// Builder for constructing an instance of this type.
 pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<Datetime>,
-        Option<i64>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -349,7 +342,10 @@ where
     St::Label: post_state::IsUnset,
 {
     /// Set the `label` field (required)
-    pub fn label(mut self, value: impl Into<S>) -> PostBuilder<post_state::SetLabel<St>, S> {
+    pub fn label(
+        mut self,
+        value: impl Into<S>,
+    ) -> PostBuilder<post_state::SetLabel<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
@@ -395,10 +391,10 @@ where
 }
 
 fn lexicon_doc_blue_rito_label_auto_post() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.rito.label.auto.post"),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::pub_quizzy::quiz;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::pub_quizzy::quiz;
 /// A quiz containing one or more rounds of questions
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -79,10 +79,7 @@ pub struct QuizGetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a question with its point value
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QuestionRef<S: BosStr = DefaultStr> {
     ///A custom name for this question, as opposed to its number
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -99,10 +96,7 @@ pub struct QuestionRef<S: BosStr = DefaultStr> {
 /// A round within a quiz
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Round<S: BosStr = DefaultStr> {
     ///Ordered list of questions in this round
     pub questions: Vec<quiz::QuestionRef<S>>,
@@ -342,7 +336,7 @@ fn _default_quiz_has_visuals() -> Option<bool> {
 
 pub mod quiz_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -581,7 +575,10 @@ where
     St::Title: quiz_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> QuizBuilder<quiz_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> QuizBuilder<quiz_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         QuizBuilder {
             _state: PhantomData,
@@ -630,10 +627,10 @@ where
 }
 
 fn lexicon_doc_pub_quizzy_quiz() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.quizzy.quiz"),
@@ -750,9 +747,11 @@ fn lexicon_doc_pub_quizzy_quiz() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("questionRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to a question with its point value",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to a question with its point value",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("question")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -760,9 +759,11 @@ fn lexicon_doc_pub_quizzy_quiz() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "A custom name for this question, as opposed to its number",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "A custom name for this question, as opposed to its number",
+                                    ),
+                                ),
                                 max_length: Some(16usize),
                                 max_graphemes: Some(160usize),
                                 ..Default::default()
@@ -798,9 +799,11 @@ fn lexicon_doc_pub_quizzy_quiz() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("questions"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Ordered list of questions in this round",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Ordered list of questions in this round",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#questionRef"),
                                     ..Default::default()
@@ -813,9 +816,11 @@ fn lexicon_doc_pub_quizzy_quiz() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Optional title for this round (requires locale if set)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Optional title for this round (requires locale if set)",
+                                    ),
+                                ),
                                 max_length: Some(1000usize),
                                 max_graphemes: Some(100usize),
                                 ..Default::default()
@@ -838,7 +843,7 @@ fn _default_question_ref_points() -> Option<i64> {
 
 pub mod question_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -971,7 +976,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> QuestionRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> QuestionRef<S> {
         QuestionRef {
             name: self._fields.0,
             points: self._fields.1.or_else(|| Some(1i64)),
@@ -983,7 +991,7 @@ where
 
 pub mod round_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Named label pointing to a dataset entry. Multiple labels with the same name but different versions can coexist, enabling versioned references to immutable dataset entries.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -156,7 +156,7 @@ impl<S: BosStr> LexiconSchema for Label<S> {
 
 pub mod label_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -215,13 +215,7 @@ pub mod label_state {
 /// Builder for constructing an instance of this type.
 pub struct LabelBuilder<St: label_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<AtUri<S>>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -318,7 +312,10 @@ where
     St::Name: label_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> LabelBuilder<label_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> LabelBuilder<label_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LabelBuilder {
             _state: PhantomData,
@@ -373,10 +370,10 @@ where
 }
 
 fn lexicon_doc_science_alt_dataset_label() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.label"),

@@ -14,7 +14,8 @@
             "app.chavatar.avatar",
             "app.chavatar.settings",
             "app.chavatar.settings.executor",
-            "app.chavatar.state"
+            "app.chavatar.state",
+            "app.chavatar.schedules"
           ],
           "action": [
             "create",

@@ -14,9 +14,14 @@
           "lastUpdated"
         ],
         "properties": {
+          "activeSetId": {
+            "type": "string",
+            "description": "TID of the currently active avatarSet from settings.avatarSets. Undefined when in fallback state or when avatarSets is not configured.",
+            "maxLength": 13
+          },
           "cursor": {
             "type": "string",
-            "description": "TID (ID) of the currently active avatar in the settings array.",
+            "description": "TID (ID) of the currently active avatar within the active set.",
             "maxLength": 13
           },
           "lastUpdated": {

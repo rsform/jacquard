@@ -135,6 +135,7 @@
       "required": [
         "createdAt",
         "lockStatus",
+        "lockStatusModerationOverride",
         "memberCount",
         "memberLimit",
         "name"
@@ -156,6 +157,10 @@
           "type": "ref",
           "description": "The lock status of the conversation.",
           "ref": "#convoLockStatus"
+        },
+        "lockStatusModerationOverride": {
+          "type": "boolean",
+          "description": "Whether the lock status is being forced by a moderation override (account inactivation or convo takedown) rather than the owner's own setting."
         },
         "memberCount": {
           "type": "integer",
@@ -938,6 +943,11 @@
             "ref": "app.bsky.richtext.facet"
           }
         },
+        "replyTo": {
+          "type": "ref",
+          "description": "If set, the message this message is replying to. The referenced message must be in the same convo.",
+          "ref": "#replyRef"
+        },
         "text": {
           "type": "string",
           "maxLength": 10000,
@@ -1001,6 +1011,14 @@
             "ref": "#reactionView"
           }
         },
+        "replyTo": {
+          "type": "union",
+          "description": "If set, the message this message is replying to. The full view of the referenced message is embedded so the client can render it inline. Only a single level is embedded: the embedded message will not itself have a populated 'replyTo' field even if it was also a reply.",
+          "refs": [
+            "#messageView",
+            "#deletedMessageView"
+          ]
+        },
         "rev": {
           "type": "string"
         },
@@ -1061,6 +1079,18 @@
         "did": {
           "type": "string",
           "format": "did"
+        }
+      }
+    },
+    "replyRef": {
+      "type": "object",
+      "description": "A reference to another message within the same convo, used to indicate that a message is a reply to it.",
+      "required": [
+        "messageId"
+      ],
+      "properties": {
+        "messageId": {
+          "type": "string"
         }
       }
     },

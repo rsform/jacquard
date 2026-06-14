@@ -3,17 +3,42 @@
   "id": "chat.bsky.group.defs",
   "description": "[NOTE: This is under active development and should be considered unstable while this note is here].",
   "defs": {
+    "disabledJoinLinkPreviewView": {
+      "type": "object",
+      "description": "Preview for a disabled join link. Carries only the code so clients can correlate with the input and render a disabled state.",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
+    "invalidJoinLinkPreviewView": {
+      "type": "object",
+      "description": "Preview for a join link code that does not map to an existing link. Carries only the code so clients can correlate with the input and render an invalid state.",
+      "required": [
+        "code"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      }
+    },
     "joinLinkPreviewView": {
       "type": "object",
+      "description": "Preview that can be shown in feeds, including to unauthenticated viewers.",
       "required": [
+        "convoId",
         "code",
         "name",
         "owner",
         "memberCount",
         "memberLimit",
         "requireApproval",
-        "joinRule",
-        "enabledStatus"
+        "joinRule"
       ],
       "properties": {
         "code": {
@@ -24,9 +49,8 @@
           "description": "Present only if the request is authenticated and the user is a member of the group.",
           "ref": "chat.bsky.convo.defs#convoView"
         },
-        "enabledStatus": {
-          "type": "ref",
-          "ref": "#linkEnabledStatus"
+        "convoId": {
+          "type": "string"
         },
         "joinRule": {
           "type": "ref",
@@ -56,6 +80,7 @@
     },
     "joinLinkView": {
       "type": "object",
+      "description": "Join link view to be used within a group view, so the convo is surrounding, not specified inside this view.",
       "required": [
         "code",
         "enabledStatus",
@@ -102,7 +127,7 @@
         "owner",
         "memberCount",
         "memberLimit",
-        "requestedAt"
+        "viewer"
       ],
       "properties": {
         "convoId": {
@@ -121,14 +146,15 @@
           "type": "ref",
           "ref": "chat.bsky.actor.defs#profileViewBasic"
         },
-        "requestedAt": {
-          "type": "string",
-          "format": "datetime"
+        "viewer": {
+          "type": "ref",
+          "ref": "#joinLinkViewerState"
         }
       }
     },
     "joinRequestView": {
       "type": "object",
+      "description": "A join request from the perspective of the group owner.",
       "required": [
         "convoId",
         "requestedBy",

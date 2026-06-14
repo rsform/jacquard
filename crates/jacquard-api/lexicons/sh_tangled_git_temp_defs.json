@@ -2,38 +2,6 @@
   "lexicon": 1,
   "id": "sh.tangled.git.temp.defs",
   "defs": {
-    "blob": {
-      "type": "object",
-      "description": "blob metadata. This object doesn't include the blob content",
-      "required": [
-        "name",
-        "mode",
-        "size",
-        "lastCommit"
-      ],
-      "properties": {
-        "lastCommit": {
-          "type": "ref",
-          "ref": "#commit"
-        },
-        "mode": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string",
-          "description": "The file name"
-        },
-        "size": {
-          "type": "integer",
-          "description": "File size in bytes"
-        },
-        "submodule": {
-          "type": "ref",
-          "description": "Submodule information if path is a submodule",
-          "ref": "#submodule"
-        }
-      }
-    },
     "branch": {
       "type": "object",
       "required": [
