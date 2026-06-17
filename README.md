@@ -172,6 +172,7 @@ Jacquard is broken up into several crates for modularity. The correct one to use
 - [Weaver](https://weaver.sh/) - [tangled repository](https://tangled.org/nonbinary.computer/weaver)
 - [wisp.place CLI tool](https://docs.wisp.place/cli/) - formerly
 - [PDS MOOver](https://pdsmoover.com/) - [tangled repository](https://tangled.org/baileytownsend.dev/pds-moover)
+- [Porxie](https://codeberg.org/Blooym/Porxie/)
 - Downloaded 117k times apparently!?
 
 ### Testimonials
