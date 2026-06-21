@@ -73,7 +73,6 @@ use jacquard_oauth::client::{OAuthClient, OAuthSession};
 use jacquard_oauth::dpop::DpopExt;
 use jacquard_oauth::resolver::OAuthResolver;
 use serde::Serialize;
-#[cfg(feature = "api")]
 use serde::de::DeserializeOwned;
 use smol_str::SmolStr;
 #[cfg(feature = "api")]
