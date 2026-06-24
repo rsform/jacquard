@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Serialize, Deserialize};
-use crate::chat_bsky::convo::ConvoView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RemoveMembers<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub members: Vec<Did<S>>,
@@ -27,27 +30,20 @@ pub struct RemoveMembers<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RemoveMembersOutput<S: BosStr = DefaultStr> {
     pub convo: ConvoView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(
-    Serialize,
-    Deserialize,
-    Debug,
-    Clone,
-    PartialEq,
-    Eq,
-    thiserror::Error,
-    miette::Diagnostic
+    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
 )]
-
 #[serde(tag = "error", content = "message")]
 pub enum RemoveMembersError {
     #[serde(rename = "InvalidConvo")]
@@ -56,7 +52,10 @@ pub enum RemoveMembersError {
     InsufficientRole(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other { error: SmolStr, message: Option<SmolStr> },
+    Other {
+        error: SmolStr,
+        message: Option<SmolStr>,
+    },
 }
 
 impl core::fmt::Display for RemoveMembersError {
@@ -100,9 +99,8 @@ impl jacquard_common::xrpc::XrpcResp for RemoveMembersResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveMembers<S> {
     const NSID: &'static str = "chat.bsky.group.removeMembers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = RemoveMembersResponse;
 }
 
@@ -112,16 +110,15 @@ Path: `/xrpc/chat.bsky.group.removeMembers`. The request payload type is `Remove
 pub struct RemoveMembersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RemoveMembersRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.group.removeMembers";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = RemoveMembers<S>;
     type Response = RemoveMembersResponse;
 }
 
 pub mod remove_members_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -164,10 +161,7 @@ pub mod remove_members_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RemoveMembersBuilder<
-    St: remove_members_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct RemoveMembersBuilder<St: remove_members_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<Did<S>>>),
     _type: PhantomData<fn() -> S>,
@@ -262,10 +256,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> RemoveMembers<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RemoveMembers<S> {
         RemoveMembers {
             convo_id: self._fields.0.unwrap(),
             members: self._fields.1.unwrap(),

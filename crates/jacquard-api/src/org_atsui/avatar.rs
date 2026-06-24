@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::at_inlay::Response;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Avatar<S: BosStr = DefaultStr> {
     ///DID of the blob owner. Used to resolve blob URLs.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -123,9 +126,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct AvatarOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -146,9 +151,8 @@ impl jacquard_common::xrpc::XrpcResp for AvatarResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Avatar<S> {
     const NSID: &'static str = "org.atsui.Avatar";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = AvatarResponse;
 }
 
@@ -158,16 +162,15 @@ Path: `/xrpc/org.atsui.Avatar`. The request payload type is `Avatar<S>`; send th
 pub struct AvatarRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AvatarRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Avatar";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Avatar<S>;
     type Response = AvatarResponse;
 }
 
 pub mod avatar_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -200,7 +203,12 @@ pub mod avatar_state {
 /// Builder for constructing an instance of this type.
 pub struct AvatarBuilder<St: avatar_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<bool>, Option<AvatarSize<S>>, Option<Data<S>>),
+    _fields: (
+        Option<Did<S>>,
+        Option<bool>,
+        Option<AvatarSize<S>>,
+        Option<Data<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -285,10 +293,7 @@ where
     St::Src: avatar_state::IsUnset,
 {
     /// Set the `src` field (required)
-    pub fn src(
-        mut self,
-        value: impl Into<Data<S>>,
-    ) -> AvatarBuilder<avatar_state::SetSrc<St>, S> {
+    pub fn src(mut self, value: impl Into<Data<S>>) -> AvatarBuilder<avatar_state::SetSrc<St>, S> {
         self._fields.3 = Option::Some(value.into());
         AvatarBuilder {
             _state: PhantomData,

@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateInviteCode<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub for_account: Option<Did<S>>,
@@ -27,9 +30,11 @@ pub struct CreateInviteCode<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateInviteCodeOutput<S: BosStr = DefaultStr> {
     pub code: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -49,9 +54,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateInviteCodeResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateInviteCode<S> {
     const NSID: &'static str = "com.atproto.server.createInviteCode";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateInviteCodeResponse;
 }
 
@@ -61,16 +65,15 @@ Path: `/xrpc/com.atproto.server.createInviteCode`. The request payload type is `
 pub struct CreateInviteCodeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateInviteCodeRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.createInviteCode";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateInviteCode<S>;
     type Response = CreateInviteCodeResponse;
 }
 
 pub mod create_invite_code_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,10 +104,7 @@ pub mod create_invite_code_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateInviteCodeBuilder<
-    St: create_invite_code_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct CreateInviteCodeBuilder<St: create_invite_code_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -112,10 +112,7 @@ pub struct CreateInviteCodeBuilder<
 
 impl CreateInviteCode<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CreateInviteCodeBuilder<
-        create_invite_code_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> CreateInviteCodeBuilder<create_invite_code_state::Empty, DefaultStr> {
         CreateInviteCodeBuilder::new()
     }
 }
@@ -195,10 +192,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CreateInviteCode<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateInviteCode<S> {
         CreateInviteCode {
             for_account: self._fields.0,
             use_count: self._fields.1.unwrap(),

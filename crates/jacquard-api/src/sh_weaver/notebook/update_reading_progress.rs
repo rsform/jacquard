@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::sh_weaver::notebook::ReadingProgress;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::sh_weaver::notebook::ReadingProgress;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateReadingProgress<S: BosStr = DefaultStr> {
     ///The entry the user is currently on.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,7 +35,6 @@ pub struct UpdateReadingProgress<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UpdateReadingProgressStatus<S: BosStr = DefaultStr> {
@@ -86,8 +88,7 @@ impl<S: BosStr> Serialize for UpdateReadingProgressStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
-for UpdateReadingProgressStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for UpdateReadingProgressStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -112,15 +113,9 @@ where
     fn into_static(self) -> Self::Output {
         match self {
             UpdateReadingProgressStatus::Reading => UpdateReadingProgressStatus::Reading,
-            UpdateReadingProgressStatus::Finished => {
-                UpdateReadingProgressStatus::Finished
-            }
-            UpdateReadingProgressStatus::Abandoned => {
-                UpdateReadingProgressStatus::Abandoned
-            }
-            UpdateReadingProgressStatus::WantToRead => {
-                UpdateReadingProgressStatus::WantToRead
-            }
+            UpdateReadingProgressStatus::Finished => UpdateReadingProgressStatus::Finished,
+            UpdateReadingProgressStatus::Abandoned => UpdateReadingProgressStatus::Abandoned,
+            UpdateReadingProgressStatus::WantToRead => UpdateReadingProgressStatus::WantToRead,
             UpdateReadingProgressStatus::Other(v) => {
                 UpdateReadingProgressStatus::Other(v.into_static())
             }
@@ -128,9 +123,11 @@ where
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct UpdateReadingProgressOutput<S: BosStr = DefaultStr> {
     pub progress: ReadingProgress<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -150,9 +147,8 @@ impl jacquard_common::xrpc::XrpcResp for UpdateReadingProgressResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateReadingProgress<S> {
     const NSID: &'static str = "sh.weaver.notebook.updateReadingProgress";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = UpdateReadingProgressResponse;
 }
 
@@ -162,16 +158,15 @@ Path: `/xrpc/sh.weaver.notebook.updateReadingProgress`. The request payload type
 pub struct UpdateReadingProgressRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateReadingProgressRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.updateReadingProgress";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = UpdateReadingProgress<S>;
     type Response = UpdateReadingProgressResponse;
 }
 
 pub mod update_reading_progress_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -218,20 +213,14 @@ pub struct UpdateReadingProgressBuilder<
 
 impl UpdateReadingProgress<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UpdateReadingProgressBuilder<
-        update_reading_progress_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> UpdateReadingProgressBuilder<update_reading_progress_state::Empty, DefaultStr> {
         UpdateReadingProgressBuilder::new()
     }
 }
 
 impl<S: BosStr> UpdateReadingProgress<S> {
     /// Create a new builder for this type
-    pub fn builder() -> UpdateReadingProgressBuilder<
-        update_reading_progress_state::Empty,
-        S,
-    > {
+    pub fn builder() -> UpdateReadingProgressBuilder<update_reading_progress_state::Empty, S> {
         UpdateReadingProgressBuilder::builder()
     }
 }
@@ -258,10 +247,7 @@ impl<S: BosStr> UpdateReadingProgressBuilder<update_reading_progress_state::Empt
     }
 }
 
-impl<
-    St: update_reading_progress_state::State,
-    S: BosStr,
-> UpdateReadingProgressBuilder<St, S> {
+impl<St: update_reading_progress_state::State, S: BosStr> UpdateReadingProgressBuilder<St, S> {
     /// Set the `currentEntry` field (optional)
     pub fn current_entry(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -283,10 +269,7 @@ where
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> UpdateReadingProgressBuilder<
-        update_reading_progress_state::SetNotebook<St>,
-        S,
-    > {
+    ) -> UpdateReadingProgressBuilder<update_reading_progress_state::SetNotebook<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UpdateReadingProgressBuilder {
             _state: PhantomData,
@@ -296,10 +279,7 @@ where
     }
 }
 
-impl<
-    St: update_reading_progress_state::State,
-    S: BosStr,
-> UpdateReadingProgressBuilder<St, S> {
+impl<St: update_reading_progress_state::State, S: BosStr> UpdateReadingProgressBuilder<St, S> {
     /// Set the `percentComplete` field (optional)
     pub fn percent_complete(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -312,23 +292,14 @@ impl<
     }
 }
 
-impl<
-    St: update_reading_progress_state::State,
-    S: BosStr,
-> UpdateReadingProgressBuilder<St, S> {
+impl<St: update_reading_progress_state::State, S: BosStr> UpdateReadingProgressBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(
-        mut self,
-        value: impl Into<Option<UpdateReadingProgressStatus<S>>>,
-    ) -> Self {
+    pub fn status(mut self, value: impl Into<Option<UpdateReadingProgressStatus<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(
-        mut self,
-        value: Option<UpdateReadingProgressStatus<S>>,
-    ) -> Self {
+    pub fn maybe_status(mut self, value: Option<UpdateReadingProgressStatus<S>>) -> Self {
         self._fields.3 = value;
         self
     }

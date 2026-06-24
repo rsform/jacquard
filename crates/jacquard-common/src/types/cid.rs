@@ -470,7 +470,7 @@ where
                     // to S::deserialize for the string content.
                     let mut link: Option<Cid<S>> = None;
 
-                    while let Some(key) = map.next_key::<&str>()? {
+                    while let Some(key) = map.next_key::<String>()? {
                         if key == "$link" {
                             link = Some(map.next_value()?);
                         } else {

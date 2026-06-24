@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -19,7 +19,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 /// All rights reserved to the creator — others cannot use, modify, or share without explicit authorization.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -103,7 +103,10 @@ impl core::fmt::Display for Cc010 {
 /// Content rights and attribution information.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ContentRights<S: BosStr = DefaultStr> {
     ///Copyright notice for the work.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -142,9 +145,7 @@ pub enum ContentRightsLicense<S: BosStr = DefaultStr> {
 impl<S: BosStr> ContentRightsLicense<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::AllRightsReserved => {
-                "place.stream.metadata.contentRights#all-rights-reserved"
-            }
+            Self::AllRightsReserved => "place.stream.metadata.contentRights#all-rights-reserved",
             Self::Cc010 => "place.stream.metadata.contentRights#cc0_1__0",
             Self::CcBy40 => "place.stream.metadata.contentRights#cc-by_4__0",
             Self::CcBySa40 => "place.stream.metadata.contentRights#cc-by-sa_4__0",
@@ -158,9 +159,7 @@ impl<S: BosStr> ContentRightsLicense<S> {
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "place.stream.metadata.contentRights#all-rights-reserved" => {
-                Self::AllRightsReserved
-            }
+            "place.stream.metadata.contentRights#all-rights-reserved" => Self::AllRightsReserved,
             "place.stream.metadata.contentRights#cc0_1__0" => Self::Cc010,
             "place.stream.metadata.contentRights#cc-by_4__0" => Self::CcBy40,
             "place.stream.metadata.contentRights#cc-by-sa_4__0" => Self::CcBySa40,
@@ -218,9 +217,7 @@ where
     type Output = ContentRightsLicense<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ContentRightsLicense::AllRightsReserved => {
-                ContentRightsLicense::AllRightsReserved
-            }
+            ContentRightsLicense::AllRightsReserved => ContentRightsLicense::AllRightsReserved,
             ContentRightsLicense::Cc010 => ContentRightsLicense::Cc010,
             ContentRightsLicense::CcBy40 => ContentRightsLicense::CcBy40,
             ContentRightsLicense::CcBySa40 => ContentRightsLicense::CcBySa40,
@@ -228,9 +225,7 @@ where
             ContentRightsLicense::CcByNcSa40 => ContentRightsLicense::CcByNcSa40,
             ContentRightsLicense::CcByNd40 => ContentRightsLicense::CcByNd40,
             ContentRightsLicense::CcByNcNd40 => ContentRightsLicense::CcByNcNd40,
-            ContentRightsLicense::Other(v) => {
-                ContentRightsLicense::Other(v.into_static())
-            }
+            ContentRightsLicense::Other(v) => ContentRightsLicense::Other(v.into_static()),
         }
     }
 }
@@ -251,10 +246,10 @@ impl<S: BosStr> LexiconSchema for ContentRights<S> {
 }
 
 fn lexicon_doc_place_stream_metadata_contentRights() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.metadata.contentRights"),
@@ -262,51 +257,67 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("all-rights-reserved"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("cc-by-nc-nd_4__0"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("cc-by-nc-sa_4__0"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("cc-by-nc_4__0"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("cc-by-nd_4__0"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("cc-by-sa_4__0"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("cc-by_4__0"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("cc0_1__0"),
-                LexUserType::Token(LexToken { ..Default::default() }),
+                LexUserType::Token(LexToken {
+                    ..Default::default()
+                }),
             );
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Content rights and attribution information."),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Content rights and attribution information.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("copyrightNotice"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Copyright notice for the work."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Copyright notice for the work.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -319,27 +330,23 @@ fn lexicon_doc_place_stream_metadata_contentRights() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Name of the creator of the work."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Name of the creator of the work.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("creditLine"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Credit line for the work."),
-                                ),
+                                description: Some(CowStr::new_static("Credit line for the work.")),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("license"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("License URL or identifier."),
-                                ),
+                                description: Some(CowStr::new_static("License URL or identifier.")),
                                 ..Default::default()
                             }),
                         );

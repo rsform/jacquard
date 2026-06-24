@@ -7,7 +7,7 @@
 
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Acursed;
@@ -17,7 +17,6 @@ impl core::fmt::Display for Acursed {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Bind;
 impl core::fmt::Display for Bind {
@@ -25,7 +24,6 @@ impl core::fmt::Display for Bind {
         write!(f, "bind")
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Bond;
@@ -35,7 +33,6 @@ impl core::fmt::Display for Bond {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Claw;
 impl core::fmt::Display for Claw {
@@ -43,7 +40,6 @@ impl core::fmt::Display for Claw {
         write!(f, "claw")
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Darksight;
@@ -53,7 +49,6 @@ impl core::fmt::Display for Darksight {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct EldritchAdaptability;
 impl core::fmt::Display for EldritchAdaptability {
@@ -61,7 +56,6 @@ impl core::fmt::Display for EldritchAdaptability {
         write!(f, "eldritchAdaptability")
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct EldritchAssault;
@@ -71,7 +65,6 @@ impl core::fmt::Display for EldritchAssault {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct EldritchEnchantment;
 impl core::fmt::Display for EldritchEnchantment {
@@ -79,7 +72,6 @@ impl core::fmt::Display for EldritchEnchantment {
         write!(f, "eldritchEnchantment")
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct EldritchVisage;
@@ -89,7 +81,6 @@ impl core::fmt::Display for EldritchVisage {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Faceless;
 impl core::fmt::Display for Faceless {
@@ -97,7 +88,6 @@ impl core::fmt::Display for Faceless {
         write!(f, "faceless")
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct FateScriber;
@@ -107,7 +97,6 @@ impl core::fmt::Display for FateScriber {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Instil;
 impl core::fmt::Display for Instil {
@@ -115,7 +104,6 @@ impl core::fmt::Display for Instil {
         write!(f, "instil")
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Invalid;
@@ -135,7 +123,6 @@ impl core::fmt::Display for Locked {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Regenerate;
 impl core::fmt::Display for Regenerate {
@@ -143,7 +130,6 @@ impl core::fmt::Display for Regenerate {
         write!(f, "regenerate")
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct RuneSeeker;
@@ -153,7 +139,6 @@ impl core::fmt::Display for RuneSeeker {
     }
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Spray;
 impl core::fmt::Display for Spray {
@@ -161,7 +146,6 @@ impl core::fmt::Display for Spray {
         write!(f, "spray")
     }
 }
-
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct Whisper;

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,14 +20,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::zone_stratos::boundary;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::zone_stratos::boundary;
+use serde::{Deserialize, Serialize};
 /// A specific domain to define exposure boundary.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Domain<S: BosStr = DefaultStr> {
     ///Domain identifier for boundary. Must be a valid domain name.
     pub value: S,
@@ -38,7 +41,10 @@ pub struct Domain<S: BosStr = DefaultStr> {
 /// A collection of domains that define the exposure boundary for a record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Domains<S: BosStr = DefaultStr> {
     ///List of domains that can access this record.
     pub values: Vec<boundary::Domain<S>>,
@@ -99,10 +105,10 @@ impl<S: BosStr> LexiconSchema for Domains<S> {
 }
 
 fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.boundary.defs"),
@@ -111,11 +117,9 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("Domain"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A specific domain to define exposure boundary.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A specific domain to define exposure boundary.",
+                    )),
                     required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -123,11 +127,9 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Domain identifier for boundary. Must be a valid domain name.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Domain identifier for boundary. Must be a valid domain name.",
+                                )),
                                 max_length: Some(253usize),
                                 ..Default::default()
                             }),
@@ -140,11 +142,9 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("Domains"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A collection of domains that define the exposure boundary for a record.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A collection of domains that define the exposure boundary for a record.",
+                    )),
                     required: Some(vec![SmolStr::new_static("values")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -152,11 +152,9 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("values"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "List of domains that can access this record.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "List of domains that can access this record.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#Domain"),
                                     ..Default::default()
@@ -178,7 +176,7 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
 
 pub mod domains_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

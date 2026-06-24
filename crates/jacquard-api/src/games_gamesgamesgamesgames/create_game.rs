@@ -8,14 +8,6 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
-use jacquard_common::types::value::Data;
-use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::AgeRating;
 use crate::games_gamesgamesgamesgames::AlternativeName;
 use crate::games_gamesgamesgamesgames::ApplicationType;
@@ -30,9 +22,20 @@ use crate::games_gamesgamesgamesgames::Release;
 use crate::games_gamesgamesgamesgames::Theme;
 use crate::games_gamesgamesgamesgames::TimeToBeat;
 use crate::games_gamesgamesgamesgames::Website;
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_derive::IntoStatic;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateGame<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_ratings: Option<Vec<AgeRating<S>>>,
@@ -82,9 +85,11 @@ pub struct CreateGame<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CreateGameOutput<S: BosStr = DefaultStr> {
     pub cid: S,
     pub uri: AtUri<S>,
@@ -105,9 +110,8 @@ impl jacquard_common::xrpc::XrpcResp for CreateGameResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateGame<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.createGame";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = CreateGameResponse;
 }
 
@@ -117,9 +121,8 @@ Path: `/xrpc/games.gamesgamesgamesgames.createGame`. The request payload type is
 pub struct CreateGameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateGameRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.createGame";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = CreateGame<S>;
     type Response = CreateGameResponse;
 }

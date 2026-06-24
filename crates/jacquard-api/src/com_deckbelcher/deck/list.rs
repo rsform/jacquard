@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,20 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_deckbelcher::CardRef;
-use crate::com_deckbelcher::richtext::Document;
 use crate::com_deckbelcher::deck::list;
+use crate::com_deckbelcher::richtext::Document;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A card entry in a decklist.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Card<S: BosStr = DefaultStr> {
     ///Number of copies in the deck.
     pub quantity: i64,
@@ -235,7 +238,6 @@ pub struct List<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -262,7 +264,10 @@ pub struct ListGetRecordOutput<S: BosStr = DefaultStr> {
 /// Primer in a separate ATProto record. For use with any longform writing lexicon.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PrimerRef<S: BosStr = DefaultStr> {
     pub r#ref: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -272,7 +277,10 @@ pub struct PrimerRef<S: BosStr = DefaultStr> {
 /// External primer content. Typically a URL, but any valid URI scheme.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct PrimerUri<S: BosStr = DefaultStr> {
     pub uri: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -523,7 +531,7 @@ impl<S: BosStr> LexiconSchema for PrimerUri<S> {
 
 pub mod card_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -582,7 +590,12 @@ pub mod card_state {
 /// Builder for constructing an instance of this type.
 pub struct CardBuilder<St: card_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<CardRef<S>>, Option<list::Section<S>>, Option<Vec<S>>),
+    _fields: (
+        Option<i64>,
+        Option<CardRef<S>>,
+        Option<list::Section<S>>,
+        Option<Vec<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -647,10 +660,7 @@ where
     St::Ref: card_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(
-        mut self,
-        value: impl Into<CardRef<S>>,
-    ) -> CardBuilder<card_state::SetRef<St>, S> {
+    pub fn r#ref(mut self, value: impl Into<CardRef<S>>) -> CardBuilder<card_state::SetRef<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CardBuilder {
             _state: PhantomData,
@@ -722,10 +732,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.deck.list"),
@@ -802,26 +812,23 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static("A Magic: The Gathering decklist."),
-                    ),
+                    description: Some(CowStr::new_static("A Magic: The Gathering decklist.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(
-                            vec![
-                                SmolStr::new_static("name"), SmolStr::new_static("cards"),
-                                SmolStr::new_static("createdAt")
-                            ],
-                        ),
+                        required: Some(vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("cards"),
+                            SmolStr::new_static("createdAt"),
+                        ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("cards"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(
-                                        CowStr::new_static("Array of cards in the decklist."),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Array of cards in the decklist.",
+                                    )),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#card"),
                                         ..Default::default()
@@ -832,11 +839,9 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp when the decklist was created.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the decklist was created.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -851,9 +856,7 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Name of the decklist."),
-                                    ),
+                                    description: Some(CowStr::new_static("Name of the decklist.")),
                                     max_length: Some(1280usize),
                                     max_graphemes: Some(128usize),
                                     ..Default::default()
@@ -862,15 +865,13 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("primer"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Deck primer with strategy, combos, and card choices.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Deck primer with strategy, combos, and card choices.",
+                                    )),
                                     refs: vec![
                                         CowStr::new_static("com.deckbelcher.richtext#document"),
                                         CowStr::new_static("#primerUri"),
-                                        CowStr::new_static("#primerRef")
+                                        CowStr::new_static("#primerRef"),
                                     ],
                                     ..Default::default()
                                 }),
@@ -878,11 +879,9 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp when the decklist was last updated.",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when the decklist was last updated.",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -921,11 +920,9 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("primerUri"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "External primer content. Typically a URL, but any valid URI scheme.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "External primer content. Typically a URL, but any valid URI scheme.",
+                    )),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -964,7 +961,7 @@ fn lexicon_doc_com_deckbelcher_deck_list() -> LexiconDoc<'static> {
 
 pub mod list_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1127,10 +1124,7 @@ where
     St::Name: list_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> ListBuilder<list_state::SetName<St>, S> {
+    pub fn name(mut self, value: impl Into<S>) -> ListBuilder<list_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
@@ -1201,7 +1195,7 @@ where
 
 pub mod primer_ref_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1306,10 +1300,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PrimerRef<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PrimerRef<S> {
         PrimerRef {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

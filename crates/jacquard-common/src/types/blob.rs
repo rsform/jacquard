@@ -89,15 +89,23 @@ impl<S: Bos<str> + AsRef<str>> Blob<S> {
 }
 
 /// Tagged blob reference with `$type` field for serde.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(tag = "$type", rename_all = "lowercase")]
-#[serde(bound(
-    serialize = "S: Bos<str> + AsRef<str> + Serialize",
-    deserialize = "S: Bos<str> + AsRef<str> + Deserialize<'de>"
-))]
+#[serde(bound(deserialize = "S: Bos<str> + AsRef<str> + Deserialize<'de>"))]
 pub enum BlobRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     /// Blob variant with embedded blob data.
     Blob(Blob<S>),
+}
+
+impl<S: Bos<str> + AsRef<str> + Serialize> Serialize for BlobRef<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: Serializer,
+    {
+        match self {
+            BlobRef::Blob(blob) => blob.serialize(serializer),
+        }
+    }
 }
 
 impl<S: Bos<str> + AsRef<str>> BlobRef<S> {

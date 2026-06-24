@@ -10,15 +10,18 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Did, Cid, UriValue};
+use jacquard_common::types::string::{Cid, Did, UriValue};
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DecryptByCid<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub password: S,
@@ -31,7 +34,10 @@ pub struct DecryptByCid<S: BosStr = DefaultStr> {
 /// Returns the encrypted result.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DecryptByCidOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional: Option<S>,
@@ -55,9 +61,8 @@ impl jacquard_common::xrpc::XrpcResp for DecryptByCidResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DecryptByCid<S> {
     const NSID: &'static str = "uk.skyblur.post.decryptByCid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Response = DecryptByCidResponse;
 }
 
@@ -67,16 +72,15 @@ Path: `/xrpc/uk.skyblur.post.decryptByCid`. The request payload type is `Decrypt
 pub struct DecryptByCidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DecryptByCidRequest {
     const PATH: &'static str = "/xrpc/uk.skyblur.post.decryptByCid";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/json",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = DecryptByCid<S>;
     type Response = DecryptByCidResponse;
 }
 
 pub mod decrypt_by_cid_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -151,7 +155,12 @@ pub mod decrypt_by_cid_state {
 /// Builder for constructing an instance of this type.
 pub struct DecryptByCidBuilder<St: decrypt_by_cid_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Cid<S>>, Option<S>, Option<UriValue<S>>, Option<Did<S>>),
+    _fields: (
+        Option<Cid<S>>,
+        Option<S>,
+        Option<UriValue<S>>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -286,10 +295,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> DecryptByCid<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DecryptByCid<S> {
         DecryptByCid {
             cid: self._fields.0.unwrap(),
             password: self._fields.1.unwrap(),

@@ -8,18 +8,21 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+use crate::fm_teal::alpha::stats::ArtistView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
-use crate::fm_teal::alpha::stats::ArtistView;
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetUserTopArtists<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -34,9 +37,11 @@ pub struct GetUserTopArtists<S: BosStr = DefaultStr> {
     pub period: Option<S>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct GetUserTopArtistsOutput<S: BosStr = DefaultStr> {
     pub artists: Vec<ArtistView<S>>,
     ///Next page cursor
@@ -84,7 +89,7 @@ fn _default_period<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_user_top_artists_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,10 +120,7 @@ pub mod get_user_top_artists_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetUserTopArtistsBuilder<
-    St: get_user_top_artists_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct GetUserTopArtistsBuilder<St: get_user_top_artists_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -126,10 +128,7 @@ pub struct GetUserTopArtistsBuilder<
 
 impl GetUserTopArtists<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetUserTopArtistsBuilder<
-        get_user_top_artists_state::Empty,
-        DefaultStr,
-    > {
+    pub fn new() -> GetUserTopArtistsBuilder<get_user_top_artists_state::Empty, DefaultStr> {
         GetUserTopArtistsBuilder::new()
     }
 }

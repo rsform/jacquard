@@ -20,14 +20,17 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::com_atproto::repo::strong_ref::StrongRef;
+use serde::{Deserialize, Serialize};
 /// A tile embed containing a strong reference to a tile record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct TileEmbed<S: BosStr = DefaultStr> {
     ///A strong reference to a garden.lexicon.exultant-zebra.tile record.
     pub tile: StrongRef<S>,
@@ -52,7 +55,7 @@ impl<S: BosStr> LexiconSchema for TileEmbed<S> {
 
 pub mod tile_embed_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -157,10 +160,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> TileEmbed<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TileEmbed<S> {
         TileEmbed {
             tile: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -169,10 +169,10 @@ where
 }
 
 fn lexicon_doc_garden_lexicon_exultant_zebra_tileEmbed() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.lexicon.exultant-zebra.tileEmbed"),
@@ -181,11 +181,9 @@ fn lexicon_doc_garden_lexicon_exultant_zebra_tileEmbed() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A tile embed containing a strong reference to a tile record.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A tile embed containing a strong reference to a tile record.",
+                    )),
                     required: Some(vec![SmolStr::new_static("tile")]),
                     properties: {
                         #[allow(unused_mut)]

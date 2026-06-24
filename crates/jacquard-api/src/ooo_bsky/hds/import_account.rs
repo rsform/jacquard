@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -36,22 +36,16 @@ impl jacquard_common::xrpc::XrpcResp for ImportAccountResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for ImportAccount {
     const NSID: &'static str = "ooo.bsky.hds.importAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/vnd.ipld.car",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/vnd.ipld.car");
     type Response = ImportAccountResponse;
-    fn encode_body(
-        &self,
-        buffer: &mut Vec<u8>,
-    ) -> Result<(), jacquard_common::xrpc::EncodeError>
+    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,
     {
-        Ok(buffer.copy_from_slice(self.body.as_ref()))
+        Ok(buffer.extend_from_slice(self.body.as_ref()))
     }
-    fn decode_body<'de>(
-        body: &'de [u8],
-    ) -> Result<Self, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(body: &'de [u8]) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
@@ -67,9 +61,8 @@ Path: `/xrpc/ooo.bsky.hds.importAccount`. The request payload type is `ImportAcc
 pub struct ImportAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportAccountRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.importAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
-        "application/vnd.ipld.car",
-    );
+    const METHOD: jacquard_common::xrpc::XrpcMethod =
+        jacquard_common::xrpc::XrpcMethod::Procedure("application/vnd.ipld.car");
     type Request<S: BosStr> = ImportAccount;
     type Response = ImportAccountResponse;
 }

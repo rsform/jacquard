@@ -23,10 +23,13 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct HiddenBox<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub gate_uri: UriValue<S>,
@@ -53,7 +56,7 @@ impl<S: BosStr> LexiconSchema for HiddenBox<S> {
 
 pub mod hidden_box_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -128,7 +131,12 @@ pub mod hidden_box_state {
 /// Builder for constructing an instance of this type.
 pub struct HiddenBoxBuilder<St: hidden_box_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Cid<S>>, Option<UriValue<S>>, Option<UriValue<S>>, Option<Data<S>>),
+    _fields: (
+        Option<Cid<S>>,
+        Option<UriValue<S>>,
+        Option<UriValue<S>>,
+        Option<Data<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -263,10 +271,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> HiddenBox<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HiddenBox<S> {
         HiddenBox {
             cid: self._fields.0.unwrap(),
             gate_uri: self._fields.1.unwrap(),
@@ -278,10 +283,10 @@ where
 }
 
 fn lexicon_doc_ooo_bsky_hidden_box() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ooo.bsky.hidden.box"),
@@ -290,12 +295,12 @@ fn lexicon_doc_ooo_bsky_hidden_box() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("gateUri"), SmolStr::new_static("uri"),
-                            SmolStr::new_static("cid"), SmolStr::new_static("value")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("gateUri"),
+                        SmolStr::new_static("uri"),
+                        SmolStr::new_static("cid"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

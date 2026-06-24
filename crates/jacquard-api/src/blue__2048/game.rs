@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::blue__2048::SyncStatus;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::blue__2048::SyncStatus;
+use serde::{Deserialize, Serialize};
 /// A declaration of an instance of a at://2048 game
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -129,7 +129,7 @@ fn _default_game_won() -> bool {
 
 pub mod game_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -390,10 +390,7 @@ where
     St::Won: game_state::IsUnset,
 {
     /// Set the `won` field (required)
-    pub fn won(
-        mut self,
-        value: impl Into<bool>,
-    ) -> GameBuilder<game_state::SetWon<St>, S> {
+    pub fn won(mut self, value: impl Into<bool>) -> GameBuilder<game_state::SetWon<St>, S> {
         self._fields.5 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -440,10 +437,10 @@ where
 }
 
 fn lexicon_doc_blue_2048_game() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.2048.game"),

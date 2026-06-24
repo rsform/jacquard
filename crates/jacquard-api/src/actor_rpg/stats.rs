@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,14 +24,17 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::actor_rpg::stats;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
-use crate::actor_rpg::stats;
+use serde::{Deserialize, Serialize};
 /// The six ability scores (1-30 per SRD)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Abilities<S: BosStr = DefaultStr> {
     ///Charisma
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,7 +61,10 @@ pub struct Abilities<S: BosStr = DefaultStr> {
 /// An attack action
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Attack<S: BosStr = DefaultStr> {
     ///Attack bonus (e.g., +5)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -81,7 +87,10 @@ pub struct Attack<S: BosStr = DefaultStr> {
 /// Currency
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Coinage<S: BosStr = DefaultStr> {
     ///Copper pieces
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -105,7 +114,10 @@ pub struct Coinage<S: BosStr = DefaultStr> {
 /// Combat and defensive stats
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Combat<S: BosStr = DefaultStr> {
     ///Armor Class
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -129,7 +141,10 @@ pub struct Combat<S: BosStr = DefaultStr> {
 /// Status conditions and effects
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Conditions<S: BosStr = DefaultStr> {
     ///Death saving throw progress
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -147,7 +162,10 @@ pub struct Conditions<S: BosStr = DefaultStr> {
 /// A custom stat
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CustomStat<S: BosStr = DefaultStr> {
     ///Category (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -169,7 +187,10 @@ pub struct CustomStat<S: BosStr = DefaultStr> {
 /// User-defined custom stat system
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct CustomStats<S: BosStr = DefaultStr> {
     ///Custom stat entries
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -187,7 +208,10 @@ pub struct CustomStats<S: BosStr = DefaultStr> {
 /// DCC ability scores (3-18 standard, can be modified by corruption/spellburn)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccAbilities<S: BosStr = DefaultStr> {
     ///Agility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -223,7 +247,10 @@ pub struct DccAbilities<S: BosStr = DefaultStr> {
 /// A weapon attack (includes deed die for warriors)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccAttack<S: BosStr = DefaultStr> {
     ///Attack modifier (e.g., +2, d16+2 for deed die)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -252,7 +279,10 @@ pub struct DccAttack<S: BosStr = DefaultStr> {
 /// Cleric spellcasting features
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccCleric<S: BosStr = DefaultStr> {
     ///Deity or supernatural patron
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -291,7 +321,10 @@ pub struct DccCleric<S: BosStr = DefaultStr> {
 /// A cleric spell
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccClericSpell<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
@@ -310,7 +343,10 @@ pub struct DccClericSpell<S: BosStr = DefaultStr> {
 /// DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccCoinage<S: BosStr = DefaultStr> {
     ///Copper pieces
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -328,7 +364,10 @@ pub struct DccCoinage<S: BosStr = DefaultStr> {
 /// Combat statistics
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccCombat<S: BosStr = DefaultStr> {
     ///Armor Class (10 + armor + AGI mod + shield)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -361,7 +400,10 @@ pub struct DccCombat<S: BosStr = DefaultStr> {
 /// A corruption effect from failed spell checks
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccCorruption<S: BosStr = DefaultStr> {
     ///Description of the corruption
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -382,7 +424,10 @@ pub struct DccCorruption<S: BosStr = DefaultStr> {
 /// Equipment and inventory
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccEquipment<S: BosStr = DefaultStr> {
     ///Armor worn (affects fumble die)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -412,7 +457,10 @@ pub struct DccEquipment<S: BosStr = DefaultStr> {
 /// Halfling class features
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccHalfling<S: BosStr = DefaultStr> {
     ///Can spend luck to aid nearby allies
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -439,7 +487,10 @@ pub struct DccHalfling<S: BosStr = DefaultStr> {
 /// Hit points (0-level characters use 1d4 + STA mod)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccHp<S: BosStr = DefaultStr> {
     ///Current HP
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -454,7 +505,10 @@ pub struct DccHp<S: BosStr = DefaultStr> {
 /// DCC character identity and progression
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccIdentity<S: BosStr = DefaultStr> {
     ///Alignment (Lawful, Neutral, Chaotic)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -481,7 +535,10 @@ pub struct DccIdentity<S: BosStr = DefaultStr> {
 /// Birth augur and luck mechanics
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccLuck<S: BosStr = DefaultStr> {
     ///Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -502,7 +559,10 @@ pub struct DccLuck<S: BosStr = DefaultStr> {
 /// DCC saving throws (3 saves, not 6)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccSaves<S: BosStr = DefaultStr> {
     ///Fortitude save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -520,7 +580,10 @@ pub struct DccSaves<S: BosStr = DefaultStr> {
 /// Current spellburn (temporary ability score sacrifice)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccSpellburn<S: BosStr = DefaultStr> {
     ///Agility points currently burned
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -541,7 +604,10 @@ pub struct DccSpellburn<S: BosStr = DefaultStr> {
 /// Dungeon Crawl Classics RPG character sheet. Supports 0-level funnel characters through 10th level.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccStats<S: BosStr = DefaultStr> {
     ///The six ability scores (STR, AGI, STA, INT, PER, LUK)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -601,7 +667,10 @@ pub struct DccStats<S: BosStr = DefaultStr> {
 /// Thief class features and skills
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccThief<S: BosStr = DefaultStr> {
     ///Alignment (affects some skill targets)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -622,7 +691,10 @@ pub struct DccThief<S: BosStr = DefaultStr> {
 /// Thief skill bonuses (roll d20 + skill vs target)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccThiefSkills<S: BosStr = DefaultStr> {
     ///Backstab attack bonus
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -670,7 +742,10 @@ pub struct DccThiefSkills<S: BosStr = DefaultStr> {
 /// Warrior and Dwarf class features
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccWarrior<S: BosStr = DefaultStr> {
     ///Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -700,7 +775,10 @@ pub struct DccWarrior<S: BosStr = DefaultStr> {
 /// Wizard and Elf spellcasting features
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccWizard<S: BosStr = DefaultStr> {
     ///Corruption effects suffered (structured)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -733,7 +811,10 @@ pub struct DccWizard<S: BosStr = DefaultStr> {
 /// A wizard spell with mercurial magic effect
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DccWizardSpell<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
@@ -758,7 +839,10 @@ pub struct DccWizardSpell<S: BosStr = DefaultStr> {
 /// Death saving throw successes and failures
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DeathSaves<S: BosStr = DefaultStr> {
     ///Failures (0-3)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -773,7 +857,10 @@ pub struct DeathSaves<S: BosStr = DefaultStr> {
 /// D&D 5e character sheet. All sub-objects are optional.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct DndStats<S: BosStr = DefaultStr> {
     ///The six ability scores (STR, DEX, CON, INT, WIS, CHA)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -830,7 +917,10 @@ pub struct DndStats<S: BosStr = DefaultStr> {
 /// Gear and inventory
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Equipment<S: BosStr = DefaultStr> {
     ///Armor
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -851,7 +941,10 @@ pub struct Equipment<S: BosStr = DefaultStr> {
 /// Hit point tracking
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Hp<S: BosStr = DefaultStr> {
     ///Current HP
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -869,7 +962,10 @@ pub struct Hp<S: BosStr = DefaultStr> {
 /// Character identity and progression
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Identity<S: BosStr = DefaultStr> {
     ///Alignment (e.g., Lawful Good)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -944,7 +1040,10 @@ pub struct StatsGetRecordOutput<S: BosStr = DefaultStr> {
 /// Passive scores (10 + skill modifier)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Passives<S: BosStr = DefaultStr> {
     ///Passive Insight
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -962,7 +1061,10 @@ pub struct Passives<S: BosStr = DefaultStr> {
 /// Personality and backstory
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Personality<S: BosStr = DefaultStr> {
     ///Backstory
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -986,7 +1088,10 @@ pub struct Personality<S: BosStr = DefaultStr> {
 /// Reverie House philosophical alignment
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct ReverieStats<S: BosStr = DefaultStr> {
     ///Authority (0-100)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1131,7 +1236,10 @@ where
 /// RPG Maker MZ character parameters
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct RmmzStats<S: BosStr = DefaultStr> {
     ///Agility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1194,7 +1302,10 @@ pub struct RmmzStats<S: BosStr = DefaultStr> {
 /// Saving throw modifiers (actual values, not proficiency flags)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Saves<S: BosStr = DefaultStr> {
     ///Charisma save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1221,7 +1332,10 @@ pub struct Saves<S: BosStr = DefaultStr> {
 /// Skill modifiers (actual values, not proficiency flags)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Skills<S: BosStr = DefaultStr> {
     ///Acrobatics (DEX)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1284,7 +1398,10 @@ pub struct Skills<S: BosStr = DefaultStr> {
 /// Spells organized by level
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct SpellList<S: BosStr = DefaultStr> {
     ///Cantrips (at-will)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1323,7 +1440,10 @@ pub struct SpellList<S: BosStr = DefaultStr> {
 /// Spellcasting details
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Spellcasting<S: BosStr = DefaultStr> {
     ///Spellcasting ability (INT, WIS, CHA)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1347,7 +1467,10 @@ pub struct Spellcasting<S: BosStr = DefaultStr> {
 /// Spell slot entry
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Spellslot<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
@@ -4045,10 +4168,10 @@ impl<S: BosStr> LexiconSchema for Spellslot<S> {
 }
 
 fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("actor.rpg.stats"),
@@ -4057,9 +4180,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("abilities"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("The six ability scores (1-30 per SRD)"),
-                    ),
+                    description: Some(CowStr::new_static("The six ability scores (1-30 per SRD)")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4127,9 +4248,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("bonus"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Attack bonus (e.g., +5)"),
-                                ),
+                                description: Some(CowStr::new_static("Attack bonus (e.g., +5)")),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -4137,9 +4256,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("damage"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Damage dice (e.g., 1d8)"),
-                                ),
+                                description: Some(CowStr::new_static("Damage dice (e.g., 1d8)")),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -4235,9 +4352,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("hitDice"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Hit dice (e.g., 5d10)"),
-                                ),
+                                description: Some(CowStr::new_static("Hit dice (e.g., 5d10)")),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -4270,9 +4385,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("conditions"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Status conditions and effects"),
-                    ),
+                    description: Some(CowStr::new_static("Status conditions and effects")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4306,18 +4419,17 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                 SmolStr::new_static("customStat"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A custom stat")),
-                    required: Some(
-                        vec![SmolStr::new_static("name"), SmolStr::new_static("value")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("value"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("category"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Category (optional)"),
-                                ),
+                                description: Some(CowStr::new_static("Category (optional)")),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -4356,18 +4468,14 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("customStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("User-defined custom stat system"),
-                    ),
+                    description: Some(CowStr::new_static("User-defined custom stat system")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("stats"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Custom stat entries"),
-                                ),
+                                description: Some(CowStr::new_static("Custom stat entries")),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#customStat"),
                                     ..Default::default()
@@ -4487,11 +4595,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccAttack"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A weapon attack (includes deed die for warriors)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A weapon attack (includes deed die for warriors)",
+                    )),
                     required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -4499,11 +4605,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("attackMod"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Attack modifier (e.g., +2, d16+2 for deed die)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Attack modifier (e.g., +2, d16+2 for deed die)",
+                                )),
                                 max_length: Some(30usize),
                                 ..Default::default()
                             }),
@@ -4511,9 +4615,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("damage"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Damage dice (e.g., 1d8+2, 1d6+d3)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Damage dice (e.g., 1d8+2, 1d6+d3)",
+                                )),
                                 max_length: Some(30usize),
                                 ..Default::default()
                             }),
@@ -4521,11 +4625,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("damageBonus"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Damage bonus (e.g., +2, +d3 for deed die)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Damage bonus (e.g., +2, +d3 for deed die)",
+                                )),
                                 max_length: Some(30usize),
                                 ..Default::default()
                             }),
@@ -4541,11 +4643,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("notes"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Special properties (backstab, trained weapon, etc.)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Special properties (backstab, trained weapon, etc.)",
+                                )),
                                 max_length: Some(200usize),
                                 ..Default::default()
                             }),
@@ -4553,9 +4653,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("range"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Range (melee or distance)"),
-                                ),
+                                description: Some(CowStr::new_static("Range (melee or distance)")),
                                 max_length: Some(30usize),
                                 ..Default::default()
                             }),
@@ -4563,9 +4661,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Attack type (melee, ranged, etc.)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Attack type (melee, ranged, etc.)",
+                                )),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -4578,18 +4676,16 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccCleric"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Cleric spellcasting features"),
-                    ),
+                    description: Some(CowStr::new_static("Cleric spellcasting features")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("deity"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Deity or supernatural patron"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Deity or supernatural patron",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -4605,11 +4701,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("disapprovalTable"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Deity-specific disapproval table if any",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Deity-specific disapproval table if any",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -4617,9 +4711,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("holySymbol"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Holy symbol description"),
-                                ),
+                                description: Some(CowStr::new_static("Holy symbol description")),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -4627,9 +4719,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("knownSpells"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Known cleric spells"),
-                                ),
+                                description: Some(CowStr::new_static("Known cleric spells")),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#dccClericSpell"),
                                     ..Default::default()
@@ -4641,9 +4731,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("layOnHandsDie"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Lay on hands die (e.g., d14, d16)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Lay on hands die (e.g., d14, d16)",
+                                )),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -4665,9 +4755,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("turnUnholyDie"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Turn unholy die (e.g., d14, d16)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Turn unholy die (e.g., d14, d16)",
+                                )),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -4687,9 +4777,10 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                 SmolStr::new_static("dccClericSpell"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("A cleric spell")),
-                    required: Some(
-                        vec![SmolStr::new_static("name"), SmolStr::new_static("level")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("level"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4712,9 +4803,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("notes"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Additional spell notes"),
-                                ),
+                                description: Some(CowStr::new_static("Additional spell notes")),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -4733,11 +4822,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccCoinage"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "DCC uses cp, sp, gp (10cp = 1sp, 10sp = 1gp)",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4784,11 +4871,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("actionDie"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Primary action die (e.g., d20, d20+d14)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Primary action die (e.g., d20, d20+d14)",
+                                )),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -4802,9 +4887,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("critDie"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Critical hit die (e.g., d8, d12, d14)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Critical hit die (e.g., d8, d12, d14)",
+                                )),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -4812,9 +4897,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("critTable"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Critical hit table (I, II, III, IV, V)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Critical hit table (I, II, III, IV, V)",
+                                )),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -4822,11 +4907,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("fumbleDie"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Fumble die (typically d4 for 0-level, varies by armor)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Fumble die (typically d4 for 0-level, varies by armor)",
+                                )),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -4852,20 +4935,18 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccCorruption"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "A corruption effect from failed spell checks",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A corruption effect from failed spell checks",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("effect"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Description of the corruption"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Description of the corruption",
+                                )),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -4879,9 +4960,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("source"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("What spell caused this corruption"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "What spell caused this corruption",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -4889,11 +4970,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Corruption severity (minor, major, greater)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Corruption severity (minor, major, greater)",
+                                )),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -4913,9 +4992,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("armor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Armor worn (affects fumble die)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Armor worn (affects fumble die)",
+                                )),
                                 max_length: Some(200usize),
                                 ..Default::default()
                             }),
@@ -4946,9 +5025,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tradeGoods"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Trade goods from occupation"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Trade goods from occupation",
+                                )),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -4956,9 +5035,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("treasure"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Valuables and treasure"),
-                                ),
+                                description: Some(CowStr::new_static("Valuables and treasure")),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -5006,9 +5083,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("luckyWeapon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Weapon type luck modifier applies to"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Weapon type luck modifier applies to",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -5033,11 +5110,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccHp"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Hit points (0-level characters use 1d4 + STA mod)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Hit points (0-level characters use 1d4 + STA mod)",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5063,18 +5138,16 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccIdentity"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("DCC character identity and progression"),
-                    ),
+                    description: Some(CowStr::new_static("DCC character identity and progression")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alignment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Alignment (Lawful, Neutral, Chaotic)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Alignment (Lawful, Neutral, Chaotic)",
+                                )),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -5082,11 +5155,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("class"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Class (Warrior, Wizard, Cleric, Thief, Elf, Dwarf, Halfling)",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -5102,11 +5173,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("occupation"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "0-level occupation (e.g., Blacksmith, Farmer)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "0-level occupation (e.g., Blacksmith, Farmer)",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -5114,11 +5183,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Level title (e.g., Squire, Cutpurse, Acolyte)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Level title (e.g., Squire, Cutpurse, Acolyte)",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -5194,9 +5261,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccSaves"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("DCC saving throws (3 saves, not 6)"),
-                    ),
+                    description: Some(CowStr::new_static("DCC saving throws (3 saves, not 6)")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5226,11 +5291,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccSpellburn"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Current spellburn (temporary ability score sacrifice)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Current spellburn (temporary ability score sacrifice)",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5421,18 +5484,16 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccThief"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Thief class features and skills"),
-                    ),
+                    description: Some(CowStr::new_static("Thief class features and skills")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alignment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Alignment (affects some skill targets)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Alignment (affects some skill targets)",
+                                )),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -5447,11 +5508,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("luckyWeapon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Weapon type that luck applies to (one type only)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Weapon type that luck applies to (one type only)",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -5471,11 +5530,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccThiefSkills"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Thief skill bonuses (roll d20 + skill vs target)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Thief skill bonuses (roll d20 + skill vs target)",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5565,20 +5622,16 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccWarrior"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Warrior and Dwarf class features"),
-                    ),
+                    description: Some(CowStr::new_static("Warrior and Dwarf class features")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("deedDie"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)",
+                                )),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -5593,9 +5646,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("luckyWeapon"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Weapon type luck modifier applies to"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Weapon type luck modifier applies to",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -5603,9 +5656,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mightyDeeds"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Signature mighty deeds of arms"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Signature mighty deeds of arms",
+                                )),
                                 items: LexArrayItem::String(LexString {
                                     max_length: Some(200usize),
                                     ..Default::default()
@@ -5641,20 +5694,16 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccWizard"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Wizard and Elf spellcasting features"),
-                    ),
+                    description: Some(CowStr::new_static("Wizard and Elf spellcasting features")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("corruption"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Corruption effects suffered (structured)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Corruption effects suffered (structured)",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#dccCorruption"),
                                     ..Default::default()
@@ -5666,9 +5715,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("corruptionText"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Corruption effects as free-form text"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Corruption effects as free-form text",
+                                )),
                                 max_length: Some(2000usize),
                                 ..Default::default()
                             }),
@@ -5676,11 +5725,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("knownSpells"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Known spells with mercurial magic effects",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Known spells with mercurial magic effects",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#dccWizardSpell"),
                                     ..Default::default()
@@ -5700,9 +5747,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("patron"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Supernatural patron (if any)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Supernatural patron (if any)",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -5710,9 +5757,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("patronBond"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Patron bond description and effects"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Patron bond description and effects",
+                                )),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -5738,12 +5785,13 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dccWizardSpell"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("A wizard spell with mercurial magic effect"),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("name"), SmolStr::new_static("level")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A wizard spell with mercurial magic effect",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("name"),
+                        SmolStr::new_static("level"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5764,11 +5812,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mercurialMagic"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Unique mercurial magic effect (d100 roll result)",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Unique mercurial magic effect (d100 roll result)",
+                                )),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -5792,9 +5838,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("notes"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Additional spell notes"),
-                                ),
+                                description: Some(CowStr::new_static("Additional spell notes")),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -5807,9 +5851,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("deathSaves"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Death saving throw successes and failures"),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Death saving throw successes and failures",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5837,11 +5881,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dndStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "D&D 5e character sheet. All sub-objects are optional.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "D&D 5e character sheet. All sub-objects are optional.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -5895,11 +5937,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("features"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Class features, racial traits, and feats",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Class features, racial traits, and feats",
+                                )),
                                 max_length: Some(5000usize),
                                 ..Default::default()
                             }),
@@ -5943,9 +5983,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("proficiencies"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Armor, weapon, and tool proficiencies"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Armor, weapon, and tool proficiencies",
+                                )),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -6002,9 +6042,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("treasure"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Valuables and treasure"),
-                                ),
+                                description: Some(CowStr::new_static("Valuables and treasure")),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -6058,18 +6096,16 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("identity"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Character identity and progression"),
-                    ),
+                    description: Some(CowStr::new_static("Character identity and progression")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alignment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Alignment (e.g., Lawful Good)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Alignment (e.g., Lawful Good)",
+                                )),
                                 max_length: Some(50usize),
                                 ..Default::default()
                             }),
@@ -6077,9 +6113,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("background"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Background (e.g., Soldier, Sage)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Background (e.g., Soldier, Sage)",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -6087,11 +6123,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("class"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Class and subclass (e.g., Fighter (Champion))",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Class and subclass (e.g., Fighter (Champion))",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -6113,9 +6147,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("race"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Race (e.g., Human, Elf, Dwarf)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Race (e.g., Human, Elf, Dwarf)",
+                                )),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -6135,11 +6169,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(
-                        CowStr::new_static(
-                            "A user's RPG character statistics. One record per user (rkey: self).",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "A user's RPG character statistics. One record per user (rkey: self).",
+                    )),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("createdAt")]),
@@ -6149,9 +6181,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static("Timestamp when this record was created"),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when this record was created",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -6194,11 +6226,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(
-                                        CowStr::new_static(
-                                            "Timestamp when this record was last modified",
-                                        ),
-                                    ),
+                                    description: Some(CowStr::new_static(
+                                        "Timestamp when this record was last modified",
+                                    )),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -6213,9 +6243,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("passives"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Passive scores (10 + skill modifier)"),
-                    ),
+                    description: Some(CowStr::new_static("Passive scores (10 + skill modifier)")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -6297,9 +6325,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reverieStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("Reverie House philosophical alignment"),
-                    ),
+                    description: Some(CowStr::new_static("Reverie House philosophical alignment")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -6338,9 +6364,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("octant"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Philosophical octant"),
-                                ),
+                                description: Some(CowStr::new_static("Philosophical octant")),
                                 ..Default::default()
                             }),
                         );
@@ -6368,9 +6392,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rmmzStats"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static("RPG Maker MZ character parameters"),
-                    ),
+                    description: Some(CowStr::new_static("RPG Maker MZ character parameters")),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -6512,11 +6534,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("saves"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Saving throw modifiers (actual values, not proficiency flags)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Saving throw modifiers (actual values, not proficiency flags)",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -6564,11 +6584,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("skills"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "Skill modifiers (actual values, not proficiency flags)",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Skill modifiers (actual values, not proficiency flags)",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -6827,9 +6845,9 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("ability"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Spellcasting ability (INT, WIS, CHA)"),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Spellcasting ability (INT, WIS, CHA)",
+                                )),
                                 max_length: Some(3usize),
                                 ..Default::default()
                             }),
@@ -6850,9 +6868,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("slots"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static("Spell slots by level"),
-                                ),
+                                description: Some(CowStr::new_static("Spell slots by level")),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#spellslot"),
                                     ..Default::default()
@@ -6877,9 +6893,10 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
                 SmolStr::new_static("spellslot"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Spell slot entry")),
-                    required: Some(
-                        vec![SmolStr::new_static("level"), SmolStr::new_static("total")],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("level"),
+                        SmolStr::new_static("total"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -6918,7 +6935,7 @@ fn lexicon_doc_actor_rpg_stats() -> LexiconDoc<'static> {
 
 pub mod custom_stat_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7098,10 +7115,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> CustomStat<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CustomStat<S> {
         CustomStat {
             category: self._fields.0,
             max: self._fields.1,
@@ -7115,7 +7129,7 @@ where
 
 pub mod dcc_cleric_spell_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7158,10 +7172,7 @@ pub mod dcc_cleric_spell_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DccClericSpellBuilder<
-    St: dcc_cleric_spell_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct DccClericSpellBuilder<St: dcc_cleric_spell_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>, Option<S>, Option<bool>),
     _type: PhantomData<fn() -> S>,
@@ -7284,10 +7295,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> DccClericSpell<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DccClericSpell<S> {
         DccClericSpell {
             level: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -7300,7 +7308,7 @@ where
 
 pub mod dcc_wizard_spell_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7343,12 +7351,16 @@ pub mod dcc_wizard_spell_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DccWizardSpellBuilder<
-    St: dcc_wizard_spell_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct DccWizardSpellBuilder<St: dcc_wizard_spell_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<bool>, Option<S>, Option<i64>, Option<S>, Option<S>),
+    _fields: (
+        Option<i64>,
+        Option<bool>,
+        Option<S>,
+        Option<i64>,
+        Option<S>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -7497,10 +7509,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> DccWizardSpell<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DccWizardSpell<S> {
         DccWizardSpell {
             level: self._fields.0.unwrap(),
             lost: self._fields.1,
@@ -7515,7 +7524,7 @@ where
 
 pub mod stats_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7728,7 +7737,7 @@ where
 
 pub mod spellslot_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -7880,10 +7889,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> Spellslot<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Spellslot<S> {
         Spellslot {
             level: self._fields.0.unwrap(),
             total: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,19 +24,22 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Deserialize, Serialize};
 /// A podcast is an episodic series of digital audio or video files which a user can download and listen to.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -306,7 +309,6 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -360,7 +362,6 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -373,7 +374,6 @@ pub enum EmbeddedActor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -430,7 +430,6 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -448,7 +447,6 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -495,7 +493,6 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -505,7 +502,6 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -541,7 +537,6 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -595,7 +590,6 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -657,7 +651,6 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -690,7 +683,6 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -725,7 +717,6 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -733,7 +724,6 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -790,7 +780,6 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -798,7 +787,6 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -822,7 +810,6 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -849,7 +836,6 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -859,7 +845,6 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -876,7 +861,6 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -884,7 +868,6 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -898,7 +881,6 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -945,7 +927,6 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -958,7 +939,6 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -980,7 +960,6 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -993,7 +972,6 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1023,7 +1001,6 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1048,7 +1025,6 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1371,7 +1347,6 @@ pub struct PodcastSeries<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1425,7 +1400,6 @@ pub enum PodcastSeriesAccountablePerson<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1438,7 +1412,6 @@ pub enum PodcastSeriesActor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1495,7 +1468,6 @@ pub enum PodcastSeriesAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1513,7 +1485,6 @@ pub enum PodcastSeriesCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1560,7 +1531,6 @@ pub enum PodcastSeriesContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1570,7 +1540,6 @@ pub enum PodcastSeriesCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1606,7 +1575,6 @@ pub enum PodcastSeriesCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1660,7 +1628,6 @@ pub enum PodcastSeriesEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1722,7 +1689,6 @@ pub enum PodcastSeriesFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1755,7 +1721,6 @@ pub enum PodcastSeriesImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1790,7 +1755,6 @@ pub enum PodcastSeriesIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1798,7 +1762,6 @@ pub enum PodcastSeriesIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1855,7 +1818,6 @@ pub enum PodcastSeriesMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1863,7 +1825,6 @@ pub enum PodcastSeriesMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1887,7 +1848,6 @@ pub enum PodcastSeriesOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1914,7 +1874,6 @@ pub enum PodcastSeriesProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1924,7 +1883,6 @@ pub enum PodcastSeriesProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1941,7 +1899,6 @@ pub enum PodcastSeriesPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1949,7 +1906,6 @@ pub enum PodcastSeriesPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1963,7 +1919,6 @@ pub enum PodcastSeriesRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2010,7 +1965,6 @@ pub enum PodcastSeriesSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2023,7 +1977,6 @@ pub enum PodcastSeriesSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2045,7 +1998,6 @@ pub enum PodcastSeriesSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2058,7 +2010,6 @@ pub enum PodcastSeriesSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2088,7 +2039,6 @@ pub enum PodcastSeriesThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
-
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2113,7 +2063,6 @@ pub enum PodcastSeriesTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
-
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2234,10 +2183,10 @@ impl<S: BosStr> LexiconSchema for PodcastSeries<S> {
 }
 
 fn lexicon_doc_social_flockfeeds_lexical_type_PodcastSeries() -> LexiconDoc<'static> {
+    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
-    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.PodcastSeries"),
@@ -5031,7 +4980,7 @@ fn lexicon_doc_social_flockfeeds_lexical_type_PodcastSeries() -> LexiconDoc<'sta
 
 pub mod podcast_series_state {
 
-    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5049,10 +4998,7 @@ pub mod podcast_series_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PodcastSeriesBuilder<
-    St: podcast_series_state::State,
-    S: BosStr = DefaultStr,
-> {
+pub struct PodcastSeriesBuilder<St: podcast_series_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<PodcastSeriesAbout<S>>,
@@ -5211,138 +5157,16 @@ impl PodcastSeriesBuilder<podcast_series_state::Empty, DefaultStr> {
         PodcastSeriesBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -5355,138 +5179,16 @@ impl<S: BosStr> PodcastSeriesBuilder<podcast_series_state::Empty, S> {
         PodcastSeriesBuilder {
             _state: PhantomData,
             _fields: (
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -5508,10 +5210,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `abstract` field (optional)
-    pub fn r#abstract(
-        mut self,
-        value: impl Into<Option<PodcastSeriesAbstract<S>>>,
-    ) -> Self {
+    pub fn r#abstract(mut self, value: impl Into<Option<PodcastSeriesAbstract<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -5524,18 +5223,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `accessMode` field (optional)
-    pub fn access_mode(
-        mut self,
-        value: impl Into<Option<PodcastSeriesAccessMode<S>>>,
-    ) -> Self {
+    pub fn access_mode(mut self, value: impl Into<Option<PodcastSeriesAccessMode<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `accessMode` field to an Option value (optional)
-    pub fn maybe_access_mode(
-        mut self,
-        value: Option<PodcastSeriesAccessMode<S>>,
-    ) -> Self {
+    pub fn maybe_access_mode(mut self, value: Option<PodcastSeriesAccessMode<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -5716,10 +5409,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(
-        mut self,
-        value: Option<PodcastSeriesAdditionalType<S>>,
-    ) -> Self {
+    pub fn maybe_additional_type(mut self, value: Option<PodcastSeriesAdditionalType<S>>) -> Self {
         self._fields.12 = value;
         self
     }
@@ -5754,10 +5444,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(
-        mut self,
-        value: Option<PodcastSeriesAlternateName<S>>,
-    ) -> Self {
+    pub fn maybe_alternate_name(mut self, value: Option<PodcastSeriesAlternateName<S>>) -> Self {
         self._fields.14 = value;
         self
     }
@@ -5784,18 +5471,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `archivedAt` field (optional)
-    pub fn archived_at(
-        mut self,
-        value: impl Into<Option<PodcastSeriesArchivedAt<S>>>,
-    ) -> Self {
+    pub fn archived_at(mut self, value: impl Into<Option<PodcastSeriesArchivedAt<S>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `archivedAt` field to an Option value (optional)
-    pub fn maybe_archived_at(
-        mut self,
-        value: Option<PodcastSeriesArchivedAt<S>>,
-    ) -> Self {
+    pub fn maybe_archived_at(mut self, value: Option<PodcastSeriesArchivedAt<S>>) -> Self {
         self._fields.16 = value;
         self
     }
@@ -5803,10 +5484,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `assesses` field (optional)
-    pub fn assesses(
-        mut self,
-        value: impl Into<Option<PodcastSeriesAssesses<S>>>,
-    ) -> Self {
+    pub fn assesses(mut self, value: impl Into<Option<PodcastSeriesAssesses<S>>>) -> Self {
         self._fields.17 = value.into();
         self
     }
@@ -5838,10 +5516,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `audience` field (optional)
-    pub fn audience(
-        mut self,
-        value: impl Into<Option<PodcastSeriesAudience<S>>>,
-    ) -> Self {
+    pub fn audience(mut self, value: impl Into<Option<PodcastSeriesAudience<S>>>) -> Self {
         self._fields.19 = value.into();
         self
     }
@@ -5906,10 +5581,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `character` field (optional)
-    pub fn character(
-        mut self,
-        value: impl Into<Option<PodcastSeriesCharacter<S>>>,
-    ) -> Self {
+    pub fn character(mut self, value: impl Into<Option<PodcastSeriesCharacter<S>>>) -> Self {
         self._fields.24 = value.into();
         self
     }
@@ -5922,10 +5594,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `citation` field (optional)
-    pub fn citation(
-        mut self,
-        value: impl Into<Option<PodcastSeriesCitation<S>>>,
-    ) -> Self {
+    pub fn citation(mut self, value: impl Into<Option<PodcastSeriesCitation<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
@@ -5951,18 +5620,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `commentCount` field (optional)
-    pub fn comment_count(
-        mut self,
-        value: impl Into<Option<PodcastSeriesCommentCount<S>>>,
-    ) -> Self {
+    pub fn comment_count(mut self, value: impl Into<Option<PodcastSeriesCommentCount<S>>>) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `commentCount` field to an Option value (optional)
-    pub fn maybe_comment_count(
-        mut self,
-        value: Option<PodcastSeriesCommentCount<S>>,
-    ) -> Self {
+    pub fn maybe_comment_count(mut self, value: Option<PodcastSeriesCommentCount<S>>) -> Self {
         self._fields.27 = value;
         self
     }
@@ -6016,10 +5679,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
-    pub fn maybe_content_rating(
-        mut self,
-        value: Option<PodcastSeriesContentRating<S>>,
-    ) -> Self {
+    pub fn maybe_content_rating(mut self, value: Option<PodcastSeriesContentRating<S>>) -> Self {
         self._fields.30 = value;
         self
     }
@@ -6046,18 +5706,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `contributor` field (optional)
-    pub fn contributor(
-        mut self,
-        value: impl Into<Option<PodcastSeriesContributor<S>>>,
-    ) -> Self {
+    pub fn contributor(mut self, value: impl Into<Option<PodcastSeriesContributor<S>>>) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `contributor` field to an Option value (optional)
-    pub fn maybe_contributor(
-        mut self,
-        value: Option<PodcastSeriesContributor<S>>,
-    ) -> Self {
+    pub fn maybe_contributor(mut self, value: Option<PodcastSeriesContributor<S>>) -> Self {
         self._fields.32 = value;
         self
     }
@@ -6111,10 +5765,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
-    pub fn maybe_copyright_year(
-        mut self,
-        value: Option<PodcastSeriesCopyrightYear<S>>,
-    ) -> Self {
+    pub fn maybe_copyright_year(mut self, value: Option<PodcastSeriesCopyrightYear<S>>) -> Self {
         self._fields.35 = value;
         self
     }
@@ -6122,18 +5773,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `correction` field (optional)
-    pub fn correction(
-        mut self,
-        value: impl Into<Option<PodcastSeriesCorrection<S>>>,
-    ) -> Self {
+    pub fn correction(mut self, value: impl Into<Option<PodcastSeriesCorrection<S>>>) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `correction` field to an Option value (optional)
-    pub fn maybe_correction(
-        mut self,
-        value: Option<PodcastSeriesCorrection<S>>,
-    ) -> Self {
+    pub fn maybe_correction(mut self, value: Option<PodcastSeriesCorrection<S>>) -> Self {
         self._fields.36 = value;
         self
     }
@@ -6192,18 +5837,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `creditText` field (optional)
-    pub fn credit_text(
-        mut self,
-        value: impl Into<Option<PodcastSeriesCreditText<S>>>,
-    ) -> Self {
+    pub fn credit_text(mut self, value: impl Into<Option<PodcastSeriesCreditText<S>>>) -> Self {
         self._fields.40 = value.into();
         self
     }
     /// Set the `creditText` field to an Option value (optional)
-    pub fn maybe_credit_text(
-        mut self,
-        value: Option<PodcastSeriesCreditText<S>>,
-    ) -> Self {
+    pub fn maybe_credit_text(mut self, value: Option<PodcastSeriesCreditText<S>>) -> Self {
         self._fields.40 = value;
         self
     }
@@ -6211,18 +5850,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `dateCreated` field (optional)
-    pub fn date_created(
-        mut self,
-        value: impl Into<Option<PodcastSeriesDateCreated<S>>>,
-    ) -> Self {
+    pub fn date_created(mut self, value: impl Into<Option<PodcastSeriesDateCreated<S>>>) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `dateCreated` field to an Option value (optional)
-    pub fn maybe_date_created(
-        mut self,
-        value: Option<PodcastSeriesDateCreated<S>>,
-    ) -> Self {
+    pub fn maybe_date_created(mut self, value: Option<PodcastSeriesDateCreated<S>>) -> Self {
         self._fields.41 = value;
         self
     }
@@ -6230,18 +5863,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `dateModified` field (optional)
-    pub fn date_modified(
-        mut self,
-        value: impl Into<Option<PodcastSeriesDateModified<S>>>,
-    ) -> Self {
+    pub fn date_modified(mut self, value: impl Into<Option<PodcastSeriesDateModified<S>>>) -> Self {
         self._fields.42 = value.into();
         self
     }
     /// Set the `dateModified` field to an Option value (optional)
-    pub fn maybe_date_modified(
-        mut self,
-        value: Option<PodcastSeriesDateModified<S>>,
-    ) -> Self {
+    pub fn maybe_date_modified(mut self, value: Option<PodcastSeriesDateModified<S>>) -> Self {
         self._fields.42 = value;
         self
     }
@@ -6257,10 +5884,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
-    pub fn maybe_date_published(
-        mut self,
-        value: Option<PodcastSeriesDatePublished<S>>,
-    ) -> Self {
+    pub fn maybe_date_published(mut self, value: Option<PodcastSeriesDatePublished<S>>) -> Self {
         self._fields.43 = value;
         self
     }
@@ -6268,18 +5892,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(
-        mut self,
-        value: impl Into<Option<PodcastSeriesDescription<S>>>,
-    ) -> Self {
+    pub fn description(mut self, value: impl Into<Option<PodcastSeriesDescription<S>>>) -> Self {
         self._fields.44 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(
-        mut self,
-        value: Option<PodcastSeriesDescription<S>>,
-    ) -> Self {
+    pub fn maybe_description(mut self, value: Option<PodcastSeriesDescription<S>>) -> Self {
         self._fields.44 = value;
         self
     }
@@ -6333,10 +5951,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
-    pub fn maybe_discussion_url(
-        mut self,
-        value: Option<PodcastSeriesDiscussionUrl<S>>,
-    ) -> Self {
+    pub fn maybe_discussion_url(mut self, value: Option<PodcastSeriesDiscussionUrl<S>>) -> Self {
         self._fields.47 = value;
         self
     }
@@ -6344,10 +5959,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `editEIDR` field (optional)
-    pub fn edit_eidr(
-        mut self,
-        value: impl Into<Option<PodcastSeriesEditEidr<S>>>,
-    ) -> Self {
+    pub fn edit_eidr(mut self, value: impl Into<Option<PodcastSeriesEditEidr<S>>>) -> Self {
         self._fields.48 = value.into();
         self
     }
@@ -6419,10 +6031,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
-    pub fn maybe_educational_use(
-        mut self,
-        value: Option<PodcastSeriesEducationalUse<S>>,
-    ) -> Self {
+    pub fn maybe_educational_use(mut self, value: Option<PodcastSeriesEducationalUse<S>>) -> Self {
         self._fields.52 = value;
         self
     }
@@ -6430,10 +6039,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `encoding` field (optional)
-    pub fn encoding(
-        mut self,
-        value: impl Into<Option<PodcastSeriesEncoding<S>>>,
-    ) -> Self {
+    pub fn encoding(mut self, value: impl Into<Option<PodcastSeriesEncoding<S>>>) -> Self {
         self._fields.53 = value.into();
         self
     }
@@ -6454,10 +6060,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
-    pub fn maybe_encoding_format(
-        mut self,
-        value: Option<PodcastSeriesEncodingFormat<S>>,
-    ) -> Self {
+    pub fn maybe_encoding_format(mut self, value: Option<PodcastSeriesEncodingFormat<S>>) -> Self {
         self._fields.54 = value;
         self
     }
@@ -6465,10 +6068,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `encodings` field (optional)
-    pub fn encodings(
-        mut self,
-        value: impl Into<Option<PodcastSeriesEncodings<S>>>,
-    ) -> Self {
+    pub fn encodings(mut self, value: impl Into<Option<PodcastSeriesEncodings<S>>>) -> Self {
         self._fields.55 = value.into();
         self
     }
@@ -6481,10 +6081,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `endDate` field (optional)
-    pub fn end_date(
-        mut self,
-        value: impl Into<Option<PodcastSeriesEndDate<S>>>,
-    ) -> Self {
+    pub fn end_date(mut self, value: impl Into<Option<PodcastSeriesEndDate<S>>>) -> Self {
         self._fields.56 = value.into();
         self
     }
@@ -6505,10 +6102,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
-    pub fn maybe_example_of_work(
-        mut self,
-        value: Option<PodcastSeriesExampleOfWork<S>>,
-    ) -> Self {
+    pub fn maybe_example_of_work(mut self, value: Option<PodcastSeriesExampleOfWork<S>>) -> Self {
         self._fields.57 = value;
         self
     }
@@ -6529,18 +6123,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `fileFormat` field (optional)
-    pub fn file_format(
-        mut self,
-        value: impl Into<Option<PodcastSeriesFileFormat<S>>>,
-    ) -> Self {
+    pub fn file_format(mut self, value: impl Into<Option<PodcastSeriesFileFormat<S>>>) -> Self {
         self._fields.59 = value.into();
         self
     }
     /// Set the `fileFormat` field to an Option value (optional)
-    pub fn maybe_file_format(
-        mut self,
-        value: Option<PodcastSeriesFileFormat<S>>,
-    ) -> Self {
+    pub fn maybe_file_format(mut self, value: Option<PodcastSeriesFileFormat<S>>) -> Self {
         self._fields.59 = value;
         self
     }
@@ -6587,10 +6175,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `hasPart` field (optional)
-    pub fn has_part(
-        mut self,
-        value: impl Into<Option<PodcastSeriesHasPart<S>>>,
-    ) -> Self {
+    pub fn has_part(mut self, value: impl Into<Option<PodcastSeriesHasPart<S>>>) -> Self {
         self._fields.63 = value.into();
         self
     }
@@ -6603,10 +6188,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `headline` field (optional)
-    pub fn headline(
-        mut self,
-        value: impl Into<Option<PodcastSeriesHeadline<S>>>,
-    ) -> Self {
+    pub fn headline(mut self, value: impl Into<Option<PodcastSeriesHeadline<S>>>) -> Self {
         self._fields.64 = value.into();
         self
     }
@@ -6619,18 +6201,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(
-        mut self,
-        value: impl Into<Option<PodcastSeriesIdentifier<S>>>,
-    ) -> Self {
+    pub fn identifier(mut self, value: impl Into<Option<PodcastSeriesIdentifier<S>>>) -> Self {
         self._fields.65 = value.into();
         self
     }
     /// Set the `identifier` field to an Option value (optional)
-    pub fn maybe_identifier(
-        mut self,
-        value: Option<PodcastSeriesIdentifier<S>>,
-    ) -> Self {
+    pub fn maybe_identifier(mut self, value: Option<PodcastSeriesIdentifier<S>>) -> Self {
         self._fields.65 = value;
         self
     }
@@ -6651,18 +6227,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `inLanguage` field (optional)
-    pub fn in_language(
-        mut self,
-        value: impl Into<Option<PodcastSeriesInLanguage<S>>>,
-    ) -> Self {
+    pub fn in_language(mut self, value: impl Into<Option<PodcastSeriesInLanguage<S>>>) -> Self {
         self._fields.67 = value.into();
         self
     }
     /// Set the `inLanguage` field to an Option value (optional)
-    pub fn maybe_in_language(
-        mut self,
-        value: Option<PodcastSeriesInLanguage<S>>,
-    ) -> Self {
+    pub fn maybe_in_language(mut self, value: Option<PodcastSeriesInLanguage<S>>) -> Self {
         self._fields.67 = value;
         self
     }
@@ -6746,18 +6316,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `isBasedOn` field (optional)
-    pub fn is_based_on(
-        mut self,
-        value: impl Into<Option<PodcastSeriesIsBasedOn<S>>>,
-    ) -> Self {
+    pub fn is_based_on(mut self, value: impl Into<Option<PodcastSeriesIsBasedOn<S>>>) -> Self {
         self._fields.72 = value.into();
         self
     }
     /// Set the `isBasedOn` field to an Option value (optional)
-    pub fn maybe_is_based_on(
-        mut self,
-        value: Option<PodcastSeriesIsBasedOn<S>>,
-    ) -> Self {
+    pub fn maybe_is_based_on(mut self, value: Option<PodcastSeriesIsBasedOn<S>>) -> Self {
         self._fields.72 = value;
         self
     }
@@ -6773,10 +6337,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
-    pub fn maybe_is_based_on_url(
-        mut self,
-        value: Option<PodcastSeriesIsBasedOnUrl<S>>,
-    ) -> Self {
+    pub fn maybe_is_based_on_url(mut self, value: Option<PodcastSeriesIsBasedOnUrl<S>>) -> Self {
         self._fields.73 = value;
         self
     }
@@ -6803,10 +6364,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `isPartOf` field (optional)
-    pub fn is_part_of(
-        mut self,
-        value: impl Into<Option<PodcastSeriesIsPartOf<S>>>,
-    ) -> Self {
+    pub fn is_part_of(mut self, value: impl Into<Option<PodcastSeriesIsPartOf<S>>>) -> Self {
         self._fields.75 = value.into();
         self
     }
@@ -6832,10 +6390,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(
-        mut self,
-        value: impl Into<Option<PodcastSeriesKeywords<S>>>,
-    ) -> Self {
+    pub fn keywords(mut self, value: impl Into<Option<PodcastSeriesKeywords<S>>>) -> Self {
         self._fields.77 = value.into();
         self
     }
@@ -6899,18 +6454,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `mainEntity` field (optional)
-    pub fn main_entity(
-        mut self,
-        value: impl Into<Option<PodcastSeriesMainEntity<S>>>,
-    ) -> Self {
+    pub fn main_entity(mut self, value: impl Into<Option<PodcastSeriesMainEntity<S>>>) -> Self {
         self._fields.81 = value.into();
         self
     }
     /// Set the `mainEntity` field to an Option value (optional)
-    pub fn maybe_main_entity(
-        mut self,
-        value: Option<PodcastSeriesMainEntity<S>>,
-    ) -> Self {
+    pub fn maybe_main_entity(mut self, value: Option<PodcastSeriesMainEntity<S>>) -> Self {
         self._fields.81 = value;
         self
     }
@@ -6937,18 +6486,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `maintainer` field (optional)
-    pub fn maintainer(
-        mut self,
-        value: impl Into<Option<PodcastSeriesMaintainer<S>>>,
-    ) -> Self {
+    pub fn maintainer(mut self, value: impl Into<Option<PodcastSeriesMaintainer<S>>>) -> Self {
         self._fields.83 = value.into();
         self
     }
     /// Set the `maintainer` field to an Option value (optional)
-    pub fn maybe_maintainer(
-        mut self,
-        value: Option<PodcastSeriesMaintainer<S>>,
-    ) -> Self {
+    pub fn maybe_maintainer(mut self, value: Option<PodcastSeriesMaintainer<S>>) -> Self {
         self._fields.83 = value;
         self
     }
@@ -6956,10 +6499,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `material` field (optional)
-    pub fn material(
-        mut self,
-        value: impl Into<Option<PodcastSeriesMaterial<S>>>,
-    ) -> Self {
+    pub fn material(mut self, value: impl Into<Option<PodcastSeriesMaterial<S>>>) -> Self {
         self._fields.84 = value.into();
         self
     }
@@ -6980,10 +6520,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
-    pub fn maybe_material_extent(
-        mut self,
-        value: Option<PodcastSeriesMaterialExtent<S>>,
-    ) -> Self {
+    pub fn maybe_material_extent(mut self, value: Option<PodcastSeriesMaterialExtent<S>>) -> Self {
         self._fields.85 = value;
         self
     }
@@ -6991,10 +6528,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `mentions` field (optional)
-    pub fn mentions(
-        mut self,
-        value: impl Into<Option<PodcastSeriesMentions<S>>>,
-    ) -> Self {
+    pub fn mentions(mut self, value: impl Into<Option<PodcastSeriesMentions<S>>>) -> Self {
         self._fields.86 = value.into();
         self
     }
@@ -7046,10 +6580,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `position` field (optional)
-    pub fn position(
-        mut self,
-        value: impl Into<Option<PodcastSeriesPosition<S>>>,
-    ) -> Self {
+    pub fn position(mut self, value: impl Into<Option<PodcastSeriesPosition<S>>>) -> Self {
         self._fields.90 = value.into();
         self
     }
@@ -7081,10 +6612,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `producer` field (optional)
-    pub fn producer(
-        mut self,
-        value: impl Into<Option<PodcastSeriesProducer<S>>>,
-    ) -> Self {
+    pub fn producer(mut self, value: impl Into<Option<PodcastSeriesProducer<S>>>) -> Self {
         self._fields.92 = value.into();
         self
     }
@@ -7097,10 +6625,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `provider` field (optional)
-    pub fn provider(
-        mut self,
-        value: impl Into<Option<PodcastSeriesProvider<S>>>,
-    ) -> Self {
+    pub fn provider(mut self, value: impl Into<Option<PodcastSeriesProvider<S>>>) -> Self {
         self._fields.93 = value.into();
         self
     }
@@ -7113,18 +6638,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `publication` field (optional)
-    pub fn publication(
-        mut self,
-        value: impl Into<Option<PodcastSeriesPublication<S>>>,
-    ) -> Self {
+    pub fn publication(mut self, value: impl Into<Option<PodcastSeriesPublication<S>>>) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `publication` field to an Option value (optional)
-    pub fn maybe_publication(
-        mut self,
-        value: Option<PodcastSeriesPublication<S>>,
-    ) -> Self {
+    pub fn maybe_publication(mut self, value: Option<PodcastSeriesPublication<S>>) -> Self {
         self._fields.94 = value;
         self
     }
@@ -7132,10 +6651,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `publisher` field (optional)
-    pub fn publisher(
-        mut self,
-        value: impl Into<Option<PodcastSeriesPublisher<S>>>,
-    ) -> Self {
+    pub fn publisher(mut self, value: impl Into<Option<PodcastSeriesPublisher<S>>>) -> Self {
         self._fields.95 = value.into();
         self
     }
@@ -7186,18 +6702,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `recordedAt` field (optional)
-    pub fn recorded_at(
-        mut self,
-        value: impl Into<Option<PodcastSeriesRecordedAt<S>>>,
-    ) -> Self {
+    pub fn recorded_at(mut self, value: impl Into<Option<PodcastSeriesRecordedAt<S>>>) -> Self {
         self._fields.98 = value.into();
         self
     }
     /// Set the `recordedAt` field to an Option value (optional)
-    pub fn maybe_recorded_at(
-        mut self,
-        value: Option<PodcastSeriesRecordedAt<S>>,
-    ) -> Self {
+    pub fn maybe_recorded_at(mut self, value: Option<PodcastSeriesRecordedAt<S>>) -> Self {
         self._fields.98 = value;
         self
     }
@@ -7213,10 +6723,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
-    pub fn maybe_released_event(
-        mut self,
-        value: Option<PodcastSeriesReleasedEvent<S>>,
-    ) -> Self {
+    pub fn maybe_released_event(mut self, value: Option<PodcastSeriesReleasedEvent<S>>) -> Self {
         self._fields.99 = value;
         self
     }
@@ -7271,10 +6778,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
-    pub fn maybe_schema_version(
-        mut self,
-        value: Option<PodcastSeriesSchemaVersion<S>>,
-    ) -> Self {
+    pub fn maybe_schema_version(mut self, value: Option<PodcastSeriesSchemaVersion<S>>) -> Self {
         self._fields.103 = value;
         self
     }
@@ -7301,10 +6805,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `sdLicense` field (optional)
-    pub fn sd_license(
-        mut self,
-        value: impl Into<Option<PodcastSeriesSdLicense<S>>>,
-    ) -> Self {
+    pub fn sd_license(mut self, value: impl Into<Option<PodcastSeriesSdLicense<S>>>) -> Self {
         self._fields.105 = value.into();
         self
     }
@@ -7317,18 +6818,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `sdPublisher` field (optional)
-    pub fn sd_publisher(
-        mut self,
-        value: impl Into<Option<PodcastSeriesSdPublisher<S>>>,
-    ) -> Self {
+    pub fn sd_publisher(mut self, value: impl Into<Option<PodcastSeriesSdPublisher<S>>>) -> Self {
         self._fields.106 = value.into();
         self
     }
     /// Set the `sdPublisher` field to an Option value (optional)
-    pub fn maybe_sd_publisher(
-        mut self,
-        value: Option<PodcastSeriesSdPublisher<S>>,
-    ) -> Self {
+    pub fn maybe_sd_publisher(mut self, value: Option<PodcastSeriesSdPublisher<S>>) -> Self {
         self._fields.106 = value;
         self
     }
@@ -7413,10 +6908,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `startDate` field (optional)
-    pub fn start_date(
-        mut self,
-        value: impl Into<Option<PodcastSeriesStartDate<S>>>,
-    ) -> Self {
+    pub fn start_date(mut self, value: impl Into<Option<PodcastSeriesStartDate<S>>>) -> Self {
         self._fields.112 = value.into();
         self
     }
@@ -7429,10 +6921,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(
-        mut self,
-        value: impl Into<Option<PodcastSeriesSubjectOf<S>>>,
-    ) -> Self {
+    pub fn subject_of(mut self, value: impl Into<Option<PodcastSeriesSubjectOf<S>>>) -> Self {
         self._fields.113 = value.into();
         self
     }
@@ -7458,10 +6947,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `temporal` field (optional)
-    pub fn temporal(
-        mut self,
-        value: impl Into<Option<PodcastSeriesTemporal<S>>>,
-    ) -> Self {
+    pub fn temporal(mut self, value: impl Into<Option<PodcastSeriesTemporal<S>>>) -> Self {
         self._fields.115 = value.into();
         self
     }
@@ -7506,10 +6992,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `thumbnail` field (optional)
-    pub fn thumbnail(
-        mut self,
-        value: impl Into<Option<PodcastSeriesThumbnail<S>>>,
-    ) -> Self {
+    pub fn thumbnail(mut self, value: impl Into<Option<PodcastSeriesThumbnail<S>>>) -> Self {
         self._fields.118 = value.into();
         self
     }
@@ -7522,18 +7005,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `thumbnailUrl` field (optional)
-    pub fn thumbnail_url(
-        mut self,
-        value: impl Into<Option<PodcastSeriesThumbnailUrl<S>>>,
-    ) -> Self {
+    pub fn thumbnail_url(mut self, value: impl Into<Option<PodcastSeriesThumbnailUrl<S>>>) -> Self {
         self._fields.119 = value.into();
         self
     }
     /// Set the `thumbnailUrl` field to an Option value (optional)
-    pub fn maybe_thumbnail_url(
-        mut self,
-        value: Option<PodcastSeriesThumbnailUrl<S>>,
-    ) -> Self {
+    pub fn maybe_thumbnail_url(mut self, value: Option<PodcastSeriesThumbnailUrl<S>>) -> Self {
         self._fields.119 = value;
         self
     }
@@ -7541,18 +7018,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `timeRequired` field (optional)
-    pub fn time_required(
-        mut self,
-        value: impl Into<Option<PodcastSeriesTimeRequired<S>>>,
-    ) -> Self {
+    pub fn time_required(mut self, value: impl Into<Option<PodcastSeriesTimeRequired<S>>>) -> Self {
         self._fields.120 = value.into();
         self
     }
     /// Set the `timeRequired` field to an Option value (optional)
-    pub fn maybe_time_required(
-        mut self,
-        value: Option<PodcastSeriesTimeRequired<S>>,
-    ) -> Self {
+    pub fn maybe_time_required(mut self, value: Option<PodcastSeriesTimeRequired<S>>) -> Self {
         self._fields.120 = value;
         self
     }
@@ -7579,18 +7050,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `translator` field (optional)
-    pub fn translator(
-        mut self,
-        value: impl Into<Option<PodcastSeriesTranslator<S>>>,
-    ) -> Self {
+    pub fn translator(mut self, value: impl Into<Option<PodcastSeriesTranslator<S>>>) -> Self {
         self._fields.122 = value.into();
         self
     }
     /// Set the `translator` field to an Option value (optional)
-    pub fn maybe_translator(
-        mut self,
-        value: Option<PodcastSeriesTranslator<S>>,
-    ) -> Self {
+    pub fn maybe_translator(mut self, value: Option<PodcastSeriesTranslator<S>>) -> Self {
         self._fields.122 = value;
         self
     }
@@ -7630,10 +7095,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `usageInfo` field (optional)
-    pub fn usage_info(
-        mut self,
-        value: impl Into<Option<PodcastSeriesUsageInfo<S>>>,
-    ) -> Self {
+    pub fn usage_info(mut self, value: impl Into<Option<PodcastSeriesUsageInfo<S>>>) -> Self {
         self._fields.125 = value.into();
         self
     }
@@ -7672,10 +7134,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `webFeed` field (optional)
-    pub fn web_feed(
-        mut self,
-        value: impl Into<Option<PodcastSeriesWebFeed<S>>>,
-    ) -> Self {
+    pub fn web_feed(mut self, value: impl Into<Option<PodcastSeriesWebFeed<S>>>) -> Self {
         self._fields.128 = value.into();
         self
     }
@@ -7688,10 +7147,7 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `wordCount` field (optional)
-    pub fn word_count(
-        mut self,
-        value: impl Into<Option<PodcastSeriesWordCount<S>>>,
-    ) -> Self {
+    pub fn word_count(mut self, value: impl Into<Option<PodcastSeriesWordCount<S>>>) -> Self {
         self._fields.129 = value.into();
         self
     }
@@ -7704,18 +7160,12 @@ impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
 
 impl<St: podcast_series_state::State, S: BosStr> PodcastSeriesBuilder<St, S> {
     /// Set the `workExample` field (optional)
-    pub fn work_example(
-        mut self,
-        value: impl Into<Option<PodcastSeriesWorkExample<S>>>,
-    ) -> Self {
+    pub fn work_example(mut self, value: impl Into<Option<PodcastSeriesWorkExample<S>>>) -> Self {
         self._fields.130 = value.into();
         self
     }
     /// Set the `workExample` field to an Option value (optional)
-    pub fn maybe_work_example(
-        mut self,
-        value: Option<PodcastSeriesWorkExample<S>>,
-    ) -> Self {
+    pub fn maybe_work_example(mut self, value: Option<PodcastSeriesWorkExample<S>>) -> Self {
         self._fields.130 = value;
         self
     }
@@ -7883,10 +7333,7 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<S>>,
-    ) -> PodcastSeries<S> {
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PodcastSeries<S> {
         PodcastSeries {
             about: self._fields.0,
             r#abstract: self._fields.1,

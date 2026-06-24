@@ -1311,7 +1311,7 @@ impl<'c> CodeGenerator<'c> {
                     Self: #ser_path,
                 {
                     Ok(
-                        buffer.copy_from_slice(self.body.as_ref())
+                        buffer.extend_from_slice(self.body.as_ref())
                     )
                 }
             }
