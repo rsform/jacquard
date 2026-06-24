@@ -132,6 +132,30 @@ impl ClientError {
         self.source.as_ref()
     }
 
+    /// Returns the HTTP status code if this is an `Http` error kind.
+    pub fn status(&self) -> Option<http::StatusCode> {
+        match &self.kind {
+            ClientErrorKind::Http { status } => Some(*status),
+            _ => None,
+        }
+    }
+
+    /// Returns true if this is an authentication error (typed `Auth` kind or HTTP 401).
+    pub fn is_auth(&self) -> bool {
+        matches!(self.kind, ClientErrorKind::Auth(_))
+            || self.status() == Some(http::StatusCode::UNAUTHORIZED)
+    }
+
+    /// Returns true if this is an HTTP 404 response.
+    pub fn is_not_found(&self) -> bool {
+        self.status() == Some(http::StatusCode::NOT_FOUND)
+    }
+
+    /// Returns true if this is an HTTP 409 conflict response.
+    pub fn is_conflict(&self) -> bool {
+        self.status() == Some(http::StatusCode::CONFLICT)
+    }
+
     /// Get the context string if present
     pub fn context(&self) -> Option<&str> {
         self.context.as_ref().map(|s| s.as_str())
@@ -496,5 +520,47 @@ impl From<crate::session::SessionStoreError> for ClientError {
 impl From<crate::deps::fluent_uri::ParseError> for ClientError {
     fn from(e: crate::deps::fluent_uri::ParseError) -> Self {
         Self::invalid_request(e.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use http::StatusCode;
+
+    #[test]
+    fn client_error_status_from_http() {
+        let err = ClientError::http(StatusCode::CONFLICT, None);
+        assert_eq!(err.status(), Some(StatusCode::CONFLICT));
+    }
+
+    #[test]
+    fn client_error_status_none_for_non_http() {
+        let err = ClientError::invalid_request("bad");
+        assert_eq!(err.status(), None);
+    }
+
+    #[test]
+    fn client_error_is_auth_typed() {
+        let err = ClientError::auth(AuthError::TokenExpired);
+        assert!(err.is_auth());
+    }
+
+    #[test]
+    fn client_error_is_auth_http_401() {
+        let err = ClientError::http(StatusCode::UNAUTHORIZED, None);
+        assert!(err.is_auth());
+    }
+
+    #[test]
+    fn client_error_is_not_found() {
+        assert!(ClientError::http(StatusCode::NOT_FOUND, None).is_not_found());
+        assert!(!ClientError::http(StatusCode::BAD_REQUEST, None).is_not_found());
+    }
+
+    #[test]
+    fn client_error_is_conflict() {
+        assert!(ClientError::http(StatusCode::CONFLICT, None).is_conflict());
+        assert!(!ClientError::http(StatusCode::NOT_FOUND, None).is_conflict());
     }
 }

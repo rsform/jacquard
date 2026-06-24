@@ -352,6 +352,9 @@ pub enum CreateRecordError {
     /// Indicates that 'swapCommit' didn't match current repo commit.
     #[serde(rename = "InvalidSwap")]
     InvalidSwap(Option<SmolStr>),
+    /// Indicates a record with the same collection/rkey already exists.
+    #[serde(rename = "AlreadyExists")]
+    AlreadyExists(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
     Other {
@@ -365,6 +368,13 @@ impl Display for CreateRecordError {
         match self {
             Self::InvalidSwap(msg) => {
                 write!(f, "InvalidSwap")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::AlreadyExists(msg) => {
+                write!(f, "AlreadyExists")?;
                 if let Some(msg) = msg {
                     write!(f, ": {}", msg)?;
                 }
@@ -1291,6 +1301,7 @@ mod tests {
     use super::*;
     use crate::{IntoStatic, cowstr::ToCowStr, types::value::Object};
     use alloc::collections::BTreeMap;
+    use alloc::string::ToString;
 
     #[test]
     fn test_list_records_serializes() {
@@ -1869,5 +1880,55 @@ mod tests {
             }
             other => panic!("expected Other, got {:?}", other),
         }
+    }
+
+    #[test]
+    fn test_create_record_error_already_exists() {
+        let json_str = r#"{"error": "AlreadyExists", "message": "record exists"}"#;
+        let error: CreateRecordError = serde_json::from_str(json_str).unwrap();
+        assert!(matches!(error, CreateRecordError::AlreadyExists(Some(_))));
+    }
+
+    #[test]
+    fn test_create_record_error_already_exists_no_message() {
+        let json_str = r#"{"error": "AlreadyExists"}"#;
+        let error: CreateRecordError = serde_json::from_str(json_str).unwrap();
+        assert!(matches!(error, CreateRecordError::AlreadyExists(None)));
+    }
+
+    #[test]
+    fn test_create_record_error_invalid_swap_still_works() {
+        let json_str = r#"{"error": "InvalidSwap", "message": "bad swap"}"#;
+        let error: CreateRecordError = serde_json::from_str(json_str).unwrap();
+        assert!(matches!(error, CreateRecordError::InvalidSwap(Some(_))));
+    }
+
+    #[test]
+    fn test_create_record_error_other_catch_all() {
+        let json_str = r#"{"error": "FutureCode", "message": "unknown"}"#;
+        let error: CreateRecordError = serde_json::from_str(json_str).unwrap();
+        match error {
+            CreateRecordError::Other { error, message } => {
+                assert_eq!(error.as_str(), "FutureCode");
+                assert_eq!(message.unwrap().as_str(), "unknown");
+            }
+            other => panic!("expected Other, got {:?}", other),
+        }
+    }
+
+    #[test]
+    fn test_create_record_error_display() {
+        assert_eq!(
+            CreateRecordError::AlreadyExists(None).to_string(),
+            "AlreadyExists"
+        );
+        assert_eq!(
+            CreateRecordError::AlreadyExists(Some("conflict".into())).to_string(),
+            "AlreadyExists: conflict"
+        );
+        assert_eq!(
+            CreateRecordError::InvalidSwap(None).to_string(),
+            "InvalidSwap"
+        );
     }
 }

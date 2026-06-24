@@ -123,6 +123,37 @@ impl AgentError {
         self.source.as_ref()
     }
 
+    /// Returns true if this is an authentication error, including write-path
+    /// 401s that surface as a boxed `ClientError::Auth` under `AgentErrorKind::Client`.
+    pub fn is_auth(&self) -> bool {
+        matches!(self.kind, AgentErrorKind::Auth(_))
+            || self.client_error().is_some_and(|c| c.is_auth())
+    }
+
+    /// Walks the source chain looking for a typed error of kind `E`.
+    ///
+    /// In practice `createRecord` boxes the typed endpoint error and the
+    /// transport `ClientError` at depth 0, so a top-level downcast already
+    /// succeeds. Chain-walking is robustness insurance against other wrapping.
+    pub fn source_downcast<E: std::error::Error + 'static>(&self) -> Option<&E> {
+        let mut current: Option<&(dyn std::error::Error + 'static)> = self
+            .source
+            .as_deref()
+            .map(|e| e as &(dyn std::error::Error + 'static));
+        while let Some(err) = current {
+            if let Some(typed) = err.downcast_ref::<E>() {
+                return Some(typed);
+            }
+            current = err.source();
+        }
+        None
+    }
+
+    /// Convenience accessor for the wrapped `ClientError`, if any.
+    pub fn client_error(&self) -> Option<&jacquard_common::error::ClientError> {
+        self.source_downcast::<jacquard_common::error::ClientError>()
+    }
+
     /// Get the context string if present
     pub fn context(&self) -> Option<&str> {
         self.context.as_ref().map(|s| s.as_str())
@@ -391,5 +422,62 @@ impl IntoStatic for AgentError {
             },
             _ => self,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use jacquard_common::error::{AuthError, ClientError};
+    use jacquard_common::xrpc::atproto::CreateRecordError;
+
+    #[test]
+    fn agent_error_source_downcast_create_record_error() {
+        let err = AgentError::sub_operation("create record", CreateRecordError::InvalidSwap(None));
+        let typed = err.source_downcast::<CreateRecordError>();
+        assert!(typed.is_some());
+        assert!(matches!(
+            typed.unwrap(),
+            CreateRecordError::InvalidSwap(None)
+        ));
+    }
+
+    #[test]
+    fn agent_error_source_downcast_client_error() {
+        let err = AgentError::from(ClientError::http(http::StatusCode::CONFLICT, None));
+        let typed = err.source_downcast::<ClientError>();
+        assert!(typed.is_some());
+        assert!(typed.unwrap().is_conflict());
+    }
+
+    #[test]
+    fn agent_error_client_error() {
+        let err = AgentError::from(ClientError::http(http::StatusCode::NOT_FOUND, None));
+        assert!(err.client_error().is_some());
+        assert!(err.client_error().unwrap().is_not_found());
+    }
+
+    #[test]
+    fn agent_error_is_auth_from_typed_auth() {
+        let err = AgentError::auth(AuthError::TokenExpired);
+        assert!(err.is_auth());
+    }
+
+    #[test]
+    fn agent_error_is_auth_from_wrapped_client_401() {
+        let err = AgentError::from(ClientError::auth(AuthError::TokenExpired));
+        assert!(err.is_auth());
+    }
+
+    #[test]
+    fn agent_error_is_not_conflict_for_non_conflict() {
+        let err = AgentError::from(ClientError::http(http::StatusCode::NOT_FOUND, None));
+        assert!(err.client_error().unwrap().is_conflict() == false);
+    }
+
+    #[test]
+    fn agent_error_source_downcast_not_found_returns_none() {
+        let err = AgentError::no_session();
+        assert!(err.source_downcast::<ClientError>().is_none());
     }
 }
