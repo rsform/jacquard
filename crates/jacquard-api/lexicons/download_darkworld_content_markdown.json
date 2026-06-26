@@ -45,6 +45,11 @@
             "ref": "#imageRef"
           },
           "maxLength": 128
+        },
+        "spoilerWarning": {
+          "type": "string",
+          "description": "big red warning such as DELTARUNE CHAPTER 5 SPOILERS the user will have to click trough to view the content",
+          "maxLength": 512
         }
       }
     }

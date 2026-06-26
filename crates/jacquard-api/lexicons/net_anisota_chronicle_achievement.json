@@ -1,0 +1,164 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.achievement",
+  "defs": {
+    "achievementContext": {
+      "type": "object",
+      "description": "Contextual data at the time of achievement unlock",
+      "properties": {
+        "followerCount": {
+          "type": "integer",
+          "description": "Follower count when achievement was unlocked",
+          "minimum": 0
+        },
+        "level": {
+          "type": "integer",
+          "description": "Player level when achievement was unlocked",
+          "minimum": 1
+        },
+        "postCount": {
+          "type": "integer",
+          "description": "Post count when achievement was unlocked",
+          "minimum": 0
+        },
+        "specimenCount": {
+          "type": "integer",
+          "description": "Specimen count when achievement was unlocked",
+          "minimum": 0
+        },
+        "totalXP": {
+          "type": "integer",
+          "description": "Total XP when achievement was unlocked",
+          "minimum": 0
+        }
+      }
+    },
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity. The signature itself proves legitimacy - no separate verification lexicons needed.",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Consolidated achievement record. Replaces 30 beta achievement lexicons. rkey is the achievement ID (e.g. followers2500, level50). Created once with createRecord when achievement is unlocked. Immutable.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "achievementId",
+          "category",
+          "unlockedAt",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "achievementId": {
+            "type": "string",
+            "description": "Unique identifier for the achievement (e.g. 'followers2500', 'level50')",
+            "maxLength": 100
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the achievement",
+            "enum": [
+              "followers",
+              "level",
+              "social",
+              "collection",
+              "patterns",
+              "special",
+              "expedition"
+            ]
+          },
+          "context": {
+            "type": "ref",
+            "ref": "#achievementContext"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the achievement record was created",
+            "format": "datetime"
+          },
+          "dailyRecordRef": {
+            "type": "string",
+            "description": "AT URI of the daily record when the achievement was unlocked"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what was accomplished",
+            "maxLength": 500
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the achievement",
+            "maxLength": 100
+          },
+          "rarity": {
+            "type": "string",
+            "description": "Rarity tier of the achievement",
+            "enum": [
+              "common",
+              "uncommon",
+              "rare",
+              "epic",
+              "legendary"
+            ]
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "tier": {
+            "type": "integer",
+            "description": "Tier or milestone value (e.g. 2500 for followers2500)",
+            "minimum": 0
+          },
+          "unlockedAt": {
+            "type": "string",
+            "description": "When the achievement was unlocked",
+            "format": "datetime"
+          },
+          "xpReward": {
+            "type": "integer",
+            "description": "XP awarded for this achievement",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

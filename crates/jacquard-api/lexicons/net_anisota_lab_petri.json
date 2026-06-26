@@ -1,0 +1,120 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.petri",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A petri culture grown in the Anisota Lab's Petri studio and saved to the owner's collection. A culture is stored as its recipe rather than its pixels: a 'seed', the dish dimensions, and the ordered list of 'drops' (each an ingredient inoculated at a normalised point and at a given iteration). Because the Gray-Scott reaction-diffusion simulation is deterministic, replaying that recipe rebuilds the exact field. 'iterations' is how far the culture has grown; 'lastTickAt' lets a reopened culture advance proportionally to real time elapsed. A small PNG thumbnail is kept for display.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "seed",
+          "width",
+          "height",
+          "drops",
+          "iterations",
+          "createdAt"
+        ],
+        "properties": {
+          "branch": {
+            "type": "integer",
+            "description": "Form tunable 'branching' (dense blob → open dendrites → veins), scaled 0..1000"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the culture was saved",
+            "format": "datetime"
+          },
+          "drops": {
+            "type": "array",
+            "description": "Ordered inoculations: each an ingredient placed at a normalised point at a given iteration",
+            "items": {
+              "type": "object",
+              "required": [
+                "ingredient",
+                "x",
+                "y",
+                "atIteration"
+              ],
+              "properties": {
+                "atIteration": {
+                  "type": "integer",
+                  "description": "Iteration count at which this drop was placed"
+                },
+                "ingredient": {
+                  "type": "string",
+                  "description": "Ingredient id (bacillus, mold, yeast, pigment, agar, antibiotic)",
+                  "maxLength": 40
+                },
+                "r": {
+                  "type": "integer",
+                  "description": "Optional inoculation radius in grid cells (per-drop size variation). Absent means the default radius."
+                },
+                "tint": {
+                  "type": "integer",
+                  "description": "Optional custom colony hue from the colour picker, scaled to 0..1000. Absent means the dropper's default colour."
+                },
+                "x": {
+                  "type": "integer",
+                  "description": "Normalised x position scaled to 0..1000"
+                },
+                "y": {
+                  "type": "integer",
+                  "description": "Normalised y position scaled to 0..1000"
+                }
+              }
+            },
+            "maxLength": 512
+          },
+          "height": {
+            "type": "integer",
+            "description": "Dish grid height in cells"
+          },
+          "image": {
+            "type": "string",
+            "description": "A PNG data URL thumbnail of the culture",
+            "maxLength": 120000
+          },
+          "iterations": {
+            "type": "integer",
+            "description": "How many simulation iterations the culture has grown"
+          },
+          "lastTickAt": {
+            "type": "string",
+            "description": "When the culture last advanced, used to grow it forward on reopen",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the culture",
+            "maxLength": 800,
+            "maxGraphemes": 100
+          },
+          "palette": {
+            "type": "string",
+            "description": "Colour palette id (agar, rose, amber, marine)",
+            "maxLength": 40
+          },
+          "seed": {
+            "type": "integer",
+            "description": "PRNG seed the simulation was initialised with"
+          },
+          "thickness": {
+            "type": "integer",
+            "description": "Form tunable 'thickness' (fine veins → fat rivulets), scaled 0..1000"
+          },
+          "wander": {
+            "type": "integer",
+            "description": "Form tunable 'wander' (straight → meandering branches), scaled 0..1000"
+          },
+          "width": {
+            "type": "integer",
+            "description": "Dish grid width in cells"
+          }
+        }
+      }
+    }
+  }
+}

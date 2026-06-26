@@ -28,6 +28,9 @@ pub struct CreateContribution<S: BosStr = DefaultStr> {
     pub contribution_type: CreateContributionContributionType<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
+    ///Optional record key. When provided, the contribution is created with this rkey instead of an auto-generated one.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rkey: Option<S>,
     ///The entity being modified. Required for corrections and additions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<AtUri<S>>,
@@ -216,6 +219,7 @@ pub struct CreateContributionBuilder<St: create_contribution_state::State, S: Bo
         Option<Data<S>>,
         Option<CreateContributionContributionType<S>>,
         Option<S>,
+        Option<S>,
         Option<AtUri<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -240,7 +244,7 @@ impl CreateContributionBuilder<create_contribution_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         CreateContributionBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -251,7 +255,7 @@ impl<S: BosStr> CreateContributionBuilder<create_contribution_state::Empty, S> {
     pub fn builder() -> Self {
         CreateContributionBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -309,14 +313,27 @@ impl<St: create_contribution_state::State, S: BosStr> CreateContributionBuilder<
 }
 
 impl<St: create_contribution_state::State, S: BosStr> CreateContributionBuilder<St, S> {
+    /// Set the `rkey` field (optional)
+    pub fn rkey(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `rkey` field to an Option value (optional)
+    pub fn maybe_rkey(mut self, value: Option<S>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: create_contribution_state::State, S: BosStr> CreateContributionBuilder<St, S> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `subject` field to an Option value (optional)
     pub fn maybe_subject(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.3 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -333,7 +350,8 @@ where
             changes: self._fields.0.unwrap(),
             contribution_type: self._fields.1.unwrap(),
             message: self._fields.2,
-            subject: self._fields.3,
+            rkey: self._fields.3,
+            subject: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -343,7 +361,8 @@ where
             changes: self._fields.0.unwrap(),
             contribution_type: self._fields.1.unwrap(),
             message: self._fields.2,
-            subject: self._fields.3,
+            rkey: self._fields.3,
+            subject: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

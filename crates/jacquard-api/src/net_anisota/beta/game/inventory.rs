@@ -664,7 +664,7 @@ fn lexicon_doc_net_anisota_beta_game_inventory() -> LexiconDoc<'static> {
                             "Beta version: Record representing an item in a player's game inventory",
                         ),
                     ),
-                    key: Some(CowStr::new_static("tid")),
+                    key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(
                             vec![

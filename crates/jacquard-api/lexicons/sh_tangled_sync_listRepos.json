@@ -1,0 +1,109 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.sync.listRepos",
+  "defs": {
+    "defaultBranch": {
+      "type": "object",
+      "required": [
+        "ref"
+      ],
+      "properties": {
+        "head": {
+          "type": "string",
+          "description": "Commit SHA at the tip of the default branch, for reconciling against a last-known state. Width depends on the repo's git object-format.",
+          "minLength": 40,
+          "maxLength": 128
+        },
+        "ref": {
+          "type": "string",
+          "description": "Default branch ref name, eg. refs/heads/main.",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "List git repos hosted on this service.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "order": {
+            "type": "string",
+            "description": "Sort direction over the service's repo listing order.",
+            "default": "desc",
+            "knownValues": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repos"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "repos": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#repo"
+              },
+              "maxLength": 1000
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    },
+    "repo": {
+      "type": "object",
+      "required": [
+        "repo",
+        "status"
+      ],
+      "properties": {
+        "defaultBranch": {
+          "type": "ref",
+          "ref": "#defaultBranch"
+        },
+        "repo": {
+          "type": "string",
+          "description": "DID of the git repo as minted by the knot",
+          "format": "did"
+        },
+        "status": {
+          "type": "string",
+          "description": "Serving status of the repo according to the knot.",
+          "knownValues": [
+            "active",
+            "archived",
+            "disabled"
+          ]
+        }
+      }
+    }
+  }
+}

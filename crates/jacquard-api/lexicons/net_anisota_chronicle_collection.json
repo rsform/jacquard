@@ -1,0 +1,163 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.collection",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Specimen photo record in the player's field guide. rkey is the specimen ID. Updated via putRecord when new photos are taken.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "specimenId",
+          "quantity",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "acquiredAt": {
+            "type": "string",
+            "description": "When the specimen was first acquired or seen",
+            "format": "datetime"
+          },
+          "commonName": {
+            "type": "string",
+            "description": "Common name of the specimen",
+            "maxLength": 200
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the specimen was first documented",
+            "format": "datetime"
+          },
+          "family": {
+            "type": "string",
+            "description": "Taxonomic family",
+            "maxLength": 100
+          },
+          "genus": {
+            "type": "string",
+            "description": "Taxonomic genus",
+            "maxLength": 100
+          },
+          "lastSeen": {
+            "type": "string",
+            "description": "When the specimen was last encountered",
+            "format": "datetime"
+          },
+          "logRecordUri": {
+            "type": "string",
+            "description": "AT URI of the associated chronicle log event"
+          },
+          "quantity": {
+            "type": "integer",
+            "description": "Number of specimens collected (0 for seen but not caught)",
+            "minimum": 0
+          },
+          "rarity": {
+            "type": "string",
+            "description": "Rarity level of the specimen",
+            "enum": [
+              "common",
+              "uncommon",
+              "rare",
+              "epic",
+              "legendary"
+            ]
+          },
+          "scientificName": {
+            "type": "string",
+            "description": "Scientific name of the specimen",
+            "maxLength": 200
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "source": {
+            "type": "string",
+            "description": "How the specimen was acquired",
+            "enum": [
+              "game_card",
+              "field_observation",
+              "trade",
+              "quest",
+              "research",
+              "expedition"
+            ]
+          },
+          "sourceDetails": {
+            "type": "unknown",
+            "description": "Additional details about acquisition"
+          },
+          "species": {
+            "type": "string",
+            "description": "Taxonomic species epithet",
+            "maxLength": 100
+          },
+          "specimenData": {
+            "type": "unknown",
+            "description": "Supplementary specimen metadata (description, photo info, etc.)"
+          },
+          "specimenId": {
+            "type": "string",
+            "description": "Unique identifier for the specimen",
+            "maxLength": 100
+          },
+          "status": {
+            "type": "string",
+            "description": "Collection status",
+            "enum": [
+              "seen",
+              "collected"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the record was last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

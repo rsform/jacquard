@@ -56,8 +56,8 @@
           },
           "quantity": {
             "type": "integer",
-            "description": "Number of specimens collected",
-            "minimum": 1
+            "description": "Number of specimens collected (0 for seen but not caught)",
+            "minimum": 0
           },
           "rarity": {
             "type": "string",

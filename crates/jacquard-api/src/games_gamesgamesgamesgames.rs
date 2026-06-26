@@ -14,6 +14,8 @@ pub mod auth_contributions;
 pub mod auth_custom_feeds;
 pub mod auth_game_browsing;
 pub mod auth_game_interactions;
+pub mod auth_games_catalog;
+pub mod auth_games_org;
 pub mod auth_profiles;
 pub mod auth_studio;
 pub mod claim;

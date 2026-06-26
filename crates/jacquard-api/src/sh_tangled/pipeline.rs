@@ -46,6 +46,7 @@ pub struct CloneOpts<S: BosStr = DefaultStr> {
     pub depth: i64,
     pub skip: bool,
     pub submodules: bool,
+    pub tags: bool,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -423,6 +424,7 @@ pub mod clone_opts_state {
         type Depth;
         type Skip;
         type Submodules;
+        type Tags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -431,6 +433,7 @@ pub mod clone_opts_state {
         type Depth = Unset;
         type Skip = Unset;
         type Submodules = Unset;
+        type Tags = Unset;
     }
     ///State transition - sets the `depth` field to Set
     pub struct SetDepth<St: State = Empty>(PhantomData<fn() -> St>);
@@ -439,6 +442,7 @@ pub mod clone_opts_state {
         type Depth = Set<members::depth>;
         type Skip = St::Skip;
         type Submodules = St::Submodules;
+        type Tags = St::Tags;
     }
     ///State transition - sets the `skip` field to Set
     pub struct SetSkip<St: State = Empty>(PhantomData<fn() -> St>);
@@ -447,6 +451,7 @@ pub mod clone_opts_state {
         type Depth = St::Depth;
         type Skip = Set<members::skip>;
         type Submodules = St::Submodules;
+        type Tags = St::Tags;
     }
     ///State transition - sets the `submodules` field to Set
     pub struct SetSubmodules<St: State = Empty>(PhantomData<fn() -> St>);
@@ -455,6 +460,16 @@ pub mod clone_opts_state {
         type Depth = St::Depth;
         type Skip = St::Skip;
         type Submodules = Set<members::submodules>;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type Depth = St::Depth;
+        type Skip = St::Skip;
+        type Submodules = St::Submodules;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -465,13 +480,15 @@ pub mod clone_opts_state {
         pub struct skip(());
         ///Marker type for the `submodules` field
         pub struct submodules(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct CloneOptsBuilder<St: clone_opts_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<bool>, Option<bool>),
+    _fields: (Option<i64>, Option<bool>, Option<bool>, Option<bool>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -494,7 +511,7 @@ impl CloneOptsBuilder<clone_opts_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         CloneOptsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -505,7 +522,7 @@ impl<S: BosStr> CloneOptsBuilder<clone_opts_state::Empty, S> {
     pub fn builder() -> Self {
         CloneOptsBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -571,9 +588,29 @@ where
 impl<St, S: BosStr> CloneOptsBuilder<St, S>
 where
     St: clone_opts_state::State,
+    St::Tags: clone_opts_state::IsUnset,
+{
+    /// Set the `tags` field (required)
+    pub fn tags(
+        mut self,
+        value: impl Into<bool>,
+    ) -> CloneOptsBuilder<clone_opts_state::SetTags<St>, S> {
+        self._fields.3 = Option::Some(value.into());
+        CloneOptsBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> CloneOptsBuilder<St, S>
+where
+    St: clone_opts_state::State,
     St::Depth: clone_opts_state::IsSet,
     St::Skip: clone_opts_state::IsSet,
     St::Submodules: clone_opts_state::IsSet,
+    St::Tags: clone_opts_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CloneOpts<S> {
@@ -581,6 +618,7 @@ where
             depth: self._fields.0.unwrap(),
             skip: self._fields.1.unwrap(),
             submodules: self._fields.2.unwrap(),
+            tags: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -590,6 +628,7 @@ where
             depth: self._fields.0.unwrap(),
             skip: self._fields.1.unwrap(),
             submodules: self._fields.2.unwrap(),
+            tags: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -612,6 +651,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         SmolStr::new_static("skip"),
                         SmolStr::new_static("depth"),
                         SmolStr::new_static("submodules"),
+                        SmolStr::new_static("tags"),
                     ]),
                     properties: {
                         #[allow(unused_mut)]
@@ -630,6 +670,12 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("submodules"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("tags"),
                             LexObjectProperty::Boolean(LexBoolean {
                                 ..Default::default()
                             }),

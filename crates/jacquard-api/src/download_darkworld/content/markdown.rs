@@ -53,6 +53,9 @@ pub struct Markdown<S: BosStr = DefaultStr> {
     ///Images referenced in the body with ![alt](imageRef)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub images: Option<Vec<markdown::ImageRef<S>>>,
+    ///big red warning such as DELTARUNE CHAPTER 5 SPOILERS the user will have to click trough to view the content
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spoiler_warning: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -162,6 +165,16 @@ impl<S: BosStr> LexiconSchema for Markdown<S> {
                     path: ValidationPath::from_field("images"),
                     max: 128usize,
                     actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.spoiler_warning {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("spoiler_warning"),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
                 });
             }
         }
@@ -364,9 +377,11 @@ fn lexicon_doc_download_darkworld_content_markdown() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("markdown"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "markdown for rendering in darkworld.download/blog",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "markdown for rendering in darkworld.download/blog",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("body")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -374,9 +389,11 @@ fn lexicon_doc_download_darkworld_content_markdown() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("body"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "markdown source ![alt](imageRef) to embed images",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "markdown source ![alt](imageRef) to embed images",
+                                    ),
+                                ),
                                 max_length: Some(1000000usize),
                                 ..Default::default()
                             }),
@@ -384,14 +401,28 @@ fn lexicon_doc_download_darkworld_content_markdown() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("images"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Images referenced in the body with ![alt](imageRef)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Images referenced in the body with ![alt](imageRef)",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#imageRef"),
                                     ..Default::default()
                                 }),
                                 max_length: Some(128usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("spoilerWarning"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "big red warning such as DELTARUNE CHAPTER 5 SPOILERS the user will have to click trough to view the content",
+                                    ),
+                                ),
+                                max_length: Some(512usize),
                                 ..Default::default()
                             }),
                         );

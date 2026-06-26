@@ -1,0 +1,104 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.progress",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Signed player progression state. Singleton (rkey: self), overwritten via putRecord. Backend validates XP claims before signing.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "totalXP",
+          "level",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was first created",
+            "format": "datetime"
+          },
+          "level": {
+            "type": "integer",
+            "description": "Current player level (derived from XP table)",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "progressPercentage": {
+            "type": "string",
+            "description": "Progress toward next level as decimal string"
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "totalXP": {
+            "type": "integer",
+            "description": "Total accumulated XP",
+            "minimum": 0
+          },
+          "triggerSource": {
+            "type": "string",
+            "description": "What triggered this save (level_up, session_end, visibility_hidden, periodic, card_advance)"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the record was last updated",
+            "format": "datetime"
+          },
+          "xpGainedSinceLastSign": {
+            "type": "integer",
+            "description": "XP gained since the last signed progress record (for rate validation against daily activity)",
+            "minimum": 0
+          },
+          "xpToNextLevel": {
+            "type": "integer",
+            "description": "XP remaining to reach next level",
+            "minimum": 0
+          }
+        }
+      }
+    }
+  }
+}

@@ -43,8 +43,9 @@ pub struct ContributionPatch<S: BosStr = DefaultStr> {
     pub contribution: StrongRef<S>,
     pub contribution_review: StrongRef<S>,
     pub created_at: Datetime,
-    ///The entity these changes apply to.
-    pub subject: AtUri<S>,
+    ///The entity these changes apply to. Absent for newGame contributions.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subject: Option<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -122,7 +123,6 @@ pub mod contribution_patch_state {
         type Contribution;
         type ContributionReview;
         type CreatedAt;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -132,7 +132,6 @@ pub mod contribution_patch_state {
         type Contribution = Unset;
         type ContributionReview = Unset;
         type CreatedAt = Unset;
-        type Subject = Unset;
     }
     ///State transition - sets the `changes` field to Set
     pub struct SetChanges<St: State = Empty>(PhantomData<fn() -> St>);
@@ -142,7 +141,6 @@ pub mod contribution_patch_state {
         type Contribution = St::Contribution;
         type ContributionReview = St::ContributionReview;
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `contribution` field to Set
     pub struct SetContribution<St: State = Empty>(PhantomData<fn() -> St>);
@@ -152,7 +150,6 @@ pub mod contribution_patch_state {
         type Contribution = Set<members::contribution>;
         type ContributionReview = St::ContributionReview;
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `contribution_review` field to Set
     pub struct SetContributionReview<St: State = Empty>(PhantomData<fn() -> St>);
@@ -162,7 +159,6 @@ pub mod contribution_patch_state {
         type Contribution = St::Contribution;
         type ContributionReview = Set<members::contribution_review>;
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -172,17 +168,6 @@ pub mod contribution_patch_state {
         type Contribution = St::Contribution;
         type ContributionReview = St::ContributionReview;
         type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Changes = St::Changes;
-        type Contribution = St::Contribution;
-        type ContributionReview = St::ContributionReview;
-        type CreatedAt = St::CreatedAt;
-        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -195,8 +180,6 @@ pub mod contribution_patch_state {
         pub struct contribution_review(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
@@ -325,22 +308,16 @@ where
     }
 }
 
-impl<St, S: BosStr> ContributionPatchBuilder<St, S>
-where
-    St: contribution_patch_state::State,
-    St::Subject: contribution_patch_state::IsUnset,
-{
-    /// Set the `subject` field (required)
-    pub fn subject(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> ContributionPatchBuilder<contribution_patch_state::SetSubject<St>, S> {
-        self._fields.4 = Option::Some(value.into());
-        ContributionPatchBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: contribution_patch_state::State, S: BosStr> ContributionPatchBuilder<St, S> {
+    /// Set the `subject` field (optional)
+    pub fn subject(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `subject` field to an Option value (optional)
+    pub fn maybe_subject(mut self, value: Option<AtUri<S>>) -> Self {
+        self._fields.4 = value;
+        self
     }
 }
 
@@ -351,7 +328,6 @@ where
     St::Contribution: contribution_patch_state::IsSet,
     St::ContributionReview: contribution_patch_state::IsSet,
     St::CreatedAt: contribution_patch_state::IsSet,
-    St::Subject: contribution_patch_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ContributionPatch<S> {
@@ -360,7 +336,7 @@ where
             contribution: self._fields.1.unwrap(),
             contribution_review: self._fields.2.unwrap(),
             created_at: self._fields.3.unwrap(),
-            subject: self._fields.4.unwrap(),
+            subject: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -371,7 +347,7 @@ where
             contribution: self._fields.1.unwrap(),
             contribution_review: self._fields.2.unwrap(),
             created_at: self._fields.3.unwrap(),
-            subject: self._fields.4.unwrap(),
+            subject: self._fields.4,
             extra_data: Some(extra_data),
         }
     }
@@ -401,7 +377,6 @@ fn lexicon_doc_games_gamesgamesgamesgames_contributionPatch() -> LexiconDoc<'sta
                             vec![
                                 SmolStr::new_static("contribution"),
                                 SmolStr::new_static("contributionReview"),
-                                SmolStr::new_static("subject"),
                                 SmolStr::new_static("changes"),
                                 SmolStr::new_static("createdAt")
                             ],
@@ -440,7 +415,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_contributionPatch() -> LexiconDoc<'sta
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
-                                        CowStr::new_static("The entity these changes apply to."),
+                                        CowStr::new_static(
+                                            "The entity these changes apply to. Absent for newGame contributions.",
+                                        ),
                                     ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()

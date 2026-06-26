@@ -1,0 +1,157 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.observatory.layout",
+  "defs": {
+    "createdBy": {
+      "type": "object",
+      "description": "Attribution for the original crafter of this layout.",
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "description": "The grid configuration captured by this layout.",
+      "properties": {
+        "buttons": {
+          "type": "unknown",
+          "description": "Built-in button overrides keyed by button key (enter, atmosphere, post, chronicle, inventory, harvest, tutorial). Each value may carry enabled, order, size, and variant."
+        },
+        "patternsIndicator": {
+          "type": "unknown",
+          "description": "Patterns visualization configuration captured with this layout"
+        },
+        "shuffleLayout": {
+          "type": "boolean",
+          "description": "Whether tiles shuffle within divider-bounded groups each session"
+        },
+        "tileOrder": {
+          "type": "array",
+          "description": "Unified rendering order. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array.",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          }
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A saved Observatory grid layout. Each record is a complete, self-contained snapshot of a layout — built-in button configuration, unified tile order, and embedded element snapshots — so it can be shared by URL and saved ('learned') into another user's PDS without depending on the original author's element records, mirroring the spell architecture. tileOrder entries are 'builtin:<key>' for built-in tiles or 'element:<index>' pointing into the embedded elements array. An optional schedule makes the layout activate automatically during a daily time window.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this layout was first saved",
+            "format": "datetime"
+          },
+          "createdBy": {
+            "type": "ref",
+            "ref": "#createdBy"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of what this layout is for",
+            "maxLength": 500
+          },
+          "elements": {
+            "type": "array",
+            "description": "Embedded snapshots of the custom elements this layout uses. Each entry mirrors the shape of a net.anisota.observatory.element record body (type, name, description, plus the type-specific payload: button, note, quote, reminder, divider, spacer, heading, or widget).",
+            "items": {
+              "type": "unknown"
+            }
+          },
+          "layout": {
+            "type": "ref",
+            "ref": "#layout"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for this layout",
+            "maxLength": 80
+          },
+          "schedule": {
+            "type": "ref",
+            "ref": "#schedule"
+          },
+          "source": {
+            "type": "ref",
+            "ref": "#source"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When this layout was last modified",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "description": "Optional daily activation window. When enabled, the layout takes over the Observatory between startTime and endTime (wrapping past midnight when startTime > endTime), optionally restricted to certain days of the week.",
+      "properties": {
+        "daysOfWeek": {
+          "type": "array",
+          "description": "Days the window applies to (0 = Sunday … 6 = Saturday). Empty or absent means every day.",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "maxLength": 7
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the schedule is active"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Window end as 'HH:MM' (24-hour, local time)",
+          "maxLength": 5
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Window start as 'HH:MM' (24-hour, local time)",
+          "maxLength": 5
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "description": "Provenance backlink for layouts learned from another user.",
+      "properties": {
+        "originalDid": {
+          "type": "string",
+          "description": "DID of the user this layout was learned from",
+          "format": "did"
+        },
+        "originalUri": {
+          "type": "string",
+          "description": "AT URI of the record this layout was learned from",
+          "format": "at-uri"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "original",
+            "learned"
+          ]
+        }
+      }
+    }
+  }
+}

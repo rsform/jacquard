@@ -33,7 +33,7 @@ pub struct GetEntry<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     bound(deserialize = "S: Deserialize<'de> + BosStr")
@@ -45,6 +45,8 @@ pub struct GetEntryOutput<S: BosStr = DefaultStr> {
     ///The file name
     pub name: S,
     pub oid: S,
+    ///Blob size
+    pub size: i64,
     ///Submodule information if path is a submodule
     #[serde(skip_serializing_if = "Option::is_none")]
     pub submodule: Option<Submodule<S>>,

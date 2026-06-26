@@ -28,6 +28,36 @@ use crate::net_anisota::beta::game::log;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Deserialize, Serialize};
+/// Details about achievement check/claim operation
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
+pub struct AchievementCheckData<S: BosStr = DefaultStr> {
+    ///Time taken to check/claim in milliseconds
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub check_duration: Option<i64>,
+    ///Type of achievement check performed
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub check_type: Option<S>,
+    ///Number of claimable achievements found
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub claimable_found: Option<i64>,
+    ///IDs of achievements that were claimed
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub claimed_achievements: Option<Vec<S>>,
+    ///Number of achievements claimed
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub claimed_count: Option<i64>,
+    ///Total number of achievements checked
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_checked: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Details about item/specimen collection
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
@@ -179,6 +209,8 @@ pub struct ItemUsageData<S: BosStr = DefaultStr> {
 )]
 pub struct Log<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub achievement_check_data: Option<log::AchievementCheckData<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub collection_data: Option<log::CollectionData<S>>,
     ///When the log record was created
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -271,6 +303,57 @@ pub struct RewardItem<S: BosStr = DefaultStr> {
 impl<S: BosStr> Log<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LogRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
+    }
+}
+
+impl<S: BosStr> LexiconSchema for AchievementCheckData<S> {
+    fn nsid() -> &'static str {
+        "net.anisota.beta.game.log"
+    }
+    fn def_name() -> &'static str {
+        "achievementCheckData"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_net_anisota_beta_game_log()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.check_duration {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("check_duration"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.claimable_found {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("claimable_found"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.claimed_count {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("claimed_count"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.total_checked {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total_checked"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
     }
 }
 
@@ -569,6 +652,69 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
         defs: {
             let mut map = BTreeMap::new();
             map.insert(
+                SmolStr::new_static("achievementCheckData"),
+                LexUserType::Object(LexObject {
+                    description: Some(CowStr::new_static(
+                        "Details about achievement check/claim operation",
+                    )),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("checkDuration"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("checkType"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static(
+                                    "Type of achievement check performed",
+                                )),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("claimableFound"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("claimedAchievements"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(CowStr::new_static(
+                                    "IDs of achievements that were claimed",
+                                )),
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("claimedCount"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("totalChecked"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("collectionData"),
                 LexUserType::Object(LexObject {
                     description: Some(
@@ -866,6 +1012,13 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
+                                SmolStr::new_static("achievementCheckData"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#achievementCheckData"),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("collectionData"),
                                 LexObjectProperty::Ref(LexRef {
                                     r#ref: CowStr::new_static("#collectionData"),
@@ -1141,6 +1294,7 @@ pub mod log_state {
 pub struct LogBuilder<St: log_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
+        Option<log::AchievementCheckData<S>>,
         Option<log::CollectionData<S>>,
         Option<Datetime>,
         Option<log::DailyRewardsData<S>>,
@@ -1180,6 +1334,7 @@ impl LogBuilder<log_state::Empty, DefaultStr> {
             _state: PhantomData,
             _fields: (
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1193,6 +1348,7 @@ impl<S: BosStr> LogBuilder<log_state::Empty, S> {
             _state: PhantomData,
             _fields: (
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1200,14 +1356,33 @@ impl<S: BosStr> LogBuilder<log_state::Empty, S> {
 }
 
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
+    /// Set the `achievementCheckData` field (optional)
+    pub fn achievement_check_data(
+        mut self,
+        value: impl Into<Option<log::AchievementCheckData<S>>>,
+    ) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `achievementCheckData` field to an Option value (optional)
+    pub fn maybe_achievement_check_data(
+        mut self,
+        value: Option<log::AchievementCheckData<S>>,
+    ) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `collectionData` field (optional)
     pub fn collection_data(mut self, value: impl Into<Option<log::CollectionData<S>>>) -> Self {
-        self._fields.0 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `collectionData` field to an Option value (optional)
     pub fn maybe_collection_data(mut self, value: Option<log::CollectionData<S>>) -> Self {
-        self._fields.0 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -1215,12 +1390,12 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `createdAt` field to an Option value (optional)
     pub fn maybe_created_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.1 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -1231,12 +1406,12 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
         mut self,
         value: impl Into<Option<log::DailyRewardsData<S>>>,
     ) -> Self {
-        self._fields.2 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `dailyRewardsData` field to an Option value (optional)
     pub fn maybe_daily_rewards_data(mut self, value: Option<log::DailyRewardsData<S>>) -> Self {
-        self._fields.2 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -1248,7 +1423,7 @@ where
 {
     /// Set the `eventType` field (required)
     pub fn event_type(mut self, value: impl Into<S>) -> LogBuilder<log_state::SetEventType<St>, S> {
-        self._fields.3 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1260,12 +1435,12 @@ where
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `feedContext` field (optional)
     pub fn feed_context(mut self, value: impl Into<Option<log::FeedContext<S>>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `feedContext` field to an Option value (optional)
     pub fn maybe_feed_context(mut self, value: Option<log::FeedContext<S>>) -> Self {
-        self._fields.4 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1273,12 +1448,12 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `gameCardData` field (optional)
     pub fn game_card_data(mut self, value: impl Into<Option<log::GameCardData<S>>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `gameCardData` field to an Option value (optional)
     pub fn maybe_game_card_data(mut self, value: Option<log::GameCardData<S>>) -> Self {
-        self._fields.5 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1286,12 +1461,12 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `gameCardId` field (optional)
     pub fn game_card_id(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `gameCardId` field to an Option value (optional)
     pub fn maybe_game_card_id(mut self, value: Option<S>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1299,12 +1474,12 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `itemUsageData` field (optional)
     pub fn item_usage_data(mut self, value: impl Into<Option<log::ItemUsageData<S>>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `itemUsageData` field to an Option value (optional)
     pub fn maybe_item_usage_data(mut self, value: Option<log::ItemUsageData<S>>) -> Self {
-        self._fields.7 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -1312,12 +1487,12 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<log::Metadata<S>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `metadata` field to an Option value (optional)
     pub fn maybe_metadata(mut self, value: Option<log::Metadata<S>>) -> Self {
-        self._fields.8 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -1325,12 +1500,12 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `parentLogUri` field (optional)
     pub fn parent_log_uri(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `parentLogUri` field to an Option value (optional)
     pub fn maybe_parent_log_uri(mut self, value: Option<S>) -> Self {
-        self._fields.9 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1338,12 +1513,12 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `rootLogUri` field (optional)
     pub fn root_log_uri(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.10 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `rootLogUri` field to an Option value (optional)
     pub fn maybe_root_log_uri(mut self, value: Option<S>) -> Self {
-        self._fields.10 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -1355,7 +1530,7 @@ where
 {
     /// Set the `sessionId` field (required)
     pub fn session_id(mut self, value: impl Into<S>) -> LogBuilder<log_state::SetSessionId<St>, S> {
-        self._fields.11 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1367,12 +1542,12 @@ where
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `sessionUri` field (optional)
     pub fn session_uri(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.12 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `sessionUri` field to an Option value (optional)
     pub fn maybe_session_uri(mut self, value: Option<S>) -> Self {
-        self._fields.12 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -1387,7 +1562,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> LogBuilder<log_state::SetTimestamp<St>, S> {
-        self._fields.13 = Option::Some(value.into());
+        self._fields.14 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1406,40 +1581,42 @@ where
     /// Build the final struct.
     pub fn build(self) -> Log<S> {
         Log {
-            collection_data: self._fields.0,
-            created_at: self._fields.1,
-            daily_rewards_data: self._fields.2,
-            event_type: self._fields.3.unwrap(),
-            feed_context: self._fields.4,
-            game_card_data: self._fields.5,
-            game_card_id: self._fields.6,
-            item_usage_data: self._fields.7,
-            metadata: self._fields.8,
-            parent_log_uri: self._fields.9,
-            root_log_uri: self._fields.10,
-            session_id: self._fields.11.unwrap(),
-            session_uri: self._fields.12,
-            timestamp: self._fields.13.unwrap(),
+            achievement_check_data: self._fields.0,
+            collection_data: self._fields.1,
+            created_at: self._fields.2,
+            daily_rewards_data: self._fields.3,
+            event_type: self._fields.4.unwrap(),
+            feed_context: self._fields.5,
+            game_card_data: self._fields.6,
+            game_card_id: self._fields.7,
+            item_usage_data: self._fields.8,
+            metadata: self._fields.9,
+            parent_log_uri: self._fields.10,
+            root_log_uri: self._fields.11,
+            session_id: self._fields.12.unwrap(),
+            session_uri: self._fields.13,
+            timestamp: self._fields.14.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Log<S> {
         Log {
-            collection_data: self._fields.0,
-            created_at: self._fields.1,
-            daily_rewards_data: self._fields.2,
-            event_type: self._fields.3.unwrap(),
-            feed_context: self._fields.4,
-            game_card_data: self._fields.5,
-            game_card_id: self._fields.6,
-            item_usage_data: self._fields.7,
-            metadata: self._fields.8,
-            parent_log_uri: self._fields.9,
-            root_log_uri: self._fields.10,
-            session_id: self._fields.11.unwrap(),
-            session_uri: self._fields.12,
-            timestamp: self._fields.13.unwrap(),
+            achievement_check_data: self._fields.0,
+            collection_data: self._fields.1,
+            created_at: self._fields.2,
+            daily_rewards_data: self._fields.3,
+            event_type: self._fields.4.unwrap(),
+            feed_context: self._fields.5,
+            game_card_data: self._fields.6,
+            game_card_id: self._fields.7,
+            item_usage_data: self._fields.8,
+            metadata: self._fields.9,
+            parent_log_uri: self._fields.10,
+            root_log_uri: self._fields.11,
+            session_id: self._fields.12.unwrap(),
+            session_uri: self._fields.13,
+            timestamp: self._fields.14.unwrap(),
             extra_data: Some(extra_data),
         }
     }

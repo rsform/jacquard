@@ -15,6 +15,11 @@
         "highlightFirstPost": {
           "type": "boolean"
         },
+        "limit": {
+          "type": "integer",
+          "description": "Show at most this many posts.",
+          "minimum": 1
+        },
         "view": {
           "type": "string",
           "knownValues": [

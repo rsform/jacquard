@@ -4,8 +4,10 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `community.lexicon` Lexicon namespace/module.
+pub mod app;
 pub mod bookmarks;
 pub mod calendar;
 pub mod interaction;
 pub mod location;
 pub mod payments;
+pub mod preference;

@@ -39,7 +39,8 @@
             },
             "rkey": {
               "type": "string",
-              "description": "Current rkey of the sh.tangled.repo record tracked by this knot"
+              "description": "Current rkey of the sh.tangled.repo record tracked by this knot",
+              "format": "record-key"
             }
           }
         }

@@ -22,6 +22,7 @@
             "type": "union",
             "refs": [
               "app.bsky.embed.images",
+              "app.bsky.embed.gallery",
               "app.bsky.embed.video",
               "app.bsky.embed.external",
               "app.bsky.embed.record",

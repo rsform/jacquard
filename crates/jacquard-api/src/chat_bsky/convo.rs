@@ -349,8 +349,6 @@ pub struct DeletedMessageView<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here].
-
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
     rename_all = "camelCase",
@@ -360,8 +358,6 @@ pub struct DirectConvo<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
-/// [NOTE: This is under active development and should be considered unstable while this note is here].
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -406,7 +402,7 @@ pub struct LogAcceptConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member was added to a group convo. The member who was added gets a logBeginConvo (to create the convo) but also a logAddMember (to show the system message as the first message the user sees).
+/// Event indicating a member was added to a group convo. The member who was added gets a logBeginConvo (to create the convo) but also a logAddMember (to show the system message as the first message the user sees).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -453,7 +449,7 @@ pub enum LogAddReactionMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was approved by the viewer. Only the owner gets this. The approved member gets a logBeginConvo.
+/// Event indicating a join request was approved by the viewer. Only the owner gets this. The approved member gets a logBeginConvo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -483,7 +479,7 @@ pub struct LogBeginConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was created for a group convo.
+/// Event indicating a join link was created for a group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -552,7 +548,7 @@ pub enum LogDeleteMessageMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was disabled for a group convo.
+/// Event indicating a join link was disabled for a group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -568,7 +564,7 @@ pub struct LogDisableJoinLink<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating info about group convo was edited.
+/// Event indicating info about group convo was edited.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -584,7 +580,7 @@ pub struct LogEditGroup<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a settings about a join link for a group convo were edited.
+/// Event indicating a settings about a join link for a group convo were edited.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -600,7 +596,7 @@ pub struct LogEditJoinLink<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was enabled for a group convo.
+/// Event indicating a join link was enabled for a group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -616,7 +612,7 @@ pub struct LogEnableJoinLink<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was made to a group the viewer owns. Only the owner gets this.
+/// Event indicating a join request was made to a group the viewer owns. Only the owner gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -646,7 +642,7 @@ pub struct LogLeaveConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was locked.
+/// Event indicating a group convo was locked.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -664,7 +660,7 @@ pub struct LogLockConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was locked permanently.
+/// Event indicating a group convo was locked permanently.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -682,7 +678,7 @@ pub struct LogLockConvoPermanently<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member joined a group convo via join link. The member who was added gets a logBeginConvo (to create the convo) but also a logMemberJoin (to show the system message as the first message the user sees).
+/// Event indicating a member joined a group convo via join link. The member who was added gets a logBeginConvo (to create the convo) but also a logMemberJoin (to show the system message as the first message the user sees).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -700,7 +696,7 @@ pub struct LogMemberJoin<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member voluntarily left a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logMemberLeave (because they already left, so can't see the system message).
+/// Event indicating a member voluntarily left a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logMemberLeave (because they already left, so can't see the system message).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -732,7 +728,7 @@ pub struct LogMuteConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was made by the requester. Only requester actor gets this.
+/// Event indicating a join request was made by the requester. Only requester actor gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -746,7 +742,7 @@ pub struct LogOutgoingJoinRequest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a convo was read up to a certain message.
+/// Event indicating a convo was read up to a certain message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -773,7 +769,7 @@ pub enum LogReadConvoMessage<S: BosStr = DefaultStr> {
     SystemMessageView(Box<convo::SystemMessageView<S>>),
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating the group owner marked join requests as read. Only the owner gets this.
+/// Event indicating the group owner marked join requests as read. Only the owner gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -814,7 +810,7 @@ pub enum LogReadMessageMessage<S: BosStr = DefaultStr> {
     SystemMessageView(Box<convo::SystemMessageView<S>>),
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was rejected by the viewer. Only the owner gets this.
+/// Event indicating a join request was rejected by the viewer. Only the owner gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -830,7 +826,7 @@ pub struct LogRejectJoinRequest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member was removed from a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logRemoveMember (because they already left, so can't see the system message).
+/// Event indicating a member was removed from a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logRemoveMember (because they already left, so can't see the system message).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -877,7 +873,7 @@ pub enum LogRemoveReactionMessage<S: BosStr = DefaultStr> {
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was unlocked.
+/// Event indicating a group convo was unlocked.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -909,7 +905,7 @@ pub struct LogUnmuteConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a prospective member withdrew their join request. Only the owner gets this.
+/// Event indicating a prospective member withdrew their join request. Only the owner gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -925,7 +921,7 @@ pub struct LogWithdrawIncomingJoinRequest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating the viewer withdrew their own join request. Only requester actor gets this.
+/// Event indicating the viewer withdrew their own join request. Only requester actor gets this.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -947,6 +943,18 @@ pub struct LogWithdrawOutgoingJoinRequest<S: BosStr = DefaultStr> {
 pub struct MessageAndReactionView<S: BosStr = DefaultStr> {
     pub message: convo::MessageView<S>,
     pub reaction: convo::ReactionView<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Placeholder embedded in place of a reply's parent message when that parent was sent before the viewer joined the group convo. The viewer has no access to that history, so no message data is carried.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
+pub struct MessageBeforeUserJoinedGroupView<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -1037,6 +1045,8 @@ pub enum MessageViewReplyTo<S: BosStr = DefaultStr> {
     MessageView(Box<convo::MessageView<S>>),
     #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
     DeletedMessageView(Box<convo::DeletedMessageView<S>>),
+    #[serde(rename = "chat.bsky.convo.defs#messageBeforeUserJoinedGroupView")]
+    MessageBeforeUserJoinedGroupView(Box<convo::MessageBeforeUserJoinedGroupView<S>>),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1087,7 +1097,7 @@ pub struct ReplyRef<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user was added to the group convo.
+/// System message indicating a user was added to the group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1104,7 +1114,7 @@ pub struct SystemMessageDataAddMember<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was created.
+/// System message indicating the group join link was created.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -1116,7 +1126,7 @@ pub struct SystemMessageDataCreateJoinLink<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was disabled.
+/// System message indicating the group join link was disabled.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -1128,7 +1138,7 @@ pub struct SystemMessageDataDisableJoinLink<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group info was edited.
+/// System message indicating the group info was edited.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -1146,7 +1156,7 @@ pub struct SystemMessageDataEditGroup<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was edited.
+/// System message indicating the group join link was edited.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -1158,7 +1168,7 @@ pub struct SystemMessageDataEditJoinLink<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was enabled.
+/// System message indicating the group join link was enabled.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -1170,7 +1180,7 @@ pub struct SystemMessageDataEnableJoinLink<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was locked.
+/// System message indicating the group convo was locked.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1184,7 +1194,7 @@ pub struct SystemMessageDataLockConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was locked permanently.
+/// System message indicating the group convo was locked permanently.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1198,7 +1208,7 @@ pub struct SystemMessageDataLockConvoPermanently<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user joined the group convo via join link.
+/// System message indicating a user joined the group convo via join link.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1217,7 +1227,7 @@ pub struct SystemMessageDataMemberJoin<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user voluntarily left the group convo.
+/// System message indicating a user voluntarily left the group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1231,7 +1241,7 @@ pub struct SystemMessageDataMemberLeave<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user was removed from the group convo.
+/// System message indicating a user was removed from the group convo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1246,7 +1256,7 @@ pub struct SystemMessageDataRemoveMember<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was unlocked.
+/// System message indicating the group convo was unlocked.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1270,8 +1280,6 @@ pub struct SystemMessageReferredUser<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
-
-/// [NOTE: This is under active development and should be considered unstable while this note is here].
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1391,10 +1399,10 @@ impl<S: BosStr> LexiconSchema for GroupConvo<S> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1280usize {
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(ConstraintError::MaxLength {
                     path: ValidationPath::from_field("name"),
-                    max: 1280usize,
+                    max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -1403,10 +1411,10 @@ impl<S: BosStr> LexiconSchema for GroupConvo<S> {
             let value = &self.name;
             {
                 let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
-                if count > 128usize {
+                if count > 50usize {
                     return Err(ConstraintError::MaxGraphemes {
                         path: ValidationPath::from_field("name"),
-                        max: 128usize,
+                        max: 50usize,
                         actual: count,
                     });
                 }
@@ -1872,6 +1880,21 @@ impl<S: BosStr> LexiconSchema for MessageAndReactionView<S> {
     }
     fn def_name() -> &'static str {
         "messageAndReactionView"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_chat_bsky_convo_defs()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for MessageBeforeUserJoinedGroupView<S> {
+    fn nsid() -> &'static str {
+        "chat.bsky.convo.defs"
+    }
+    fn def_name() -> &'static str {
+        "messageBeforeUserJoinedGroupView"
     }
     fn lexicon_doc() -> LexiconDoc<'static> {
         lexicon_doc_chat_bsky_convo_defs()
@@ -2590,11 +2613,6 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("directConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here].",
-                        ),
-                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2606,21 +2624,14 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("groupConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here].",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("lockStatus"),
-                            SmolStr::new_static("lockStatusModerationOverride"),
-                            SmolStr::new_static("memberCount"),
-                            SmolStr::new_static("memberLimit"),
-                            SmolStr::new_static("name")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("createdAt"),
+                        SmolStr::new_static("lockStatus"),
+                        SmolStr::new_static("lockStatusModerationOverride"),
+                        SmolStr::new_static("memberCount"),
+                        SmolStr::new_static("memberLimit"),
+                        SmolStr::new_static("name"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2634,9 +2645,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("joinLink"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "chat.bsky.group.defs#joinLinkView",
-                                ),
+                                r#ref: CowStr::new_static("chat.bsky.group.defs#joinLinkView"),
                                 ..Default::default()
                             }),
                         );
@@ -2674,13 +2683,11 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "The display name of the group conversation.",
-                                    ),
-                                ),
-                                max_length: Some(1280usize),
-                                max_graphemes: Some(128usize),
+                                description: Some(CowStr::new_static(
+                                    "The display name of the group conversation.",
+                                )),
+                                max_length: Some(500usize),
+                                max_graphemes: Some(50usize),
                                 ..Default::default()
                             }),
                         );
@@ -2727,7 +2734,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member was added to a group convo. The member who was added gets a logBeginConvo (to create the convo) but also a logAddMember (to show the system message as the first message the user sees).",
+                            "Event indicating a member was added to a group convo. The member who was added gets a logBeginConvo (to create the convo) but also a logAddMember (to show the system message as the first message the user sees).",
                         ),
                     ),
                     required: Some(
@@ -2847,7 +2854,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was approved by the viewer. Only the owner gets this. The approved member gets a logBeginConvo.",
+                            "Event indicating a join request was approved by the viewer. Only the owner gets this. The approved member gets a logBeginConvo.",
                         ),
                     ),
                     required: Some(
@@ -2911,23 +2918,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logCreateJoinLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was created for a group convo.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Event indicating a join link was created for a group convo.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
@@ -2938,7 +2944,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3045,23 +3053,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logDisableJoinLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was disabled for a group convo.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Event indicating a join link was disabled for a group convo.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
@@ -3072,7 +3079,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3082,23 +3091,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logEditGroup"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating info about group convo was edited.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Event indicating info about group convo was edited.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
@@ -3109,7 +3117,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3121,7 +3131,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a settings about a join link for a group convo were edited.",
+                            "Event indicating a settings about a join link for a group convo were edited.",
                         ),
                     ),
                     required: Some(
@@ -3156,23 +3166,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logEnableJoinLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join link was enabled for a group convo.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Event indicating a join link was enabled for a group convo.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
@@ -3183,7 +3192,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3195,7 +3206,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was made to a group the viewer owns. Only the owner gets this.",
+                            "Event indicating a join request was made to a group the viewer owns. Only the owner gets this.",
                         ),
                     ),
                     required: Some(
@@ -3262,24 +3273,23 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logLockConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was locked.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message"),
-                            SmolStr::new_static("relatedProfiles")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Event indicating a group convo was locked.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("relatedProfiles"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
@@ -3291,11 +3301,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("relatedProfiles"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Profiles referred in the system message.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Profiles referred in the system message.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "chat.bsky.actor.defs#profileViewBasic",
@@ -3307,7 +3315,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3317,24 +3327,23 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logLockConvoPermanently"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was locked permanently.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message"),
-                            SmolStr::new_static("relatedProfiles")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Event indicating a group convo was locked permanently.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("relatedProfiles"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
@@ -3346,11 +3355,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("relatedProfiles"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Profiles referred in the system message.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Profiles referred in the system message.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "chat.bsky.actor.defs#profileViewBasic",
@@ -3362,7 +3369,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3374,7 +3383,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member joined a group convo via join link. The member who was added gets a logBeginConvo (to create the convo) but also a logMemberJoin (to show the system message as the first message the user sees).",
+                            "Event indicating a member joined a group convo via join link. The member who was added gets a logBeginConvo (to create the convo) but also a logMemberJoin (to show the system message as the first message the user sees).",
                         ),
                     ),
                     required: Some(
@@ -3429,7 +3438,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member voluntarily left a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logMemberLeave (because they already left, so can't see the system message).",
+                            "Event indicating a member voluntarily left a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logMemberLeave (because they already left, so can't see the system message).",
                         ),
                     ),
                     required: Some(
@@ -3514,7 +3523,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was made by the requester. Only requester actor gets this.",
+                            "Event indicating a join request was made by the requester. Only requester actor gets this.",
                         ),
                     ),
                     required: Some(
@@ -3539,23 +3548,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logReadConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a convo was read up to a certain message.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Event indicating a convo was read up to a certain message.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
@@ -3563,14 +3571,16 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
                                     CowStr::new_static("#deletedMessageView"),
-                                    CowStr::new_static("#systemMessageView")
+                                    CowStr::new_static("#systemMessageView"),
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3582,7 +3592,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating the group owner marked join requests as read. Only the owner gets this.",
+                            "Event indicating the group owner marked join requests as read. Only the owner gets this.",
                         ),
                     ),
                     required: Some(
@@ -3650,7 +3660,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a join request was rejected by the viewer. Only the owner gets this.",
+                            "Event indicating a join request was rejected by the viewer. Only the owner gets this.",
                         ),
                     ),
                     required: Some(
@@ -3689,7 +3699,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a member was removed from a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logRemoveMember (because they already left, so can't see the system message).",
+                            "Event indicating a member was removed from a group convo. The member who was removed gets a logLeaveConvo (to leave the convo) but not a logRemoveMember (because they already left, so can't see the system message).",
                         ),
                     ),
                     required: Some(
@@ -3807,24 +3817,23 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("logUnlockConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a group convo was unlocked.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("rev"), SmolStr::new_static("convoId"),
-                            SmolStr::new_static("message"),
-                            SmolStr::new_static("relatedProfiles")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Event indicating a group convo was unlocked.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("convoId"),
+                        SmolStr::new_static("message"),
+                        SmolStr::new_static("relatedProfiles"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("convoId"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("message"),
@@ -3836,11 +3845,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("relatedProfiles"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(
-                                    CowStr::new_static(
-                                        "Profiles referred in the system message.",
-                                    ),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Profiles referred in the system message.",
+                                )),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static(
                                         "chat.bsky.actor.defs#profileViewBasic",
@@ -3852,7 +3859,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map
                     },
@@ -3894,7 +3903,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating a prospective member withdrew their join request. Only the owner gets this.",
+                            "Event indicating a prospective member withdrew their join request. Only the owner gets this.",
                         ),
                     ),
                     required: Some(
@@ -3933,7 +3942,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Event indicating the viewer withdrew their own join request. Only requester actor gets this.",
+                            "Event indicating the viewer withdrew their own join request. Only requester actor gets this.",
                         ),
                     ),
                     required: Some(
@@ -3979,6 +3988,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                                 ..Default::default()
                             }),
                         );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("messageBeforeUserJoinedGroupView"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Placeholder embedded in place of a reply's parent message when that parent was sent before the viewer joined the group convo. The viewer has no access to that history, so no message data is carried.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
                         map
                     },
                     ..Default::default()
@@ -4136,7 +4161,8 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                                 ),
                                 refs: vec![
                                     CowStr::new_static("#messageView"),
-                                    CowStr::new_static("#deletedMessageView")
+                                    CowStr::new_static("#deletedMessageView"),
+                                    CowStr::new_static("#messageBeforeUserJoinedGroupView")
                                 ],
                                 ..Default::default()
                             }),
@@ -4270,17 +4296,14 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataAddMember"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user was added to the group convo.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("member"), SmolStr::new_static("role"),
-                            SmolStr::new_static("addedBy")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating a user was added to the group convo.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("member"),
+                        SmolStr::new_static("role"),
+                        SmolStr::new_static("addedBy"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4301,9 +4324,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("role"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "chat.bsky.actor.defs#memberRole",
-                                ),
+                                r#ref: CowStr::new_static("chat.bsky.actor.defs#memberRole"),
                                 ..Default::default()
                             }),
                         );
@@ -4315,11 +4336,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataCreateJoinLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was created.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating the group join link was created.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4331,11 +4350,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataDisableJoinLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was disabled.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating the group join link was disabled.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4347,29 +4364,27 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataEditGroup"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group info was edited.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating the group info was edited.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("newName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Group name that replaced the old."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Group name that replaced the old.",
+                                )),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("oldName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(
-                                    CowStr::new_static("Group name that was replaced."),
-                                ),
+                                description: Some(CowStr::new_static(
+                                    "Group name that was replaced.",
+                                )),
                                 ..Default::default()
                             }),
                         );
@@ -4381,11 +4396,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataEditJoinLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was edited.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating the group join link was edited.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4397,11 +4410,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataEnableJoinLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group join link was enabled.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating the group join link was enabled.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4413,11 +4424,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataLockConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was locked.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating the group convo was locked.",
+                    )),
                     required: Some(vec![SmolStr::new_static("lockedBy")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -4437,11 +4446,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataLockConvoPermanently"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was locked permanently.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating the group convo was locked permanently.",
+                    )),
                     required: Some(vec![SmolStr::new_static("lockedBy")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -4461,14 +4468,13 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataMemberJoin"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user joined the group convo via join link.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![SmolStr::new_static("member"), SmolStr::new_static("role")],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating a user joined the group convo via join link.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("member"),
+                        SmolStr::new_static("role"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4489,9 +4495,7 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("role"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static(
-                                    "chat.bsky.actor.defs#memberRole",
-                                ),
+                                r#ref: CowStr::new_static("chat.bsky.actor.defs#memberRole"),
                                 ..Default::default()
                             }),
                         );
@@ -4503,11 +4507,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataMemberLeave"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user voluntarily left the group convo.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating a user voluntarily left the group convo.",
+                    )),
                     required: Some(vec![SmolStr::new_static("member")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -4527,17 +4529,13 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataRemoveMember"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating a user was removed from the group convo.",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("member"),
-                            SmolStr::new_static("removedBy")
-                        ],
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating a user was removed from the group convo.",
+                    )),
+                    required: Some(vec![
+                        SmolStr::new_static("member"),
+                        SmolStr::new_static("removedBy"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4563,11 +4561,9 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageDataUnlockConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. System message indicating the group convo was unlocked.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "System message indicating the group convo was unlocked.",
+                    )),
                     required: Some(vec![SmolStr::new_static("unlockedBy")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -4606,17 +4602,12 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("systemMessageView"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here].",
-                        ),
-                    ),
-                    required: Some(
-                        vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("rev"),
-                            SmolStr::new_static("sentAt"), SmolStr::new_static("data")
-                        ],
-                    ),
+                    required: Some(vec![
+                        SmolStr::new_static("id"),
+                        SmolStr::new_static("rev"),
+                        SmolStr::new_static("sentAt"),
+                        SmolStr::new_static("data"),
+                    ]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -4635,18 +4626,22 @@ fn lexicon_doc_chat_bsky_convo_defs() -> LexiconDoc<'static> {
                                     CowStr::new_static("#systemMessageDataCreateJoinLink"),
                                     CowStr::new_static("#systemMessageDataEditJoinLink"),
                                     CowStr::new_static("#systemMessageDataEnableJoinLink"),
-                                    CowStr::new_static("#systemMessageDataDisableJoinLink")
+                                    CowStr::new_static("#systemMessageDataDisableJoinLink"),
                                 ],
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("rev"),
-                            LexObjectProperty::String(LexString { ..Default::default() }),
+                            LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("sentAt"),

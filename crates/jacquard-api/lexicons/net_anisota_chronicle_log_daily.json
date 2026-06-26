@@ -1,0 +1,267 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.log.daily",
+  "defs": {
+    "activityCounts": {
+      "type": "object",
+      "description": "Aggregate activity counts for the day (no timestamps or URIs)",
+      "properties": {
+        "likesSent": {
+          "type": "integer",
+          "description": "Likes sent today",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "description": "Posts created today",
+          "minimum": 0
+        },
+        "postsRead": {
+          "type": "integer",
+          "description": "Posts read today",
+          "minimum": 0
+        },
+        "repliesSent": {
+          "type": "integer",
+          "description": "Replies sent today",
+          "minimum": 0
+        },
+        "repostsSent": {
+          "type": "integer",
+          "description": "Reposts sent today",
+          "minimum": 0
+        }
+      }
+    },
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "engagementCounts": {
+      "type": "object",
+      "description": "Engagement received on user's posts (aggregate counts only)",
+      "properties": {
+        "likesReceived": {
+          "type": "integer",
+          "description": "Likes received on posts today",
+          "minimum": 0
+        },
+        "quotesReceived": {
+          "type": "integer",
+          "description": "Quotes received today",
+          "minimum": 0
+        },
+        "repliesReceived": {
+          "type": "integer",
+          "description": "Replies received on posts today",
+          "minimum": 0
+        },
+        "repostsReceived": {
+          "type": "integer",
+          "description": "Reposts received today",
+          "minimum": 0
+        }
+      }
+    },
+    "expeditionSummary": {
+      "type": "object",
+      "description": "Summary of expeditions for the day (details in chronicle.expedition)",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "Number of expeditions completed today",
+          "minimum": 0
+        },
+        "currentCampNumber": {
+          "type": "integer",
+          "description": "Current camp number within the active expedition (0 = exploring, not camped; unset if no active expedition)",
+          "minimum": 0
+        },
+        "currentExpeditionNumber": {
+          "type": "integer",
+          "description": "Number of the currently active expedition (unset if no active expedition)",
+          "minimum": 1
+        },
+        "totalDuration": {
+          "type": "integer",
+          "description": "Total expedition duration in milliseconds",
+          "minimum": 0
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Daily activity snapshot. Updated throughout the day via putRecord. rkey is YYYY-MM-DD in user's local timezone.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "date",
+          "player",
+          "activity",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "activity": {
+            "type": "ref",
+            "ref": "#activityCounts"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the daily record was first created",
+            "format": "datetime"
+          },
+          "date": {
+            "type": "string",
+            "description": "Date string in YYYY-MM-DD format (user's local timezone)"
+          },
+          "engagement": {
+            "type": "ref",
+            "ref": "#engagementCounts"
+          },
+          "expeditionRefs": {
+            "type": "array",
+            "description": "AT URIs of expedition records that occurred on this day",
+            "items": {
+              "type": "string"
+            }
+          },
+          "expeditions": {
+            "type": "ref",
+            "ref": "#expeditionSummary"
+          },
+          "patterns": {
+            "type": "ref",
+            "ref": "#patternsData"
+          },
+          "player": {
+            "type": "ref",
+            "ref": "#playerSnapshot"
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the daily record was last updated",
+            "format": "datetime"
+          },
+          "upperLogRefs": {
+            "type": "array",
+            "description": "AT URIs of containing logs (weekly, monthly, yearly) this day belongs to",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "patternsData": {
+      "type": "object",
+      "description": "Activity pattern data for the day based on half-hour blocks",
+      "properties": {
+        "activeBlockCount": {
+          "type": "integer",
+          "description": "Number of half-hour blocks with activity today",
+          "minimum": 0,
+          "maximum": 48
+        },
+        "activeBlocks": {
+          "type": "array",
+          "description": "Half-hour slots with activity, as HH:MM strings (e.g. '09:00', '09:30'). Max 48 per day.",
+          "items": {
+            "type": "string"
+          },
+          "maxLength": 48
+        },
+        "offlineXPAwarded": {
+          "type": "integer",
+          "description": "XP awarded for offline time",
+          "minimum": 0
+        }
+      }
+    },
+    "playerSnapshot": {
+      "type": "object",
+      "description": "Player state snapshot for this day",
+      "required": [
+        "level",
+        "totalXP"
+      ],
+      "properties": {
+        "itemsAcquiredToday": {
+          "type": "integer",
+          "description": "Number of items acquired today",
+          "minimum": 0
+        },
+        "itemsConsumedToday": {
+          "type": "integer",
+          "description": "Number of items consumed/used today",
+          "minimum": 0
+        },
+        "itemsTotal": {
+          "type": "integer",
+          "description": "Total items in inventory",
+          "minimum": 0
+        },
+        "level": {
+          "type": "integer",
+          "description": "Player level at end of day",
+          "minimum": 1
+        },
+        "specimensDocumented": {
+          "type": "integer",
+          "description": "Total specimens in collection",
+          "minimum": 0
+        },
+        "totalXP": {
+          "type": "integer",
+          "description": "Total accumulated XP",
+          "minimum": 0
+        },
+        "xpGainedToday": {
+          "type": "integer",
+          "description": "XP gained during this day",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

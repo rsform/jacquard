@@ -25,6 +25,7 @@ use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
 use crate::app_bsky::embed::external::ExternalRecord;
+use crate::app_bsky::embed::gallery::Gallery;
 use crate::app_bsky::embed::images::Images;
 use crate::app_bsky::embed::record::Record;
 use crate::app_bsky::embed::record_with_media::RecordWithMedia;
@@ -36,7 +37,7 @@ use crate::net_anisota::feed::post;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Deserialize, Serialize};
-/// A post that can be created on the Anisota network
+/// A post that can be created in the world of Anisota
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -76,6 +77,8 @@ pub struct Post<S: BosStr = DefaultStr> {
 pub enum PostEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<Images<S>>),
+    #[serde(rename = "app.bsky.embed.gallery")]
+    Gallery(Box<Gallery<S>>),
     #[serde(rename = "app.bsky.embed.video")]
     Video(Box<Video<S>>),
     #[serde(rename = "app.bsky.embed.external")]
@@ -476,7 +479,7 @@ fn lexicon_doc_net_anisota_feed_post() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     description: Some(
                         CowStr::new_static(
-                            "A post that can be created on the Anisota network",
+                            "A post that can be created in the world of Anisota",
                         ),
                     ),
                     key: Some(CowStr::new_static("tid")),
@@ -507,6 +510,7 @@ fn lexicon_doc_net_anisota_feed_post() -> LexiconDoc<'static> {
                                 LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("app.bsky.embed.images"),
+                                        CowStr::new_static("app.bsky.embed.gallery"),
                                         CowStr::new_static("app.bsky.embed.video"),
                                         CowStr::new_static("app.bsky.embed.external"),
                                         CowStr::new_static("app.bsky.embed.record"),

@@ -79,6 +79,10 @@ pub struct Preferences<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_comments")]
     pub show_comments: Option<bool>,
+    /// Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_preferences_show_first_last")]
+    pub show_first_last: Option<bool>,
     /// Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_preferences_show_in_discover")]
@@ -632,6 +636,12 @@ fn lexicon_doc_pub_leaflet_publication() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
+                            SmolStr::new_static("showFirstLast"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
                             SmolStr::new_static("showInDiscover"),
                             LexObjectProperty::Boolean(LexBoolean {
                                 ..Default::default()
@@ -773,6 +783,10 @@ fn _default_preferences_show_comments() -> Option<bool> {
     Some(true)
 }
 
+fn _default_preferences_show_first_last() -> Option<bool> {
+    Some(false)
+}
+
 fn _default_preferences_show_in_discover() -> Option<bool> {
     Some(true)
 }
@@ -793,6 +807,7 @@ impl Default for Preferences {
     fn default() -> Self {
         Self {
             show_comments: Some(true),
+            show_first_last: Some(false),
             show_in_discover: Some(true),
             show_mentions: Some(true),
             show_prev_next: Some(true),

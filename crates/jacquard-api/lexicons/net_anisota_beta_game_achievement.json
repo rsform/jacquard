@@ -1,0 +1,111 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.beta.game.achievement",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record representing an achievement unlocked by a player",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "achievementId",
+          "category",
+          "name",
+          "unlockedAt",
+          "signature"
+        ],
+        "properties": {
+          "achievementId": {
+            "type": "string",
+            "description": "Unique identifier for the achievement (e.g., 'followers-1000', 'level-10')",
+            "maxLength": 100
+          },
+          "category": {
+            "type": "string",
+            "description": "Category of the achievement",
+            "enum": [
+              "followers",
+              "level",
+              "social",
+              "collection"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what was accomplished",
+            "maxLength": 500
+          },
+          "metadata": {
+            "type": "unknown",
+            "description": "Additional achievement-specific data"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name of the achievement",
+            "maxLength": 100
+          },
+          "rarity": {
+            "type": "string",
+            "description": "Rarity tier of the achievement",
+            "enum": [
+              "common",
+              "uncommon",
+              "rare",
+              "epic",
+              "legendary"
+            ]
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#signature"
+          },
+          "tier": {
+            "type": "integer",
+            "description": "Tier or milestone value (e.g., 1000 for followers-1000, 10 for level-10)",
+            "minimum": 0
+          },
+          "unlockedAt": {
+            "type": "string",
+            "description": "When the achievement was unlocked",
+            "format": "datetime"
+          },
+          "verificationUri": {
+            "type": "string",
+            "description": "AT URI linking to the verification record on the Anisota brand PDS",
+            "format": "at-uri"
+          },
+          "xpReward": {
+            "type": "integer",
+            "description": "Experience points awarded for this achievement",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "description": "Cryptographic signature proving authenticity",
+      "required": [
+        "issuer",
+        "signedAt",
+        "sig"
+      ],
+      "properties": {
+        "issuer": {
+          "type": "string",
+          "description": "DID of the signing authority (Anisota backend)"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded cryptographic signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the achievement was signed",
+          "format": "datetime"
+        }
+      }
+    }
+  }
+}

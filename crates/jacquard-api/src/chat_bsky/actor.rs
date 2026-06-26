@@ -35,7 +35,6 @@ use crate::com_atproto::label::Label;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Deserialize, Serialize};
-/// [NOTE: This is under active development and should be considered unstable while this note is here].
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -47,7 +46,7 @@ pub struct DirectConvoMember<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. A current group convo member.
+/// A current group convo member.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -135,7 +134,7 @@ where
     }
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. A past group convo member.
+/// A past group convo member.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -286,11 +285,6 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("directConvoMember"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here].",
-                        ),
-                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -302,11 +296,7 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("groupConvoMember"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. A current group convo member.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static("A current group convo member.")),
                     required: Some(vec![SmolStr::new_static("role")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -339,11 +329,7 @@ fn lexicon_doc_chat_bsky_actor_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pastGroupConvoMember"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. A past group convo member.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static("A past group convo member.")),
                     required: Some(vec![]),
                     properties: {
                         #[allow(unused_mut)]

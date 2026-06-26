@@ -60,7 +60,7 @@ pub struct Collection<S: BosStr = DefaultStr> {
     ///URI of the game.log record that documents the acquisition of this specimen
     #[serde(skip_serializing_if = "Option::is_none")]
     pub log_record_uri: Option<S>,
-    ///Number of specimens collected
+    ///Number of specimens collected (0 for seen but not caught)
     pub quantity: i64,
     ///Rarity level of the specimen
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -216,10 +216,10 @@ impl<S: BosStr> LexiconSchema for Collection<S> {
         }
         {
             let value = &self.quantity;
-            if *value < 1i64 {
+            if *value < 0i64 {
                 return Err(ConstraintError::Minimum {
                     path: ValidationPath::from_field("quantity"),
-                    min: 1i64,
+                    min: 0i64,
                     actual: *value,
                 });
             }
@@ -845,7 +845,7 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("quantity"),
                                 LexObjectProperty::Integer(LexInteger {
-                                    minimum: Some(1i64),
+                                    minimum: Some(0i64),
                                     ..Default::default()
                                 }),
                             );

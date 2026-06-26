@@ -1,0 +1,176 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.log.yearly",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Yearly aggregation of monthly records. rkey is YYYY. Updated once per month, finalized when year ends.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "year",
+          "aggregates",
+          "status",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "aggregates": {
+            "type": "ref",
+            "ref": "#yearlyAggregates"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the yearly record was first created",
+            "format": "datetime"
+          },
+          "finalizedAt": {
+            "type": "string",
+            "description": "When the yearly record was finalized (end of year)",
+            "format": "datetime"
+          },
+          "lowerLogRefs": {
+            "type": "array",
+            "description": "AT URIs of monthly log records included in this year",
+            "items": {
+              "type": "string"
+            }
+          },
+          "patterns": {
+            "type": "ref",
+            "ref": "#yearlyPatterns"
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "status": {
+            "type": "string",
+            "description": "Whether this year is still being updated or has been finalized",
+            "enum": [
+              "active",
+              "finalized"
+            ]
+          },
+          "year": {
+            "type": "string",
+            "description": "Year string in YYYY format (e.g. 2026)"
+          }
+        }
+      }
+    },
+    "yearlyAggregates": {
+      "type": "object",
+      "description": "Rolled-up counts from monthly records",
+      "properties": {
+        "daysActive": {
+          "type": "integer",
+          "description": "Total days with activity this year",
+          "minimum": 0
+        },
+        "levelsGained": {
+          "type": "integer",
+          "description": "Levels gained this year",
+          "minimum": 0
+        },
+        "likesReceived": {
+          "type": "integer",
+          "description": "Total likes received this year",
+          "minimum": 0
+        },
+        "monthsActive": {
+          "type": "integer",
+          "description": "Number of months with activity this year",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "description": "Total posts created this year",
+          "minimum": 0
+        },
+        "postsRead": {
+          "type": "integer",
+          "description": "Total posts read this year",
+          "minimum": 0
+        },
+        "repliesReceived": {
+          "type": "integer",
+          "description": "Total replies received this year",
+          "minimum": 0
+        },
+        "specimensPhotographed": {
+          "type": "integer",
+          "description": "New specimens photographed this year",
+          "minimum": 0
+        },
+        "totalXPGained": {
+          "type": "integer",
+          "description": "Total XP gained this year",
+          "minimum": 0
+        }
+      }
+    },
+    "yearlyPatterns": {
+      "type": "object",
+      "description": "Activity pattern aggregation for the year based on half-hour blocks",
+      "properties": {
+        "avgBlocksPerDay": {
+          "type": "integer",
+          "description": "Average active blocks per day (totalActiveBlocks / daysActive, rounded)",
+          "minimum": 0
+        },
+        "peakBlocks": {
+          "type": "integer",
+          "description": "Highest activeBlockCount for any single day in the year",
+          "minimum": 0,
+          "maximum": 48
+        },
+        "totalActiveBlocks": {
+          "type": "integer",
+          "description": "Sum of activeBlockCount across all days in the year",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.log",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Granular chronicle event log. Each record is a single timestamped event. TID rkey for chronological ordering. Used to capture moments that don't have their own record type (moth sightings, random encounters, item discoveries, etc).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "event",
+          "occurredAt",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was created",
+            "format": "datetime"
+          },
+          "detail": {
+            "type": "string",
+            "description": "Extra context (rarity, reason, conditions, etc.)"
+          },
+          "event": {
+            "type": "string",
+            "description": "Event type. Extensible — new values added as features grow.",
+            "enum": [
+              "moth_sighted",
+              "item_found"
+            ]
+          },
+          "expeditionRef": {
+            "type": "string",
+            "description": "AT URI of the parent expedition (if during an expedition)"
+          },
+          "occurredAt": {
+            "type": "string",
+            "description": "When the event actually happened",
+            "format": "datetime"
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "net.anisota.chronicle.expedition#chronicleSignature"
+          },
+          "subject": {
+            "type": "string",
+            "description": "What was involved (specimen name, item id, etc.)"
+          }
+        }
+      }
+    }
+  }
+}

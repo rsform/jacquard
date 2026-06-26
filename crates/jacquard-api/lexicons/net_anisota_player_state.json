@@ -1,0 +1,86 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.player.state",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Ephemeral player state for cross-device sync. Singleton record (rkey: self), overwritten via putRecord.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "updatedAt"
+        ],
+        "properties": {
+          "activeBlocksIntentionDaily": {
+            "type": "string",
+            "description": "Target active blocks per day (decimal string, e.g. '6')"
+          },
+          "activityIntentionConsuming7d": {
+            "type": "string",
+            "description": "Deprecated: use activityIntentionTotal7d. Target weekly consuming count."
+          },
+          "activityIntentionCreating7d": {
+            "type": "string",
+            "description": "Deprecated: use activityIntentionTotal7d. Target weekly creating count."
+          },
+          "activityIntentionTotal7d": {
+            "type": "string",
+            "description": "Target total weekly activity count, sum of all actions (decimal string, e.g. '500')"
+          },
+          "activityIntentionX": {
+            "type": "string",
+            "description": "Activity style intention X position as grid percentage (0-100, consuming axis)"
+          },
+          "activityIntentionY": {
+            "type": "string",
+            "description": "Activity style intention Y position as grid percentage (0-100, creating axis)"
+          },
+          "currentLight": {
+            "type": "string",
+            "description": "Current light charge in Wh (decimal string, e.g. '280.0')"
+          },
+          "currentStamina": {
+            "type": "string",
+            "description": "Current stamina level (decimal string, e.g. '42.5')"
+          },
+          "equipped": {
+            "type": "unknown",
+            "description": "Equipment slots: object mapping slotId (hands, backpack, camp) to arrays of equipped item ID strings"
+          },
+          "lastSessionStart": {
+            "type": "string",
+            "description": "When the current session started (for multi-device awareness)",
+            "format": "datetime"
+          },
+          "lightDrainActive": {
+            "type": "boolean",
+            "description": "Whether light drain was active when state was saved"
+          },
+          "slotCapacity": {
+            "type": "unknown",
+            "description": "Slot capacity overrides: object mapping slotId to integer capacity (for upgrades). Slots not listed use default capacity."
+          },
+          "starterItemsGranted": {
+            "type": "boolean",
+            "description": "Whether the player has received their starter items"
+          },
+          "triggerSource": {
+            "type": "string",
+            "description": "What caused this state snapshot (visibility_hidden, session_end, stamina_depleted, manual)"
+          },
+          "tutorialCompletedAt": {
+            "type": "string",
+            "description": "When the player completed (or skipped) the interactive tutorial. Presence of this field means the tutorial is done; absence means it has not been completed.",
+            "format": "datetime"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When this state snapshot was taken",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

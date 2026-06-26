@@ -7,7 +7,8 @@
       "required": [
         "skip",
         "depth",
-        "submodules"
+        "submodules",
+        "tags"
       ],
       "properties": {
         "depth": {
@@ -17,6 +18,9 @@
           "type": "boolean"
         },
         "submodules": {
+          "type": "boolean"
+        },
+        "tags": {
           "type": "boolean"
         }
       }

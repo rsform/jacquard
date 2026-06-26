@@ -8,5 +8,6 @@ pub mod draft;
 pub mod like;
 pub mod list;
 pub mod list_item;
+pub mod perception;
 pub mod post;
 pub mod repost;

@@ -4,12 +4,11 @@
   "defs": {
     "directConvoMember": {
       "type": "object",
-      "description": "[NOTE: This is under active development and should be considered unstable while this note is here].",
       "properties": {}
     },
     "groupConvoMember": {
       "type": "object",
-      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. A current group convo member.",
+      "description": "A current group convo member.",
       "required": [
         "role"
       ],
@@ -35,7 +34,7 @@
     },
     "pastGroupConvoMember": {
       "type": "object",
-      "description": "[NOTE: This is under active development and should be considered unstable while this note is here]. A past group convo member.",
+      "description": "A past group convo member.",
       "required": [],
       "properties": {}
     },

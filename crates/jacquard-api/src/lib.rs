@@ -391,6 +391,9 @@ pub mod net_mmatt;
 #[cfg(feature = "net_shwilliam")]
 pub mod net_shwilliam;
 
+#[cfg(feature = "net_snrp")]
+pub mod net_snrp;
+
 #[cfg(feature = "net_wafrn")]
 pub mod net_wafrn;
 

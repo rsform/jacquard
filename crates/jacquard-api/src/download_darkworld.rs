@@ -6,6 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `download.darkworld` Lexicon namespace/module.
+pub mod abusivelist;
 pub mod content;
 pub mod deltarune;
 pub mod site;

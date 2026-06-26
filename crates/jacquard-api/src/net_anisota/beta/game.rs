@@ -4,6 +4,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `net.anisota.beta.game` Lexicon namespace/module.
+pub mod achievement;
 pub mod collection;
 pub mod inventory;
 pub mod log;

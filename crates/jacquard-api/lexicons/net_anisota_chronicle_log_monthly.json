@@ -1,0 +1,185 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.log.monthly",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Monthly aggregation of weekly records. rkey is YYYY-MM. Updated once per week, finalized when month ends.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "month",
+          "aggregates",
+          "status",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "aggregates": {
+            "type": "ref",
+            "ref": "#monthlyAggregates"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the monthly record was first created",
+            "format": "datetime"
+          },
+          "expeditionRefs": {
+            "type": "array",
+            "description": "AT URIs of expedition records that occurred during this month",
+            "items": {
+              "type": "string"
+            }
+          },
+          "finalizedAt": {
+            "type": "string",
+            "description": "When the monthly record was finalized (end of month)",
+            "format": "datetime"
+          },
+          "lowerLogRefs": {
+            "type": "array",
+            "description": "AT URIs of weekly log records included in this month",
+            "items": {
+              "type": "string"
+            }
+          },
+          "month": {
+            "type": "string",
+            "description": "Month string in YYYY-MM format (e.g. 2026-02)"
+          },
+          "patterns": {
+            "type": "ref",
+            "ref": "#monthlyPatterns"
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "status": {
+            "type": "string",
+            "description": "Whether this month is still being updated or has been finalized",
+            "enum": [
+              "active",
+              "finalized"
+            ]
+          },
+          "upperLogRefs": {
+            "type": "array",
+            "description": "AT URIs of containing logs (yearly) this month belongs to",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "monthlyAggregates": {
+      "type": "object",
+      "description": "Rolled-up counts from weekly records",
+      "properties": {
+        "daysActive": {
+          "type": "integer",
+          "description": "Number of days with activity this month",
+          "minimum": 0
+        },
+        "likesReceived": {
+          "type": "integer",
+          "description": "Total likes received this month",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "description": "Total posts created this month",
+          "minimum": 0
+        },
+        "postsRead": {
+          "type": "integer",
+          "description": "Total posts read this month",
+          "minimum": 0
+        },
+        "repliesReceived": {
+          "type": "integer",
+          "description": "Total replies received this month",
+          "minimum": 0
+        },
+        "specimensPhotographed": {
+          "type": "integer",
+          "description": "New specimens photographed this month",
+          "minimum": 0
+        },
+        "totalXPGained": {
+          "type": "integer",
+          "description": "Total XP gained this month",
+          "minimum": 0
+        },
+        "weeksActive": {
+          "type": "integer",
+          "description": "Number of weeks with activity this month",
+          "minimum": 0
+        }
+      }
+    },
+    "monthlyPatterns": {
+      "type": "object",
+      "description": "Activity pattern aggregation for the month based on half-hour blocks",
+      "properties": {
+        "avgBlocksPerDay": {
+          "type": "integer",
+          "description": "Average active blocks per day (totalActiveBlocks / daysActive, rounded)",
+          "minimum": 0
+        },
+        "peakBlocks": {
+          "type": "integer",
+          "description": "Highest activeBlockCount for any single day in the month",
+          "minimum": 0,
+          "maximum": 48
+        },
+        "totalActiveBlocks": {
+          "type": "integer",
+          "description": "Sum of activeBlockCount across all days in the month",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

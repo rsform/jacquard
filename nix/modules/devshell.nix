@@ -1,34 +1,34 @@
-{inputs, ...}: {
-  perSystem = {
-    config,
-    self',
-    pkgs,
-    lib,
-    ...
-  }: {
-    devShells.default = pkgs.mkShell {
-      name = "jacquard-shell";
-      inputsFrom = [
-        self'.devShells.rust
-        config.pre-commit.devShell # See ./nix/modules/pre-commit.nix
-      ];
-      packages = with pkgs; [
-        just
-        nixd # Nix language server
-        bacon
-        rust-analyzer
-        cargo-machete
-        cargo-semver-checks
-        cargo-binstall
-        cargo-dist
-        cargo-nextest
-        zip
-        atproto-goat
-      ];
+{ inputs, ... }: {
+  perSystem =
+    { config
+    , self'
+    , pkgs
+    , lib
+    , ...
+    }: {
+      devShells.default = pkgs.mkShell {
+        name = "jacquard-shell";
+        inputsFrom = [
+          self'.devShells.rust
+          config.pre-commit.devShell # See ./nix/modules/pre-commit.nix
+        ];
+        packages = with pkgs; [
+          just
+          nixd # Nix language server
+          bacon
+          rust-analyzer
+          cargo-machete
+          cargo-semver-checks
+          cargo-binstall
+          cargo-dist
+          cargo-nextest
+          zip
+          atproto-goat
+        ];
+      };
+      apps = {
+        default.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
+        lexgen.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
+      };
     };
-    apps = {
-      default.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
-      lexgen.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
-    };
-  };
 }

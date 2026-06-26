@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.inkblot",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A symmetric Rorschach-style inkblot crafted in the Anisota Lab's Social Inkblot Test and saved to the owner's library. The blot is fully reproducible from its integer 'seed' and its generation 'params'; 'palette' names the ink colour. A rendered PNG data URL is stored in 'image' so the blot can be shown anywhere (including by other people viewing the social gallery) without re-running the generator. Inkblots carry no user-supplied name: the record's TID rkey is its identifier and display name everywhere it is shown.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "seed",
+          "palette",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the inkblot was saved",
+            "format": "datetime"
+          },
+          "image": {
+            "type": "string",
+            "description": "A rendered PNG of the blot as a data URL, for display",
+            "maxLength": 200000
+          },
+          "palette": {
+            "type": "string",
+            "description": "Ink palette id (classic, sepia, indigo, blood, moss)",
+            "maxLength": 64
+          },
+          "params": {
+            "type": "unknown",
+            "description": "The generation parameters (complexity, blobiness, spread, spatter, radial)"
+          },
+          "seed": {
+            "type": "integer",
+            "description": "The deterministic RNG seed that reproduces the blot"
+          }
+        }
+      }
+    }
+  }
+}

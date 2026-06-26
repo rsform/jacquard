@@ -2,7 +2,7 @@
 name = "jacquard-api"
 description = "Generated AT Protocol API bindings for Jacquard"
 edition.workspace = true
-version = "0.12.0"
+version = "0.12.1"
 authors.workspace = true
 repository.workspace = true
 keywords.workspace = true
@@ -15,9 +15,9 @@ license.workspace = true
 features = [ "bluesky", "other", "streaming" ]
 
 [dependencies]
-jacquard-common = { version = "0.12.0", path = "../jacquard-common" }
-jacquard-derive = { version = "0.12.0", path = "../jacquard-derive" }
-jacquard-lexicon = { version = "0.12.0", path = "../jacquard-lexicon", default-features = false }
+jacquard-common = { version = "0.12.1", path = "../jacquard-common" }
+jacquard-derive = { version = "0.12.1", path = "../jacquard-derive" }
+jacquard-lexicon = { version = "0.12.1", path = "../jacquard-lexicon", default-features = false }
 miette.workspace = true
 serde.workspace = true
 thiserror.workspace = true
@@ -123,7 +123,7 @@ dev_tsunagite = []
 dev_vielle = []
 directory_evnt = []
 diy_razorgirl = []
-download_darkworld = []
+download_darkworld = ["com_atproto"]
 eu_atchef = []
 events_smokesignal = []
 fm_teal = []
@@ -161,6 +161,7 @@ net_jbsm = []
 net_mimonelu = []
 net_mmatt = []
 net_shwilliam = []
+net_snrp = []
 net_wafrn = ["com_atproto"]
 network_cosmik = ["com_atproto"]
 network_slices = ["app_bsky"]

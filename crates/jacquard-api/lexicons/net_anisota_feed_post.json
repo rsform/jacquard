@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "record",
-      "description": "A post that can be created on the Anisota network",
+      "description": "A post that can be created in the world of Anisota",
       "key": "tid",
       "record": {
         "type": "object",
@@ -22,6 +22,7 @@
             "type": "union",
             "refs": [
               "app.bsky.embed.images",
+              "app.bsky.embed.gallery",
               "app.bsky.embed.video",
               "app.bsky.embed.external",
               "app.bsky.embed.record",

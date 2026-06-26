@@ -31,6 +31,9 @@ pub struct PostsList<S: BosStr = DefaultStr> {
     pub filter_by_tags: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub highlight_first_post: Option<bool>,
+    ///Show at most this many posts.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub view: Option<PostsListView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -125,6 +128,15 @@ impl<S: BosStr> LexiconSchema for PostsList<S> {
         lexicon_doc_pub_leaflet_blocks_postsList()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.limit {
+            if *value < 1i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("limit"),
+                    min: 1i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -158,6 +170,13 @@ fn lexicon_doc_pub_leaflet_blocks_postsList() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("highlightFirstPost"),
                             LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("limit"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(1i64),
                                 ..Default::default()
                             }),
                         );

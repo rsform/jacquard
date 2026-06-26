@@ -25,6 +25,7 @@ use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
 use crate::app_bsky::embed::external::ExternalRecord;
+use crate::app_bsky::embed::gallery::Gallery;
 use crate::app_bsky::embed::images::Images;
 use crate::app_bsky::embed::record::Record;
 use crate::app_bsky::embed::record_with_media::RecordWithMedia;
@@ -79,6 +80,8 @@ pub struct Draft<S: BosStr = DefaultStr> {
 pub enum DraftEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<Images<S>>),
+    #[serde(rename = "app.bsky.embed.gallery")]
+    Gallery(Box<Gallery<S>>),
     #[serde(rename = "app.bsky.embed.video")]
     Video(Box<Video<S>>),
     #[serde(rename = "app.bsky.embed.external")]
@@ -526,6 +529,7 @@ fn lexicon_doc_net_anisota_feed_draft() -> LexiconDoc<'static> {
                                 LexObjectProperty::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("app.bsky.embed.images"),
+                                        CowStr::new_static("app.bsky.embed.gallery"),
                                         CowStr::new_static("app.bsky.embed.video"),
                                         CowStr::new_static("app.bsky.embed.external"),
                                         CowStr::new_static("app.bsky.embed.record"),

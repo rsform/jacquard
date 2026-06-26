@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.inkblot.perception",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "One person's perception of an inkblot — their answer to 'what do you see?'. Points at the inkblot record via a strongRef 'subject'. In the Social Inkblot Test, a viewer's own perception is written before everyone else's perceptions of the same blot are revealed (so the first impression is uncontaminated). Perceptions are aggregated through the Constellation backlink index on '.subject.uri'.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the perception was written",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "ref",
+            "description": "The inkblot record this perception is of",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "text": {
+            "type": "string",
+            "description": "What the viewer sees in the blot",
+            "maxLength": 1200,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    }
+  }
+}

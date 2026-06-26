@@ -1,0 +1,134 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.level",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "journeyData": {
+      "type": "object",
+      "description": "Journey info from previous level",
+      "properties": {
+        "daysFromPreviousLevel": {
+          "type": "integer",
+          "description": "Days taken to advance from previous level",
+          "minimum": 0
+        },
+        "xpGainedFromPreviousLevel": {
+          "type": "integer",
+          "description": "XP gained since previous level",
+          "minimum": 0
+        }
+      }
+    },
+    "levelSnapshot": {
+      "type": "object",
+      "description": "Player state at the moment of leveling up",
+      "required": [
+        "totalXP"
+      ],
+      "properties": {
+        "daysPlayed": {
+          "type": "integer",
+          "description": "Total days played at time of level-up",
+          "minimum": 0
+        },
+        "itemsTotal": {
+          "type": "integer",
+          "description": "Total items at time of level-up",
+          "minimum": 0
+        },
+        "postsReadTotal": {
+          "type": "integer",
+          "description": "Total posts read all-time at level-up",
+          "minimum": 0
+        },
+        "specimensDocumented": {
+          "type": "integer",
+          "description": "Total specimens documented at time of level-up",
+          "minimum": 0
+        },
+        "totalXP": {
+          "type": "integer",
+          "description": "Total XP at time of level-up",
+          "minimum": 0
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Immutable level milestone record. Created once on level-up with createRecord. rkey is zero-padded level (001-099).",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "level",
+          "snapshot",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the level was reached",
+            "format": "datetime"
+          },
+          "journey": {
+            "type": "ref",
+            "ref": "#journeyData"
+          },
+          "level": {
+            "type": "integer",
+            "description": "The level that was reached",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "snapshot": {
+            "type": "ref",
+            "ref": "#levelSnapshot"
+          }
+        }
+      }
+    }
+  }
+}

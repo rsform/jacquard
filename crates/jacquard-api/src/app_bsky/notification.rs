@@ -51,6 +51,8 @@ pub struct ActivitySubscription<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Deprecated: use chat.bsky.notification preferences instead. This will only return a default value.
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
@@ -250,6 +252,7 @@ pub struct Preference<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Preferences<S: BosStr = DefaultStr> {
+    ///Deprecated: use chat.bsky.notification preferences instead. This will only return a default value.
     pub chat: notification::ChatPreference<S>,
     pub follow: notification::FilterablePreference<S>,
     pub like: notification::FilterablePreference<S>,
@@ -591,18 +594,20 @@ fn lexicon_doc_app_bsky_notification_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chatPreference"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("include"),
-                        SmolStr::new_static("push"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Deprecated: use chat.bsky.notification preferences instead. This will only return a default value.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("include"), SmolStr::new_static("push")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("include"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("push"),

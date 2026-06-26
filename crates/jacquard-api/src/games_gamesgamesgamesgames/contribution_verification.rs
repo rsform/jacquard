@@ -43,7 +43,8 @@ pub struct ContributionVerification<S: BosStr = DefaultStr> {
     pub contribution_type: ContributionVerificationContributionType<S>,
     pub contributor: Did<S>,
     pub created_at: Datetime,
-    pub subject: AtUri<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subject: Option<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -296,7 +297,6 @@ pub mod contribution_verification_state {
         type ContributionType;
         type Contributor;
         type CreatedAt;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -307,7 +307,6 @@ pub mod contribution_verification_state {
         type ContributionType = Unset;
         type Contributor = Unset;
         type CreatedAt = Unset;
-        type Subject = Unset;
     }
     ///State transition - sets the `accepted_by` field to Set
     pub struct SetAcceptedBy<St: State = Empty>(PhantomData<fn() -> St>);
@@ -318,7 +317,6 @@ pub mod contribution_verification_state {
         type ContributionType = St::ContributionType;
         type Contributor = St::Contributor;
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `contribution` field to Set
     pub struct SetContribution<St: State = Empty>(PhantomData<fn() -> St>);
@@ -329,7 +327,6 @@ pub mod contribution_verification_state {
         type ContributionType = St::ContributionType;
         type Contributor = St::Contributor;
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `contribution_type` field to Set
     pub struct SetContributionType<St: State = Empty>(PhantomData<fn() -> St>);
@@ -340,7 +337,6 @@ pub mod contribution_verification_state {
         type ContributionType = Set<members::contribution_type>;
         type Contributor = St::Contributor;
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `contributor` field to Set
     pub struct SetContributor<St: State = Empty>(PhantomData<fn() -> St>);
@@ -351,7 +347,6 @@ pub mod contribution_verification_state {
         type ContributionType = St::ContributionType;
         type Contributor = Set<members::contributor>;
         type CreatedAt = St::CreatedAt;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -362,18 +357,6 @@ pub mod contribution_verification_state {
         type ContributionType = St::ContributionType;
         type Contributor = St::Contributor;
         type CreatedAt = Set<members::created_at>;
-        type Subject = St::Subject;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type AcceptedBy = St::AcceptedBy;
-        type Contribution = St::Contribution;
-        type ContributionType = St::ContributionType;
-        type Contributor = St::Contributor;
-        type CreatedAt = St::CreatedAt;
-        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -388,8 +371,6 @@ pub mod contribution_verification_state {
         pub struct contributor(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
@@ -546,22 +527,16 @@ where
     }
 }
 
-impl<St, S: BosStr> ContributionVerificationBuilder<St, S>
-where
-    St: contribution_verification_state::State,
-    St::Subject: contribution_verification_state::IsUnset,
-{
-    /// Set the `subject` field (required)
-    pub fn subject(
-        mut self,
-        value: impl Into<AtUri<S>>,
-    ) -> ContributionVerificationBuilder<contribution_verification_state::SetSubject<St>, S> {
-        self._fields.5 = Option::Some(value.into());
-        ContributionVerificationBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: contribution_verification_state::State, S: BosStr> ContributionVerificationBuilder<St, S> {
+    /// Set the `subject` field (optional)
+    pub fn subject(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `subject` field to an Option value (optional)
+    pub fn maybe_subject(mut self, value: Option<AtUri<S>>) -> Self {
+        self._fields.5 = value;
+        self
     }
 }
 
@@ -573,7 +548,6 @@ where
     St::ContributionType: contribution_verification_state::IsSet,
     St::Contributor: contribution_verification_state::IsSet,
     St::CreatedAt: contribution_verification_state::IsSet,
-    St::Subject: contribution_verification_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ContributionVerification<S> {
@@ -583,7 +557,7 @@ where
             contribution_type: self._fields.2.unwrap(),
             contributor: self._fields.3.unwrap(),
             created_at: self._fields.4.unwrap(),
-            subject: self._fields.5.unwrap(),
+            subject: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -598,7 +572,7 @@ where
             contribution_type: self._fields.2.unwrap(),
             contributor: self._fields.3.unwrap(),
             created_at: self._fields.4.unwrap(),
-            subject: self._fields.5.unwrap(),
+            subject: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -628,7 +602,6 @@ fn lexicon_doc_games_gamesgamesgamesgames_contributionVerification() -> LexiconD
                             vec![
                                 SmolStr::new_static("contribution"),
                                 SmolStr::new_static("contributor"),
-                                SmolStr::new_static("subject"),
                                 SmolStr::new_static("contributionType"),
                                 SmolStr::new_static("acceptedBy"),
                                 SmolStr::new_static("createdAt")

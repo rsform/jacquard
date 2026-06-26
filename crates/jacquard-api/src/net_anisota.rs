@@ -6,7 +6,11 @@
 //! Generated bindings for the `net.anisota` Lexicon namespace/module.
 pub mod auth_full_app;
 pub mod beta;
+pub mod chronicle;
 pub mod feed;
 pub mod graph;
 pub mod harvest;
+pub mod lab;
+pub mod observatory;
+pub mod player;
 pub mod settings;

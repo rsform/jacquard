@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.poetry",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A fridge-poetry composition made in the Anisota Lab's Word Magnets studio, where word tiles drawn from the author's own recent posts are arranged on a field into a short poem. The record keeps the assembled text, the placed tiles with their positions (so the arrangement can be reopened), and at-uri references to the posts the used words were drawn from.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "board": {
+            "type": "unknown",
+            "description": "Optional snapshot of the studio board taken at save time, so the arrangement can be re-laid faithfully at any size: { aspect, font, bx, by, bw, bh } — the bounding box of the placed tiles (bx/by/bw/bh as 0..1000 of the surface, matching tile x/y), the box's width:height aspect, and the tile font size as a fraction of the box width."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the poem was saved",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "Optional title for the poem",
+            "maxLength": 800,
+            "maxGraphemes": 100
+          },
+          "sources": {
+            "type": "array",
+            "description": "at-uri references to the author's own posts that the used words were drawn from",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "maxLength": 512
+          },
+          "text": {
+            "type": "string",
+            "description": "The assembled poem — the placed word tiles read top-to-bottom, left-to-right",
+            "maxLength": 6000,
+            "maxGraphemes": 1000
+          },
+          "tiles": {
+            "type": "array",
+            "description": "The placed word tiles and their positions, so the arrangement can be reopened. Each is an object: { word, fragment, x, y, rot } where x/y are the tile centre as a 0..1000 fraction of the field and rot is degrees.",
+            "items": {
+              "type": "unknown"
+            },
+            "maxLength": 512
+          }
+        }
+      }
+    }
+  }
+}

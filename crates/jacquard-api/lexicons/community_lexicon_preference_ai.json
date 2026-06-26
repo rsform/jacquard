@@ -1,0 +1,115 @@
+{
+  "lexicon": 1,
+  "id": "community.lexicon.preference.ai",
+  "description": "Declares a user's preferences regarding AI usage of their public data. A record at key 'self' with globalScope establishes default preferences. Additional records keyed by TID establish scoped overrides for specific entities or content collections.",
+  "defs": {
+    "collectionScope": {
+      "type": "object",
+      "description": "Scopes preferences to a specific record collection in the user's repository.",
+      "required": [
+        "collection"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "NSID of the collection this override applies to.",
+          "format": "nsid"
+        }
+      }
+    },
+    "entityScope": {
+      "type": "object",
+      "description": "Scopes preferences to a specific AI consumer.",
+      "required": [
+        "entity"
+      ],
+      "properties": {
+        "entity": {
+          "type": "string",
+          "description": "DID or domain of the entity this override applies to."
+        }
+      }
+    },
+    "globalScope": {
+      "type": "object",
+      "description": "Account-wide default. The record at key 'self' should carry this scope.",
+      "properties": {}
+    },
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "updatedAt",
+          "scope",
+          "preferences"
+        ],
+        "properties": {
+          "preferences": {
+            "type": "ref",
+            "ref": "#preferenceSet"
+          },
+          "scope": {
+            "type": "union",
+            "description": "What this record's preferences apply to.",
+            "refs": [
+              "#globalScope",
+              "#entityScope",
+              "#collectionScope"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Timestamp of the most recent change to this record.",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "preference": {
+      "type": "object",
+      "required": [
+        "allow",
+        "updatedAt"
+      ],
+      "properties": {
+        "allow": {
+          "type": "boolean",
+          "description": "Whether this usage is permitted (true) or denied (false)."
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "When this specific preference was last changed.",
+          "format": "datetime"
+        }
+      }
+    },
+    "preferenceSet": {
+      "type": "object",
+      "description": "A set of AI usage preferences. Omitted fields mean undefined (no declared preference).",
+      "properties": {
+        "embedding": {
+          "type": "ref",
+          "description": "Use for vector embeddings or semantic indexing.",
+          "ref": "#preference"
+        },
+        "inference": {
+          "type": "ref",
+          "description": "Use at inference time for retrieval, RAG, or context injection.",
+          "ref": "#preference"
+        },
+        "syntheticContent": {
+          "type": "ref",
+          "description": "Use to generate synthetic content or interactions derived from user data.",
+          "ref": "#preference"
+        },
+        "training": {
+          "type": "ref",
+          "description": "Use as input for training, fine-tuning, distillation, or RLHF of ML models.",
+          "ref": "#preference"
+        }
+      }
+    }
+  }
+}

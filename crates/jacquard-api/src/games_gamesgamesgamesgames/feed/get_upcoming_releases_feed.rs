@@ -25,10 +25,20 @@ use serde::{Deserialize, Serialize};
 pub struct GetUpcomingReleasesFeed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub from: Option<S>,
     /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub now: Option<S>,
+    ///  Defaults to `false`.
+    #[serde(default = "_default_shuffle")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shuffle: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub to: Option<S>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,6 +50,8 @@ pub struct GetUpcomingReleasesFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub feed: Vec<GameFeedViewItem<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_count: Option<i64>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -76,6 +88,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
+fn _default_shuffle() -> Option<bool> {
+    Some(false)
+}
+
 pub mod get_upcoming_releases_feed_state {
 
     pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
@@ -101,7 +117,14 @@ pub struct GetUpcomingReleasesFeedBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<i64>,
+        Option<S>,
+        Option<bool>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -125,7 +148,7 @@ impl GetUpcomingReleasesFeedBuilder<get_upcoming_releases_feed_state::Empty, Def
     pub fn new() -> Self {
         GetUpcomingReleasesFeedBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -136,7 +159,7 @@ impl<S: BosStr> GetUpcomingReleasesFeedBuilder<get_upcoming_releases_feed_state:
     pub fn builder() -> Self {
         GetUpcomingReleasesFeedBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -156,14 +179,66 @@ impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleases
 }
 
 impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
+    /// Set the `from` field (optional)
+    pub fn from(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `from` field to an Option value (optional)
+    pub fn maybe_from(mut self, value: Option<S>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self._fields.1 = value;
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
+    /// Set the `now` field (optional)
+    pub fn now(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `now` field to an Option value (optional)
+    pub fn maybe_now(mut self, value: Option<S>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
+    /// Set the `shuffle` field (optional)
+    pub fn shuffle(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `shuffle` field to an Option value (optional)
+    pub fn maybe_shuffle(mut self, value: Option<bool>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St: get_upcoming_releases_feed_state::State, S: BosStr> GetUpcomingReleasesFeedBuilder<St, S> {
+    /// Set the `to` field (optional)
+    pub fn to(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `to` field to an Option value (optional)
+    pub fn maybe_to(mut self, value: Option<S>) -> Self {
+        self._fields.5 = value;
         self
     }
 }
@@ -176,7 +251,11 @@ where
     pub fn build(self) -> GetUpcomingReleasesFeed<S> {
         GetUpcomingReleasesFeed {
             cursor: self._fields.0,
-            limit: self._fields.1,
+            from: self._fields.1,
+            limit: self._fields.2,
+            now: self._fields.3,
+            shuffle: self._fields.4,
+            to: self._fields.5,
         }
     }
 }

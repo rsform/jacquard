@@ -1,0 +1,363 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.expedition",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "expeditionConditions": {
+      "type": "object",
+      "description": "Environmental conditions during expedition",
+      "properties": {
+        "biome": {
+          "type": "string",
+          "description": "Forest biome type"
+        },
+        "lightLevel": {
+          "type": "string",
+          "description": "Time-of-day light condition at expedition start",
+          "enum": [
+            "dawn",
+            "morning",
+            "midday",
+            "afternoon",
+            "dusk",
+            "night",
+            "deepnight"
+          ]
+        },
+        "moonPhase": {
+          "type": "string",
+          "description": "Moon phase condition (nighttime only)",
+          "enum": [
+            "full_moon",
+            "new_moon"
+          ]
+        },
+        "userState": {
+          "type": "string",
+          "description": "User fatigue state at expedition start",
+          "enum": [
+            "well_rested",
+            "tired",
+            "exhausted",
+            "first_expedition"
+          ]
+        },
+        "weather": {
+          "type": "string",
+          "description": "Weather condition during expedition",
+          "enum": [
+            "clear",
+            "overcast",
+            "rainy",
+            "stormy",
+            "foggy"
+          ]
+        }
+      }
+    },
+    "expeditionFindings": {
+      "type": "object",
+      "description": "What was found/gathered during the expedition",
+      "properties": {
+        "itemsCollected": {
+          "type": "integer",
+          "description": "Number of items collected",
+          "minimum": 0
+        },
+        "likesSent": {
+          "type": "integer",
+          "description": "Likes sent during the expedition",
+          "minimum": 0
+        },
+        "mothsSeen": {
+          "type": "integer",
+          "description": "Total moth encounters (caught + escaped)",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "description": "Posts created during the expedition",
+          "minimum": 0
+        },
+        "postsRead": {
+          "type": "integer",
+          "description": "Posts read during the expedition",
+          "minimum": 0
+        },
+        "specimensFound": {
+          "type": "integer",
+          "description": "Number of specimens successfully caught",
+          "minimum": 0
+        },
+        "xpGained": {
+          "type": "integer",
+          "description": "XP gained from the expedition",
+          "minimum": 0
+        }
+      }
+    },
+    "expeditionHeartbeat": {
+      "type": "object",
+      "description": "Periodic snapshot of expedition progress for cross-device sync",
+      "properties": {
+        "light": {
+          "type": "ref",
+          "ref": "#heartbeatLight"
+        },
+        "progress": {
+          "type": "ref",
+          "ref": "#heartbeatProgress"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "When this heartbeat was written",
+          "format": "datetime"
+        }
+      }
+    },
+    "expeditionLight": {
+      "type": "object",
+      "description": "Light resource tracking for the expedition",
+      "properties": {
+        "atEnd": {
+          "type": "integer",
+          "description": "Light level when expedition ended (in minutes)",
+          "minimum": 0
+        },
+        "atStart": {
+          "type": "integer",
+          "description": "Light level when expedition started (in minutes)",
+          "minimum": 0
+        },
+        "consumed": {
+          "type": "integer",
+          "description": "Total light consumed during expedition",
+          "minimum": 0
+        },
+        "drainRate": {
+          "type": "integer",
+          "description": "Effective drain rate as a percentage (80 = 0.8x drain). Multiply by 0.01 to get the float multiplier."
+        },
+        "regenerated": {
+          "type": "integer",
+          "description": "Light regenerated during camps",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "description": "Light status at start of expedition",
+          "enum": [
+            "bright",
+            "steady",
+            "dim",
+            "flickering",
+            "dying",
+            "fullCharge",
+            "charged",
+            "low",
+            "critical",
+            "dead"
+          ]
+        }
+      }
+    },
+    "heartbeatLight": {
+      "type": "object",
+      "description": "Light state at heartbeat time",
+      "properties": {
+        "current": {
+          "type": "integer",
+          "description": "Current light level"
+        },
+        "drainActive": {
+          "type": "boolean",
+          "description": "Whether drain is actively ticking"
+        },
+        "drainRate": {
+          "type": "integer",
+          "description": "Current drain rate as percentage"
+        },
+        "frozen": {
+          "type": "boolean",
+          "description": "Whether light is frozen (at hub/trailhead)"
+        }
+      }
+    },
+    "heartbeatProgress": {
+      "type": "object",
+      "description": "Session progress counters at heartbeat time",
+      "properties": {
+        "itemsCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "likesSent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mothsSeenCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "postsRead": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repostsSent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "specimensCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "xpGained": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Expedition record. Created with status 'active' when entering the forest, updated to 'completed'/'abandoned' on extraction/abandon. rkey is a TID. Tracks the full lifecycle of a forest expedition including camps, gathered loot, light consumption, and conditions.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "status",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "abandonReason": {
+            "type": "string",
+            "description": "Reason for abandonment (only set if status is 'abandoned')",
+            "enum": [
+              "light_depleted",
+              "user_abandoned",
+              "app_crash",
+              "force_close",
+              "auto_abandoned_stale"
+            ]
+          },
+          "activeDuration": {
+            "type": "integer",
+            "description": "Active exploring time in milliseconds (excludes camp rest time)",
+            "minimum": 0
+          },
+          "campsCount": {
+            "type": "integer",
+            "description": "Number of camps made during the expedition",
+            "minimum": 0
+          },
+          "completedAt": {
+            "type": "string",
+            "description": "When the expedition ended (extracted or abandoned)",
+            "format": "datetime"
+          },
+          "conditions": {
+            "type": "ref",
+            "ref": "#expeditionConditions"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was created",
+            "format": "datetime"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Total expedition duration in milliseconds",
+            "minimum": 0
+          },
+          "expeditionNumber": {
+            "type": "integer",
+            "description": "Sequential expedition number for this user (Expedition 1, 2, 3...)",
+            "minimum": 1
+          },
+          "findings": {
+            "type": "ref",
+            "ref": "#expeditionFindings"
+          },
+          "heartbeat": {
+            "type": "ref",
+            "ref": "#expeditionHeartbeat"
+          },
+          "light": {
+            "type": "ref",
+            "ref": "#expeditionLight"
+          },
+          "restDuration": {
+            "type": "integer",
+            "description": "Total camp/rest time in milliseconds",
+            "minimum": 0
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "When the expedition started (entered forest)",
+            "format": "datetime"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current expedition status",
+            "enum": [
+              "active",
+              "completed",
+              "abandoned"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the record was last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

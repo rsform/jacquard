@@ -11,7 +11,7 @@ use alloc::collections::BTreeMap;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::Did;
+use jacquard_common::types::string::{Did, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
@@ -36,7 +36,7 @@ pub struct DescribeRepoOutput<S: BosStr = DefaultStr> {
     pub owner_did: Did<S>,
     pub repo_did: Did<S>,
     ///Current rkey of the sh.tangled.repo record tracked by this knot
-    pub rkey: S,
+    pub rkey: RecordKey<Rkey<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }

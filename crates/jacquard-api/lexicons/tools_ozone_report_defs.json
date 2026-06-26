@@ -471,6 +471,11 @@
           "type": "string",
           "description": "Optional public note, potentially visible to the reporter."
         },
+        "report": {
+          "type": "ref",
+          "description": "Full view of the report this activity belongs to.",
+          "ref": "#reportView"
+        },
         "reportId": {
           "type": "integer",
           "description": "ID of the report this activity belongs to"

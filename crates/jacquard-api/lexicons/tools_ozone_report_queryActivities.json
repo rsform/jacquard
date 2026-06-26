@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.report.queryActivities",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Query report activities across all reports, ordered by createdAt. Used by downstream pollers; for per-report activity history use listActivities.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "activityTypes": {
+            "type": "array",
+            "description": "Filter to specific activity types (e.g. closeActivity, escalationActivity). If omitted, all types are returned.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAfter": {
+            "type": "string",
+            "description": "Retrieve activities created at or after a given timestamp",
+            "format": "datetime"
+          },
+          "createdBefore": {
+            "type": "string",
+            "description": "Retrieve activities created at or before a given timestamp",
+            "format": "datetime"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Cursor of the form `<createdAtMs>::<activityId>`."
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "sortDirection": {
+            "type": "string",
+            "default": "desc",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "activities"
+          ],
+          "properties": {
+            "activities": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "tools.ozone.report.defs#reportActivityView"
+              }
+            },
+            "cursor": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

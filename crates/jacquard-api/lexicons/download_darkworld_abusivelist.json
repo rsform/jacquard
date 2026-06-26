@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "download.darkworld.abusivelist",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A declaration of a tracked abusive blocklist.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "ref",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

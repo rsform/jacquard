@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.12.1] - 2026-06-26
+
+## Additions (possibly breaking)
+- Record fetch errors now have typed accessors for underlying errors 
+- Added a previously missing 'AlreadyExists' error type to record fetch error enum.
+
+## Bug fixes
+- Fixed a bug in binary payload encode/decode code generation which resulted in errors in blob fetching
+
 ## [0.12.0] - 2026-06-013
 
 ### Breaking changes (in addition to those from the beta!)

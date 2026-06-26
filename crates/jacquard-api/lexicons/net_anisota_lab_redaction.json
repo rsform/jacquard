@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.redaction",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A redaction (erasure poetry) piece made in the Anisota Lab's Post Redaction Art studio, where the words of an existing post are blacked out one at a time and the words left standing become a found poem. The record keeps the surviving text, the indices of the words that were redacted (so the piece can be reopened over the same post), and an at-uri pointing back at the post the words were drawn from.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "source",
+          "text",
+          "createdAt"
+        ],
+        "properties": {
+          "author": {
+            "type": "string",
+            "description": "The handle or DID of the source post's author, kept for display and so the backlink reads even if the source can't be re-fetched",
+            "maxLength": 512
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the piece was saved",
+            "format": "datetime"
+          },
+          "name": {
+            "type": "string",
+            "description": "Optional title for the piece",
+            "maxLength": 800,
+            "maxGraphemes": 100
+          },
+          "original": {
+            "type": "string",
+            "description": "A snapshot of the source post's full text, so the piece can still be read if the source post is later deleted or edited",
+            "maxLength": 12000,
+            "maxGraphemes": 2000
+          },
+          "redacted": {
+            "type": "array",
+            "description": "Zero-based indices of the word tokens that were blacked out, so the arrangement can be reopened over the same post text",
+            "items": {
+              "type": "integer"
+            },
+            "maxLength": 4096
+          },
+          "source": {
+            "type": "string",
+            "description": "at-uri of the post whose words were redacted — the piece backlinks to it",
+            "format": "at-uri"
+          },
+          "text": {
+            "type": "string",
+            "description": "The found poem — the words left un-redacted, in reading order",
+            "maxLength": 6000,
+            "maxGraphemes": 1000
+          },
+          "wordCount": {
+            "type": "integer",
+            "description": "Total number of word tokens in the source post text, so the redacted indices stay meaningful"
+          }
+        }
+      }
+    }
+  }
+}

@@ -5,7 +5,7 @@
     "main": {
       "type": "record",
       "description": "Beta version: Record representing an item in a player's game inventory",
-      "key": "tid",
+      "key": "any",
       "record": {
         "type": "object",
         "required": [

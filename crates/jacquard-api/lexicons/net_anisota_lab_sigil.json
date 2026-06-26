@@ -1,0 +1,59 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.sigil",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A sigil crafted in the Anisota Lab's Sigil studio and saved to the owner's library. Each record stores the finished figure as a standalone SVG (for display and re-export) and its normalised 'core path' as integer coordinates (x and y interleaved, scaled 0..1000) — the single line a sigil is, and the shape a future gesture-passcode could be matched against. 'method' records which bench made it (intent, square, wheel or draw).",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "method",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the sigil was saved",
+            "format": "datetime"
+          },
+          "meta": {
+            "type": "unknown",
+            "description": "Optional method-specific details (e.g. the word, planet, seed or settings used)"
+          },
+          "method": {
+            "type": "string",
+            "description": "Which crafting method produced it",
+            "enum": [
+              "intent",
+              "square",
+              "wheel",
+              "draw"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the sigil",
+            "maxLength": 800,
+            "maxGraphemes": 100
+          },
+          "points": {
+            "type": "array",
+            "description": "The normalised core path: x and y interleaved, each scaled to 0..1000",
+            "items": {
+              "type": "integer"
+            },
+            "maxLength": 4096
+          },
+          "svg": {
+            "type": "string",
+            "description": "A standalone SVG document of the finished figure",
+            "maxLength": 60000
+          }
+        }
+      }
+    }
+  }
+}

@@ -11,11 +11,28 @@
           "cursor": {
             "type": "string"
           },
+          "from": {
+            "type": "string",
+            "description": "Lower bound date as YYYYMMDD (exclusive). Overrides 'now' for the chronological mode filter."
+          },
           "limit": {
             "type": "integer",
             "default": 50,
             "minimum": 1,
             "maximum": 100
+          },
+          "now": {
+            "type": "string",
+            "description": "Current date as YYYYMMDD. Used to determine what counts as upcoming."
+          },
+          "shuffle": {
+            "type": "boolean",
+            "description": "When true, returns a randomized subset from the near-term window instead of stable chronological order.",
+            "default": false
+          },
+          "to": {
+            "type": "string",
+            "description": "Upper bound date as YYYYMMDD (inclusive). Limits results to releases on or before this date."
           }
         }
       },
@@ -36,6 +53,9 @@
                 "type": "ref",
                 "ref": "games.gamesgamesgamesgames.defs#gameFeedViewItem"
               }
+            },
+            "totalCount": {
+              "type": "integer"
             }
           }
         }

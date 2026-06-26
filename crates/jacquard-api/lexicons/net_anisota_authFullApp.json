@@ -17,6 +17,7 @@
             "net.anisota.feed.list",
             "net.anisota.feed.listItem",
             "net.anisota.feed.draft",
+            "net.anisota.feed.perception",
             "net.anisota.chronicle.log",
             "net.anisota.chronicle.log.daily",
             "net.anisota.chronicle.log.weekly",
@@ -38,7 +39,16 @@
             "net.anisota.graph.listMute",
             "net.anisota.graph.list",
             "net.anisota.observatory.element",
-            "net.anisota.observatory.layout"
+            "net.anisota.observatory.layout",
+            "net.anisota.observatory.preset",
+            "net.anisota.lab.sigil",
+            "net.anisota.lab.synth",
+            "net.anisota.lab.inkblot",
+            "net.anisota.lab.inkblot.perception",
+            "net.anisota.lab.carving",
+            "net.anisota.lab.petri",
+            "net.anisota.lab.poetry",
+            "net.anisota.lab.redaction"
           ],
           "action": [
             "create",

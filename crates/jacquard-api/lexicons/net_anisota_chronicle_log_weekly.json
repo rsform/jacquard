@@ -1,0 +1,212 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.log.weekly",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Weekly aggregation of daily records. rkey is YYYY-WNN (ISO week). Updated once per day, finalized when week ends.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "week",
+          "aggregates",
+          "status",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "aggregates": {
+            "type": "ref",
+            "ref": "#weeklyAggregates"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the weekly record was first created",
+            "format": "datetime"
+          },
+          "expeditionRefs": {
+            "type": "array",
+            "description": "AT URIs of expedition records that occurred during this week",
+            "items": {
+              "type": "string"
+            }
+          },
+          "finalizedAt": {
+            "type": "string",
+            "description": "When the weekly record was finalized (end of week)",
+            "format": "datetime"
+          },
+          "lowerLogRefs": {
+            "type": "array",
+            "description": "AT URIs of daily log records included in this week",
+            "items": {
+              "type": "string"
+            }
+          },
+          "patterns": {
+            "type": "ref",
+            "ref": "#weeklyPatterns"
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "status": {
+            "type": "string",
+            "description": "Whether this week is still being updated or has been finalized",
+            "enum": [
+              "active",
+              "finalized"
+            ]
+          },
+          "trends": {
+            "type": "ref",
+            "ref": "#trendData"
+          },
+          "upperLogRefs": {
+            "type": "array",
+            "description": "AT URIs of containing logs (monthly, yearly) this week belongs to",
+            "items": {
+              "type": "string"
+            }
+          },
+          "week": {
+            "type": "string",
+            "description": "ISO week string in YYYY-WNN format (e.g. 2026-W06)"
+          }
+        }
+      }
+    },
+    "trendData": {
+      "type": "object",
+      "description": "Week-over-week trend comparisons",
+      "properties": {
+        "activityChange": {
+          "type": "string",
+          "description": "Percentage change in activity compared to previous week"
+        },
+        "engagementChange": {
+          "type": "string",
+          "description": "Percentage change in engagement compared to previous week"
+        },
+        "xpChange": {
+          "type": "string",
+          "description": "Percentage change in XP compared to previous week (e.g. '+12%')"
+        }
+      }
+    },
+    "weeklyAggregates": {
+      "type": "object",
+      "description": "Rolled-up counts from daily records",
+      "properties": {
+        "daysActive": {
+          "type": "integer",
+          "description": "Number of days with activity this week",
+          "minimum": 0
+        },
+        "likesReceived": {
+          "type": "integer",
+          "description": "Total likes received this week",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "description": "Total posts created this week",
+          "minimum": 0
+        },
+        "postsRead": {
+          "type": "integer",
+          "description": "Total posts read this week",
+          "minimum": 0
+        },
+        "quotesReceived": {
+          "type": "integer",
+          "description": "Total quotes received this week",
+          "minimum": 0
+        },
+        "repliesReceived": {
+          "type": "integer",
+          "description": "Total replies received this week",
+          "minimum": 0
+        },
+        "repostsReceived": {
+          "type": "integer",
+          "description": "Total reposts received this week",
+          "minimum": 0
+        },
+        "specimensPhotographed": {
+          "type": "integer",
+          "description": "New specimens photographed this week",
+          "minimum": 0
+        },
+        "totalXPGained": {
+          "type": "integer",
+          "description": "Total XP gained this week",
+          "minimum": 0
+        }
+      }
+    },
+    "weeklyPatterns": {
+      "type": "object",
+      "description": "Activity pattern aggregation for the week based on half-hour blocks",
+      "properties": {
+        "avgBlocksPerDay": {
+          "type": "integer",
+          "description": "Average active blocks per day (totalActiveBlocks / daysActive, rounded)",
+          "minimum": 0
+        },
+        "peakBlocks": {
+          "type": "integer",
+          "description": "Highest activeBlockCount for any single day in the week",
+          "minimum": 0,
+          "maximum": 48
+        },
+        "totalActiveBlocks": {
+          "type": "integer",
+          "description": "Sum of activeBlockCount across all days in the week",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

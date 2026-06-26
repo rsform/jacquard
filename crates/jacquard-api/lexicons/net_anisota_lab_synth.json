@@ -1,0 +1,143 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.synth",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A multitrack composition made in the Anisota Lab's Synth studio and saved to the owner's library. The piece is stored as compact musical event data (not audio), so it can be reloaded into the synth, replayed and edited. The shared loop has a tempo and step length; each track is either a 'tone' voice (a waveform playing degrees of the composition's scale) or a 'drum' lane (the studio's synthesized kit). A track's notes are stored in 'cells' as interleaved integers — for a tone track [step, degree, step, degree, ...] where degree indexes the scale ladder; for a drum track [step, piece, ...] where piece is 0..4 (kick, snare, hat, clap, tom). 'fx' captures the rack the piece was shaped with.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "tempo",
+          "steps",
+          "tracks",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the composition was saved",
+            "format": "datetime"
+          },
+          "fx": {
+            "type": "object",
+            "description": "The shared rack the composition was shaped with, each 0..100",
+            "properties": {
+              "cutoff": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "drive": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "echo": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "master": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              },
+              "reso": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 100
+              }
+            }
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the composition",
+            "maxLength": 800,
+            "maxGraphemes": 100
+          },
+          "root": {
+            "type": "integer",
+            "description": "Root note of the scale as a MIDI note number",
+            "minimum": 0,
+            "maximum": 127
+          },
+          "scale": {
+            "type": "string",
+            "description": "Scale the tone tracks' degrees are drawn from",
+            "enum": [
+              "pentatonic",
+              "minor",
+              "major",
+              "dorian"
+            ]
+          },
+          "steps": {
+            "type": "integer",
+            "description": "Number of sixteenth-note steps in the loop",
+            "minimum": 4,
+            "maximum": 64
+          },
+          "tempo": {
+            "type": "integer",
+            "description": "Loop tempo in beats per minute",
+            "minimum": 40,
+            "maximum": 240
+          },
+          "tracks": {
+            "type": "array",
+            "description": "The overlapping tracks, played together on the loop",
+            "items": {
+              "type": "object",
+              "required": [
+                "kind",
+                "cells"
+              ],
+              "properties": {
+                "cells": {
+                  "type": "array",
+                  "description": "Interleaved note data: [step, degree-or-piece, ...]",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "maxLength": 8192
+                },
+                "gain": {
+                  "type": "integer",
+                  "description": "Track level, 0..100",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "kind": {
+                  "type": "string",
+                  "description": "A pitched voice or a percussion lane",
+                  "enum": [
+                    "tone",
+                    "drum"
+                  ]
+                },
+                "muted": {
+                  "type": "boolean",
+                  "description": "Whether the track is silenced in the mix"
+                },
+                "wave": {
+                  "type": "string",
+                  "description": "Oscillator shape for a tone track",
+                  "enum": [
+                    "triangle",
+                    "sine",
+                    "sawtooth",
+                    "square"
+                  ]
+                }
+              }
+            },
+            "maxLength": 32
+          }
+        }
+      }
+    }
+  }
+}

@@ -6,5 +6,6 @@
 //! Generated bindings for the `sh.tangled.git` Lexicon namespace/module.
 pub mod list_ref_updates;
 pub mod list_ref_updates_by;
+pub mod list_refs;
 pub mod ref_update;
 pub mod temp;

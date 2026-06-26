@@ -14,6 +14,7 @@ pub mod get_latest_report;
 pub mod get_live_stats;
 pub mod get_report;
 pub mod list_activities;
+pub mod query_activities;
 pub mod query_reports;
 pub mod reassign_queue;
 pub mod refresh_stats;
@@ -1575,6 +1576,9 @@ pub struct ReportActivityView<S: BosStr = DefaultStr> {
     ///Optional public note, potentially visible to the reporter.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_note: Option<S>,
+    ///Full view of the report this activity belongs to.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub report: Option<report::ReportView<S>>,
     ///ID of the report this activity belongs to
     pub report_id: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -2658,6 +2662,13 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
+                            SmolStr::new_static("report"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#reportView"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
                             SmolStr::new_static("reportId"),
                             LexObjectProperty::Integer(LexInteger {
                                 ..Default::default()
@@ -3319,6 +3330,7 @@ pub struct ReportActivityViewBuilder<St: report_activity_view_state::State, S: B
         Option<Data<S>>,
         Option<Member<S>>,
         Option<S>,
+        Option<report::ReportView<S>>,
         Option<i64>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -3343,7 +3355,9 @@ impl ReportActivityViewBuilder<report_activity_view_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ReportActivityViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -3354,7 +3368,9 @@ impl<S: BosStr> ReportActivityViewBuilder<report_activity_view_state::Empty, S> 
     pub fn builder() -> Self {
         ReportActivityViewBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None, None),
+            _fields: (
+                None, None, None, None, None, None, None, None, None, None, None,
+            ),
             _type: PhantomData,
         }
     }
@@ -3507,6 +3523,19 @@ impl<St: report_activity_view_state::State, S: BosStr> ReportActivityViewBuilder
     }
 }
 
+impl<St: report_activity_view_state::State, S: BosStr> ReportActivityViewBuilder<St, S> {
+    /// Set the `report` field (optional)
+    pub fn report(mut self, value: impl Into<Option<report::ReportView<S>>>) -> Self {
+        self._fields.9 = value.into();
+        self
+    }
+    /// Set the `report` field to an Option value (optional)
+    pub fn maybe_report(mut self, value: Option<report::ReportView<S>>) -> Self {
+        self._fields.9 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> ReportActivityViewBuilder<St, S>
 where
     St: report_activity_view_state::State,
@@ -3517,7 +3546,7 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> ReportActivityViewBuilder<report_activity_view_state::SetReportId<St>, S> {
-        self._fields.9 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         ReportActivityViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -3548,7 +3577,8 @@ where
             meta: self._fields.6,
             moderator: self._fields.7,
             public_note: self._fields.8,
-            report_id: self._fields.9.unwrap(),
+            report: self._fields.9,
+            report_id: self._fields.10.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -3564,7 +3594,8 @@ where
             meta: self._fields.6,
             moderator: self._fields.7,
             public_note: self._fields.8,
-            report_id: self._fields.9.unwrap(),
+            report: self._fields.9,
+            report_id: self._fields.10.unwrap(),
             extra_data: Some(extra_data),
         }
     }

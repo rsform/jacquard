@@ -1,0 +1,306 @@
+{
+  "lexicon": 1,
+  "id": "community.lexicon.app.defs",
+  "defs": {
+    "accountIndicator": {
+      "type": "object",
+      "description": "A record whose presence in an account can indicate that the account probably uses this app.",
+      "required": [
+        "collection"
+      ],
+      "properties": {
+        "collection": {
+          "type": "string",
+          "description": "Record collection to look for in an account repository.",
+          "format": "nsid"
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Optional record key to look for within the collection.",
+          "format": "record-key"
+        }
+      }
+    },
+    "aspectRatio": {
+      "type": "object",
+      "description": "width:height represents an aspect ratio. It may be approximate.",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "discontinued": {
+      "type": "token",
+      "description": "The app is no longer available or supported."
+    },
+    "image": {
+      "type": "object",
+      "description": "An image associated with an app, including accessibility and display metadata. Exactly one of `image` (ATProto blob) or `uri` (remote URL) MUST be present. Consumers SHOULD ignore image items that have neither or both.",
+      "required": [
+        "alt"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text description of the image, for accessibility.",
+          "maxLength": 1000,
+          "maxGraphemes": 300
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "#aspectRatio"
+        },
+        "image": {
+          "type": "blob",
+          "description": "The raw image file.",
+          "accept": [
+            "image/*"
+          ],
+          "maxSize": 2000000
+        },
+        "purpose": {
+          "type": "string",
+          "description": "How directories and stores should use the image. Omit this field when no known purpose fits.",
+          "knownValues": [
+            "community.lexicon.app.defs#purposeIcon",
+            "community.lexicon.app.defs#purposeLogo",
+            "community.lexicon.app.defs#purposeHero",
+            "community.lexicon.app.defs#purposeScreenshot",
+            "community.lexicon.app.defs#purposeBanner",
+            "community.lexicon.app.defs#purposeSocialCard",
+            "community.lexicon.app.defs#purposeAppStore",
+            "community.lexicon.app.defs#purposeAd"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "description": "Remote image URI.",
+          "format": "uri"
+        }
+      }
+    },
+    "lexiconInterop": {
+      "type": "object",
+      "description": "Self-declared AT Protocol lexicon interoperability signals.",
+      "properties": {
+        "consumes": {
+          "type": "array",
+          "description": "Lexicon collections this app reads, displays, imports, or otherwise consumes.",
+          "items": {
+            "type": "string",
+            "format": "nsid"
+          }
+        },
+        "produces": {
+          "type": "array",
+          "description": "Lexicon collections this app creates or publishes records for.",
+          "items": {
+            "type": "string",
+            "format": "nsid"
+          }
+        }
+      }
+    },
+    "link": {
+      "type": "object",
+      "description": "A labeled URI associated with an app.",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "description": "Human-readable label for the URI.",
+          "maxLength": 100,
+          "maxGraphemes": 50
+        },
+        "role": {
+          "type": "ref",
+          "description": "Known role of this link, if any.",
+          "ref": "#linkRole"
+        },
+        "uri": {
+          "type": "string",
+          "description": "Destination URI.",
+          "format": "uri"
+        }
+      }
+    },
+    "linkRole": {
+      "type": "string",
+      "description": "Known role of a link associated with an app.",
+      "knownValues": [
+        "community.lexicon.app.defs#linkRoleWebsite",
+        "community.lexicon.app.defs#linkRoleWebManifest",
+        "community.lexicon.app.defs#linkRolePrivacyPolicy",
+        "community.lexicon.app.defs#linkRoleTermsOfService",
+        "community.lexicon.app.defs#linkRoleSupport",
+        "community.lexicon.app.defs#linkRoleSourceCode",
+        "community.lexicon.app.defs#linkRoleDocs",
+        "community.lexicon.app.defs#linkRoleChangelog",
+        "community.lexicon.app.defs#linkRoleStatus",
+        "community.lexicon.app.defs#linkRoleAppStore",
+        "community.lexicon.app.defs#linkRolePlayStore",
+        "community.lexicon.app.defs#linkRoleFDroid"
+      ]
+    },
+    "linkRoleAppStore": {
+      "type": "token",
+      "description": "Apple App Store listing."
+    },
+    "linkRoleChangelog": {
+      "type": "token",
+      "description": "Changelog or release notes."
+    },
+    "linkRoleDocs": {
+      "type": "token",
+      "description": "Documentation."
+    },
+    "linkRoleFDroid": {
+      "type": "token",
+      "description": "F-Droid listing."
+    },
+    "linkRolePlayStore": {
+      "type": "token",
+      "description": "Google Play Store listing."
+    },
+    "linkRolePrivacyPolicy": {
+      "type": "token",
+      "description": "Privacy policy."
+    },
+    "linkRoleSourceCode": {
+      "type": "token",
+      "description": "Source code repository or source distribution."
+    },
+    "linkRoleStatus": {
+      "type": "token",
+      "description": "Service status page."
+    },
+    "linkRoleSupport": {
+      "type": "token",
+      "description": "Support, help, or contact page."
+    },
+    "linkRoleTermsOfService": {
+      "type": "token",
+      "description": "Terms of service."
+    },
+    "linkRoleWebManifest": {
+      "type": "token",
+      "description": "Web App Manifest."
+    },
+    "linkRoleWebsite": {
+      "type": "token",
+      "description": "Primary website or landing page."
+    },
+    "platform": {
+      "type": "string",
+      "description": "Platform where an app is available.",
+      "knownValues": [
+        "community.lexicon.app.defs#platformWeb",
+        "community.lexicon.app.defs#platformIOS",
+        "community.lexicon.app.defs#platformAndroid",
+        "community.lexicon.app.defs#platformMacOS",
+        "community.lexicon.app.defs#platformWindows",
+        "community.lexicon.app.defs#platformLinux",
+        "community.lexicon.app.defs#platformCLI"
+      ]
+    },
+    "platformAndroid": {
+      "type": "token",
+      "description": "Android app."
+    },
+    "platformCLI": {
+      "type": "token",
+      "description": "Command line interface."
+    },
+    "platformIOS": {
+      "type": "token",
+      "description": "iOS app."
+    },
+    "platformLinux": {
+      "type": "token",
+      "description": "Linux app."
+    },
+    "platformMacOS": {
+      "type": "token",
+      "description": "macOS app."
+    },
+    "platformWeb": {
+      "type": "token",
+      "description": "Web app or website."
+    },
+    "platformWindows": {
+      "type": "token",
+      "description": "Windows app."
+    },
+    "preview": {
+      "type": "token",
+      "description": "The app is available as an alpha, beta, early access, or preview release."
+    },
+    "purposeAd": {
+      "type": "token",
+      "description": "A promotional or advertising image."
+    },
+    "purposeAppStore": {
+      "type": "token",
+      "description": "A promotional image formatted for a native app store listing."
+    },
+    "purposeBanner": {
+      "type": "token",
+      "description": "A wide banner image, such as a header image for a profile or listing page."
+    },
+    "purposeHero": {
+      "type": "token",
+      "description": "A large promotional or feature image, typically used at the top of a directory listing."
+    },
+    "purposeIcon": {
+      "type": "token",
+      "description": "A small square icon representing the app, typically used in launchers, lists, and tab bars."
+    },
+    "purposeLogo": {
+      "type": "token",
+      "description": "A logotype or wordmark for the app."
+    },
+    "purposeScreenshot": {
+      "type": "token",
+      "description": "A screenshot of the app's UI, used in directory and store listings."
+    },
+    "purposeSocialCard": {
+      "type": "token",
+      "description": "An image sized and formatted for social media sharing previews (Open Graph, Twitter Card, etc.)."
+    },
+    "released": {
+      "type": "token",
+      "description": "The app is generally available."
+    },
+    "status": {
+      "type": "string",
+      "description": "Current release or maintenance status of an app.",
+      "knownValues": [
+        "community.lexicon.app.defs#unreleased",
+        "community.lexicon.app.defs#preview",
+        "community.lexicon.app.defs#released",
+        "community.lexicon.app.defs#unmaintained",
+        "community.lexicon.app.defs#discontinued"
+      ]
+    },
+    "unmaintained": {
+      "type": "token",
+      "description": "The app may still be available, but is no longer actively maintained."
+    },
+    "unreleased": {
+      "type": "token",
+      "description": "The app has been announced but is not yet available."
+    }
+  }
+}

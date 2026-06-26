@@ -6,17 +6,17 @@
       "type": "permission-set",
       "title": "Manage bookmarks",
       "title:lang": {
-        "es": "Gestionar marcadores",
+        "ja": "ブックマークの管理",
         "de": "Lesezeichen verwalten",
-        "pt": "Gerenciar favoritos",
-        "ja": "ブックマークの管理"
+        "es": "Gestionar marcadores",
+        "pt": "Gerenciar favoritos"
       },
       "detail": "View, create, edit, and delete the account's saved bookmarks.",
       "detail:lang": {
-        "pt": "Ver, criar, editar e excluir os favoritos salvos da conta.",
         "de": "Die gespeicherten Lesezeichen des Kontos anzeigen, erstellen, bearbeiten und löschen.",
-        "es": "Ver, crear, editar y eliminar los marcadores guardados de la cuenta.",
-        "ja": "アカウントに保存されたブックマークの表示、作成、編集、削除を行います。"
+        "pt": "Ver, criar, editar e excluir os favoritos salvos da conta.",
+        "ja": "アカウントに保存されたブックマークの表示、作成、編集、削除を行います。",
+        "es": "Ver, crear, editar y eliminar los marcadores guardados de la cuenta."
       },
       "permissions": [
         {

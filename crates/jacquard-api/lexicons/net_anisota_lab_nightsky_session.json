@@ -1,0 +1,192 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.nightsky.session",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A record of one sky-gazing session in the Anisota Lab's Nightsky experiment, saved to the gazer's PDS. Captures how long they watched, how they were watching, and a tally of everything their viewfinder witnessed. Like Chronicle records, each session carries an ES256 signature minted by the Anisota backend, so the data can be verified to have come from the app rather than being hand-written.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "startedAt",
+          "endedAt",
+          "durationMs",
+          "totalWitnessed",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When the session record was created",
+            "format": "datetime"
+          },
+          "durationMs": {
+            "type": "integer",
+            "description": "How long the session lasted, in milliseconds",
+            "minimum": 0
+          },
+          "endedAt": {
+            "type": "string",
+            "description": "When the gazing session ended",
+            "format": "datetime"
+          },
+          "lookAround": {
+            "type": "boolean",
+            "description": "Whether the 360° look-around dome was used during the session"
+          },
+          "signature": {
+            "type": "ref",
+            "description": "ES256 signature proving the record came from the Anisota app",
+            "ref": "#chronicleSignature"
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "When the gazing session began",
+            "format": "datetime"
+          },
+          "timeModes": {
+            "type": "array",
+            "description": "Which time-of-day modes were viewed during the session",
+            "items": {
+              "type": "string",
+              "enum": [
+                "night",
+                "day",
+                "24h"
+              ]
+            },
+            "maxLength": 8
+          },
+          "totalWitnessed": {
+            "type": "integer",
+            "description": "Total number of things witnessed in the viewfinder this session (sum of the witnessed tally)",
+            "minimum": 0
+          },
+          "witnessed": {
+            "type": "ref",
+            "description": "Per-kind counts of what was witnessed",
+            "ref": "#witnessedTally"
+          }
+        }
+      }
+    },
+    "witnessedTally": {
+      "type": "object",
+      "description": "Per-kind counts of celestial and daytime sights witnessed in the viewfinder",
+      "properties": {
+        "anomalies": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "auroras": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bats": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "birds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "bugs": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "comets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "critters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "glints": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "jetTrails": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "meteorShowers": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "meteorStorms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "moonrises": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "owls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "planes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rains": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "satellites": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "shootingStars": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ufos": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

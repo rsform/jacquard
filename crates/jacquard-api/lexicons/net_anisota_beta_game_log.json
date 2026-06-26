@@ -2,6 +2,47 @@
   "lexicon": 1,
   "id": "net.anisota.beta.game.log",
   "defs": {
+    "achievementCheckData": {
+      "type": "object",
+      "description": "Details about achievement check/claim operation",
+      "properties": {
+        "checkDuration": {
+          "type": "integer",
+          "description": "Time taken to check/claim in milliseconds",
+          "minimum": 0
+        },
+        "checkType": {
+          "type": "string",
+          "description": "Type of achievement check performed",
+          "enum": [
+            "manual_check",
+            "manual_claim_all"
+          ]
+        },
+        "claimableFound": {
+          "type": "integer",
+          "description": "Number of claimable achievements found",
+          "minimum": 0
+        },
+        "claimedAchievements": {
+          "type": "array",
+          "description": "IDs of achievements that were claimed",
+          "items": {
+            "type": "string"
+          }
+        },
+        "claimedCount": {
+          "type": "integer",
+          "description": "Number of achievements claimed",
+          "minimum": 0
+        },
+        "totalChecked": {
+          "type": "integer",
+          "description": "Total number of achievements checked",
+          "minimum": 0
+        }
+      }
+    },
     "collectionData": {
       "type": "object",
       "description": "Details about item/specimen collection",
@@ -187,6 +228,10 @@
           "sessionId"
         ],
         "properties": {
+          "achievementCheckData": {
+            "type": "ref",
+            "ref": "#achievementCheckData"
+          },
           "collectionData": {
             "type": "ref",
             "ref": "#collectionData"
@@ -212,7 +257,8 @@
               "item_used",
               "stamina_depleted",
               "level_up",
-              "session_started"
+              "session_started",
+              "achievement_check"
             ]
           },
           "feedContext": {

@@ -37,7 +37,7 @@ use serde::{Deserialize, Serialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Declaration<S: BosStr = DefaultStr> {
-    ///[NOTE: This is under active development and should be considered unstable while this note is here]. Declaration about group chat invitation preferences for the record owner.
+    ///Declaration about group chat invitation preferences for the record owner.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_group_invites: Option<DeclarationAllowGroupInvites<S>>,
     pub allow_incoming: DeclarationAllowIncoming<S>,
@@ -45,7 +45,7 @@ pub struct Declaration<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Declaration about group chat invitation preferences for the record owner.
+/// Declaration about group chat invitation preferences for the record owner.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DeclarationAllowGroupInvites<S: BosStr = DefaultStr> {
@@ -436,7 +436,7 @@ fn lexicon_doc_chat_bsky_actor_declaration() -> LexiconDoc<'static> {
                                 LexObjectProperty::String(LexString {
                                     description: Some(
                                         CowStr::new_static(
-                                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Declaration about group chat invitation preferences for the record owner.",
+                                            "Declaration about group chat invitation preferences for the record owner.",
                                         ),
                                     ),
                                     ..Default::default()

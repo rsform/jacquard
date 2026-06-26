@@ -38,7 +38,7 @@ use crate::chat_bsky::moderation;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Deserialize, Serialize};
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. A view of a conversation for moderation purposes. Unlike chat.bsky.convo.defs#convoView, it does not include viewer-specific data (such as muted, unreadCount, status, lastMessage, lastReaction), since the requester is a moderator and not a member of the conversation. The member list is not included; use chat.bsky.moderation.getConvoMembers to list members.
+/// A view of a conversation for moderation purposes. Unlike chat.bsky.convo.defs#convoView, it does not include viewer-specific data (such as muted, unreadCount, status, lastMessage, lastReaction), since the requester is a moderator and not a member of the conversation. The member list is not included; use chat.bsky.moderation.getConvoMembers to list members.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -65,7 +65,7 @@ pub enum ConvoViewKind<S: BosStr = DefaultStr> {
     GroupConvo(Box<moderation::GroupConvo<S>>),
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Data specific to a direct conversation, for moderation purposes.
+/// Data specific to a direct conversation, for moderation purposes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -77,7 +77,7 @@ pub struct DirectConvo<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// [NOTE: This is under active development and should be considered unstable while this note is here]. Data specific to a group conversation, for moderation purposes. Unlike chat.bsky.convo.defs#groupConvo, it does not include viewer-specific data (such as unreadJoinRequestCount), since the requester is a moderator and not a member of the conversation.
+/// Data specific to a group conversation, for moderation purposes. Unlike chat.bsky.convo.defs#groupConvo, it does not include viewer-specific data (such as unreadJoinRequestCount), since the requester is a moderator and not a member of the conversation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -146,10 +146,10 @@ impl<S: BosStr> LexiconSchema for GroupConvo<S> {
         {
             let value = &self.name;
             #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1280usize {
+            if <str>::len(value.as_ref()) > 500usize {
                 return Err(ConstraintError::MaxLength {
                     path: ValidationPath::from_field("name"),
-                    max: 1280usize,
+                    max: 500usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -158,10 +158,10 @@ impl<S: BosStr> LexiconSchema for GroupConvo<S> {
             let value = &self.name;
             {
                 let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
-                if count > 128usize {
+                if count > 50usize {
                     return Err(ConstraintError::MaxGraphemes {
                         path: ValidationPath::from_field("name"),
-                        max: 128usize,
+                        max: 50usize,
                         actual: count,
                     });
                 }
@@ -186,7 +186,7 @@ fn lexicon_doc_chat_bsky_moderation_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. A view of a conversation for moderation purposes. Unlike chat.bsky.convo.defs#convoView, it does not include viewer-specific data (such as muted, unreadCount, status, lastMessage, lastReaction), since the requester is a moderator and not a member of the conversation. The member list is not included; use chat.bsky.moderation.getConvoMembers to list members.",
+                            "A view of a conversation for moderation purposes. Unlike chat.bsky.convo.defs#convoView, it does not include viewer-specific data (such as muted, unreadCount, status, lastMessage, lastReaction), since the requester is a moderator and not a member of the conversation. The member list is not included; use chat.bsky.moderation.getConvoMembers to list members.",
                         ),
                     ),
                     required: Some(
@@ -226,11 +226,9 @@ fn lexicon_doc_chat_bsky_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("directConvo"),
                 LexUserType::Object(LexObject {
-                    description: Some(
-                        CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Data specific to a direct conversation, for moderation purposes.",
-                        ),
-                    ),
+                    description: Some(CowStr::new_static(
+                        "Data specific to a direct conversation, for moderation purposes.",
+                    )),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -244,7 +242,7 @@ fn lexicon_doc_chat_bsky_moderation_defs() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "[NOTE: This is under active development and should be considered unstable while this note is here]. Data specific to a group conversation, for moderation purposes. Unlike chat.bsky.convo.defs#groupConvo, it does not include viewer-specific data (such as unreadJoinRequestCount), since the requester is a moderator and not a member of the conversation.",
+                            "Data specific to a group conversation, for moderation purposes. Unlike chat.bsky.convo.defs#groupConvo, it does not include viewer-specific data (such as unreadJoinRequestCount), since the requester is a moderator and not a member of the conversation.",
                         ),
                     ),
                     required: Some(
@@ -311,8 +309,8 @@ fn lexicon_doc_chat_bsky_moderation_defs() -> LexiconDoc<'static> {
                                         "The display name of the group conversation.",
                                     ),
                                 ),
-                                max_length: Some(1280usize),
-                                max_graphemes: Some(128usize),
+                                max_length: Some(500usize),
+                                max_graphemes: Some(50usize),
                                 ..Default::default()
                             }),
                         );

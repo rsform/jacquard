@@ -19,6 +19,7 @@
     },
     "chatPreference": {
       "type": "object",
+      "description": "Deprecated: use chat.bsky.notification preferences instead. This will only return a default value.",
       "required": [
         "include",
         "push"
@@ -94,6 +95,7 @@
       "properties": {
         "chat": {
           "type": "ref",
+          "description": "Deprecated: use chat.bsky.notification preferences instead. This will only return a default value.",
           "ref": "#chatPreference"
         },
         "follow": {

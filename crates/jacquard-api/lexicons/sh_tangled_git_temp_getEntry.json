@@ -35,7 +35,8 @@
           "required": [
             "name",
             "mode",
-            "oid"
+            "oid",
+            "size"
           ],
           "properties": {
             "lastCommit": {
@@ -59,6 +60,10 @@
             },
             "oid": {
               "type": "string"
+            },
+            "size": {
+              "type": "integer",
+              "description": "Blob size"
             },
             "submodule": {
               "type": "ref",
