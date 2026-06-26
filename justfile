@@ -9,10 +9,7 @@ pre-commit-all:
 test *ARGS:
     cargo nextest run {{ ARGS }}
 
-publish:
-    @echo "Running tests..."
-    test-all
-    check-wasm
+publish: test-all check-wasm
     @echo "Publishing..."
     cargo publish -p jacquard-common
     cargo publish -p jacquard-lexicon
