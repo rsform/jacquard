@@ -44,6 +44,8 @@ pub struct ValidationCheck {
     pub is_required: bool,
     /// Is this validating an array length (vs string length)?
     pub is_array: bool,
+    /// Is this validating each item of an array?
+    pub is_array_item: bool,
     /// The specific constraint to check
     pub check: ConstraintCheck,
 }

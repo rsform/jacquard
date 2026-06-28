@@ -19,10 +19,11 @@ use jacquard_common::{
     bos::{BosStr, DefaultStr},
     deps::fluent_uri::Uri,
     http_client::HttpClient,
-    session::SessionStoreError,
+    session::{SessionKey, SessionStoreError},
     types::{did::Did, string::Datetime},
 };
 use jose_jwk::Key;
+use mini_moka::sync::Cache as MokaCache;
 use serde::{Deserialize, Serialize};
 use smol_str::{SmolStr, ToSmolStr, format_smolstr};
 use tokio::sync::Mutex;
@@ -450,6 +451,13 @@ where
     pub client_data: ClientData<Str>,
     /// Per-`(DID, session_id)` mutex that serializes concurrent refresh attempts.
     pending: DashMap<SmolStr, Arc<Mutex<()>>>,
+    /// In-memory cache of restored sessions, keyed by `SessionKey`.
+    /// Prevents each `restore` from creating a fresh `OAuthSession` with its
+    /// own DPoP nonce state, which causes conflicts when multiple rapid
+    /// requests hit the same PDS session. Lazily initialized.
+    #[allow(dead_code)]
+    pub(crate) session_cache:
+        std::sync::OnceLock<MokaCache<SessionKey, crate::client::OAuthSession<T, S>>>,
 }
 
 impl<T, S, Str> SessionRegistry<T, S, Str>
@@ -467,6 +475,7 @@ where
             client,
             client_data,
             pending: DashMap::new(),
+            session_cache: std::sync::OnceLock::new(),
         }
     }
 
@@ -480,6 +489,7 @@ where
             client,
             client_data,
             pending: DashMap::new(),
+            session_cache: std::sync::OnceLock::new(),
         }
     }
 }
@@ -491,6 +501,15 @@ where
     Str: BosStr + FromStr + Ord + Clone,
     <Str as FromStr>::Err: core::fmt::Debug,
 {
+    pub(crate) fn cache(&self) -> &MokaCache<SessionKey, crate::client::OAuthSession<T, S>> {
+        self.session_cache.get_or_init(|| {
+            MokaCache::builder()
+                .time_to_live(std::time::Duration::from_secs(30))
+                .max_capacity(64)
+                .build()
+        })
+    }
+
     async fn get_refreshed<D: BosStr + Send + Sync>(
         &self,
         did: &Did<D>,

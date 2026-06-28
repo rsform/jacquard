@@ -890,7 +890,21 @@ pub fn validations_to_tokens_resolved(
                 },
             };
 
-            if check.is_required {
+            if check.is_array_item && check.is_required {
+                quote! {
+                    for value in &self.#field_ident {
+                        #inner_check
+                    }
+                }
+            } else if check.is_array_item {
+                quote! {
+                    if let Some(values) = &self.#field_ident {
+                        for value in values {
+                            #inner_check
+                        }
+                    }
+                }
+            } else if check.is_required {
                 quote! {
                     {
                         let value = &self.#field_ident;

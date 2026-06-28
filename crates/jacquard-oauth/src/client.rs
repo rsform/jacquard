@@ -9,6 +9,8 @@ use crate::{
     session::{ClientData, ClientSessionData, DpopClientData, SessionRegistry},
     types::{AuthorizeOptions, CallbackParams},
 };
+use jacquard_common::session::SessionKey;
+
 #[cfg(feature = "scope-check")]
 use crate::{
     error::ScopeError,
@@ -144,14 +146,6 @@ where
 {
     /// Create an OAuth client from an explicit resolver instance, taking ownership of both.
     pub fn new_from_resolver(store: S, client: T, client_data: ClientData<SmolStr>) -> Self {
-        // #[cfg(feature = "tracing")]
-        // tracing::info!(
-        //     redirect_uris = ?client_data.config.redirect_uris,
-        //     scopes = ?client_data.config.scopes,
-        //     has_keyset = client_data.keyset.is_some(),
-        //     "oauth client created:"
-        // );
-
         let client = Arc::new(client);
         let registry = Arc::new(SessionRegistry::new(store, client.clone(), client_data));
         Self {
@@ -387,13 +381,26 @@ where
     }
 
     /// Restore a previously created session from the backing store, refreshing tokens if needed.
+    ///
+    /// Returns a cached session if one is still live for this `(DID, session_id)`,
+    /// avoiding a fresh store read + token refresh + `OAuthSession` construction
+    /// on every call. This is critical for rapid sequential PDS operations
+    /// (e.g. `stageFile` followed by `uploadBlob`) which must share the same
+    /// DPoP nonce state.
     pub async fn restore(
         &self,
         did: &Did<impl BosStr + Send + Sync>,
         session_id: &str,
     ) -> Result<OAuthSession<T, S>> {
-        self.create_session(self.registry.get(did, session_id, true).await?)
-            .await
+        let key = SessionKey::new(did.borrow().into_static(), session_id);
+        if let Some(session) = self.registry.cache().get(&key) {
+            return Ok(session);
+        }
+        let session = self
+            .create_session(self.registry.get(did, session_id, true).await?)
+            .await?;
+        self.registry.cache().insert(key, session.clone());
+        Ok(session)
     }
 
     /// Resume a stored session for `input`, or begin OAuth authorization and return a login URL.
@@ -684,9 +691,26 @@ where
     /// Optional WebSocket client; `()` when WebSocket support is not required.
     pub ws_client: W,
     /// Mutable session data including DPoP key, nonces, and token set.
-    pub data: RwLock<ClientSessionData>,
+    /// `Arc`-wrapped so cloned sessions share mutable state (DPoP nonces, tokens).
+    pub data: Arc<RwLock<ClientSessionData>>,
     /// Default call options applied to every outgoing XRPC request from this session.
-    pub options: RwLock<CallOptions>,
+    pub options: Arc<RwLock<CallOptions>>,
+}
+
+impl<T, S, W: Clone> Clone for OAuthSession<T, S, W>
+where
+    T: OAuthResolver,
+    S: ClientAuthStore,
+{
+    fn clone(&self) -> Self {
+        Self {
+            registry: self.registry.clone(),
+            client: self.client.clone(),
+            ws_client: self.ws_client.clone(),
+            data: self.data.clone(),
+            options: self.options.clone(),
+        }
+    }
 }
 
 impl<T, S> OAuthSession<T, S, ()>
@@ -707,8 +731,8 @@ where
             registry,
             client,
             ws_client: (),
-            data: RwLock::new(data),
-            options: RwLock::new(CallOptions::default()),
+            data: Arc::new(RwLock::new(data)),
+            options: Arc::new(RwLock::new(CallOptions::default())),
         }
     }
 }
@@ -733,8 +757,8 @@ where
             registry,
             client,
             ws_client,
-            data: RwLock::new(data),
-            options: RwLock::new(CallOptions::default()),
+            data: Arc::new(RwLock::new(data)),
+            options: Arc::new(RwLock::new(CallOptions::default())),
         }
     }
 
@@ -748,7 +772,7 @@ where
             client: self.client,
             ws_client: self.ws_client,
             data: self.data,
-            options: RwLock::new(options.into_static()),
+            options: Arc::new(RwLock::new(options.into_static())),
         }
     }
 

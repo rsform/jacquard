@@ -554,6 +554,7 @@ fn build_validations(
                     field_type: field_type_str.clone(),
                     is_required,
                     is_array: false,
+                    is_array_item: false,
                     check: ConstraintCheck::MaxLength { max },
                 });
             }
@@ -564,6 +565,7 @@ fn build_validations(
                     field_type: field_type_str.clone(),
                     is_required,
                     is_array: false,
+                    is_array_item: false,
                     check: ConstraintCheck::MaxGraphemes { max },
                 });
             }
@@ -574,6 +576,7 @@ fn build_validations(
                     field_type: field_type_str.clone(),
                     is_required,
                     is_array: false,
+                    is_array_item: false,
                     check: ConstraintCheck::MinLength { min },
                 });
             }
@@ -584,6 +587,7 @@ fn build_validations(
                     field_type: field_type_str,
                     is_required,
                     is_array: false,
+                    is_array_item: false,
                     check: ConstraintCheck::MinGraphemes { min },
                 });
             }
@@ -596,6 +600,7 @@ fn build_validations(
                     field_type: field_type_str.clone(),
                     is_required,
                     is_array: false,
+                    is_array_item: false,
                     check: ConstraintCheck::Maximum { max },
                 });
             }
@@ -606,6 +611,7 @@ fn build_validations(
                     field_type: field_type_str,
                     is_required,
                     is_array: false,
+                    is_array_item: false,
                     check: ConstraintCheck::Minimum { min },
                 });
             }
@@ -618,6 +624,7 @@ fn build_validations(
                     field_type: field_type_str.clone(),
                     is_required,
                     is_array: true,
+                    is_array_item: false,
                     check: ConstraintCheck::MaxLength { max },
                 });
             }
@@ -628,6 +635,7 @@ fn build_validations(
                     field_type: field_type_str,
                     is_required,
                     is_array: true,
+                    is_array_item: false,
                     check: ConstraintCheck::MinLength { min },
                 });
             }

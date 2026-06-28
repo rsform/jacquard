@@ -53,7 +53,28 @@ impl<'de> Visitor<'de> for OptBytesVisitor {
     type Value = Option<Bytes>;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        formatter.write_str("a base64-encoded string")
+        formatter.write_str("a base64-encoded $bytes object or structured bytes")
+    }
+
+    fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(Some(Bytes::copy_from_slice(v)))
+    }
+
+    fn visit_borrowed_bytes<E>(self, v: &'de [u8]) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(Some(Bytes::copy_from_slice(v)))
+    }
+
+    fn visit_byte_buf<E>(self, v: Vec<u8>) -> Result<Self::Value, E>
+    where
+        E: de::Error,
+    {
+        Ok(Some(Bytes::from_owner(v)))
     }
 
     fn visit_none<E>(self) -> Result<Self::Value, E>

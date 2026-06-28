@@ -2653,6 +2653,7 @@ dependencies = [
  "jose-jwk",
  "k256",
  "miette",
+ "mini-moka-wasm",
  "n0-future",
  "p256",
  "p384",

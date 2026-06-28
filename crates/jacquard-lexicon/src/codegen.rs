@@ -156,7 +156,8 @@ impl<'c> CodeGenerator<'c> {
         };
 
         // Extract validation checks for this specific def.
-        let validation_checks = schema_impl::extract_validation_checks(lex_doc, def_name);
+        let validation_checks =
+            schema_impl::extract_validation_checks(self.corpus, lex_doc, def_name);
         let validation_code = crate::derive_impl::doc_to_tokens::validations_to_tokens_resolved(
             &validation_checks,
             Some(resolved),

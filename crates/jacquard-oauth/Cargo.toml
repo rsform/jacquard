@@ -45,6 +45,7 @@ http.workspace = true
 bytes.workspace = true
 rand = { version = "0.8.5", features = ["small_rng"] }
 dashmap = "6.1.0"
+mini-moka = { package = "mini-moka-wasm", version = "0.10", path = "../mini-moka-wasm" }
 tokio = { workspace = true, default-features = false, features = ["sync"] }
 trait-variant.workspace = true
 n0-future = { workspace = true, optional = true }

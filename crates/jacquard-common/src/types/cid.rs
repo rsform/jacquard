@@ -168,9 +168,12 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Cid<S> {
     where
         Ser: Serializer,
     {
-        match self {
-            Cid::Ipld { cid, s: _ } => cid.serialize(serializer),
-            Cid::Str(s) => s.as_ref().serialize(serializer),
+        if serializer.is_human_readable() {
+            self.as_str().serialize(serializer)
+        } else {
+            self.to_ipld()
+                .map_err(serde::ser::Error::custom)?
+                .serialize(serializer)
         }
     }
 }
@@ -192,7 +195,7 @@ where
             let s = S::deserialize(deserializer)?;
             Ok(Cid::Str(s))
         } else {
-            // CBOR: use IpldCid's deserializer which handles CBOR tag 42.
+            // CBOR/postcard: use IpldCid's deserializer for canonical CID bytes.
             let cid = IpldCid::deserialize(deserializer)?;
             Ok(Cid::ipld(cid))
         }
@@ -654,5 +657,25 @@ mod tests {
         let link = CidLink::str(TEST_CID);
         assert_eq!(&*link, TEST_CID);
         assert_eq!(link.as_ref(), TEST_CID);
+    }
+
+    #[test]
+    fn cid_string_roundtrips_through_postcard_as_binary_cid() {
+        let cid = Cid::<SmolStr>::from(TEST_CID.to_string());
+        let bytes = postcard::to_allocvec(&cid).unwrap();
+        let parsed: Cid<SmolStr> = postcard::from_bytes(&bytes).unwrap();
+
+        assert_eq!(parsed.as_str(), TEST_CID);
+        assert!(matches!(parsed, Cid::Ipld { .. }));
+    }
+
+    #[test]
+    fn cid_string_roundtrips_through_dag_cbor_as_binary_cid() {
+        let cid = Cid::<SmolStr>::from(TEST_CID.to_string());
+        let bytes = serde_ipld_dagcbor::to_vec(&cid).unwrap();
+        let parsed: Cid<SmolStr> = serde_ipld_dagcbor::from_slice(&bytes).unwrap();
+
+        assert_eq!(parsed.as_str(), TEST_CID);
+        assert!(matches!(parsed, Cid::Ipld { .. }));
     }
 }

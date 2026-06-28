@@ -79,6 +79,25 @@ fn serialize_deserialize_bytes_json() {
 }
 
 #[test]
+fn from_data_deserializes_structured_bytes() {
+    #[derive(serde::Deserialize)]
+    struct HasBytes {
+        #[serde(with = "crate::serde_bytes_helper")]
+        bytes: Bytes,
+    }
+
+    let mut map = BTreeMap::new();
+    map.insert(
+        "bytes".to_smolstr(),
+        Data::Bytes(Bytes::from_static(b"hello")),
+    );
+    let data: Data<SmolStr> = Data::Object(Object(map));
+
+    let parsed: HasBytes = from_data(&data).unwrap();
+    assert_eq!(parsed.bytes.as_ref(), b"hello");
+}
+
+#[test]
 fn serialize_deserialize_cid_link_json() {
     let data = Data::CidLink(Cid::cow_str(CowStr::Borrowed(
         "bafyreih4g7bvo6hdq2juolev5bfzpbo4ewkxh5mzxwgvkjp3kitc6hqkha",
