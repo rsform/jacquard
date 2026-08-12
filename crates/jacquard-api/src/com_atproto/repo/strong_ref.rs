@@ -23,9 +23,9 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[derive(Serialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     bound(deserialize = "S: Deserialize<'de> + BosStr")
@@ -33,8 +33,37 @@ use serde::{Deserialize, Serialize};
 pub struct StrongRef<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(flatten, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+#[derive(Deserialize)]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
+struct StrongRefWire<S: BosStr = DefaultStr> {
+    cid: Cid<S>,
+    uri: AtUri<S>,
+    #[serde(flatten, default)]
+    extra_data: BTreeMap<SmolStr, Data<S>>,
+}
+
+impl<'de, S> Deserialize<'de> for StrongRef<S>
+where
+    S: BosStr + Deserialize<'de>,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let wire = StrongRefWire::<S>::deserialize(deserializer)?;
+        Ok(Self {
+            cid: wire.cid,
+            uri: wire.uri,
+            extra_data: (!wire.extra_data.is_empty()).then_some(wire.extra_data),
+        })
+    }
 }
 
 impl<S: BosStr> LexiconSchema for StrongRef<S> {
@@ -56,7 +85,7 @@ pub mod strong_ref_state {
 
     pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
     #[allow(unused)]
-    use ::core::marker::PhantomData;
+    use core::marker::PhantomData;
     mod sealed {
         pub trait Sealed {}
     }
@@ -204,7 +233,7 @@ where
 fn lexicon_doc_com_atproto_repo_strongRef() -> LexiconDoc<'static> {
     use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
-    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_common::{deps::smol_str::SmolStr, types::blob::MimeType, CowStr};
     use jacquard_lexicon::lexicon::*;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,

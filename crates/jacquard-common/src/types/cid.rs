@@ -3,7 +3,7 @@ use crate::{CowStr, IntoStatic};
 use alloc::string::{String, ToString};
 pub use cid::Cid as IpldCid;
 use core::{convert::Infallible, fmt, ops::Deref, str::FromStr};
-use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
+use serde::{de::Visitor, Deserialize, Deserializer, Serialize, Serializer};
 use smol_str::{SmolStr, ToSmolStr};
 
 /// CID codec for AT Protocol (raw).
@@ -190,12 +190,94 @@ where
     where
         D: Deserializer<'de>,
     {
+        // Use one visitor for text and binary forms. This matters when serde
+        // replays an internally tagged enum through its private ContentDeserializer:
+        // that adapter reports human-readable=true even though the original value
+        // came from DAG-CBOR, and represents tag-42 as a newtype around bytes.
+        struct CidVisitor<S>(core::marker::PhantomData<S>);
+        impl<'de, S> Visitor<'de> for CidVisitor<S>
+        where
+            S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        {
+            type Value = Cid<S>;
+
+            fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                formatter.write_str("a CID link")
+            }
+
+            fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                let s = S::deserialize(serde::de::value::StrDeserializer::<E>::new(value))?;
+                Ok(Cid::Str(s))
+            }
+
+            fn visit_borrowed_str<E>(self, value: &'de str) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                self.visit_str(value)
+            }
+
+            fn visit_string<E>(self, value: String) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                let s = S::deserialize(serde::de::value::StringDeserializer::<E>::new(value))?;
+                Ok(Cid::Str(s))
+            }
+
+            fn visit_bytes<E>(self, value: &[u8]) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                let cid = IpldCid::try_from(value).map_err(E::custom)?;
+                Ok(Cid::ipld(cid))
+            }
+
+            fn visit_byte_buf<E>(self, value: alloc::vec::Vec<u8>) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                self.visit_bytes(&value)
+            }
+
+            fn visit_newtype_struct<D>(self, deserializer: D) -> Result<Self::Value, D::Error>
+            where
+                D: serde::de::Deserializer<'de>,
+            {
+                struct BytesVisitor;
+                impl<'de> Visitor<'de> for BytesVisitor {
+                    type Value = alloc::vec::Vec<u8>;
+
+                    fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+                        formatter.write_str("CID bytes")
+                    }
+
+                    fn visit_bytes<E: serde::de::Error>(
+                        self,
+                        value: &[u8],
+                    ) -> Result<Self::Value, E> {
+                        Ok(value.to_vec())
+                    }
+
+                    fn visit_byte_buf<E: serde::de::Error>(
+                        self,
+                        value: alloc::vec::Vec<u8>,
+                    ) -> Result<Self::Value, E> {
+                        Ok(value)
+                    }
+                }
+
+                let bytes = deserializer.deserialize_bytes(BytesVisitor)?;
+                self.visit_byte_buf(bytes)
+            }
+        }
+
         if deserializer.is_human_readable() {
-            // JSON: deserialize S (string), wrap in Str variant.
-            let s = S::deserialize(deserializer)?;
-            Ok(Cid::Str(s))
+            deserializer.deserialize_any(CidVisitor(core::marker::PhantomData))
         } else {
-            // CBOR/postcard: use IpldCid's deserializer for canonical CID bytes.
             let cid = IpldCid::deserialize(deserializer)?;
             Ok(Cid::ipld(cid))
         }
