@@ -3,7 +3,7 @@ use crate::{CowStr, IntoStatic};
 use alloc::string::{String, ToString};
 pub use cid::Cid as IpldCid;
 use core::{convert::Infallible, fmt, ops::Deref, str::FromStr};
-use serde::{de::Visitor, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize, Serializer, de::Visitor};
 use smol_str::{SmolStr, ToSmolStr};
 
 /// CID codec for AT Protocol (raw).

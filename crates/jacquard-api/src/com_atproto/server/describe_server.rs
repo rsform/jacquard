@@ -60,6 +60,9 @@ pub struct Links<S: BosStr = DefaultStr> {
 pub struct DescribeServerOutput<S: BosStr = DefaultStr> {
     ///List of domain suffixes that can be used in account handles.
     pub available_user_domains: Vec<S>,
+    ///Maximum size of a blob that can be uploaded via com.atproto.repo.uploadBlob, in bytes.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blob_upload_limit: Option<i64>,
     ///Contact information
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contact: Option<describe_server::Contact<S>>,

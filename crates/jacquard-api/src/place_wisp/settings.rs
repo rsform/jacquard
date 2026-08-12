@@ -213,6 +213,18 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
                 });
             }
         }
+        if let Some(values) = &self.index_files {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 255usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("index_files"),
+                        max: 255usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.spa_mode {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 500usize {

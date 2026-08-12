@@ -804,6 +804,46 @@ impl<'c> CodeGenerator<'c> {
         Ok(GeneratedCode::type_only(enum_def))
     }
 
+    /// Generate a permissioned-space declaration marker.
+    ///
+    /// `type: "space"` is lexicon metadata rather than a wire object. Keep the
+    /// declaration available to repository code without inventing a serde
+    /// representation for fields that are never sent on the wire.
+    pub(super) fn generate_space(
+        &self,
+        nsid: &str,
+        def_name: &str,
+        space: &crate::lexicon::LexSpace<'static>,
+    ) -> Result<GeneratedCode> {
+        let type_name = self.def_to_type_name(nsid, def_name);
+        let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
+        let doc = self.generate_doc_comment(space.description.as_ref());
+        let key = space.key.as_ref().map(|value| value.as_ref()).unwrap_or("");
+        let name = space
+            .name
+            .as_ref()
+            .map(|value| value.as_ref())
+            .unwrap_or("");
+        let collections: Vec<&str> = space
+            .collections
+            .iter()
+            .map(|value| value.as_ref())
+            .collect();
+
+        let tokens = quote! {
+            #doc
+            #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+            pub struct #ident;
+
+            impl #ident {
+                pub const KEY: &'static str = #key;
+                pub const NAME: &'static str = #name;
+                pub const COLLECTIONS: &'static [&'static str] = &[#(#collections),*];
+            }
+        };
+        Ok(GeneratedCode::type_only(tokens))
+    }
+
     /// Generate enum for string with known values.
     pub(super) fn generate_known_values_enum(
         &self,

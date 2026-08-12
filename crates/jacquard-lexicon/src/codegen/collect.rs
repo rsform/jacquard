@@ -134,6 +134,9 @@ impl<'c> CodeGenerator<'c> {
             Some(LexStringFormat::AtUri) => {
                 imports.common.insert(CommonType::AtUri);
             }
+            Some(LexStringFormat::SpaceRef) => {
+                imports.common.insert(CommonType::AtSpaceUri);
+            }
             Some(LexStringFormat::Uri) => {
                 imports.common.insert(CommonType::UriValue);
             }
@@ -723,6 +726,8 @@ impl<'c> CodeGenerator<'c> {
                 i.external.insert(ExternalImport::Bytes);
                 i
             }
+            // Space declarations generate metadata-only marker types.
+            LexUserType::Space(_) => ImportSet::default(),
             // Boolean, plain Integer, Blob: type aliases with no special imports.
             _ => ImportSet::default(),
         };

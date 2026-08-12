@@ -205,6 +205,18 @@ impl<S: BosStr> LexiconSchema for Submission<S> {
         lexicon_doc_net_alternativeproto_submission()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(values) = &self.alternative_to {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 100usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("alternative_to"),
+                        max: 100usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         {
             let value = &self.description;
             #[allow(unused_comparisons)]
@@ -274,6 +286,18 @@ impl<S: BosStr> LexiconSchema for Submission<S> {
                     max: 200usize,
                     actual: <str>::len(value.as_ref()),
                 });
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 50usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 50usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
             }
         }
         Ok(())

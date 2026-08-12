@@ -19,6 +19,7 @@ pub enum CommonType {
     Did,
     Handle,
     AtUri,
+    AtSpaceUri,
     Nsid,
     Tid,
     Cid,
@@ -51,6 +52,7 @@ impl CommonType {
             Self::Did => "Did",
             Self::Handle => "Handle",
             Self::AtUri => "AtUri",
+            Self::AtSpaceUri => "AtSpaceUri",
             Self::Nsid => "Nsid",
             Self::Tid => "Tid",
             Self::Cid => "Cid",
@@ -88,6 +90,7 @@ impl CommonType {
             Self::CidLink => ("jacquard_common::types::cid::CidLink", true),
             Self::BlobRef => ("jacquard_common::types::blob::BlobRef", true),
             Self::AtUri => ("jacquard_common::types::string::AtUri", true),
+            Self::AtSpaceUri => ("jacquard_common::types::aturi::AtSpaceUri", true),
             Self::Nsid => ("jacquard_common::types::string::Nsid", true),
             Self::Cid => ("jacquard_common::types::string::Cid", true),
             // RecordKey is a COMPOSITE type: RecordKey<Rkey<S>>. needs_type_param
@@ -117,6 +120,7 @@ impl CommonType {
             | Self::RecordKey
             | Self::Rkey
             | Self::UriValue => "jacquard_common::types::string",
+            Self::AtSpaceUri => "jacquard_common::types::aturi",
             Self::AtIdentifier => "jacquard_common::types::ident",
             Self::CidLink => "jacquard_common::types::cid",
             Self::BlobRef => "jacquard_common::types::blob",

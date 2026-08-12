@@ -233,7 +233,7 @@ where
 fn lexicon_doc_com_atproto_repo_strongRef() -> LexiconDoc<'static> {
     use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
-    use jacquard_common::{deps::smol_str::SmolStr, types::blob::MimeType, CowStr};
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,

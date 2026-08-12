@@ -4,6 +4,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `io.atcr` Lexicon namespace/module.
+pub mod auth_full_app;
 pub mod hold;
 pub mod manifest;
 pub mod repo;

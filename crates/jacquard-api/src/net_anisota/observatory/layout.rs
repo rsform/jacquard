@@ -137,7 +137,7 @@ pub struct Schedule<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Provenance backlink for layouts learned from another user.
+/// Provenance for this layout. 'original' was crafted here, 'learned' was saved from another user's shared layout (see originalUri/originalDid), and 'migrated' marks the layout the one-time unify migration captured from the user's live grid — that value is the migration's idempotency sentinel and must be preserved when a record is re-saved, or the migration will run again and duplicate the layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
@@ -161,6 +161,7 @@ pub struct Source<S: BosStr = DefaultStr> {
 pub enum SourceType<S: BosStr = DefaultStr> {
     Original,
     Learned,
+    Migrated,
     Other(S),
 }
 
@@ -169,6 +170,7 @@ impl<S: BosStr> SourceType<S> {
         match self {
             Self::Original => "original",
             Self::Learned => "learned",
+            Self::Migrated => "migrated",
             Self::Other(s) => s.as_ref(),
         }
     }
@@ -177,6 +179,7 @@ impl<S: BosStr> SourceType<S> {
         match s.as_ref() {
             "original" => Self::Original,
             "learned" => Self::Learned,
+            "migrated" => Self::Migrated,
             _ => Self::Other(s),
         }
     }
@@ -229,6 +232,7 @@ where
         match self {
             SourceType::Original => SourceType::Original,
             SourceType::Learned => SourceType::Learned,
+            SourceType::Migrated => SourceType::Migrated,
             SourceType::Other(v) => SourceType::Other(v.into_static()),
         }
     }
@@ -266,6 +270,18 @@ impl<S: BosStr> LexiconSchema for Layout<S> {
         lexicon_doc_net_anisota_observatory_layout()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(values) = &self.tile_order {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 64usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tile_order"),
+                        max: 64usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }
@@ -352,6 +368,28 @@ impl<S: BosStr> LexiconSchema for Schedule<S> {
                     max: 7usize,
                     actual: value.len(),
                 });
+            }
+        }
+        if let Some(values) = &self.days_of_week {
+            for value in values {
+                if *value > 6i64 {
+                    return Err(ConstraintError::Maximum {
+                        path: ValidationPath::from_field("days_of_week"),
+                        max: 6i64,
+                        actual: *value,
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.days_of_week {
+            for value in values {
+                if *value < 0i64 {
+                    return Err(ConstraintError::Minimum {
+                        path: ValidationPath::from_field("days_of_week"),
+                        min: 0i64,
+                        actual: *value,
+                    });
+                }
             }
         }
         if let Some(ref value) = self.end_time {
@@ -655,18 +693,22 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("source"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Provenance backlink for layouts learned from another user.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Provenance for this layout. 'original' was crafted here, 'learned' was saved from another user's shared layout (see originalUri/originalDid), and 'migrated' marks the layout the one-time unify migration captured from the user's live grid — that value is the migration's idempotency sentinel and must be preserved when a record is re-saved, or the migration will run again and duplicate the layout.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("originalDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID of the user this layout was learned from",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "DID of the user this layout was learned from",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -674,18 +716,18 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("originalUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT URI of the record this layout was learned from",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT URI of the record this layout was learned from",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

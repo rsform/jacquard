@@ -40,6 +40,9 @@ pub struct Settings<S: BosStr = DefaultStr> {
     ///Whether this node may archive your livestream for improving the service
     #[serde(skip_serializing_if = "Option::is_none")]
     pub debug_recording: Option<bool>,
+    ///Whether this node should record your livestreams into VODs that you can publish
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub livestream_recording: Option<bool>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -125,7 +128,7 @@ pub mod settings_state {
 /// Builder for constructing an instance of this type.
 pub struct SettingsBuilder<St: settings_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<bool>,),
+    _fields: (Option<bool>, Option<bool>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -148,7 +151,7 @@ impl SettingsBuilder<settings_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
-            _fields: (None,),
+            _fields: (None, None),
             _type: PhantomData,
         }
     }
@@ -159,7 +162,7 @@ impl<S: BosStr> SettingsBuilder<settings_state::Empty, S> {
     pub fn builder() -> Self {
         SettingsBuilder {
             _state: PhantomData,
-            _fields: (None,),
+            _fields: (None, None),
             _type: PhantomData,
         }
     }
@@ -178,6 +181,19 @@ impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     }
 }
 
+impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
+    /// Set the `livestreamRecording` field (optional)
+    pub fn livestream_recording(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `livestreamRecording` field to an Option value (optional)
+    pub fn maybe_livestream_recording(mut self, value: Option<bool>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> SettingsBuilder<St, S>
 where
     St: settings_state::State,
@@ -186,6 +202,7 @@ where
     pub fn build(self) -> Settings<S> {
         Settings {
             debug_recording: self._fields.0,
+            livestream_recording: self._fields.1,
             extra_data: Default::default(),
         }
     }
@@ -193,6 +210,7 @@ where
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Settings<S> {
         Settings {
             debug_recording: self._fields.0,
+            livestream_recording: self._fields.1,
             extra_data: Some(extra_data),
         }
     }
@@ -216,12 +234,17 @@ fn lexicon_doc_place_stream_server_settings() -> LexiconDoc<'static> {
                     )),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("debugRecording"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("livestreamRecording"),
                                 LexObjectProperty::Boolean(LexBoolean {
                                     ..Default::default()
                                 }),

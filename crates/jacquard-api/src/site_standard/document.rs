@@ -270,6 +270,32 @@ impl<S: BosStr> LexiconSchema for Document<S> {
                 }
             }
         }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 1280usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 1280usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                {
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                    if count > 128usize {
+                        return Err(ConstraintError::MaxGraphemes {
+                            path: ValidationPath::from_field("tags"),
+                            max: 128usize,
+                            actual: count,
+                        });
+                    }
+                }
+            }
+        }
         {
             let value = &self.title;
             #[allow(unused_comparisons)]

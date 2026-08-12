@@ -395,6 +395,30 @@ impl<S: BosStr> LexiconSchema for Card<S> {
                 });
             }
         }
+        {
+            let value = &self.section;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 640usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("section"),
+                    max: 640usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.section;
+            {
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                if count > 64usize {
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("section"),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.tags {
             #[allow(unused_comparisons)]
             if value.len() > 128usize {
@@ -403,6 +427,32 @@ impl<S: BosStr> LexiconSchema for Card<S> {
                     max: 128usize,
                     actual: value.len(),
                 });
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 640usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 640usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                {
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                    if count > 64usize {
+                        return Err(ConstraintError::MaxGraphemes {
+                            path: ValidationPath::from_field("tags"),
+                            max: 64usize,
+                            actual: count,
+                        });
+                    }
+                }
             }
         }
         Ok(())
@@ -447,6 +497,28 @@ impl<S: BosStr> LexiconSchema for List<S> {
         lexicon_doc_com_deckbelcher_deck_list()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.format {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 320usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("format"),
+                    max: 320usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.format {
+            {
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                if count > 32usize {
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("format"),
+                        max: 32usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         {
             let value = &self.name;
             #[allow(unused_comparisons)]

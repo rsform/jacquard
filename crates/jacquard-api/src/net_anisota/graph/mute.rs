@@ -79,9 +79,9 @@ pub struct Mute<S: BosStr = DefaultStr> {
     pub reason: Option<S>,
     ///DID of the account to mute
     pub subject: Did<S>,
-    ///Specific feeds where this mute should apply. If empty, applies to all feeds
+    ///Specific feeds where this mute should apply: feed generator / list at-uris, or the literal sentinel 'following' for the home timeline (which has no at-uri). Empty or absent applies everywhere. Matches net.anisota.graph.wordlist#targetFeeds.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub target_feeds: Option<Vec<AtUri<S>>>,
+    pub target_feeds: Option<Vec<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -174,6 +174,18 @@ impl<S: BosStr> LexiconSchema for Mute<S> {
                     max: 50usize,
                     actual: value.len(),
                 });
+            }
+        }
+        if let Some(values) = &self.target_feeds {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 512usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("target_feeds"),
+                        max: 512usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
             }
         }
         Ok(())
@@ -331,11 +343,11 @@ fn lexicon_doc_net_anisota_graph_mute() -> LexiconDoc<'static> {
                                 LexObjectProperty::Array(LexArray {
                                     description: Some(
                                         CowStr::new_static(
-                                            "Specific feeds where this mute should apply. If empty, applies to all feeds",
+                                            "Specific feeds where this mute should apply: feed generator / list at-uris, or the literal sentinel 'following' for the home timeline (which has no at-uri). Empty or absent applies everywhere. Matches net.anisota.graph.wordlist#targetFeeds.",
                                         ),
                                     ),
                                     items: LexArrayItem::String(LexString {
-                                        format: Some(LexStringFormat::AtUri),
+                                        max_length: Some(512usize),
                                         ..Default::default()
                                     }),
                                     max_length: Some(50usize),
@@ -408,7 +420,7 @@ pub struct MuteBuilder<St: mute_state::State, S: BosStr = DefaultStr> {
         Option<Datetime>,
         Option<S>,
         Option<Did<S>>,
-        Option<Vec<AtUri<S>>>,
+        Option<Vec<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -528,12 +540,12 @@ where
 
 impl<St: mute_state::State, S: BosStr> MuteBuilder<St, S> {
     /// Set the `targetFeeds` field (optional)
-    pub fn target_feeds(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
+    pub fn target_feeds(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `targetFeeds` field to an Option value (optional)
-    pub fn maybe_target_feeds(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
+    pub fn maybe_target_feeds(mut self, value: Option<Vec<S>>) -> Self {
         self._fields.5 = value;
         self
     }

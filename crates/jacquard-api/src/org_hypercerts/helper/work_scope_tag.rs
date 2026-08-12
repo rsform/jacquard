@@ -140,6 +140,18 @@ impl<S: BosStr> LexiconSchema for WorkScopeTag<S> {
                 });
             }
         }
+        if let Some(values) = &self.aliases {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 200usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("aliases"),
+                        max: 200usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 10000usize {

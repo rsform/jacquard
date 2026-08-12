@@ -44,6 +44,7 @@ pub struct PostsList<S: BosStr = DefaultStr> {
 pub enum PostsListView<S: BosStr = DefaultStr> {
     Small,
     Medium,
+    Chapter,
     Other(S),
 }
 
@@ -52,6 +53,7 @@ impl<S: BosStr> PostsListView<S> {
         match self {
             Self::Small => "small",
             Self::Medium => "medium",
+            Self::Chapter => "chapter",
             Self::Other(s) => s.as_ref(),
         }
     }
@@ -60,6 +62,7 @@ impl<S: BosStr> PostsListView<S> {
         match s.as_ref() {
             "small" => Self::Small,
             "medium" => Self::Medium,
+            "chapter" => Self::Chapter,
             _ => Self::Other(s),
         }
     }
@@ -112,6 +115,7 @@ where
         match self {
             PostsListView::Small => PostsListView::Small,
             PostsListView::Medium => PostsListView::Medium,
+            PostsListView::Chapter => PostsListView::Chapter,
             PostsListView::Other(v) => PostsListView::Other(v.into_static()),
         }
     }

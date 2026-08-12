@@ -52,6 +52,9 @@ pub struct Image<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub full_bleed: Option<bool>,
     pub image: BlobRef<S>,
+    ///Display width of the image in pixels, capped at the page width.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub width: Option<i64>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -347,6 +350,12 @@ fn lexicon_doc_pub_leaflet_blocks_image() -> LexiconDoc<'static> {
                                 ..Default::default()
                             }),
                         );
+                        map.insert(
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
                         map
                     },
                     ..Default::default()
@@ -410,6 +419,7 @@ pub struct ImageBuilder<St: image_state::State, S: BosStr = DefaultStr> {
         Option<image::AspectRatio<S>>,
         Option<bool>,
         Option<BlobRef<S>>,
+        Option<i64>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -433,7 +443,7 @@ impl ImageBuilder<image_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -444,7 +454,7 @@ impl<S: BosStr> ImageBuilder<image_state::Empty, S> {
     pub fn builder() -> Self {
         ImageBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -514,6 +524,19 @@ where
     }
 }
 
+impl<St: image_state::State, S: BosStr> ImageBuilder<St, S> {
+    /// Set the `width` field (optional)
+    pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `width` field to an Option value (optional)
+    pub fn maybe_width(mut self, value: Option<i64>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> ImageBuilder<St, S>
 where
     St: image_state::State,
@@ -527,6 +550,7 @@ where
             aspect_ratio: self._fields.1.unwrap(),
             full_bleed: self._fields.2,
             image: self._fields.3.unwrap(),
+            width: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -537,6 +561,7 @@ where
             aspect_ratio: self._fields.1.unwrap(),
             full_bleed: self._fields.2,
             image: self._fields.3.unwrap(),
+            width: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

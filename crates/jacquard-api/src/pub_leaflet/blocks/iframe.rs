@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,7 +38,7 @@ pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(
     rename_all = "camelCase",
     bound(deserialize = "S: Deserialize<'de> + BosStr")
@@ -48,7 +48,11 @@ pub struct Iframe<S: BosStr = DefaultStr> {
     pub aspect_ratio: Option<iframe::AspectRatio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
-    pub url: UriValue<S>,
+    ///DEPRECATED — use pub.leaflet.blocks.html instead. Inline HTML rendered via the iframe's srcdoc attribute. Takes precedence over url.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub html: Option<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub url: Option<UriValue<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -290,7 +294,6 @@ fn lexicon_doc_pub_leaflet_blocks_iframe() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("url")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -310,6 +313,17 @@ fn lexicon_doc_pub_leaflet_blocks_iframe() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
+                            SmolStr::new_static("html"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "DEPRECATED — use pub.leaflet.blocks.html instead. Inline HTML rendered via the iframe's srcdoc attribute. Takes precedence over url.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
                                 format: Some(LexStringFormat::Uri),
@@ -324,154 +338,5 @@ fn lexicon_doc_pub_leaflet_blocks_iframe() -> LexiconDoc<'static> {
             map
         },
         ..Default::default()
-    }
-}
-
-pub mod iframe_state {
-
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
-    #[allow(unused)]
-    use ::core::marker::PhantomData;
-    mod sealed {
-        pub trait Sealed {}
-    }
-    /// State trait tracking which required fields have been set
-    pub trait State: sealed::Sealed {
-        type Url;
-    }
-    /// Empty state - all required fields are unset
-    pub struct Empty(());
-    impl sealed::Sealed for Empty {}
-    impl State for Empty {
-        type Url = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Url = Set<members::url>;
-    }
-    /// Marker types for field names
-    #[allow(non_camel_case_types)]
-    pub mod members {
-        ///Marker type for the `url` field
-        pub struct url(());
-    }
-}
-
-/// Builder for constructing an instance of this type.
-pub struct IframeBuilder<St: iframe_state::State, S: BosStr = DefaultStr> {
-    _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<iframe::AspectRatio<S>>,
-        Option<i64>,
-        Option<UriValue<S>>,
-    ),
-    _type: PhantomData<fn() -> S>,
-}
-
-impl Iframe<DefaultStr> {
-    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> IframeBuilder<iframe_state::Empty, DefaultStr> {
-        IframeBuilder::new()
-    }
-}
-
-impl<S: BosStr> Iframe<S> {
-    /// Create a new builder for this type
-    pub fn builder() -> IframeBuilder<iframe_state::Empty, S> {
-        IframeBuilder::builder()
-    }
-}
-
-impl IframeBuilder<iframe_state::Empty, DefaultStr> {
-    /// Create a new builder with all fields unset, using the default string type, if needed
-    pub fn new() -> Self {
-        IframeBuilder {
-            _state: PhantomData,
-            _fields: (None, None, None),
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<S: BosStr> IframeBuilder<iframe_state::Empty, S> {
-    /// Create a new builder with all fields unset
-    pub fn builder() -> Self {
-        IframeBuilder {
-            _state: PhantomData,
-            _fields: (None, None, None),
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St: iframe_state::State, S: BosStr> IframeBuilder<St, S> {
-    /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<iframe::AspectRatio<S>>>) -> Self {
-        self._fields.0 = value.into();
-        self
-    }
-    /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<iframe::AspectRatio<S>>) -> Self {
-        self._fields.0 = value;
-        self
-    }
-}
-
-impl<St: iframe_state::State, S: BosStr> IframeBuilder<St, S> {
-    /// Set the `height` field (optional)
-    pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.1 = value.into();
-        self
-    }
-    /// Set the `height` field to an Option value (optional)
-    pub fn maybe_height(mut self, value: Option<i64>) -> Self {
-        self._fields.1 = value;
-        self
-    }
-}
-
-impl<St, S: BosStr> IframeBuilder<St, S>
-where
-    St: iframe_state::State,
-    St::Url: iframe_state::IsUnset,
-{
-    /// Set the `url` field (required)
-    pub fn url(
-        mut self,
-        value: impl Into<UriValue<S>>,
-    ) -> IframeBuilder<iframe_state::SetUrl<St>, S> {
-        self._fields.2 = Option::Some(value.into());
-        IframeBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> IframeBuilder<St, S>
-where
-    St: iframe_state::State,
-    St::Url: iframe_state::IsSet,
-{
-    /// Build the final struct.
-    pub fn build(self) -> Iframe<S> {
-        Iframe {
-            aspect_ratio: self._fields.0,
-            height: self._fields.1,
-            url: self._fields.2.unwrap(),
-            extra_data: Default::default(),
-        }
-    }
-    /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Iframe<S> {
-        Iframe {
-            aspect_ratio: self._fields.0,
-            height: self._fields.1,
-            url: self._fields.2.unwrap(),
-            extra_data: Some(extra_data),
-        }
     }
 }

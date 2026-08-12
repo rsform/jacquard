@@ -150,6 +150,17 @@ impl<S: BosStr> LexiconSchema for SubjectRef<S> {
             }
         }
         {
+            let value = &self.r#type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("type"),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
             let value = &self.uri;
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 8192usize {

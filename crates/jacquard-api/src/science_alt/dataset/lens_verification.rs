@@ -201,6 +201,17 @@ impl<S: BosStr> LexiconSchema for LensVerification<S> {
                 });
             }
         }
+        {
+            let value = &self.verification_method;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("verification_method"),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }

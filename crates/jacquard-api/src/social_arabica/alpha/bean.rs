@@ -138,10 +138,10 @@ impl<S: BosStr> LexiconSchema for Bean<S> {
     fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.description {
             #[allow(unused_comparisons)]
-            if <str>::len(value.as_ref()) > 1000usize {
+            if <str>::len(value.as_ref()) > 5000usize {
                 return Err(ConstraintError::MaxLength {
                     path: ValidationPath::from_field("description"),
-                    max: 1000usize,
+                    max: 5000usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -647,7 +647,7 @@ fn lexicon_doc_social_arabica_alpha_bean() -> LexiconDoc<'static> {
                                             "Public roaster description or tasting notes for the beans",
                                         ),
                                     ),
-                                    max_length: Some(1000usize),
+                                    max_length: Some(5000usize),
                                     ..Default::default()
                                 }),
                             );

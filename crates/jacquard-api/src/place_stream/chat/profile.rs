@@ -449,7 +449,6 @@ fn lexicon_doc_place_stream_chat_profile() -> LexiconDoc<'static> {
                     )),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

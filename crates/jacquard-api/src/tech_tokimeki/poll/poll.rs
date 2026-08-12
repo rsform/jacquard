@@ -127,6 +127,28 @@ impl<S: BosStr> LexiconSchema for Poll<S> {
                 });
             }
         }
+        for value in &self.options {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("options"),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        for value in &self.options {
+            {
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                if count > 50usize {
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("options"),
+                        max: 50usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }

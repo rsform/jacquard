@@ -264,6 +264,18 @@ impl<S: BosStr> LexiconSchema for Preferences<S> {
                 });
             }
         }
+        if let Some(values) = &self.external_link_skipped_hostnames {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 255usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("external_link_skipped_hostnames"),
+                        max: 255usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.label_preferences {
             #[allow(unused_comparisons)]
             if value.len() > 500usize {

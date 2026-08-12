@@ -224,6 +224,58 @@ impl<S: BosStr> LexiconSchema for Bookmark<S> {
                 });
             }
         }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 250usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 250usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) < 1usize {
+                    return Err(ConstraintError::MinLength {
+                        path: ValidationPath::from_field("tags"),
+                        min: 1usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                {
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                    if count > 25usize {
+                        return Err(ConstraintError::MaxGraphemes {
+                            path: ValidationPath::from_field("tags"),
+                            max: 25usize,
+                            actual: count,
+                        });
+                    }
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                {
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                    if count < 1usize {
+                        return Err(ConstraintError::MinGraphemes {
+                            path: ValidationPath::from_field("tags"),
+                            min: 1usize,
+                            actual: count,
+                        });
+                    }
+                }
+            }
+        }
         Ok(())
     }
 }

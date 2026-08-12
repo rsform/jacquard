@@ -11,13 +11,13 @@ use alloc::collections::BTreeMap;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::Did;
+use jacquard_common::types::string::{Did, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     bound(deserialize = "S: Deserialize<'de> + BosStr")
@@ -32,7 +32,7 @@ pub struct Create<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo_did: Option<Did<S>>,
     ///Rkey of the repository record
-    pub rkey: S,
+    pub rkey: RecordKey<Rkey<S>>,
     ///A source URL to clone from, populate this when forking or importing a repository.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<S>,
@@ -46,6 +46,9 @@ pub struct Create<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct CreateOutput<S: BosStr = DefaultStr> {
+    ///Multibase-encoded public signing key the knot holds for this repository
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub key: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo_did: Option<Did<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -80,4 +83,201 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
         jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
     type Request<S: BosStr> = Create<S>;
     type Response = CreateResponse;
+}
+
+pub mod create_state {
+
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Name;
+        type Rkey;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Name = Unset;
+        type Rkey = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Name = Set<members::name>;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type Name = St::Name;
+        type Rkey = Set<members::rkey>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct CreateBuilder<St: create_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<S>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<RecordKey<Rkey<S>>>,
+        Option<S>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl Create<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> CreateBuilder<create_state::Empty, DefaultStr> {
+        CreateBuilder::new()
+    }
+}
+
+impl<S: BosStr> Create<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> CreateBuilder<create_state::Empty, S> {
+        CreateBuilder::builder()
+    }
+}
+
+impl CreateBuilder<create_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        CreateBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> CreateBuilder<create_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        CreateBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: create_state::State, S: BosStr> CreateBuilder<St, S> {
+    /// Set the `defaultBranch` field (optional)
+    pub fn default_branch(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `defaultBranch` field to an Option value (optional)
+    pub fn maybe_default_branch(mut self, value: Option<S>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> CreateBuilder<St, S>
+where
+    St: create_state::State,
+    St::Name: create_state::IsUnset,
+{
+    /// Set the `name` field (required)
+    pub fn name(mut self, value: impl Into<S>) -> CreateBuilder<create_state::SetName<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        CreateBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: create_state::State, S: BosStr> CreateBuilder<St, S> {
+    /// Set the `repoDid` field (optional)
+    pub fn repo_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `repoDid` field to an Option value (optional)
+    pub fn maybe_repo_did(mut self, value: Option<Did<S>>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> CreateBuilder<St, S>
+where
+    St: create_state::State,
+    St::Rkey: create_state::IsUnset,
+{
+    /// Set the `rkey` field (required)
+    pub fn rkey(
+        mut self,
+        value: impl Into<RecordKey<Rkey<S>>>,
+    ) -> CreateBuilder<create_state::SetRkey<St>, S> {
+        self._fields.3 = Option::Some(value.into());
+        CreateBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: create_state::State, S: BosStr> CreateBuilder<St, S> {
+    /// Set the `source` field (optional)
+    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `source` field to an Option value (optional)
+    pub fn maybe_source(mut self, value: Option<S>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> CreateBuilder<St, S>
+where
+    St: create_state::State,
+    St::Name: create_state::IsSet,
+    St::Rkey: create_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> Create<S> {
+        Create {
+            default_branch: self._fields.0,
+            name: self._fields.1.unwrap(),
+            repo_did: self._fields.2,
+            rkey: self._fields.3.unwrap(),
+            source: self._fields.4,
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Create<S> {
+        Create {
+            default_branch: self._fields.0,
+            name: self._fields.1.unwrap(),
+            repo_did: self._fields.2,
+            rkey: self._fields.3.unwrap(),
+            source: self._fields.4,
+            extra_data: Some(extra_data),
+        }
+    }
 }

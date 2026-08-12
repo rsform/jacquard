@@ -79,6 +79,9 @@ pub enum LexStringFormat {
     Language,
     Tid,
     RecordKey,
+    /// Permissioned space URI reference (`at://.../space/...`).
+    #[serde(rename = "space-ref")]
+    SpaceRef,
 }
 #[skip_serializing_none]
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
@@ -379,6 +382,28 @@ pub struct LexXrpcSubscription<'s> {
     pub errors: Option<Vec<LexXrpcError<'s>>>,
 }
 
+// Permissioned spaces
+
+/// A permissioned-space declaration (`type: "space"`).
+///
+/// This is a Lexicon extension used by proposal-0016. The parser keeps the
+/// declaration in the same AST as records, procedures, and permission sets so
+/// resolved documents do not need a parallel JSON model.
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone, Default)]
+pub struct LexSpace<'s> {
+    #[serde(borrow)]
+    pub description: Option<CowStr<'s>>,
+    #[serde(borrow)]
+    pub key: Option<CowStr<'s>>,
+    #[serde(borrow)]
+    pub name: Option<CowStr<'s>>,
+    #[serde(default, rename = "name:lang")]
+    pub name_lang: Option<HashMap<CowStr<'s>, CowStr<'s>>>,
+    #[serde(borrow)]
+    pub collections: Vec<Nsid<CowStr<'s>>>,
+}
+
 // database
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -596,6 +621,9 @@ pub enum LexUserType<'s> {
     // lexPermissionSet
     #[serde(borrow)]
     PermissionSet(LexPermissionSet<'s>),
+    // proposal-0016 permissioned space declaration
+    #[serde(borrow)]
+    Space(LexSpace<'s>),
 }
 
 // IntoStatic implementations for all lexicon types
@@ -1052,6 +1080,24 @@ impl IntoStatic for LexPermissionSet<'_> {
     }
 }
 
+impl IntoStatic for LexSpace<'_> {
+    type Output = LexSpace<'static>;
+
+    fn into_static(self) -> Self::Output {
+        LexSpace {
+            description: self.description.into_static(),
+            key: self.key.into_static(),
+            name: self.name.into_static(),
+            name_lang: self.name_lang.into_static(),
+            collections: self
+                .collections
+                .into_iter()
+                .map(|collection| collection.into_static())
+                .collect(),
+        }
+    }
+}
+
 impl IntoStatic for LexUserType<'_> {
     type Output = LexUserType<'static>;
     fn into_static(self) -> Self::Output {
@@ -1072,6 +1118,7 @@ impl IntoStatic for LexUserType<'_> {
             Self::Unknown(x) => LexUserType::Unknown(x.into_static()),
             Self::Union(x) => LexUserType::Union(x.into_static()),
             Self::PermissionSet(x) => LexUserType::PermissionSet(x.into_static()),
+            Self::Space(x) => LexUserType::Space(x.into_static()),
         }
     }
 }

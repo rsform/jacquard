@@ -4,6 +4,8 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `sh.tangled.git` Lexicon namespace/module.
+pub mod count_ref_updates;
+pub mod count_ref_updates_by;
 pub mod list_ref_updates;
 pub mod list_ref_updates_by;
 pub mod list_refs;

@@ -178,6 +178,18 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
                 });
             }
         }
+        if let Some(values) = &self.links {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 1000usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("links"),
+                        max: 1000usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.website {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 1000usize {

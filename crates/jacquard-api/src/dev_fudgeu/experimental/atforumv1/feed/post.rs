@@ -140,6 +140,26 @@ impl<S: BosStr> LexiconSchema for Post<S> {
                 });
             }
         }
+        for value in &self.tags {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 25usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
+                    max: 25usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        for value in &self.tags {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("tags"),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.title;
             #[allow(unused_comparisons)]

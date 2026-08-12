@@ -122,6 +122,26 @@ impl<S: BosStr> LexiconSchema for Registration<S> {
         lexicon_doc_org_passingreads_book_registration()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        for value in &self.authors {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 512usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("authors"),
+                    max: 512usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        for value in &self.authors {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("authors"),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         if let Some(ref value) = self.cover {
             {
                 let size = value.blob().size;

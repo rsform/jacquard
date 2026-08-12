@@ -45,11 +45,112 @@ pub struct Profile<S: BosStr = DefaultStr> {
     ///Default hold DID for blob storage. If null, user has opted out of defaults.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub default_hold: Option<Did<S>>,
+    ///Preferred client for pull commands (docker, podman, buildah, nerdctl, crane). 'none' shows the image reference only. Defaults to docker if empty.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub oci_client: Option<ProfileOciClient<S>>,
+    ///Preferred registry domain for UI display. Must be one of the appview's configured registry domains. Empty means the primary (first configured) domain.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub registry_domain: Option<S>,
     ///Profile last updated timestamp
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Preferred client for pull commands (docker, podman, buildah, nerdctl, crane). 'none' shows the image reference only. Defaults to docker if empty.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileOciClient<S: BosStr = DefaultStr> {
+    Docker,
+    Podman,
+    Buildah,
+    Nerdctl,
+    Crane,
+    None,
+    Other(S),
+}
+
+impl<S: BosStr> ProfileOciClient<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Docker => "docker",
+            Self::Podman => "podman",
+            Self::Buildah => "buildah",
+            Self::Nerdctl => "nerdctl",
+            Self::Crane => "crane",
+            Self::None => "none",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "docker" => Self::Docker,
+            "podman" => Self::Podman,
+            "buildah" => Self::Buildah,
+            "nerdctl" => Self::Nerdctl,
+            "crane" => Self::Crane,
+            "none" => Self::None,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ProfileOciClient<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ProfileOciClient<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ProfileOciClient<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProfileOciClient<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ProfileOciClient<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ProfileOciClient<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ProfileOciClient<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileOciClient::Docker => ProfileOciClient::Docker,
+            ProfileOciClient::Podman => ProfileOciClient::Podman,
+            ProfileOciClient::Buildah => ProfileOciClient::Buildah,
+            ProfileOciClient::Nerdctl => ProfileOciClient::Nerdctl,
+            ProfileOciClient::Crane => ProfileOciClient::Crane,
+            ProfileOciClient::None => ProfileOciClient::None,
+            ProfileOciClient::Other(v) => ProfileOciClient::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -107,6 +208,26 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
         lexicon_doc_io_atcr_sailor_profile()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.oci_client {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("oci_client"),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.registry_domain {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("registry_domain"),
+                    max: 255usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -150,6 +271,8 @@ pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
         Option<bool>,
         Option<Datetime>,
         Option<Did<S>>,
+        Option<ProfileOciClient<S>>,
+        Option<S>,
         Option<Datetime>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -174,7 +297,7 @@ impl ProfileBuilder<profile_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -185,7 +308,7 @@ impl<S: BosStr> ProfileBuilder<profile_state::Empty, S> {
     pub fn builder() -> Self {
         ProfileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -237,14 +360,40 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 }
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
+    /// Set the `ociClient` field (optional)
+    pub fn oci_client(mut self, value: impl Into<Option<ProfileOciClient<S>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `ociClient` field to an Option value (optional)
+    pub fn maybe_oci_client(mut self, value: Option<ProfileOciClient<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
+    /// Set the `registryDomain` field (optional)
+    pub fn registry_domain(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `registryDomain` field to an Option value (optional)
+    pub fn maybe_registry_domain(mut self, value: Option<S>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.3 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -260,7 +409,9 @@ where
             auto_remove_untagged: self._fields.0,
             created_at: self._fields.1.unwrap(),
             default_hold: self._fields.2,
-            updated_at: self._fields.3,
+            oci_client: self._fields.3,
+            registry_domain: self._fields.4,
+            updated_at: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -270,7 +421,9 @@ where
             auto_remove_untagged: self._fields.0,
             created_at: self._fields.1.unwrap(),
             default_hold: self._fields.2,
-            updated_at: self._fields.3,
+            oci_client: self._fields.3,
+            registry_domain: self._fields.4,
+            updated_at: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -325,6 +478,30 @@ fn lexicon_doc_io_atcr_sailor_profile() -> LexiconDoc<'static> {
                                         ),
                                     ),
                                     format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("ociClient"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Preferred client for pull commands (docker, podman, buildah, nerdctl, crane). 'none' shows the image reference only. Defaults to docker if empty.",
+                                        ),
+                                    ),
+                                    max_length: Some(32usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("registryDomain"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Preferred registry domain for UI display. Must be one of the appview's configured registry domains. Empty means the primary (first configured) domain.",
+                                        ),
+                                    ),
+                                    max_length: Some(255usize),
                                     ..Default::default()
                                 }),
                             );

@@ -52,6 +52,33 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Per-category counts of activity performed inside anisota, summed across the period and across devices.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
+pub struct InAppCounts<S: BosStr = DefaultStr> {
+    ///Likes created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub likes: Option<i64>,
+    ///Top-level posts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posts: Option<i64>,
+    ///Quote posts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quotes: Option<i64>,
+    ///Replies created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replies: Option<i64>,
+    ///Reposts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reposts: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Weekly aggregation of daily records. rkey is YYYY-WNN (ISO week). Updated once per day, finalized when week ends.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -71,6 +98,9 @@ pub struct Weekly<S: BosStr = DefaultStr> {
     ///When the weekly record was finalized (end of week)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finalized_at: Option<Datetime>,
+    ///Rolled-up in-anisota activity for the week (summed daily inApp across devices, per field). Optional and additive; the read side may instead compute this from the week's daily logs.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub in_app: Option<weekly::InAppCounts<S>>,
     ///AT URIs of daily log records included in this week
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lower_log_refs: Option<Vec<S>>,
@@ -199,6 +229,66 @@ impl<S: BosStr> LexiconSchema for ChronicleSignature<S> {
         lexicon_doc_net_anisota_chronicle_log_weekly()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for InAppCounts<S> {
+    fn nsid() -> &'static str {
+        "net.anisota.chronicle.log.weekly"
+    }
+    fn def_name() -> &'static str {
+        "inAppCounts"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_net_anisota_chronicle_log_weekly()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.likes {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("likes"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("posts"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.quotes {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("quotes"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.replies {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("replies"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.reposts {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("reposts"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -800,6 +890,57 @@ fn lexicon_doc_net_anisota_chronicle_log_weekly() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("inAppCounts"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Per-category counts of activity performed inside anisota, summed across the period and across devices.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("likes"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("posts"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("quotes"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("replies"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reposts"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
                     description: Some(
@@ -863,6 +1004,13 @@ fn lexicon_doc_net_anisota_chronicle_log_weekly() -> LexiconDoc<'static> {
                                         ),
                                     ),
                                     format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("inApp"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#inAppCounts"),
                                     ..Default::default()
                                 }),
                             );
@@ -1208,6 +1356,7 @@ pub struct WeeklyBuilder<St: weekly_state::State, S: BosStr = DefaultStr> {
         Option<Datetime>,
         Option<Vec<S>>,
         Option<Datetime>,
+        Option<weekly::InAppCounts<S>>,
         Option<Vec<S>>,
         Option<weekly::WeeklyPatterns<S>>,
         Option<weekly::ChronicleSignature<S>>,
@@ -1239,7 +1388,7 @@ impl WeeklyBuilder<weekly_state::Empty, DefaultStr> {
         WeeklyBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1252,7 +1401,7 @@ impl<S: BosStr> WeeklyBuilder<weekly_state::Empty, S> {
         WeeklyBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1324,14 +1473,27 @@ impl<St: weekly_state::State, S: BosStr> WeeklyBuilder<St, S> {
 }
 
 impl<St: weekly_state::State, S: BosStr> WeeklyBuilder<St, S> {
+    /// Set the `inApp` field (optional)
+    pub fn in_app(mut self, value: impl Into<Option<weekly::InAppCounts<S>>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `inApp` field to an Option value (optional)
+    pub fn maybe_in_app(mut self, value: Option<weekly::InAppCounts<S>>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
+impl<St: weekly_state::State, S: BosStr> WeeklyBuilder<St, S> {
     /// Set the `lowerLogRefs` field (optional)
     pub fn lower_log_refs(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `lowerLogRefs` field to an Option value (optional)
     pub fn maybe_lower_log_refs(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.4 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1339,12 +1501,12 @@ impl<St: weekly_state::State, S: BosStr> WeeklyBuilder<St, S> {
 impl<St: weekly_state::State, S: BosStr> WeeklyBuilder<St, S> {
     /// Set the `patterns` field (optional)
     pub fn patterns(mut self, value: impl Into<Option<weekly::WeeklyPatterns<S>>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `patterns` field to an Option value (optional)
     pub fn maybe_patterns(mut self, value: Option<weekly::WeeklyPatterns<S>>) -> Self {
-        self._fields.5 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -1359,7 +1521,7 @@ where
         mut self,
         value: impl Into<weekly::ChronicleSignature<S>>,
     ) -> WeeklyBuilder<weekly_state::SetSignature<St>, S> {
-        self._fields.6 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         WeeklyBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1375,7 +1537,7 @@ where
 {
     /// Set the `status` field (required)
     pub fn status(mut self, value: impl Into<S>) -> WeeklyBuilder<weekly_state::SetStatus<St>, S> {
-        self._fields.7 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         WeeklyBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1387,12 +1549,12 @@ where
 impl<St: weekly_state::State, S: BosStr> WeeklyBuilder<St, S> {
     /// Set the `trends` field (optional)
     pub fn trends(mut self, value: impl Into<Option<weekly::TrendData<S>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `trends` field to an Option value (optional)
     pub fn maybe_trends(mut self, value: Option<weekly::TrendData<S>>) -> Self {
-        self._fields.8 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -1400,12 +1562,12 @@ impl<St: weekly_state::State, S: BosStr> WeeklyBuilder<St, S> {
 impl<St: weekly_state::State, S: BosStr> WeeklyBuilder<St, S> {
     /// Set the `upperLogRefs` field (optional)
     pub fn upper_log_refs(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `upperLogRefs` field to an Option value (optional)
     pub fn maybe_upper_log_refs(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.9 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1417,7 +1579,7 @@ where
 {
     /// Set the `week` field (required)
     pub fn week(mut self, value: impl Into<S>) -> WeeklyBuilder<weekly_state::SetWeek<St>, S> {
-        self._fields.10 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         WeeklyBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1442,13 +1604,14 @@ where
             created_at: self._fields.1.unwrap(),
             expedition_refs: self._fields.2,
             finalized_at: self._fields.3,
-            lower_log_refs: self._fields.4,
-            patterns: self._fields.5,
-            signature: self._fields.6.unwrap(),
-            status: self._fields.7.unwrap(),
-            trends: self._fields.8,
-            upper_log_refs: self._fields.9,
-            week: self._fields.10.unwrap(),
+            in_app: self._fields.4,
+            lower_log_refs: self._fields.5,
+            patterns: self._fields.6,
+            signature: self._fields.7.unwrap(),
+            status: self._fields.8.unwrap(),
+            trends: self._fields.9,
+            upper_log_refs: self._fields.10,
+            week: self._fields.11.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1459,13 +1622,14 @@ where
             created_at: self._fields.1.unwrap(),
             expedition_refs: self._fields.2,
             finalized_at: self._fields.3,
-            lower_log_refs: self._fields.4,
-            patterns: self._fields.5,
-            signature: self._fields.6.unwrap(),
-            status: self._fields.7.unwrap(),
-            trends: self._fields.8,
-            upper_log_refs: self._fields.9,
-            week: self._fields.10.unwrap(),
+            in_app: self._fields.4,
+            lower_log_refs: self._fields.5,
+            patterns: self._fields.6,
+            signature: self._fields.7.unwrap(),
+            status: self._fields.8.unwrap(),
+            trends: self._fields.9,
+            upper_log_refs: self._fields.10,
+            week: self._fields.11.unwrap(),
             extra_data: Some(extra_data),
         }
     }

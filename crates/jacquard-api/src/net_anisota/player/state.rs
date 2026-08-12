@@ -37,6 +37,12 @@ use serde::{Deserialize, Serialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct State<S: BosStr = DefaultStr> {
+    ///ISO datetime the player most recently accepted the Terms of Service / Privacy Policy.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accepted_terms_at: Option<Datetime>,
+    ///The highest Terms of Service / Privacy Policy version this player has accepted (see src/utils/termsVersion.js TERMS_VERSION). Drives the first-run acceptance gate; when this is below the current TERMS_VERSION the user is re-prompted to accept.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accepted_terms_version: Option<i64>,
     ///Target active blocks per day (decimal string, e.g. '6')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active_blocks_intention_daily: Option<S>,
@@ -55,6 +61,12 @@ pub struct State<S: BosStr = DefaultStr> {
     ///Activity style intention Y position as grid percentage (0-100, creating axis)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_intention_y: Option<S>,
+    ///Chosen app experience: 'story' (full immersive) or 'open' (simpler). Authoritative cross-device value for the mode picked during onboarding.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub app_mode: Option<S>,
+    ///Object mapping completed story/onboarding chapter ids (e.g. 'welcome') to the ISO datetime they were completed. Drives whether the onboarding/changelog overlays are shown.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub completed_chapters: Option<Data<S>>,
     ///Current light charge in Wh (decimal string, e.g. '280.0')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_light: Option<S>,
@@ -64,12 +76,24 @@ pub struct State<S: BosStr = DefaultStr> {
     ///Equipment slots: object mapping slotId (hands, backpack, camp) to arrays of equipped item ID strings
     #[serde(skip_serializing_if = "Option::is_none")]
     pub equipped: Option<Data<S>>,
+    ///Whether the v2 inventory/equipment migration has been applied for this player.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inventory_migration_v2: Option<bool>,
+    ///Whether the v3 inventory/equipment migration (power-station id remap) has been applied for this player.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub inventory_migration_v3: Option<bool>,
     ///When the current session started (for multi-device awareness)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_session_start: Option<Datetime>,
     ///Whether light drain was active when state was saved
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light_drain_active: Option<bool>,
+    ///Rest ledger high-water-mark: the longest rest stretch ever (time away from the forest between walks) in minutes, as a decimal string. Monotonic — only ever increases. Everything else the rest ledger shows is computed on read from the walk records; this is the one durable figure.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub longest_rest_minutes: Option<S>,
+    ///Comma-joined list of goal ids the player selected during onboarding (e.g. 'offline-more,reply-more'). Stored as a string to avoid depending on array support.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub onboarding_goals: Option<S>,
     ///Slot capacity overrides: object mapping slotId to integer capacity (for upgrades). Slots not listed use default capacity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub slot_capacity: Option<Data<S>>,
@@ -183,7 +207,8 @@ pub mod state_state {
 pub struct StateBuilder<St: state_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<S>,
+        Option<Datetime>,
+        Option<i64>,
         Option<S>,
         Option<S>,
         Option<S>,
@@ -192,8 +217,15 @@ pub struct StateBuilder<St: state_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<S>,
         Option<Data<S>>,
+        Option<S>,
+        Option<S>,
+        Option<Data<S>>,
+        Option<bool>,
+        Option<bool>,
         Option<Datetime>,
         Option<bool>,
+        Option<S>,
+        Option<S>,
         Option<Data<S>>,
         Option<bool>,
         Option<S>,
@@ -224,7 +256,7 @@ impl StateBuilder<state_state::Empty, DefaultStr> {
             _state: PhantomData,
             _fields: (
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -238,7 +270,7 @@ impl<S: BosStr> StateBuilder<state_state::Empty, S> {
             _state: PhantomData,
             _fields: (
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -246,14 +278,40 @@ impl<S: BosStr> StateBuilder<state_state::Empty, S> {
 }
 
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `acceptedTermsAt` field (optional)
+    pub fn accepted_terms_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `acceptedTermsAt` field to an Option value (optional)
+    pub fn maybe_accepted_terms_at(mut self, value: Option<Datetime>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `acceptedTermsVersion` field (optional)
+    pub fn accepted_terms_version(mut self, value: impl Into<Option<i64>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `acceptedTermsVersion` field to an Option value (optional)
+    pub fn maybe_accepted_terms_version(mut self, value: Option<i64>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `activeBlocksIntentionDaily` field (optional)
     pub fn active_blocks_intention_daily(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.0 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `activeBlocksIntentionDaily` field to an Option value (optional)
     pub fn maybe_active_blocks_intention_daily(mut self, value: Option<S>) -> Self {
-        self._fields.0 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -261,12 +319,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `activityIntentionConsuming7d` field (optional)
     pub fn activity_intention_consuming7d(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `activityIntentionConsuming7d` field to an Option value (optional)
     pub fn maybe_activity_intention_consuming7d(mut self, value: Option<S>) -> Self {
-        self._fields.1 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -274,12 +332,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `activityIntentionCreating7d` field (optional)
     pub fn activity_intention_creating7d(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `activityIntentionCreating7d` field to an Option value (optional)
     pub fn maybe_activity_intention_creating7d(mut self, value: Option<S>) -> Self {
-        self._fields.2 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -287,12 +345,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `activityIntentionTotal7d` field (optional)
     pub fn activity_intention_total7d(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `activityIntentionTotal7d` field to an Option value (optional)
     pub fn maybe_activity_intention_total7d(mut self, value: Option<S>) -> Self {
-        self._fields.3 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -300,12 +358,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `activityIntentionX` field (optional)
     pub fn activity_intention_x(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `activityIntentionX` field to an Option value (optional)
     pub fn maybe_activity_intention_x(mut self, value: Option<S>) -> Self {
-        self._fields.4 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -313,12 +371,38 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `activityIntentionY` field (optional)
     pub fn activity_intention_y(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `activityIntentionY` field to an Option value (optional)
     pub fn maybe_activity_intention_y(mut self, value: Option<S>) -> Self {
-        self._fields.5 = value;
+        self._fields.7 = value;
+        self
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `appMode` field (optional)
+    pub fn app_mode(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.8 = value.into();
+        self
+    }
+    /// Set the `appMode` field to an Option value (optional)
+    pub fn maybe_app_mode(mut self, value: Option<S>) -> Self {
+        self._fields.8 = value;
+        self
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `completedChapters` field (optional)
+    pub fn completed_chapters(mut self, value: impl Into<Option<Data<S>>>) -> Self {
+        self._fields.9 = value.into();
+        self
+    }
+    /// Set the `completedChapters` field to an Option value (optional)
+    pub fn maybe_completed_chapters(mut self, value: Option<Data<S>>) -> Self {
+        self._fields.9 = value;
         self
     }
 }
@@ -326,12 +410,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `currentLight` field (optional)
     pub fn current_light(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `currentLight` field to an Option value (optional)
     pub fn maybe_current_light(mut self, value: Option<S>) -> Self {
-        self._fields.6 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -339,12 +423,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `currentStamina` field (optional)
     pub fn current_stamina(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `currentStamina` field to an Option value (optional)
     pub fn maybe_current_stamina(mut self, value: Option<S>) -> Self {
-        self._fields.7 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -352,12 +436,38 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `equipped` field (optional)
     pub fn equipped(mut self, value: impl Into<Option<Data<S>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `equipped` field to an Option value (optional)
     pub fn maybe_equipped(mut self, value: Option<Data<S>>) -> Self {
-        self._fields.8 = value;
+        self._fields.12 = value;
+        self
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `inventoryMigrationV2` field (optional)
+    pub fn inventory_migration_v2(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.13 = value.into();
+        self
+    }
+    /// Set the `inventoryMigrationV2` field to an Option value (optional)
+    pub fn maybe_inventory_migration_v2(mut self, value: Option<bool>) -> Self {
+        self._fields.13 = value;
+        self
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `inventoryMigrationV3` field (optional)
+    pub fn inventory_migration_v3(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.14 = value.into();
+        self
+    }
+    /// Set the `inventoryMigrationV3` field to an Option value (optional)
+    pub fn maybe_inventory_migration_v3(mut self, value: Option<bool>) -> Self {
+        self._fields.14 = value;
         self
     }
 }
@@ -365,12 +475,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `lastSessionStart` field (optional)
     pub fn last_session_start(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.15 = value.into();
         self
     }
     /// Set the `lastSessionStart` field to an Option value (optional)
     pub fn maybe_last_session_start(mut self, value: Option<Datetime>) -> Self {
-        self._fields.9 = value;
+        self._fields.15 = value;
         self
     }
 }
@@ -378,12 +488,38 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `lightDrainActive` field (optional)
     pub fn light_drain_active(mut self, value: impl Into<Option<bool>>) -> Self {
-        self._fields.10 = value.into();
+        self._fields.16 = value.into();
         self
     }
     /// Set the `lightDrainActive` field to an Option value (optional)
     pub fn maybe_light_drain_active(mut self, value: Option<bool>) -> Self {
-        self._fields.10 = value;
+        self._fields.16 = value;
+        self
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `longestRestMinutes` field (optional)
+    pub fn longest_rest_minutes(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.17 = value.into();
+        self
+    }
+    /// Set the `longestRestMinutes` field to an Option value (optional)
+    pub fn maybe_longest_rest_minutes(mut self, value: Option<S>) -> Self {
+        self._fields.17 = value;
+        self
+    }
+}
+
+impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
+    /// Set the `onboardingGoals` field (optional)
+    pub fn onboarding_goals(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.18 = value.into();
+        self
+    }
+    /// Set the `onboardingGoals` field to an Option value (optional)
+    pub fn maybe_onboarding_goals(mut self, value: Option<S>) -> Self {
+        self._fields.18 = value;
         self
     }
 }
@@ -391,12 +527,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `slotCapacity` field (optional)
     pub fn slot_capacity(mut self, value: impl Into<Option<Data<S>>>) -> Self {
-        self._fields.11 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `slotCapacity` field to an Option value (optional)
     pub fn maybe_slot_capacity(mut self, value: Option<Data<S>>) -> Self {
-        self._fields.11 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -404,12 +540,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `starterItemsGranted` field (optional)
     pub fn starter_items_granted(mut self, value: impl Into<Option<bool>>) -> Self {
-        self._fields.12 = value.into();
+        self._fields.20 = value.into();
         self
     }
     /// Set the `starterItemsGranted` field to an Option value (optional)
     pub fn maybe_starter_items_granted(mut self, value: Option<bool>) -> Self {
-        self._fields.12 = value;
+        self._fields.20 = value;
         self
     }
 }
@@ -417,12 +553,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `triggerSource` field (optional)
     pub fn trigger_source(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.13 = value.into();
+        self._fields.21 = value.into();
         self
     }
     /// Set the `triggerSource` field to an Option value (optional)
     pub fn maybe_trigger_source(mut self, value: Option<S>) -> Self {
-        self._fields.13 = value;
+        self._fields.21 = value;
         self
     }
 }
@@ -430,12 +566,12 @@ impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
 impl<St: state_state::State, S: BosStr> StateBuilder<St, S> {
     /// Set the `tutorialCompletedAt` field (optional)
     pub fn tutorial_completed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.14 = value.into();
+        self._fields.22 = value.into();
         self
     }
     /// Set the `tutorialCompletedAt` field to an Option value (optional)
     pub fn maybe_tutorial_completed_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.14 = value;
+        self._fields.22 = value;
         self
     }
 }
@@ -450,7 +586,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> StateBuilder<state_state::SetUpdatedAt<St>, S> {
-        self._fields.15 = Option::Some(value.into());
+        self._fields.23 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -467,44 +603,60 @@ where
     /// Build the final struct.
     pub fn build(self) -> State<S> {
         State {
-            active_blocks_intention_daily: self._fields.0,
-            activity_intention_consuming7d: self._fields.1,
-            activity_intention_creating7d: self._fields.2,
-            activity_intention_total7d: self._fields.3,
-            activity_intention_x: self._fields.4,
-            activity_intention_y: self._fields.5,
-            current_light: self._fields.6,
-            current_stamina: self._fields.7,
-            equipped: self._fields.8,
-            last_session_start: self._fields.9,
-            light_drain_active: self._fields.10,
-            slot_capacity: self._fields.11,
-            starter_items_granted: self._fields.12,
-            trigger_source: self._fields.13,
-            tutorial_completed_at: self._fields.14,
-            updated_at: self._fields.15.unwrap(),
+            accepted_terms_at: self._fields.0,
+            accepted_terms_version: self._fields.1,
+            active_blocks_intention_daily: self._fields.2,
+            activity_intention_consuming7d: self._fields.3,
+            activity_intention_creating7d: self._fields.4,
+            activity_intention_total7d: self._fields.5,
+            activity_intention_x: self._fields.6,
+            activity_intention_y: self._fields.7,
+            app_mode: self._fields.8,
+            completed_chapters: self._fields.9,
+            current_light: self._fields.10,
+            current_stamina: self._fields.11,
+            equipped: self._fields.12,
+            inventory_migration_v2: self._fields.13,
+            inventory_migration_v3: self._fields.14,
+            last_session_start: self._fields.15,
+            light_drain_active: self._fields.16,
+            longest_rest_minutes: self._fields.17,
+            onboarding_goals: self._fields.18,
+            slot_capacity: self._fields.19,
+            starter_items_granted: self._fields.20,
+            trigger_source: self._fields.21,
+            tutorial_completed_at: self._fields.22,
+            updated_at: self._fields.23.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> State<S> {
         State {
-            active_blocks_intention_daily: self._fields.0,
-            activity_intention_consuming7d: self._fields.1,
-            activity_intention_creating7d: self._fields.2,
-            activity_intention_total7d: self._fields.3,
-            activity_intention_x: self._fields.4,
-            activity_intention_y: self._fields.5,
-            current_light: self._fields.6,
-            current_stamina: self._fields.7,
-            equipped: self._fields.8,
-            last_session_start: self._fields.9,
-            light_drain_active: self._fields.10,
-            slot_capacity: self._fields.11,
-            starter_items_granted: self._fields.12,
-            trigger_source: self._fields.13,
-            tutorial_completed_at: self._fields.14,
-            updated_at: self._fields.15.unwrap(),
+            accepted_terms_at: self._fields.0,
+            accepted_terms_version: self._fields.1,
+            active_blocks_intention_daily: self._fields.2,
+            activity_intention_consuming7d: self._fields.3,
+            activity_intention_creating7d: self._fields.4,
+            activity_intention_total7d: self._fields.5,
+            activity_intention_x: self._fields.6,
+            activity_intention_y: self._fields.7,
+            app_mode: self._fields.8,
+            completed_chapters: self._fields.9,
+            current_light: self._fields.10,
+            current_stamina: self._fields.11,
+            equipped: self._fields.12,
+            inventory_migration_v2: self._fields.13,
+            inventory_migration_v3: self._fields.14,
+            last_session_start: self._fields.15,
+            light_drain_active: self._fields.16,
+            longest_rest_minutes: self._fields.17,
+            onboarding_goals: self._fields.18,
+            slot_capacity: self._fields.19,
+            starter_items_granted: self._fields.20,
+            trigger_source: self._fields.21,
+            tutorial_completed_at: self._fields.22,
+            updated_at: self._fields.23.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -534,6 +686,24 @@ fn lexicon_doc_net_anisota_player_state() -> LexiconDoc<'static> {
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("acceptedTermsAt"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "ISO datetime the player most recently accepted the Terms of Service / Privacy Policy.",
+                                        ),
+                                    ),
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("acceptedTermsVersion"),
+                                LexObjectProperty::Integer(LexInteger {
+                                    ..Default::default()
+                                }),
+                            );
                             map.insert(
                                 SmolStr::new_static("activeBlocksIntentionDaily"),
                                 LexObjectProperty::String(LexString {
@@ -601,6 +771,23 @@ fn lexicon_doc_net_anisota_player_state() -> LexiconDoc<'static> {
                                 }),
                             );
                             map.insert(
+                                SmolStr::new_static("appMode"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Chosen app experience: 'story' (full immersive) or 'open' (simpler). Authoritative cross-device value for the mode picked during onboarding.",
+                                        ),
+                                    ),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("completedChapters"),
+                                LexObjectProperty::Unknown(LexUnknown {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("currentLight"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
@@ -629,6 +816,18 @@ fn lexicon_doc_net_anisota_player_state() -> LexiconDoc<'static> {
                                 }),
                             );
                             map.insert(
+                                SmolStr::new_static("inventoryMigrationV2"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("inventoryMigrationV3"),
+                                LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("lastSessionStart"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
@@ -643,6 +842,28 @@ fn lexicon_doc_net_anisota_player_state() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("lightDrainActive"),
                                 LexObjectProperty::Boolean(LexBoolean {
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("longestRestMinutes"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Rest ledger high-water-mark: the longest rest stretch ever (time away from the forest between walks) in minutes, as a decimal string. Monotonic — only ever increases. Everything else the rest ledger shows is computed on read from the walk records; this is the one durable figure.",
+                                        ),
+                                    ),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("onboardingGoals"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Comma-joined list of goal ids the player selected during onboarding (e.g. 'offline-more,reply-more'). Stored as a string to avoid depending on array support.",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

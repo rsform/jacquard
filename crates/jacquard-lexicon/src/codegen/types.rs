@@ -183,6 +183,7 @@ impl<'c> CodeGenerator<'c> {
             Some(LexStringFormat::AtIdentifier) => resolved.type_tokens(&CommonType::AtIdentifier),
             Some(LexStringFormat::Nsid) => resolved.type_tokens(&CommonType::Nsid),
             Some(LexStringFormat::AtUri) => resolved.type_tokens(&CommonType::AtUri),
+            Some(LexStringFormat::SpaceRef) => resolved.type_tokens(&CommonType::AtSpaceUri),
             Some(LexStringFormat::Uri) => resolved.type_tokens(&CommonType::UriValue),
             Some(LexStringFormat::Cid) => resolved.type_tokens(&CommonType::Cid),
             Some(LexStringFormat::Language) => resolved.type_tokens(&CommonType::Language),

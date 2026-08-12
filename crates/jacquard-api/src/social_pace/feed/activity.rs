@@ -160,6 +160,17 @@ impl<S: BosStr> LexiconSchema for Activity<S> {
                 }
             }
         }
+        {
+            let value = &self.r#type;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("type"),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }

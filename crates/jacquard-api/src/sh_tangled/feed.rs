@@ -5,6 +5,12 @@
 
 //! Generated bindings for the `sh.tangled.feed` Lexicon namespace/module.
 pub mod comment;
+pub mod count_comments;
+pub mod count_comments_by;
+pub mod count_reactions;
+pub mod count_reactions_by;
+pub mod count_stars;
+pub mod count_stars_by;
 pub mod list_comments;
 pub mod list_comments_by;
 pub mod list_reactions;

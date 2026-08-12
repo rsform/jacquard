@@ -217,6 +217,18 @@ impl<S: BosStr> LexiconSchema for Oekaki<S> {
                 });
             }
         }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 640usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 640usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }

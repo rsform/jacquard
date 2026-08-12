@@ -148,6 +148,18 @@ impl<S: BosStr> LexiconSchema for Goal<S> {
                 });
             }
         }
+        if let Some(values) = &self.categories {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 64usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("categories"),
+                        max: 64usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.completed_accent_color {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {

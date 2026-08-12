@@ -292,6 +292,56 @@ fn user_type_to_tokens(
                 permissions: vec![],
             })
         },
+        LexUserType::Space(space) => {
+            let description = field_cow_str("description", &space.description, p);
+            let key = field_cow_str("key", &space.key, p);
+            let name = field_cow_str("name", &space.name, p);
+            let cow = &p.cow;
+            let btree = &p.btree;
+            let name_lang = match &space.name_lang {
+                Some(values) => {
+                    let entries: Vec<_> = values
+                        .iter()
+                        .map(|(language, value)| {
+                            let language = language.as_ref();
+                            let value = value.as_ref();
+                            quote! {
+                                map.insert(#cow::new_static(#language), #cow::new_static(#value));
+                            }
+                        })
+                        .collect();
+                    quote! {
+                        name_lang: Some({
+                            let mut map = #btree::new();
+                            #(#entries)*
+                            map
+                        }),
+                    }
+                }
+                None => TokenStream::new(),
+            };
+            let collections: Vec<_> = space
+                .collections
+                .iter()
+                .map(|collection| {
+                    let collection = collection.as_ref();
+                    quote! {
+                        ::jacquard_common::types::nsid::Nsid::from(
+                            #cow::new_static(#collection)
+                        )
+                    }
+                })
+                .collect();
+            quote! {
+                #lex LexUserType::Space(#lex LexSpace {
+                    #description
+                    #key
+                    #name
+                    #name_lang
+                    collections: vec![#(#collections),*],
+                })
+            }
+        }
     }
 }
 
@@ -579,6 +629,7 @@ fn lex_string_to_tokens(s: &LexString, p: &DocPaths) -> TokenStream {
         LexStringFormat::Did => quote! { #lex LexStringFormat::Did },
         LexStringFormat::Handle => quote! { #lex LexStringFormat::Handle },
         LexStringFormat::AtUri => quote! { #lex LexStringFormat::AtUri },
+        LexStringFormat::SpaceRef => quote! { #lex LexStringFormat::SpaceRef },
         LexStringFormat::Nsid => quote! { #lex LexStringFormat::Nsid },
         LexStringFormat::Cid => quote! { #lex LexStringFormat::Cid },
         LexStringFormat::Datetime => quote! { #lex LexStringFormat::Datetime },

@@ -6,6 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `sh.tangled.string` Lexicon namespace/module.
+pub mod count_strings;
 pub mod list_strings;
 
 #[allow(unused_imports)]

@@ -319,6 +319,18 @@ impl<S: BosStr> LexiconSchema for Tag<S> {
                 });
             }
         }
+        if let Some(values) = &self.aliases {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 200usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("aliases"),
+                        max: 200usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.category {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 50usize {
@@ -381,6 +393,18 @@ impl<S: BosStr> LexiconSchema for Tag<S> {
                     max: 20usize,
                     actual: value.len(),
                 });
+            }
+        }
+        if let Some(values) = &self.same_as {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 2048usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("same_as"),
+                        max: 2048usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
             }
         }
         if let Some(ref value) = self.status {

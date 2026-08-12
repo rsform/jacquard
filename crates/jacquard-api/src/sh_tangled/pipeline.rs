@@ -7,6 +7,10 @@
 
 //! Generated bindings for the `sh.tangled.pipeline` Lexicon namespace/module.
 pub mod cancel_pipeline;
+pub mod count_pipelines;
+pub mod count_pipelines_by;
+pub mod count_statuses;
+pub mod count_statuses_by;
 pub mod list_pipelines;
 pub mod list_pipelines_by;
 pub mod list_statuses;
@@ -84,6 +88,11 @@ pub struct PipelineGetRecordOutput<S: BosStr = DefaultStr> {
 pub struct ManualTriggerData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inputs: Option<Vec<pipeline::Pair<S>>>,
+    ///optional ref the SHA was resolved from, for display and TANGLED_REF
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#ref: Option<S>,
+    ///commit SHA the manual run targets
+    pub sha: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -106,7 +115,12 @@ pub struct Pair<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct PullRequestTriggerData<S: BosStr = DefaultStr> {
-    pub action: S,
+    ///the pull request lifecycle action that produced this trigger
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub action: Option<S>,
+    ///AT-URI of the sh.tangled.repo.pull record this run belongs to
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pull: Option<AtUri<S>>,
     pub source_branch: S,
     pub source_sha: S,
     pub target_branch: S,
@@ -141,6 +155,9 @@ pub struct TriggerMetadata<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub push: Option<pipeline::PushTriggerData<S>>,
     pub repo: pipeline::TriggerRepo<S>,
+    ///Repository DID that code and workflow definitions are checked out from, when different from repo (e.g. a fork's commit for a fork-based manual trigger). If absent, source uses repo itself.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_repo: Option<Did<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -173,6 +190,8 @@ pub struct Workflow<S: BosStr = DefaultStr> {
     pub engine: S,
     pub name: S,
     pub raw: S,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub runs_on: Option<Vec<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -251,6 +270,28 @@ impl<S: BosStr> LexiconSchema for ManualTriggerData<S> {
         lexicon_doc_sh_tangled_pipeline()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        {
+            let value = &self.sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 40usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("sha"),
+                    max: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.sha;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 40usize {
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("sha"),
+                    min: 40usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -690,6 +731,9 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
+                        description: Some(CowStr::new_static(
+                            "DEPRECATED: use sh.tangled.ci.pipeline instead",
+                        )),
                         required: Some(vec![
                             SmolStr::new_static("triggerMetadata"),
                             SmolStr::new_static("workflows"),
@@ -724,6 +768,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("manualTriggerData"),
                 LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("sha")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -734,6 +779,28 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                                     r#ref: CowStr::new_static("#pair"),
                                     ..Default::default()
                                 }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("ref"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "optional ref the SHA was resolved from, for display and TANGLED_REF",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("sha"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static("commit SHA the manual run targets"),
+                                ),
+                                min_length: Some(40usize),
+                                max_length: Some(40usize),
                                 ..Default::default()
                             }),
                         );
@@ -776,7 +843,6 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         SmolStr::new_static("sourceBranch"),
                         SmolStr::new_static("targetBranch"),
                         SmolStr::new_static("sourceSha"),
-                        SmolStr::new_static("action"),
                     ]),
                     properties: {
                         #[allow(unused_mut)]
@@ -784,6 +850,19 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("action"),
                             LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static(
+                                    "the pull request lifecycle action that produced this trigger",
+                                )),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("pull"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(CowStr::new_static(
+                                    "AT-URI of the sh.tangled.repo.pull record this run belongs to",
+                                )),
+                                format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
                         );
@@ -853,18 +932,15 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("triggerMetadata"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("kind"),
-                        SmolStr::new_static("repo"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("kind"), SmolStr::new_static("repo")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("kind"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("manual"),
@@ -891,6 +967,18 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                             SmolStr::new_static("repo"),
                             LexObjectProperty::Ref(LexRef {
                                 r#ref: CowStr::new_static("#triggerRepo"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("sourceRepo"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Repository DID that code and workflow definitions are checked out from, when different from repo (e.g. a fork's commit for a fork-based manual trigger). If absent, source uses repo itself.",
+                                    ),
+                                ),
+                                format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
                         );
@@ -982,6 +1070,15 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("raw"),
                             LexObjectProperty::String(LexString {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("runsOn"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
+                                }),
                                 ..Default::default()
                             }),
                         );
@@ -1201,6 +1298,7 @@ pub struct TriggerMetadataBuilder<St: trigger_metadata_state::State, S: BosStr =
         Option<pipeline::PullRequestTriggerData<S>>,
         Option<pipeline::PushTriggerData<S>>,
         Option<pipeline::TriggerRepo<S>>,
+        Option<Did<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -1224,7 +1322,7 @@ impl TriggerMetadataBuilder<trigger_metadata_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         TriggerMetadataBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1235,7 +1333,7 @@ impl<S: BosStr> TriggerMetadataBuilder<trigger_metadata_state::Empty, S> {
     pub fn builder() -> Self {
         TriggerMetadataBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1324,6 +1422,19 @@ where
     }
 }
 
+impl<St: trigger_metadata_state::State, S: BosStr> TriggerMetadataBuilder<St, S> {
+    /// Set the `sourceRepo` field (optional)
+    pub fn source_repo(mut self, value: impl Into<Option<Did<S>>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `sourceRepo` field to an Option value (optional)
+    pub fn maybe_source_repo(mut self, value: Option<Did<S>>) -> Self {
+        self._fields.5 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> TriggerMetadataBuilder<St, S>
 where
     St: trigger_metadata_state::State,
@@ -1338,6 +1449,7 @@ where
             pull_request: self._fields.2,
             push: self._fields.3,
             repo: self._fields.4.unwrap(),
+            source_repo: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -1349,6 +1461,7 @@ where
             pull_request: self._fields.2,
             push: self._fields.3,
             repo: self._fields.4.unwrap(),
+            source_repo: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -1657,6 +1770,7 @@ pub struct WorkflowBuilder<St: workflow_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<S>,
         Option<S>,
+        Option<Vec<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -1680,7 +1794,7 @@ impl WorkflowBuilder<workflow_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         WorkflowBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1691,7 +1805,7 @@ impl<S: BosStr> WorkflowBuilder<workflow_state::Empty, S> {
     pub fn builder() -> Self {
         WorkflowBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1767,6 +1881,19 @@ where
     }
 }
 
+impl<St: workflow_state::State, S: BosStr> WorkflowBuilder<St, S> {
+    /// Set the `runsOn` field (optional)
+    pub fn runs_on(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `runsOn` field to an Option value (optional)
+    pub fn maybe_runs_on(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.4 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> WorkflowBuilder<St, S>
 where
     St: workflow_state::State,
@@ -1782,6 +1909,7 @@ where
             engine: self._fields.1.unwrap(),
             name: self._fields.2.unwrap(),
             raw: self._fields.3.unwrap(),
+            runs_on: self._fields.4,
             extra_data: Default::default(),
         }
     }
@@ -1792,6 +1920,7 @@ where
             engine: self._fields.1.unwrap(),
             name: self._fields.2.unwrap(),
             raw: self._fields.3.unwrap(),
+            runs_on: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

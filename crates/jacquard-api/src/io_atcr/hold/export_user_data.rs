@@ -180,6 +180,18 @@ impl<S: BosStr> LexiconSchema for CrewExport<S> {
         lexicon_doc_io_atcr_hold_exportUserData()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(values) = &self.permissions {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 64usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("permissions"),
+                        max: 64usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.role {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 32usize {

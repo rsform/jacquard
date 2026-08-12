@@ -4,6 +4,9 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `sh.tangled.label` Lexicon namespace/module.
+pub mod count_definitions;
+pub mod count_ops;
+pub mod count_ops_by;
 pub mod definition;
 pub mod list_definitions;
 pub mod list_ops;

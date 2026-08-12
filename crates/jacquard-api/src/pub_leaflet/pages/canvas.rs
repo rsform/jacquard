@@ -26,15 +26,19 @@ use crate::pub_leaflet::blocks::button::Button;
 use crate::pub_leaflet::blocks::code::Code;
 use crate::pub_leaflet::blocks::header::Header;
 use crate::pub_leaflet::blocks::horizontal_rule::HorizontalRule;
+use crate::pub_leaflet::blocks::html::Html;
 use crate::pub_leaflet::blocks::iframe::Iframe;
 use crate::pub_leaflet::blocks::image::Image;
+use crate::pub_leaflet::blocks::image_gallery::ImageGallery;
 use crate::pub_leaflet::blocks::math::Math;
+use crate::pub_leaflet::blocks::members_only_delimiter::MembersOnlyDelimiter;
 use crate::pub_leaflet::blocks::ordered_list::OrderedList;
 use crate::pub_leaflet::blocks::page::Page;
 use crate::pub_leaflet::blocks::poll::Poll;
 use crate::pub_leaflet::blocks::posts_list::PostsList;
 use crate::pub_leaflet::blocks::signup::Signup;
 use crate::pub_leaflet::blocks::standard_site_post::StandardSitePost;
+use crate::pub_leaflet::blocks::standard_site_publication::StandardSitePublication;
 use crate::pub_leaflet::blocks::text::Text;
 use crate::pub_leaflet::blocks::unordered_list::UnorderedList;
 use crate::pub_leaflet::blocks::website::Website;
@@ -68,6 +72,8 @@ pub struct Block<S: BosStr = DefaultStr> {
 pub enum BlockBlock<S: BosStr = DefaultStr> {
     #[serde(rename = "pub.leaflet.blocks.iframe")]
     Iframe(Box<Iframe<S>>),
+    #[serde(rename = "pub.leaflet.blocks.html")]
+    Html(Box<Html<S>>),
     #[serde(rename = "pub.leaflet.blocks.text")]
     Text(Box<Text<S>>),
     #[serde(rename = "pub.leaflet.blocks.blockquote")]
@@ -76,6 +82,8 @@ pub enum BlockBlock<S: BosStr = DefaultStr> {
     Header(Box<Header<S>>),
     #[serde(rename = "pub.leaflet.blocks.image")]
     Image(Box<Image<S>>),
+    #[serde(rename = "pub.leaflet.blocks.imageGallery")]
+    ImageGallery(Box<ImageGallery<S>>),
     #[serde(rename = "pub.leaflet.blocks.unorderedList")]
     UnorderedList(Box<UnorderedList<S>>),
     #[serde(rename = "pub.leaflet.blocks.orderedList")]
@@ -92,6 +100,8 @@ pub enum BlockBlock<S: BosStr = DefaultStr> {
     BskyPost(Box<BskyPost<S>>),
     #[serde(rename = "pub.leaflet.blocks.standardSitePost")]
     StandardSitePost(Box<StandardSitePost<S>>),
+    #[serde(rename = "pub.leaflet.blocks.standardSitePublication")]
+    StandardSitePublication(Box<StandardSitePublication<S>>),
     #[serde(rename = "pub.leaflet.blocks.page")]
     Page(Box<Page<S>>),
     #[serde(rename = "pub.leaflet.blocks.poll")]
@@ -102,6 +112,8 @@ pub enum BlockBlock<S: BosStr = DefaultStr> {
     PostsList(Box<PostsList<S>>),
     #[serde(rename = "pub.leaflet.blocks.signup")]
     Signup(Box<Signup<S>>),
+    #[serde(rename = "pub.leaflet.blocks.membersOnlyDelimiter")]
+    MembersOnlyDelimiter(Box<MembersOnlyDelimiter<S>>),
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -503,10 +515,12 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("pub.leaflet.blocks.iframe"),
+                                    CowStr::new_static("pub.leaflet.blocks.html"),
                                     CowStr::new_static("pub.leaflet.blocks.text"),
                                     CowStr::new_static("pub.leaflet.blocks.blockquote"),
                                     CowStr::new_static("pub.leaflet.blocks.header"),
                                     CowStr::new_static("pub.leaflet.blocks.image"),
+                                    CowStr::new_static("pub.leaflet.blocks.imageGallery"),
                                     CowStr::new_static("pub.leaflet.blocks.unorderedList"),
                                     CowStr::new_static("pub.leaflet.blocks.orderedList"),
                                     CowStr::new_static("pub.leaflet.blocks.website"),
@@ -515,11 +529,15 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
                                     CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
                                     CowStr::new_static("pub.leaflet.blocks.bskyPost"),
                                     CowStr::new_static("pub.leaflet.blocks.standardSitePost"),
+                                    CowStr::new_static(
+                                        "pub.leaflet.blocks.standardSitePublication",
+                                    ),
                                     CowStr::new_static("pub.leaflet.blocks.page"),
                                     CowStr::new_static("pub.leaflet.blocks.poll"),
                                     CowStr::new_static("pub.leaflet.blocks.button"),
                                     CowStr::new_static("pub.leaflet.blocks.postsList"),
                                     CowStr::new_static("pub.leaflet.blocks.signup"),
+                                    CowStr::new_static("pub.leaflet.blocks.membersOnlyDelimiter"),
                                 ],
                                 ..Default::default()
                             }),

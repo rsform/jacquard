@@ -79,7 +79,7 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Consolidated achievement record. Replaces 30 beta achievement lexicons. rkey is the achievement ID (e.g. followers2500, level50). Created once with createRecord when achievement is unlocked. Immutable.
+/// DEPRECATED - superseded by net.anisota.chronicle.milestone. No new records are written to this collection; the schema is kept because earlier records still exist on users' PDSes and remain readable. rkey is the achievement ID (e.g. followers2500, level50). Immutable.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -444,7 +444,7 @@ fn lexicon_doc_net_anisota_chronicle_achievement() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     description: Some(
                         CowStr::new_static(
-                            "Consolidated achievement record. Replaces 30 beta achievement lexicons. rkey is the achievement ID (e.g. followers2500, level50). Created once with createRecord when achievement is unlocked. Immutable.",
+                            "DEPRECATED - superseded by net.anisota.chronicle.milestone. No new records are written to this collection; the schema is kept because earlier records still exist on users' PDSes and remain readable. rkey is the achievement ID (e.g. followers2500, level50). Immutable.",
                         ),
                     ),
                     key: Some(CowStr::new_static("any")),

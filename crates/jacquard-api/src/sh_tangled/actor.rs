@@ -4,4 +4,6 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `sh.tangled.actor` Lexicon namespace/module.
+pub mod get_profile;
+pub mod get_profiles;
 pub mod profile;

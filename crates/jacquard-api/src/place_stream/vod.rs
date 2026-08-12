@@ -7,8 +7,16 @@
 
 //! Generated bindings for the `place.stream.vod` Lexicon namespace/module.
 pub mod comment;
+pub mod create_draft;
+pub mod delete_draft;
+pub mod draft_defs;
+pub mod draft_video;
 pub mod gate;
 pub mod get_comments;
+pub mod get_draft;
+pub mod list_drafts;
+pub mod publish_draft;
+pub mod update_draft;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;

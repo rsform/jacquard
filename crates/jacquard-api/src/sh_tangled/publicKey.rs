@@ -4,4 +4,5 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `sh.tangled.publicKey` Lexicon namespace/module.
+pub mod count_keys;
 pub mod list_keys;

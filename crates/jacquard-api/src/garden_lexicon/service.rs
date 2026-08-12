@@ -180,6 +180,18 @@ impl<S: BosStr> LexiconSchema for Method<S> {
         lexicon_doc_garden_lexicon_service()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(values) = &self.auth_methods {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 50usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("auth_methods"),
+                        max: 50usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }

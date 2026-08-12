@@ -77,7 +77,7 @@ pub struct LangBreakdown<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// An update to a git repository, emitted by knots.
+/// An event record representing git-push operation to git repository, emitted by knots.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -87,6 +87,9 @@ pub struct LangBreakdown<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct RefUpdate<S: BosStr = DefaultStr> {
+    ///files changed between commits
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub changed_files: Option<Vec<S>>,
     ///did of the user that pushed this ref
     pub committer_did: Did<S>,
     pub meta: ref_update::Meta<S>,
@@ -97,6 +100,9 @@ pub struct RefUpdate<S: BosStr = DefaultStr> {
     ///did of the owner of the repo
     #[serde(skip_serializing_if = "Option::is_none")]
     pub owner_did: Option<Did<S>>,
+    ///push options passed on git-push
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub push_options: Option<Vec<S>>,
     ///Ref being updated
     pub r#ref: S,
     ///DID of the repo itself
@@ -280,6 +286,28 @@ impl<S: BosStr> LexiconSchema for RefUpdate<S> {
                 });
             }
         }
+        if let Some(ref value) = self.push_options {
+            #[allow(unused_comparisons)]
+            if value.len() > 50usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("push_options"),
+                    max: 50usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(values) = &self.push_options {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 1024usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("push_options"),
+                        max: 1024usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         {
             let value = &self.r#ref;
             #[allow(unused_comparisons)]
@@ -433,28 +461,42 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "An update to a git repository, emitted by knots.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "An event record representing git-push operation to git repository, emitted by knots.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ref"),
-                            SmolStr::new_static("committerDid"),
-                            SmolStr::new_static("repo"),
-                            SmolStr::new_static("oldSha"),
-                            SmolStr::new_static("newSha"),
-                            SmolStr::new_static("meta"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ref"),
+                                SmolStr::new_static("committerDid"),
+                                SmolStr::new_static("repo"), SmolStr::new_static("oldSha"),
+                                SmolStr::new_static("newSha"), SmolStr::new_static("meta")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
+                                SmolStr::new_static("changedFiles"),
+                                LexObjectProperty::Array(LexArray {
+                                    description: Some(
+                                        CowStr::new_static("files changed between commits"),
+                                    ),
+                                    items: LexArrayItem::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("committerDid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "did of the user that pushed this ref",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("did of the user that pushed this ref"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -469,7 +511,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("newSha"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("new SHA of this ref")),
+                                    description: Some(
+                                        CowStr::new_static("new SHA of this ref"),
+                                    ),
                                     min_length: Some(40usize),
                                     max_length: Some(40usize),
                                     ..Default::default()
@@ -478,7 +522,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("oldSha"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("old SHA of this ref")),
+                                    description: Some(
+                                        CowStr::new_static("old SHA of this ref"),
+                                    ),
                                     min_length: Some(40usize),
                                     max_length: Some(40usize),
                                     ..Default::default()
@@ -487,10 +533,24 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("ownerDid"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "did of the owner of the repo",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("did of the owner of the repo"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("pushOptions"),
+                                LexObjectProperty::Array(LexArray {
+                                    description: Some(
+                                        CowStr::new_static("push options passed on git-push"),
+                                    ),
+                                    items: LexArrayItem::String(LexString {
+                                        max_length: Some(1024usize),
+                                        ..Default::default()
+                                    }),
+                                    max_length: Some(50usize),
                                     ..Default::default()
                                 }),
                             );
@@ -506,7 +566,9 @@ fn lexicon_doc_sh_tangled_git_refUpdate() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("repo"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("DID of the repo itself")),
+                                    description: Some(
+                                        CowStr::new_static("DID of the repo itself"),
+                                    ),
                                     format: Some(LexStringFormat::Did),
                                     ..Default::default()
                                 }),
@@ -991,11 +1053,13 @@ pub mod ref_update_state {
 pub struct RefUpdateBuilder<St: ref_update_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
+        Option<Vec<S>>,
         Option<Did<S>>,
         Option<ref_update::Meta<S>>,
         Option<S>,
         Option<S>,
         Option<Did<S>>,
+        Option<Vec<S>>,
         Option<S>,
         Option<Did<S>>,
     ),
@@ -1021,7 +1085,7 @@ impl RefUpdateBuilder<ref_update_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         RefUpdateBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1032,9 +1096,22 @@ impl<S: BosStr> RefUpdateBuilder<ref_update_state::Empty, S> {
     pub fn builder() -> Self {
         RefUpdateBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: ref_update_state::State, S: BosStr> RefUpdateBuilder<St, S> {
+    /// Set the `changedFiles` field (optional)
+    pub fn changed_files(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `changedFiles` field to an Option value (optional)
+    pub fn maybe_changed_files(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.0 = value;
+        self
     }
 }
 
@@ -1048,7 +1125,7 @@ where
         mut self,
         value: impl Into<Did<S>>,
     ) -> RefUpdateBuilder<ref_update_state::SetCommitterDid<St>, S> {
-        self._fields.0 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1067,7 +1144,7 @@ where
         mut self,
         value: impl Into<ref_update::Meta<S>>,
     ) -> RefUpdateBuilder<ref_update_state::SetMeta<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1086,7 +1163,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> RefUpdateBuilder<ref_update_state::SetNewSha<St>, S> {
-        self._fields.2 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1105,7 +1182,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> RefUpdateBuilder<ref_update_state::SetOldSha<St>, S> {
-        self._fields.3 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1117,12 +1194,25 @@ where
 impl<St: ref_update_state::State, S: BosStr> RefUpdateBuilder<St, S> {
     /// Set the `ownerDid` field (optional)
     pub fn owner_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `ownerDid` field to an Option value (optional)
     pub fn maybe_owner_did(mut self, value: Option<Did<S>>) -> Self {
-        self._fields.4 = value;
+        self._fields.5 = value;
+        self
+    }
+}
+
+impl<St: ref_update_state::State, S: BosStr> RefUpdateBuilder<St, S> {
+    /// Set the `pushOptions` field (optional)
+    pub fn push_options(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `pushOptions` field to an Option value (optional)
+    pub fn maybe_push_options(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.6 = value;
         self
     }
 }
@@ -1137,7 +1227,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> RefUpdateBuilder<ref_update_state::SetRef<St>, S> {
-        self._fields.5 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1156,7 +1246,7 @@ where
         mut self,
         value: impl Into<Did<S>>,
     ) -> RefUpdateBuilder<ref_update_state::SetRepo<St>, S> {
-        self._fields.6 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         RefUpdateBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1178,26 +1268,30 @@ where
     /// Build the final struct.
     pub fn build(self) -> RefUpdate<S> {
         RefUpdate {
-            committer_did: self._fields.0.unwrap(),
-            meta: self._fields.1.unwrap(),
-            new_sha: self._fields.2.unwrap(),
-            old_sha: self._fields.3.unwrap(),
-            owner_did: self._fields.4,
-            r#ref: self._fields.5.unwrap(),
-            repo: self._fields.6.unwrap(),
+            changed_files: self._fields.0,
+            committer_did: self._fields.1.unwrap(),
+            meta: self._fields.2.unwrap(),
+            new_sha: self._fields.3.unwrap(),
+            old_sha: self._fields.4.unwrap(),
+            owner_did: self._fields.5,
+            push_options: self._fields.6,
+            r#ref: self._fields.7.unwrap(),
+            repo: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RefUpdate<S> {
         RefUpdate {
-            committer_did: self._fields.0.unwrap(),
-            meta: self._fields.1.unwrap(),
-            new_sha: self._fields.2.unwrap(),
-            old_sha: self._fields.3.unwrap(),
-            owner_did: self._fields.4,
-            r#ref: self._fields.5.unwrap(),
-            repo: self._fields.6.unwrap(),
+            changed_files: self._fields.0,
+            committer_did: self._fields.1.unwrap(),
+            meta: self._fields.2.unwrap(),
+            new_sha: self._fields.3.unwrap(),
+            old_sha: self._fields.4.unwrap(),
+            owner_did: self._fields.5,
+            push_options: self._fields.6,
+            r#ref: self._fields.7.unwrap(),
+            repo: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

@@ -106,6 +106,50 @@ impl<S: BosStr> LexiconSchema for Post<S> {
         lexicon_doc_tech_manos_twmirror_post()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        {
+            let value = &self.tw_user_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tw_user_id"),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.tw_user_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("tw_user_id"),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.tweet_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 20usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tweet_id"),
+                    max: 20usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.tweet_id;
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) < 1usize {
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("tweet_id"),
+                    min: 1usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }

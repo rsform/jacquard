@@ -11,7 +11,7 @@ use alloc::collections::BTreeMap;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::Did;
+use jacquard_common::types::string::{Did, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
@@ -23,12 +23,20 @@ use serde::{Deserialize, Serialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Delete<S: BosStr = DefaultStr> {
-    ///DID of the repository owner
-    pub did: Did<S>,
-    ///Name of the repository to delete
-    pub name: S,
-    ///Rkey of the repository record
-    pub rkey: S,
+    ///DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub did: Option<Did<S>>,
+    ///Admin-only. Delete even though the repository record still exists on the owner's PDS.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub force: Option<bool>,
+    ///Name of the repository to delete. A knot without the repo-did-input capability reads this and DID in place of repo.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
+    ///DID of the repository to delete
+    pub repo: Did<S>,
+    ///Rkey of the repository record. A knot without the repo-did-input capability checks this against the owner's PDS.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rkey: Option<RecordKey<Rkey<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -73,58 +81,38 @@ pub mod delete_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type Name;
-        type Rkey;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type Name = Unset;
-        type Rkey = Unset;
+        type Repo = Unset;
     }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Name = St::Name;
-        type Rkey = St::Rkey;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Did = St::Did;
-        type Name = Set<members::name>;
-        type Rkey = St::Rkey;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRkey<St> {}
-    impl<St: State> State for SetRkey<St> {
-        type Did = St::Did;
-        type Name = St::Name;
-        type Rkey = Set<members::rkey>;
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct DeleteBuilder<St: delete_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<S>, Option<S>),
+    _fields: (
+        Option<Did<S>>,
+        Option<bool>,
+        Option<S>,
+        Option<Did<S>>,
+        Option<RecordKey<Rkey<S>>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -147,7 +135,7 @@ impl DeleteBuilder<delete_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         DeleteBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -158,20 +146,59 @@ impl<S: BosStr> DeleteBuilder<delete_state::Empty, S> {
     pub fn builder() -> Self {
         DeleteBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: delete_state::State, S: BosStr> DeleteBuilder<St, S> {
+    /// Set the `did` field (optional)
+    pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `did` field to an Option value (optional)
+    pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: delete_state::State, S: BosStr> DeleteBuilder<St, S> {
+    /// Set the `force` field (optional)
+    pub fn force(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `force` field to an Option value (optional)
+    pub fn maybe_force(mut self, value: Option<bool>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: delete_state::State, S: BosStr> DeleteBuilder<St, S> {
+    /// Set the `name` field (optional)
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
+        self._fields.2 = value;
+        self
     }
 }
 
 impl<St, S: BosStr> DeleteBuilder<St, S>
 where
     St: delete_state::State,
-    St::Did: delete_state::IsUnset,
+    St::Repo: delete_state::IsUnset,
 {
-    /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> DeleteBuilder<delete_state::SetDid<St>, S> {
-        self._fields.0 = Option::Some(value.into());
+    /// Set the `repo` field (required)
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> DeleteBuilder<delete_state::SetRepo<St>, S> {
+        self._fields.3 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -180,60 +207,43 @@ where
     }
 }
 
-impl<St, S: BosStr> DeleteBuilder<St, S>
-where
-    St: delete_state::State,
-    St::Name: delete_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> DeleteBuilder<delete_state::SetName<St>, S> {
-        self._fields.1 = Option::Some(value.into());
-        DeleteBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: delete_state::State, S: BosStr> DeleteBuilder<St, S> {
+    /// Set the `rkey` field (optional)
+    pub fn rkey(mut self, value: impl Into<Option<RecordKey<Rkey<S>>>>) -> Self {
+        self._fields.4 = value.into();
+        self
+    }
+    /// Set the `rkey` field to an Option value (optional)
+    pub fn maybe_rkey(mut self, value: Option<RecordKey<Rkey<S>>>) -> Self {
+        self._fields.4 = value;
+        self
     }
 }
 
 impl<St, S: BosStr> DeleteBuilder<St, S>
 where
     St: delete_state::State,
-    St::Rkey: delete_state::IsUnset,
-{
-    /// Set the `rkey` field (required)
-    pub fn rkey(mut self, value: impl Into<S>) -> DeleteBuilder<delete_state::SetRkey<St>, S> {
-        self._fields.2 = Option::Some(value.into());
-        DeleteBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
-impl<St, S: BosStr> DeleteBuilder<St, S>
-where
-    St: delete_state::State,
-    St::Did: delete_state::IsSet,
-    St::Name: delete_state::IsSet,
-    St::Rkey: delete_state::IsSet,
+    St::Repo: delete_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Delete<S> {
         Delete {
-            did: self._fields.0.unwrap(),
-            name: self._fields.1.unwrap(),
-            rkey: self._fields.2.unwrap(),
+            did: self._fields.0,
+            force: self._fields.1,
+            name: self._fields.2,
+            repo: self._fields.3.unwrap(),
+            rkey: self._fields.4,
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Delete<S> {
         Delete {
-            did: self._fields.0.unwrap(),
-            name: self._fields.1.unwrap(),
-            rkey: self._fields.2.unwrap(),
+            did: self._fields.0,
+            force: self._fields.1,
+            name: self._fields.2,
+            repo: self._fields.3.unwrap(),
+            rkey: self._fields.4,
             extra_data: Some(extra_data),
         }
     }

@@ -11,7 +11,7 @@ use alloc::collections::BTreeMap;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::AtUri;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
@@ -24,7 +24,8 @@ use serde::{Deserialize, Serialize};
 )]
 pub struct DeleteBranch<S: BosStr = DefaultStr> {
     pub branch: S,
-    pub repo: AtUri<S>,
+    ///DID of the repository
+    pub repo: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -106,7 +107,7 @@ pub mod delete_branch_state {
 /// Builder for constructing an instance of this type.
 pub struct DeleteBranchBuilder<St: delete_branch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<AtUri<S>>),
+    _fields: (Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -173,7 +174,7 @@ where
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
-        value: impl Into<AtUri<S>>,
+        value: impl Into<Did<S>>,
     ) -> DeleteBranchBuilder<delete_branch_state::SetRepo<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DeleteBranchBuilder {

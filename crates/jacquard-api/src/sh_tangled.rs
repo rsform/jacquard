@@ -5,6 +5,7 @@
 
 //! Generated bindings for the `sh.tangled` Lexicon namespace/module.
 pub mod actor;
+pub mod ci;
 pub mod feed;
 pub mod git;
 pub mod graph;
@@ -16,6 +17,7 @@ pub mod pipeline;
 pub mod publicKey;
 pub mod public_key;
 pub mod repo;
+pub mod search;
 pub mod spindle;
 pub mod string;
 pub mod sync;

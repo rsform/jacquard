@@ -194,6 +194,16 @@ impl<S: BosStr> LexiconSchema for Crew<S> {
         lexicon_doc_io_atcr_hold_crew()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        for value in &self.permissions {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("permissions"),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.role;
             #[allow(unused_comparisons)]

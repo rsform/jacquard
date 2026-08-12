@@ -4,6 +4,10 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `sh.tangled.graph` Lexicon namespace/module.
+pub mod count_follows;
+pub mod count_follows_by;
+pub mod count_vouches;
+pub mod count_vouches_by;
 pub mod follow;
 pub mod list_follows;
 pub mod list_follows_by;

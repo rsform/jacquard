@@ -462,6 +462,30 @@ impl<S: BosStr> LexiconSchema for Song<S> {
                 });
             }
         }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 256usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 256usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) < 1usize {
+                    return Err(ConstraintError::MinLength {
+                        path: ValidationPath::from_field("tags"),
+                        min: 1usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         {
             let value = &self.title;
             #[allow(unused_comparisons)]

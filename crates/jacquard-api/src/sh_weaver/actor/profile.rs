@@ -292,6 +292,42 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
                 }
             }
         }
+        if let Some(ref value) = self.pronouns {
+            #[allow(unused_comparisons)]
+            if value.len() > 5usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("pronouns"),
+                    max: 5usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(values) = &self.pronouns {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 500usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("pronouns"),
+                        max: 500usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.pronouns {
+            for value in values {
+                {
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                    if count > 50usize {
+                        return Err(ConstraintError::MaxGraphemes {
+                            path: ValidationPath::from_field("pronouns"),
+                            max: 50usize,
+                            actual: count,
+                        });
+                    }
+                }
+            }
+        }
         Ok(())
     }
 }

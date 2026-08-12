@@ -7,6 +7,7 @@
 
 //! Generated bindings for the `place.stream.media` Lexicon namespace/module.
 pub mod create_upload;
+pub mod finalize_livestream;
 pub mod get_upload_status;
 pub mod get_video;
 pub mod get_video_list;

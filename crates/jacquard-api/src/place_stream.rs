@@ -6,6 +6,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `place.stream` Lexicon namespace/module.
+pub mod auth_full;
 pub mod badge;
 pub mod beta;
 pub mod branding;
@@ -86,6 +87,7 @@ pub struct ActivityLabel<S: BosStr = DefaultStr> {
 pub enum ActivityLabelLabel<S: BosStr = DefaultStr> {
     Events,
     JustChatting,
+    Podcasting,
     Music,
     Art,
     SoftwareDev,
@@ -102,6 +104,7 @@ impl<S: BosStr> ActivityLabelLabel<S> {
         match self {
             Self::Events => "events",
             Self::JustChatting => "just_chatting",
+            Self::Podcasting => "podcasting",
             Self::Music => "music",
             Self::Art => "art",
             Self::SoftwareDev => "software_dev",
@@ -118,6 +121,7 @@ impl<S: BosStr> ActivityLabelLabel<S> {
         match s.as_ref() {
             "events" => Self::Events,
             "just_chatting" => Self::JustChatting,
+            "podcasting" => Self::Podcasting,
             "music" => Self::Music,
             "art" => Self::Art,
             "software_dev" => Self::SoftwareDev,
@@ -178,6 +182,7 @@ where
         match self {
             ActivityLabelLabel::Events => ActivityLabelLabel::Events,
             ActivityLabelLabel::JustChatting => ActivityLabelLabel::JustChatting,
+            ActivityLabelLabel::Podcasting => ActivityLabelLabel::Podcasting,
             ActivityLabelLabel::Music => ActivityLabelLabel::Music,
             ActivityLabelLabel::Art => ActivityLabelLabel::Art,
             ActivityLabelLabel::SoftwareDev => ActivityLabelLabel::SoftwareDev,

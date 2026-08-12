@@ -24,6 +24,7 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Deserialize, Serialize};
@@ -40,6 +41,9 @@ pub struct Teleport<S: BosStr = DefaultStr> {
     ///The time limit in seconds for the teleport. If not set, the teleport is permanent. Must be at least 60 seconds, and no more than 32,400 seconds (9 hours).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_seconds: Option<i64>,
+    ///The source livestream this teleport is sending viewers away from. When the teleport fires, this is the livestream that gets ended (the same update place.stream.live.stopLivestream performs), so the source streamer returns to pre-live. Teleports without an origin livestream are treated as a no-op.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub livestream: Option<StrongRef<S>>,
     ///The time the teleport becomes active.
     pub starts_at: Datetime,
     ///The DID of the streamer to teleport to.
@@ -172,7 +176,12 @@ pub mod teleport_state {
 /// Builder for constructing an instance of this type.
 pub struct TeleportBuilder<St: teleport_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<Datetime>, Option<Did<S>>),
+    _fields: (
+        Option<i64>,
+        Option<StrongRef<S>>,
+        Option<Datetime>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -195,7 +204,7 @@ impl TeleportBuilder<teleport_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         TeleportBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -206,7 +215,7 @@ impl<S: BosStr> TeleportBuilder<teleport_state::Empty, S> {
     pub fn builder() -> Self {
         TeleportBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -225,6 +234,19 @@ impl<St: teleport_state::State, S: BosStr> TeleportBuilder<St, S> {
     }
 }
 
+impl<St: teleport_state::State, S: BosStr> TeleportBuilder<St, S> {
+    /// Set the `livestream` field (optional)
+    pub fn livestream(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `livestream` field to an Option value (optional)
+    pub fn maybe_livestream(mut self, value: Option<StrongRef<S>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> TeleportBuilder<St, S>
 where
     St: teleport_state::State,
@@ -235,7 +257,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> TeleportBuilder<teleport_state::SetStartsAt<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         TeleportBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -254,7 +276,7 @@ where
         mut self,
         value: impl Into<Did<S>>,
     ) -> TeleportBuilder<teleport_state::SetStreamer<St>, S> {
-        self._fields.2 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TeleportBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -273,8 +295,9 @@ where
     pub fn build(self) -> Teleport<S> {
         Teleport {
             duration_seconds: self._fields.0,
-            starts_at: self._fields.1.unwrap(),
-            streamer: self._fields.2.unwrap(),
+            livestream: self._fields.1,
+            starts_at: self._fields.2.unwrap(),
+            streamer: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -282,8 +305,9 @@ where
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Teleport<S> {
         Teleport {
             duration_seconds: self._fields.0,
-            starts_at: self._fields.1.unwrap(),
-            streamer: self._fields.2.unwrap(),
+            livestream: self._fields.1,
+            starts_at: self._fields.2.unwrap(),
+            streamer: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -319,6 +343,13 @@ fn lexicon_doc_place_stream_live_teleport() -> LexiconDoc<'static> {
                                 LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(60i64),
                                     maximum: Some(32400i64),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("livestream"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("com.atproto.repo.strongRef"),
                                     ..Default::default()
                                 }),
                             );

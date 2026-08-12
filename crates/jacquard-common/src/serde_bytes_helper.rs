@@ -11,7 +11,7 @@ use base64::{
 use bytes::Bytes;
 use serde::{
     Deserializer, Serializer,
-    de::{self, MapAccess, Visitor},
+    de::{self, MapAccess, SeqAccess, Visitor},
 };
 
 /// Serialize Bytes as a CBOR byte string
@@ -37,7 +37,7 @@ where
     D: Deserializer<'de>,
 {
     if deserializer.is_human_readable() {
-        Ok(deserializer.deserialize_map(BytesVisitor)?)
+        deserializer.deserialize_any(BytesVisitor)
     } else {
         let vec: Vec<u8> = serde_bytes::deserialize(deserializer)?;
         Ok(Bytes::from(vec))
@@ -74,6 +74,17 @@ impl<'de> Visitor<'de> for BytesVisitor {
         Ok(Bytes::from_owner(v))
     }
 
+    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    where
+        A: SeqAccess<'de>,
+    {
+        let mut value = Vec::with_capacity(seq.size_hint().unwrap_or(0));
+        while let Some(byte) = seq.next_element()? {
+            value.push(byte);
+        }
+        Ok(Bytes::from(value))
+    }
+
     fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
     where
         A: MapAccess<'de>,
@@ -107,5 +118,34 @@ impl<'de> Visitor<'de> for BytesVisitor {
         }
 
         bytes.ok_or_else(|| de::Error::missing_field("$bytes"))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde::{Deserialize, Serialize};
+
+    #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+    struct BytePayload {
+        #[serde(with = "super")]
+        bytes: Bytes,
+    }
+
+    #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
+    #[serde(tag = "$type")]
+    enum TaggedPayload {
+        #[serde(rename = "com.example.bytes")]
+        Bytes(BytePayload),
+    }
+
+    #[test]
+    fn dag_cbor_bytes_survive_internally_tagged_buffering() {
+        let value = TaggedPayload::Bytes(BytePayload {
+            bytes: Bytes::from_static(&[0, 1, 2, 255]),
+        });
+        let encoded = serde_ipld_dagcbor::to_vec(&value).unwrap();
+        let decoded: TaggedPayload = serde_ipld_dagcbor::from_slice(&encoded).unwrap();
+        assert_eq!(decoded, value);
     }
 }

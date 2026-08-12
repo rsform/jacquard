@@ -83,7 +83,7 @@ pub struct PublicClaims<S: BosStr = DefaultStr> {
     /// HTTP method of the request the DPoP proof is bound to (e.g., `"POST"`).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub htm: Option<S>,
-    /// HTTP target URI of the request the DPoP proof is bound to.
+    /// HTTP target URI of the DPoP proof is bound to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub htu: Option<S>,
     /// Access token hash: base64url-encoded SHA-256 of the access token, binding the proof to a specific token.
@@ -92,6 +92,17 @@ pub struct PublicClaims<S: BosStr = DefaultStr> {
     /// Server-provided nonce, included to prevent replay attacks when required by the authorization server.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nonce: Option<S>,
+    /// DPoP confirmation key thumbprint for a bound access or space credential token.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cnf: Option<Confirmation<S>>,
+}
+
+/// DPoP confirmation claim used by tokens bound to a holder key.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+pub struct Confirmation<S: BosStr = DefaultStr> {
+    /// RFC 7638 JWK thumbprint of the holder key.
+    pub jkt: S,
 }
 
 /// Manual `Default` impl to avoid a spurious `S: Default` bound from the derive macro.
@@ -104,6 +115,7 @@ impl<S: BosStr> Default for PublicClaims<S> {
             htu: None,
             ath: None,
             nonce: None,
+            cnf: None,
         }
     }
 }
@@ -159,6 +171,20 @@ where
             htu: self.htu.map(IntoStatic::into_static),
             ath: self.ath.map(IntoStatic::into_static),
             nonce: self.nonce.map(IntoStatic::into_static),
+            cnf: self.cnf.map(IntoStatic::into_static),
+        }
+    }
+}
+
+impl<S> IntoStatic for Confirmation<S>
+where
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Confirmation<S::Output>;
+    fn into_static(self) -> Self::Output {
+        Confirmation {
+            jkt: self.jkt.into_static(),
         }
     }
 }

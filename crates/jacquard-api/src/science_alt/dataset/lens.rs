@@ -155,6 +155,16 @@ impl<S: BosStr> LexiconSchema for CodeReference<S> {
                 });
             }
         }
+        if let Some(ref value) = self.language {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 50usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("language"),
+                    max: 50usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.path;
             #[allow(unused_comparisons)]

@@ -37,12 +37,16 @@ pub struct Merge<S: BosStr = DefaultStr> {
     ///Merge commit message
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commit_message: Option<S>,
-    ///DID of the repository owner
-    pub did: Did<S>,
-    ///Name of the repository
-    pub name: S,
+    ///DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub did: Option<Did<S>>,
+    ///Name of the repository. A knot without the repo-did-input capability reads this and DID in place of repo.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
     ///Patch content to merge
     pub patch: S,
+    ///DID of the repository
+    pub repo: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -88,66 +92,50 @@ pub mod merge_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Branch;
-        type Did;
-        type Name;
         type Patch;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Branch = Unset;
-        type Did = Unset;
-        type Name = Unset;
         type Patch = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBranch<St> {}
     impl<St: State> State for SetBranch<St> {
         type Branch = Set<members::branch>;
-        type Did = St::Did;
-        type Name = St::Name;
         type Patch = St::Patch;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Branch = St::Branch;
-        type Did = Set<members::did>;
-        type Name = St::Name;
-        type Patch = St::Patch;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Branch = St::Branch;
-        type Did = St::Did;
-        type Name = Set<members::name>;
-        type Patch = St::Patch;
+        type Repo = St::Repo;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPatch<St> {}
     impl<St: State> State for SetPatch<St> {
         type Branch = St::Branch;
-        type Did = St::Did;
-        type Name = St::Name;
         type Patch = Set<members::patch>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Branch = St::Branch;
+        type Patch = St::Patch;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `branch` field
         pub struct branch(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `patch` field
         pub struct patch(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
@@ -163,6 +151,7 @@ pub struct MergeBuilder<St: merge_state::State, S: BosStr = DefaultStr> {
         Option<Did<S>>,
         Option<S>,
         Option<S>,
+        Option<Did<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -186,7 +175,7 @@ impl MergeBuilder<merge_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         MergeBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -197,7 +186,7 @@ impl<S: BosStr> MergeBuilder<merge_state::Empty, S> {
     pub fn builder() -> Self {
         MergeBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -271,35 +260,29 @@ impl<St: merge_state::State, S: BosStr> MergeBuilder<St, S> {
     }
 }
 
-impl<St, S: BosStr> MergeBuilder<St, S>
-where
-    St: merge_state::State,
-    St::Did: merge_state::IsUnset,
-{
-    /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> MergeBuilder<merge_state::SetDid<St>, S> {
-        self._fields.5 = Option::Some(value.into());
-        MergeBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: merge_state::State, S: BosStr> MergeBuilder<St, S> {
+    /// Set the `did` field (optional)
+    pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `did` field to an Option value (optional)
+    pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
+        self._fields.5 = value;
+        self
     }
 }
 
-impl<St, S: BosStr> MergeBuilder<St, S>
-where
-    St: merge_state::State,
-    St::Name: merge_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> MergeBuilder<merge_state::SetName<St>, S> {
-        self._fields.6 = Option::Some(value.into());
-        MergeBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: merge_state::State, S: BosStr> MergeBuilder<St, S> {
+    /// Set the `name` field (optional)
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
+        self._fields.6 = value;
+        self
     }
 }
 
@@ -322,10 +305,25 @@ where
 impl<St, S: BosStr> MergeBuilder<St, S>
 where
     St: merge_state::State,
+    St::Repo: merge_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(mut self, value: impl Into<Did<S>>) -> MergeBuilder<merge_state::SetRepo<St>, S> {
+        self._fields.8 = Option::Some(value.into());
+        MergeBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MergeBuilder<St, S>
+where
+    St: merge_state::State,
     St::Branch: merge_state::IsSet,
-    St::Did: merge_state::IsSet,
-    St::Name: merge_state::IsSet,
     St::Patch: merge_state::IsSet,
+    St::Repo: merge_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Merge<S> {
@@ -335,9 +333,10 @@ where
             branch: self._fields.2.unwrap(),
             commit_body: self._fields.3,
             commit_message: self._fields.4,
-            did: self._fields.5.unwrap(),
-            name: self._fields.6.unwrap(),
+            did: self._fields.5,
+            name: self._fields.6,
             patch: self._fields.7.unwrap(),
+            repo: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -349,9 +348,10 @@ where
             branch: self._fields.2.unwrap(),
             commit_body: self._fields.3,
             commit_message: self._fields.4,
-            did: self._fields.5.unwrap(),
-            name: self._fields.6.unwrap(),
+            did: self._fields.5,
+            name: self._fields.6,
             patch: self._fields.7.unwrap(),
+            repo: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

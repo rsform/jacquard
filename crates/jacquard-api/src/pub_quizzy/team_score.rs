@@ -193,6 +193,15 @@ impl<S: BosStr> LexiconSchema for ScoredAnswer<S> {
                 });
             }
         }
+        for value in &self.scores {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("scores"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }

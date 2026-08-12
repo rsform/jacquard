@@ -359,7 +359,7 @@ fn lexicon_doc_sh_tangled_feed_listComments() -> LexiconDoc<'static> {
                                 SmolStr::new_static("subject"),
                                 LexXrpcParametersProperty::String(LexString {
                                     description: Some(CowStr::new_static(
-                                        "Record AT-URI the comments are attached to.",
+                                        "Record AT-URI the comments attach to.",
                                     )),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()

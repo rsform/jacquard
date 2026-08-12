@@ -15,6 +15,15 @@ pub mod branch;
 pub mod branches;
 pub mod collaborator;
 pub mod compare;
+pub mod count_artifacts;
+pub mod count_artifacts_by;
+pub mod count_collaborators;
+pub mod count_collaborators_by;
+pub mod count_issues;
+pub mod count_issues_by;
+pub mod count_pulls;
+pub mod count_pulls_by;
+pub mod count_repos;
 pub mod create;
 pub mod delete;
 pub mod delete_branch;
@@ -23,6 +32,13 @@ pub mod diff;
 pub mod fork_status;
 pub mod fork_sync;
 pub mod get_default_branch;
+pub mod get_issue;
+pub mod get_issues;
+pub mod get_pull;
+pub mod get_pulls;
+pub mod get_repo;
+pub mod get_repo_by_repo_did;
+pub mod get_repos;
 pub mod hidden_ref;
 pub mod issue;
 pub mod languages;
@@ -40,8 +56,11 @@ pub mod log;
 pub mod merge;
 pub mod merge_check;
 pub mod pull;
+pub mod push;
 pub mod remove_collaborator;
 pub mod remove_secret;
+pub mod rename;
+pub mod reserve_key;
 pub mod set_default_branch;
 pub mod tag;
 pub mod tags;
@@ -195,6 +214,30 @@ impl<S: BosStr> LexiconSchema for Repo<S> {
                     max: 50usize,
                     actual: value.len(),
                 });
+            }
+        }
+        if let Some(values) = &self.topics {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 50usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("topics"),
+                        max: 50usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.topics {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) < 1usize {
+                    return Err(ConstraintError::MinLength {
+                        path: ValidationPath::from_field("topics"),
+                        min: 1usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
             }
         }
         Ok(())

@@ -48,12 +48,16 @@ pub struct ConflictInfo<S: BosStr = DefaultStr> {
 pub struct MergeCheck<S: BosStr = DefaultStr> {
     ///Target branch to merge into
     pub branch: S,
-    ///DID of the repository owner
-    pub did: Did<S>,
-    ///Name of the repository
-    pub name: S,
+    ///DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub did: Option<Did<S>>,
+    ///Name of the repository. A knot without the repo-did-input capability reads this and DID in place of repo.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<S>,
     ///Patch or pull request to check for merge conflicts
     pub patch: S,
+    ///DID of the repository
+    pub repo: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -170,57 +174,75 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![
-                                SmolStr::new_static("did"),
-                                SmolStr::new_static("name"),
-                                SmolStr::new_static("patch"),
-                                SmolStr::new_static("branch"),
-                            ]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("branch"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Target branch to merge into",
-                                        )),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("did"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "DID of the repository owner",
-                                        )),
-                                        format: Some(LexStringFormat::Did),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("name"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Name of the repository",
-                                        )),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map.insert(
-                                    SmolStr::new_static("patch"),
-                                    LexObjectProperty::String(LexString {
-                                        description: Some(CowStr::new_static(
-                                            "Patch or pull request to check for merge conflicts",
-                                        )),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(
+                                    vec![
+                                        SmolStr::new_static("repo"), SmolStr::new_static("patch"),
+                                        SmolStr::new_static("branch")
+                                    ],
+                                ),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("branch"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static("Target branch to merge into"),
+                                            ),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("did"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.",
+                                                ),
+                                            ),
+                                            format: Some(LexStringFormat::Did),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("name"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "Name of the repository. A knot without the repo-did-input capability reads this and DID in place of repo.",
+                                                ),
+                                            ),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("patch"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static(
+                                                    "Patch or pull request to check for merge conflicts",
+                                                ),
+                                            ),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map.insert(
+                                        SmolStr::new_static("repo"),
+                                        LexObjectProperty::String(LexString {
+                                            description: Some(
+                                                CowStr::new_static("DID of the repository"),
+                                            ),
+                                            format: Some(LexStringFormat::Did),
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -243,73 +265,63 @@ pub mod merge_check_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Branch;
-        type Did;
-        type Name;
         type Patch;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Branch = Unset;
-        type Did = Unset;
-        type Name = Unset;
         type Patch = Unset;
+        type Repo = Unset;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBranch<St> {}
     impl<St: State> State for SetBranch<St> {
         type Branch = Set<members::branch>;
-        type Did = St::Did;
-        type Name = St::Name;
         type Patch = St::Patch;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Branch = St::Branch;
-        type Did = Set<members::did>;
-        type Name = St::Name;
-        type Patch = St::Patch;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Branch = St::Branch;
-        type Did = St::Did;
-        type Name = Set<members::name>;
-        type Patch = St::Patch;
+        type Repo = St::Repo;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPatch<St> {}
     impl<St: State> State for SetPatch<St> {
         type Branch = St::Branch;
-        type Did = St::Did;
-        type Name = St::Name;
         type Patch = Set<members::patch>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Branch = St::Branch;
+        type Patch = St::Patch;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `branch` field
         pub struct branch(());
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `patch` field
         pub struct patch(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct MergeCheckBuilder<St: merge_check_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<Did<S>>,
+        Option<S>,
+        Option<S>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -332,7 +344,7 @@ impl MergeCheckBuilder<merge_check_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         MergeCheckBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -343,7 +355,7 @@ impl<S: BosStr> MergeCheckBuilder<merge_check_state::Empty, S> {
     pub fn builder() -> Self {
         MergeCheckBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None),
+            _fields: (None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -368,41 +380,29 @@ where
     }
 }
 
-impl<St, S: BosStr> MergeCheckBuilder<St, S>
-where
-    St: merge_check_state::State,
-    St::Did: merge_check_state::IsUnset,
-{
-    /// Set the `did` field (required)
-    pub fn did(
-        mut self,
-        value: impl Into<Did<S>>,
-    ) -> MergeCheckBuilder<merge_check_state::SetDid<St>, S> {
-        self._fields.1 = Option::Some(value.into());
-        MergeCheckBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: merge_check_state::State, S: BosStr> MergeCheckBuilder<St, S> {
+    /// Set the `did` field (optional)
+    pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `did` field to an Option value (optional)
+    pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
+        self._fields.1 = value;
+        self
     }
 }
 
-impl<St, S: BosStr> MergeCheckBuilder<St, S>
-where
-    St: merge_check_state::State,
-    St::Name: merge_check_state::IsUnset,
-{
-    /// Set the `name` field (required)
-    pub fn name(
-        mut self,
-        value: impl Into<S>,
-    ) -> MergeCheckBuilder<merge_check_state::SetName<St>, S> {
-        self._fields.2 = Option::Some(value.into());
-        MergeCheckBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: merge_check_state::State, S: BosStr> MergeCheckBuilder<St, S> {
+    /// Set the `name` field (optional)
+    pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `name` field to an Option value (optional)
+    pub fn maybe_name(mut self, value: Option<S>) -> Self {
+        self._fields.2 = value;
+        self
     }
 }
 
@@ -428,18 +428,37 @@ where
 impl<St, S: BosStr> MergeCheckBuilder<St, S>
 where
     St: merge_check_state::State,
+    St::Repo: merge_check_state::IsUnset,
+{
+    /// Set the `repo` field (required)
+    pub fn repo(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> MergeCheckBuilder<merge_check_state::SetRepo<St>, S> {
+        self._fields.4 = Option::Some(value.into());
+        MergeCheckBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> MergeCheckBuilder<St, S>
+where
+    St: merge_check_state::State,
     St::Branch: merge_check_state::IsSet,
-    St::Did: merge_check_state::IsSet,
-    St::Name: merge_check_state::IsSet,
     St::Patch: merge_check_state::IsSet,
+    St::Repo: merge_check_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MergeCheck<S> {
         MergeCheck {
             branch: self._fields.0.unwrap(),
-            did: self._fields.1.unwrap(),
-            name: self._fields.2.unwrap(),
+            did: self._fields.1,
+            name: self._fields.2,
             patch: self._fields.3.unwrap(),
+            repo: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -447,9 +466,10 @@ where
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MergeCheck<S> {
         MergeCheck {
             branch: self._fields.0.unwrap(),
-            did: self._fields.1.unwrap(),
-            name: self._fields.2.unwrap(),
+            did: self._fields.1,
+            name: self._fields.2,
             patch: self._fields.3.unwrap(),
+            repo: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }
     }

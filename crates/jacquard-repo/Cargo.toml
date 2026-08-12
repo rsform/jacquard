@@ -18,6 +18,7 @@ default = []
 # Internal
 jacquard-common = { path = "../jacquard-common", version = "0.12.1", features = ["crypto-ed25519", "crypto-k256", "crypto-p256"] }
 jacquard-derive = { path = "../jacquard-derive", version = "0.12.1" }
+jacquard-lexicon = { path = "../jacquard-lexicon", version = "0.12.1" }
 jacquard-api = { path = "../jacquard-api", version = "0.12.1", features = ["streaming"] }
 
 # Serialization
@@ -43,6 +44,7 @@ hkdf = "0.12"
 hmac = "0.12"
 rand = "0.8"
 serde_json = "1.0"
+url = "2.5"
 
 # Error handling
 thiserror.workspace = true

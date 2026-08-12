@@ -10,6 +10,7 @@ pub mod complete_upload;
 pub mod crew;
 pub mod delete_user_data;
 pub mod export_user_data;
+pub mod get_layers_for_manifest;
 pub mod get_part_upload_url;
 pub mod get_quota;
 pub mod initiate_upload;

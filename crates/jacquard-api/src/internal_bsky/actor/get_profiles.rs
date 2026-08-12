@@ -25,6 +25,10 @@ use serde::{Deserialize, Serialize};
 )]
 pub struct GetProfiles<S: BosStr = DefaultStr> {
     pub dids: Vec<Did<S>>,
+    ///  Defaults to `false`.
+    #[serde(default = "_default_include_takedowns")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_takedowns: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub social_proof: Option<Vec<Did<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -70,6 +74,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetProfilesRequest {
     type Response = GetProfilesResponse;
 }
 
+fn _default_include_takedowns() -> Option<bool> {
+    Some(false)
+}
+
 pub mod get_profiles_state {
 
     pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
@@ -105,7 +113,12 @@ pub mod get_profiles_state {
 /// Builder for constructing an instance of this type.
 pub struct GetProfilesBuilder<St: get_profiles_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<Did<S>>>, Option<Vec<Did<S>>>, Option<Did<S>>),
+    _fields: (
+        Option<Vec<Did<S>>>,
+        Option<bool>,
+        Option<Vec<Did<S>>>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -128,7 +141,7 @@ impl GetProfilesBuilder<get_profiles_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         GetProfilesBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -139,7 +152,7 @@ impl<S: BosStr> GetProfilesBuilder<get_profiles_state::Empty, S> {
     pub fn builder() -> Self {
         GetProfilesBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -165,14 +178,27 @@ where
 }
 
 impl<St: get_profiles_state::State, S: BosStr> GetProfilesBuilder<St, S> {
+    /// Set the `includeTakedowns` field (optional)
+    pub fn include_takedowns(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `includeTakedowns` field to an Option value (optional)
+    pub fn maybe_include_takedowns(mut self, value: Option<bool>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: get_profiles_state::State, S: BosStr> GetProfilesBuilder<St, S> {
     /// Set the `socialProof` field (optional)
     pub fn social_proof(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `socialProof` field to an Option value (optional)
     pub fn maybe_social_proof(mut self, value: Option<Vec<Did<S>>>) -> Self {
-        self._fields.1 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -180,12 +206,12 @@ impl<St: get_profiles_state::State, S: BosStr> GetProfilesBuilder<St, S> {
 impl<St: get_profiles_state::State, S: BosStr> GetProfilesBuilder<St, S> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
     pub fn maybe_viewer(mut self, value: Option<Did<S>>) -> Self {
-        self._fields.2 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -199,8 +225,9 @@ where
     pub fn build(self) -> GetProfiles<S> {
         GetProfiles {
             dids: self._fields.0.unwrap(),
-            social_proof: self._fields.1,
-            viewer: self._fields.2,
+            include_takedowns: self._fields.1,
+            social_proof: self._fields.2,
+            viewer: self._fields.3,
         }
     }
 }

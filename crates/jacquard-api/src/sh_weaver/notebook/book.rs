@@ -126,6 +126,58 @@ impl<S: BosStr> LexiconSchema for Book<S> {
         lexicon_doc_sh_weaver_notebook_book()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.content_warnings {
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("content_warnings"),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.path {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("path"),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 10usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
+                    max: 10usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 64usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 64usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(ref value) = self.title {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 300usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("title"),
+                    max: 300usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }

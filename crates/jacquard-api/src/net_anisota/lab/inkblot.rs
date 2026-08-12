@@ -42,7 +42,7 @@ use serde::{Deserialize, Serialize};
 pub struct Inkblot<S: BosStr = DefaultStr> {
     ///When the inkblot was saved
     pub created_at: Datetime,
-    ///A rendered PNG of the blot as a data URL, for display
+    ///A rendered still of the blot as an image data URL (PNG, or WebP when a denser blot needs the more compact encoding to stay sharp within the size cap), for display
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image: Option<S>,
     ///Ink palette id (classic, sepia, indigo, blood, moss)
@@ -398,7 +398,7 @@ fn lexicon_doc_net_anisota_lab_inkblot() -> LexiconDoc<'static> {
                                 LexObjectProperty::String(LexString {
                                     description: Some(
                                         CowStr::new_static(
-                                            "A rendered PNG of the blot as a data URL, for display",
+                                            "A rendered still of the blot as an image data URL (PNG, or WebP when a denser blot needs the more compact encoding to stay sharp within the size cap), for display",
                                         ),
                                     ),
                                     max_length: Some(200000usize),

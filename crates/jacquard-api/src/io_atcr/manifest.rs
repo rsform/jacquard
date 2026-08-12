@@ -456,6 +456,18 @@ impl<S: BosStr> LexiconSchema for Platform<S> {
                 });
             }
         }
+        if let Some(values) = &self.os_features {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 64usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("os_features"),
+                        max: 64usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.os_version {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 64usize {

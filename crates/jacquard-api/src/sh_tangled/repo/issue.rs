@@ -7,6 +7,8 @@
 
 //! Generated bindings for the `sh.tangled.repo.issue` Lexicon namespace/module.
 pub mod comment;
+pub mod count_states;
+pub mod count_states_by;
 pub mod list_states;
 pub mod list_states_by;
 pub mod state;
@@ -21,6 +23,7 @@ use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
 use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
 use jacquard_common::types::uri::{RecordUri, UriError};
@@ -42,6 +45,8 @@ use serde::{Deserialize, Serialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Issue<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blobs: Option<Vec<BlobRef<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<S>,
     pub created_at: Datetime,
@@ -176,6 +181,7 @@ pub mod issue_state {
 pub struct IssueBuilder<St: issue_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
+        Option<Vec<BlobRef<S>>>,
         Option<S>,
         Option<Datetime>,
         Option<Vec<Did<S>>>,
@@ -205,7 +211,7 @@ impl IssueBuilder<issue_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         IssueBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -216,21 +222,34 @@ impl<S: BosStr> IssueBuilder<issue_state::Empty, S> {
     pub fn builder() -> Self {
         IssueBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
 impl<St: issue_state::State, S: BosStr> IssueBuilder<St, S> {
+    /// Set the `blobs` field (optional)
+    pub fn blobs(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `blobs` field to an Option value (optional)
+    pub fn maybe_blobs(mut self, value: Option<Vec<BlobRef<S>>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: issue_state::State, S: BosStr> IssueBuilder<St, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.0 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
     pub fn maybe_body(mut self, value: Option<S>) -> Self {
-        self._fields.0 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -245,7 +264,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> IssueBuilder<issue_state::SetCreatedAt<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -257,12 +276,12 @@ where
 impl<St: issue_state::State, S: BosStr> IssueBuilder<St, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<Vec<Did<S>>>) -> Self {
-        self._fields.2 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -270,12 +289,12 @@ impl<St: issue_state::State, S: BosStr> IssueBuilder<St, S> {
 impl<St: issue_state::State, S: BosStr> IssueBuilder<St, S> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
     pub fn maybe_references(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
-        self._fields.3 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -287,7 +306,7 @@ where
 {
     /// Set the `repo` field (required)
     pub fn repo(mut self, value: impl Into<Did<S>>) -> IssueBuilder<issue_state::SetRepo<St>, S> {
-        self._fields.4 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -303,7 +322,7 @@ where
 {
     /// Set the `title` field (required)
     pub fn title(mut self, value: impl Into<S>) -> IssueBuilder<issue_state::SetTitle<St>, S> {
-        self._fields.5 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -322,24 +341,26 @@ where
     /// Build the final struct.
     pub fn build(self) -> Issue<S> {
         Issue {
-            body: self._fields.0,
-            created_at: self._fields.1.unwrap(),
-            mentions: self._fields.2,
-            references: self._fields.3,
-            repo: self._fields.4.unwrap(),
-            title: self._fields.5.unwrap(),
+            blobs: self._fields.0,
+            body: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            mentions: self._fields.3,
+            references: self._fields.4,
+            repo: self._fields.5.unwrap(),
+            title: self._fields.6.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Issue<S> {
         Issue {
-            body: self._fields.0,
-            created_at: self._fields.1.unwrap(),
-            mentions: self._fields.2,
-            references: self._fields.3,
-            repo: self._fields.4.unwrap(),
-            title: self._fields.5.unwrap(),
+            blobs: self._fields.0,
+            body: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            mentions: self._fields.3,
+            references: self._fields.4,
+            repo: self._fields.5.unwrap(),
+            title: self._fields.6.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -368,6 +389,15 @@ fn lexicon_doc_sh_tangled_repo_issue() -> LexiconDoc<'static> {
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("blobs"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Blob(LexBlob {
+                                        ..Default::default()
+                                    }),
+                                    ..Default::default()
+                                }),
+                            );
                             map.insert(
                                 SmolStr::new_static("body"),
                                 LexObjectProperty::String(LexString {

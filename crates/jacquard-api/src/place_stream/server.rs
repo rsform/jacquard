@@ -201,6 +201,18 @@ impl<S: BosStr> LexiconSchema for Webhook<S> {
                 });
             }
         }
+        if let Some(values) = &self.mute_words {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 100usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("mute_words"),
+                        max: 100usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.name {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 100usize {

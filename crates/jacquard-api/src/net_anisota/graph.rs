@@ -6,3 +6,5 @@
 //! Generated bindings for the `net.anisota.graph` Lexicon namespace/module.
 pub mod list_mute;
 pub mod mute;
+pub mod scoped_mute;
+pub mod wordlist;

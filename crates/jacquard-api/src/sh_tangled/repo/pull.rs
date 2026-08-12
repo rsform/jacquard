@@ -7,6 +7,8 @@
 
 //! Generated bindings for the `sh.tangled.repo.pull` Lexicon namespace/module.
 pub mod comment;
+pub mod count_statuses;
+pub mod count_statuses_by;
 pub mod list_statuses;
 pub mod list_statuses_by;
 pub mod status;
@@ -44,6 +46,8 @@ use serde::{Deserialize, Serialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Pull<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub blobs: Option<Vec<BlobRef<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<S>,
     pub created_at: Datetime,
@@ -307,6 +311,7 @@ pub mod pull_state {
 pub struct PullBuilder<St: pull_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
+        Option<Vec<BlobRef<S>>>,
         Option<S>,
         Option<Datetime>,
         Option<AtUri<S>>,
@@ -339,7 +344,7 @@ impl PullBuilder<pull_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         PullBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -350,21 +355,34 @@ impl<S: BosStr> PullBuilder<pull_state::Empty, S> {
     pub fn builder() -> Self {
         PullBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
 impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
+    /// Set the `blobs` field (optional)
+    pub fn blobs(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `blobs` field to an Option value (optional)
+    pub fn maybe_blobs(mut self, value: Option<Vec<BlobRef<S>>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.0 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `body` field to an Option value (optional)
     pub fn maybe_body(mut self, value: Option<S>) -> Self {
-        self._fields.0 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -379,7 +397,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> PullBuilder<pull_state::SetCreatedAt<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -391,12 +409,12 @@ where
 impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `dependentOn` field (optional)
     pub fn dependent_on(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `dependentOn` field to an Option value (optional)
     pub fn maybe_dependent_on(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.2 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -404,12 +422,12 @@ impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
 impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `mentions` field to an Option value (optional)
     pub fn maybe_mentions(mut self, value: Option<Vec<Did<S>>>) -> Self {
-        self._fields.3 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -417,12 +435,12 @@ impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
 impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `references` field to an Option value (optional)
     pub fn maybe_references(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
-        self._fields.4 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -437,7 +455,7 @@ where
         mut self,
         value: impl Into<Vec<pull::Round<S>>>,
     ) -> PullBuilder<pull_state::SetRounds<St>, S> {
-        self._fields.5 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -449,12 +467,12 @@ where
 impl<St: pull_state::State, S: BosStr> PullBuilder<St, S> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<pull::Source<S>>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
     pub fn maybe_source(mut self, value: Option<pull::Source<S>>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -469,7 +487,7 @@ where
         mut self,
         value: impl Into<pull::Target<S>>,
     ) -> PullBuilder<pull_state::SetTarget<St>, S> {
-        self._fields.7 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -485,7 +503,7 @@ where
 {
     /// Set the `title` field (required)
     pub fn title(mut self, value: impl Into<S>) -> PullBuilder<pull_state::SetTitle<St>, S> {
-        self._fields.8 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -505,30 +523,32 @@ where
     /// Build the final struct.
     pub fn build(self) -> Pull<S> {
         Pull {
-            body: self._fields.0,
-            created_at: self._fields.1.unwrap(),
-            dependent_on: self._fields.2,
-            mentions: self._fields.3,
-            references: self._fields.4,
-            rounds: self._fields.5.unwrap(),
-            source: self._fields.6,
-            target: self._fields.7.unwrap(),
-            title: self._fields.8.unwrap(),
+            blobs: self._fields.0,
+            body: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            dependent_on: self._fields.3,
+            mentions: self._fields.4,
+            references: self._fields.5,
+            rounds: self._fields.6.unwrap(),
+            source: self._fields.7,
+            target: self._fields.8.unwrap(),
+            title: self._fields.9.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Pull<S> {
         Pull {
-            body: self._fields.0,
-            created_at: self._fields.1.unwrap(),
-            dependent_on: self._fields.2,
-            mentions: self._fields.3,
-            references: self._fields.4,
-            rounds: self._fields.5.unwrap(),
-            source: self._fields.6,
-            target: self._fields.7.unwrap(),
-            title: self._fields.8.unwrap(),
+            blobs: self._fields.0,
+            body: self._fields.1,
+            created_at: self._fields.2.unwrap(),
+            dependent_on: self._fields.3,
+            mentions: self._fields.4,
+            references: self._fields.5,
+            rounds: self._fields.6.unwrap(),
+            source: self._fields.7,
+            target: self._fields.8.unwrap(),
+            title: self._fields.9.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -558,6 +578,15 @@ fn lexicon_doc_sh_tangled_repo_pull() -> LexiconDoc<'static> {
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("blobs"),
+                                LexObjectProperty::Array(LexArray {
+                                    items: LexArrayItem::Blob(LexBlob {
+                                        ..Default::default()
+                                    }),
+                                    ..Default::default()
+                                }),
+                            );
                             map.insert(
                                 SmolStr::new_static("body"),
                                 LexObjectProperty::String(LexString {

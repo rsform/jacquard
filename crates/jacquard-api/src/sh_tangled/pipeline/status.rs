@@ -385,6 +385,9 @@ fn lexicon_doc_sh_tangled_pipeline_status() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
+                        description: Some(CowStr::new_static(
+                            "DEPRECATED: use sh.tangled.ci.pipeline instead",
+                        )),
                         required: Some(vec![
                             SmolStr::new_static("pipeline"),
                             SmolStr::new_static("workflow"),

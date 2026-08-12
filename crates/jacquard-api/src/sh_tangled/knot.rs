@@ -7,6 +7,10 @@
 
 //! Generated bindings for the `sh.tangled.knot` Lexicon namespace/module.
 pub mod add_member;
+pub mod ban;
+pub mod count_knots;
+pub mod count_members;
+pub mod count_members_by;
 pub mod list_keys;
 pub mod list_knots;
 pub mod list_members;
@@ -16,6 +20,7 @@ pub mod remove_member;
 
 #[cfg(feature = "streaming")]
 pub mod subscribe_repos;
+pub mod unban;
 pub mod version;
 
 #[allow(unused_imports)]

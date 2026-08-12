@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 // Re-export Lazy from crate root for submodule use via `super::Lazy`
 pub use crate::Lazy;
 
-/// AT Protocol URI (at://) types and validation
+/// AT Protocol URI (`at://`) types and validation, including permissioned space URIs.
 pub mod aturi;
 /// Blob references for binary data
 pub mod blob;

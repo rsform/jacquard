@@ -60,6 +60,16 @@ impl<S: BosStr> LexiconSchema for StorageExternal<S> {
                 });
             }
         }
+        for value in &self.urls {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 1000usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("urls"),
+                    max: 1000usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         Ok(())
     }
 }

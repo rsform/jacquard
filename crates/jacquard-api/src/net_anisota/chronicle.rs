@@ -7,7 +7,10 @@
 pub mod achievement;
 pub mod collection;
 pub mod expedition;
+pub mod fieldwork;
 pub mod inventory;
 pub mod level;
 pub mod log;
+pub mod milestone;
 pub mod progress;
+pub mod walk;

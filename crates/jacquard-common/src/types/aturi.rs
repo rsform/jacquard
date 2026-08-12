@@ -20,7 +20,7 @@ use regex_automata::meta::Regex;
 #[cfg(target_arch = "wasm32")]
 use regex_lite::Regex;
 use serde::Serializer;
-use serde::{de::Error, Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, de::Error};
 use smol_str::SmolStr;
 
 use super::Lazy;
@@ -276,9 +276,7 @@ fn validate_uri_shape(uri: &str) -> Result<UriShape, AtStrError> {
     // The space marker is positional: only the first path segment after the
     // authority may carry it. A standard URI with a collection or rkey that
     // happens to be "space" must parse as standard.
-    let after_scheme = uri
-        .strip_prefix("at://")
-        .unwrap_or(uri);
+    let after_scheme = uri.strip_prefix("at://").unwrap_or(uri);
     let first_path_segment = after_scheme.split('/').nth(1);
     if first_path_segment == Some("space") {
         validate_space_and_index(uri).map(|indices| UriShape::Space { indices })
@@ -1393,10 +1391,12 @@ mod tests {
     fn permissioned_space_rejects_noncanonical_forms() {
         assert!(AtSpaceUri::new("at://did:plc:space/com.example.type/demo").is_err());
         assert!(AtSpaceUri::new("at://did:plc:space/space/com.example.type/demo/").is_err());
-        assert!(AtSpaceUri::new(
-            "at://did:plc:space/space/com.example.type/demo/did:plc:author/com.example.record"
-        )
-        .is_err());
+        assert!(
+            AtSpaceUri::new(
+                "at://did:plc:space/space/com.example.type/demo/did:plc:author/com.example.record"
+            )
+            .is_err()
+        );
     }
 
     #[test]

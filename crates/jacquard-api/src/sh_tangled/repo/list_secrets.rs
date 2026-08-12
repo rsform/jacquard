@@ -41,7 +41,8 @@ pub struct ListSecrets<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct ListSecretsOutput<S: BosStr = DefaultStr> {
-    pub secrets: Vec<list_secrets::Secret<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub secrets: Option<Vec<list_secrets::Secret<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }

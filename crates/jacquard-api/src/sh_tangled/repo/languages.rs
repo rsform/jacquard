@@ -69,7 +69,8 @@ pub struct Languages<S: BosStr = DefaultStr> {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct LanguagesOutput<S: BosStr = DefaultStr> {
-    pub languages: Vec<languages::Language<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub languages: Option<Vec<languages::Language<S>>>,
     ///The git reference used
     pub r#ref: S,
     ///Total number of files analyzed

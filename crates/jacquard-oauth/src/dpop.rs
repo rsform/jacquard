@@ -817,6 +817,7 @@ pub fn build_dpop_proof(
             htu: Some(url),
             ath,
             nonce,
+            cnf: None,
         },
     };
     Ok(signing::create_signed_jwt_es256(

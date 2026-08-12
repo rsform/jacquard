@@ -28,6 +28,7 @@ pub struct ListGames<S: BosStr = DefaultStr> {
     pub age_ratings: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub application_types: Option<Vec<S>>,
+    /// (max length: 256)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -38,6 +39,10 @@ pub struct ListGames<S: BosStr = DefaultStr> {
     #[serde(default = "_default_include_cancelled")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_cancelled: Option<bool>,
+    ///  Defaults to `false`.
+    #[serde(default = "_default_include_unpublished")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub include_unpublished: Option<bool>,
     ///  Defaults to `false`.
     #[serde(default = "_default_include_unrated")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,11 +55,11 @@ pub struct ListGames<S: BosStr = DefaultStr> {
     pub modes: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub player_perspectives: Option<Vec<S>>,
-    /// Defaults to `"indexed_at"`.
+    /// Defaults to `"indexed_at"`. Max length: 64.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort: Option<S>,
-    /// Defaults to `"desc"`.
+    /// Defaults to `"desc"`. Max length: 64.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sort_direction: Option<S>,
@@ -107,6 +112,10 @@ fn _default_include_cancelled() -> Option<bool> {
     Some(false)
 }
 
+fn _default_include_unpublished() -> Option<bool> {
+    Some(false)
+}
+
 fn _default_include_unrated() -> Option<bool> {
     Some(false)
 }
@@ -153,6 +162,7 @@ pub struct ListGamesBuilder<St: list_games_state::State, S: BosStr = DefaultStr>
         Option<Vec<S>>,
         Option<bool>,
         Option<bool>,
+        Option<bool>,
         Option<i64>,
         Option<Vec<S>>,
         Option<Vec<S>>,
@@ -183,7 +193,7 @@ impl ListGamesBuilder<list_games_state::Empty, DefaultStr> {
         ListGamesBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -196,7 +206,7 @@ impl<S: BosStr> ListGamesBuilder<list_games_state::Empty, S> {
         ListGamesBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -282,14 +292,27 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 }
 
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
+    /// Set the `includeUnpublished` field (optional)
+    pub fn include_unpublished(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `includeUnpublished` field to an Option value (optional)
+    pub fn maybe_include_unpublished(mut self, value: Option<bool>) -> Self {
+        self._fields.6 = value;
+        self
+    }
+}
+
+impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `includeUnrated` field (optional)
     pub fn include_unrated(mut self, value: impl Into<Option<bool>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `includeUnrated` field to an Option value (optional)
     pub fn maybe_include_unrated(mut self, value: Option<bool>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -297,12 +320,12 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.8 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self._fields.7 = value;
+        self._fields.8 = value;
         self
     }
 }
@@ -310,12 +333,12 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `modes` field (optional)
     pub fn modes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
     pub fn maybe_modes(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.8 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -323,12 +346,12 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `playerPerspectives` field to an Option value (optional)
     pub fn maybe_player_perspectives(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.9 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -336,12 +359,12 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.10 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
     pub fn maybe_sort(mut self, value: Option<S>) -> Self {
-        self._fields.10 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -349,12 +372,12 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `sortDirection` field (optional)
     pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.11 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
     pub fn maybe_sort_direction(mut self, value: Option<S>) -> Self {
-        self._fields.11 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -362,12 +385,12 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `themes` field (optional)
     pub fn themes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.12 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `themes` field to an Option value (optional)
     pub fn maybe_themes(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.12 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -385,13 +408,14 @@ where
             did: self._fields.3,
             genres: self._fields.4,
             include_cancelled: self._fields.5,
-            include_unrated: self._fields.6,
-            limit: self._fields.7,
-            modes: self._fields.8,
-            player_perspectives: self._fields.9,
-            sort: self._fields.10,
-            sort_direction: self._fields.11,
-            themes: self._fields.12,
+            include_unpublished: self._fields.6,
+            include_unrated: self._fields.7,
+            limit: self._fields.8,
+            modes: self._fields.9,
+            player_perspectives: self._fields.10,
+            sort: self._fields.11,
+            sort_direction: self._fields.12,
+            themes: self._fields.13,
         }
     }
 }

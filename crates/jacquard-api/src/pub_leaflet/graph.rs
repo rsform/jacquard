@@ -4,4 +4,5 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `pub.leaflet.graph` Lexicon namespace/module.
+pub mod recommendations;
 pub mod subscription;

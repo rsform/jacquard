@@ -43,6 +43,9 @@ pub struct Tag<S: BosStr = DefaultStr> {
     ///DEPRECATED: Digest of the manifest (e.g., 'sha256:...'). Kept for backward compatibility with old records. New records should use 'manifest' field instead.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub manifest_digest: Option<S>,
+    ///OCI media type of the manifest (e.g., 'application/vnd.oci.image.manifest.v1+json' or 'application/vnd.oci.image.index.v1+json')
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub media_type: Option<S>,
     ///Repository name (e.g., 'myapp'). Scoped to user's DID.
     pub repository: S,
     ///Tag name (e.g., 'latest', 'v1.0.0', '12-slim')
@@ -115,6 +118,16 @@ impl<S: BosStr> LexiconSchema for Tag<S> {
                 return Err(ConstraintError::MaxLength {
                     path: ValidationPath::from_field("manifest_digest"),
                     max: 128usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.media_type {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 255usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("media_type"),
+                    max: 255usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -197,6 +210,7 @@ pub struct TagBuilder<St: tag_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<S>,
         Option<S>,
+        Option<S>,
         Option<Datetime>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -221,7 +235,7 @@ impl TagBuilder<tag_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         TagBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -232,7 +246,7 @@ impl<S: BosStr> TagBuilder<tag_state::Empty, S> {
     pub fn builder() -> Self {
         TagBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -264,6 +278,19 @@ impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     }
 }
 
+impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
+    /// Set the `mediaType` field (optional)
+    pub fn media_type(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `mediaType` field to an Option value (optional)
+    pub fn maybe_media_type(mut self, value: Option<S>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> TagBuilder<St, S>
 where
     St: tag_state::State,
@@ -274,7 +301,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> TagBuilder<tag_state::SetRepository<St>, S> {
-        self._fields.2 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -290,7 +317,7 @@ where
 {
     /// Set the `tag` field (required)
     pub fn tag(mut self, value: impl Into<S>) -> TagBuilder<tag_state::SetTag<St>, S> {
-        self._fields.3 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -302,12 +329,12 @@ where
 impl<St: tag_state::State, S: BosStr> TagBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.4 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -323,9 +350,10 @@ where
         Tag {
             manifest: self._fields.0,
             manifest_digest: self._fields.1,
-            repository: self._fields.2.unwrap(),
-            tag: self._fields.3.unwrap(),
-            updated_at: self._fields.4,
+            media_type: self._fields.2,
+            repository: self._fields.3.unwrap(),
+            tag: self._fields.4.unwrap(),
+            updated_at: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -334,9 +362,10 @@ where
         Tag {
             manifest: self._fields.0,
             manifest_digest: self._fields.1,
-            repository: self._fields.2.unwrap(),
-            tag: self._fields.3.unwrap(),
-            updated_at: self._fields.4,
+            media_type: self._fields.2,
+            repository: self._fields.3.unwrap(),
+            tag: self._fields.4.unwrap(),
+            updated_at: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -392,6 +421,18 @@ fn lexicon_doc_io_atcr_tag() -> LexiconDoc<'static> {
                                         ),
                                     ),
                                     max_length: Some(128usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("mediaType"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "OCI media type of the manifest (e.g., 'application/vnd.oci.image.manifest.v1+json' or 'application/vnd.oci.image.index.v1+json')",
+                                        ),
+                                    ),
+                                    max_length: Some(255usize),
                                     ..Default::default()
                                 }),
                             );

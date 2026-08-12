@@ -143,6 +143,44 @@ impl<S: BosStr> LexiconSchema for Play<S> {
         lexicon_doc_fm_teal_alpha_feed_play()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(values) = &self.artist_names {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 256usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("artist_names"),
+                        max: 256usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.artist_names {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) < 1usize {
+                    return Err(ConstraintError::MinLength {
+                        path: ValidationPath::from_field("artist_names"),
+                        min: 1usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.artist_names {
+            for value in values {
+                {
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                    if count > 2560usize {
+                        return Err(ConstraintError::MaxGraphemes {
+                            path: ValidationPath::from_field("artist_names"),
+                            max: 2560usize,
+                            actual: count,
+                        });
+                    }
+                }
+            }
+        }
         if let Some(ref value) = self.release_discriminant {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {

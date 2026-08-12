@@ -6,6 +6,9 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `sh.tangled.spindle` Lexicon namespace/module.
+pub mod count_members;
+pub mod count_members_by;
+pub mod count_spindles;
 pub mod list_members;
 pub mod list_members_by;
 pub mod list_spindles;

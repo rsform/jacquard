@@ -50,6 +50,9 @@ pub struct Page<S: BosStr = DefaultStr> {
     pub repository: S,
     ///Record last updated timestamp
     pub updated_at: Datetime,
+    ///Whether the description was manually edited by the user. When true, auto-population from manifest annotations is skipped on push.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user_edited: Option<bool>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -240,6 +243,7 @@ pub struct PageBuilder<St: page_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<S>,
         Option<Datetime>,
+        Option<bool>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -263,7 +267,7 @@ impl PageBuilder<page_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         PageBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -274,7 +278,7 @@ impl<S: BosStr> PageBuilder<page_state::Empty, S> {
     pub fn builder() -> Self {
         PageBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -363,6 +367,19 @@ where
     }
 }
 
+impl<St: page_state::State, S: BosStr> PageBuilder<St, S> {
+    /// Set the `userEdited` field (optional)
+    pub fn user_edited(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `userEdited` field to an Option value (optional)
+    pub fn maybe_user_edited(mut self, value: Option<bool>) -> Self {
+        self._fields.5 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> PageBuilder<St, S>
 where
     St: page_state::State,
@@ -378,6 +395,7 @@ where
             description: self._fields.2,
             repository: self._fields.3.unwrap(),
             updated_at: self._fields.4.unwrap(),
+            user_edited: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -389,6 +407,7 @@ where
             description: self._fields.2,
             repository: self._fields.3.unwrap(),
             updated_at: self._fields.4.unwrap(),
+            user_edited: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
@@ -469,6 +488,12 @@ fn lexicon_doc_io_atcr_repo_page() -> LexiconDoc<'static> {
                                         CowStr::new_static("Record last updated timestamp"),
                                     ),
                                     format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("userEdited"),
+                                LexObjectProperty::Boolean(LexBoolean {
                                     ..Default::default()
                                 }),
                             );

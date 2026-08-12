@@ -96,7 +96,7 @@ pub struct Brew<S: BosStr = DefaultStr> {
     ///Tasting notes and observations about the brew
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tasting_notes: Option<S>,
-    ///Water temperature in tenths of a degree Celsius (e.g., 935 = 93.5°C)
+    ///Water temperature in tenths of a degree Celsius or Fahrenheit (e.g., 935 = 93.5°C)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub temperature: Option<i64>,
     ///Total brew time in seconds
@@ -307,10 +307,10 @@ impl<S: BosStr> LexiconSchema for Brew<S> {
             }
         }
         if let Some(ref value) = self.temperature {
-            if *value > 1000i64 {
+            if *value > 2120i64 {
                 return Err(ConstraintError::Maximum {
                     path: ValidationPath::from_field("temperature"),
-                    max: 1000i64,
+                    max: 2120i64,
                     actual: *value,
                 });
             }
@@ -646,7 +646,7 @@ fn lexicon_doc_social_arabica_alpha_brew() -> LexiconDoc<'static> {
                                 SmolStr::new_static("temperature"),
                                 LexObjectProperty::Integer(LexInteger {
                                     minimum: Some(0i64),
-                                    maximum: Some(1000i64),
+                                    maximum: Some(2120i64),
                                     ..Default::default()
                                 }),
                             );

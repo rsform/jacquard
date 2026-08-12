@@ -111,12 +111,17 @@ pub struct QueueView<S: BosStr = DefaultStr> {
     pub id: i64,
     ///Display name of the queue
     pub name: S,
+    ///Policy keys recommended when actioning reports in this queue
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommended_policies: Option<Vec<S>>,
     ///Report reason types this queue accepts (fully qualified NSIDs)
-    pub report_types: Vec<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub report_types: Option<Vec<S>>,
     ///Statistics about this queue
     pub stats: queue::QueueStats<S>,
     ///Subject types this queue accepts.
-    pub subject_types: Vec<S>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subject_types: Option<Vec<S>>,
     pub updated_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -163,28 +168,6 @@ impl<S: BosStr> LexiconSchema for QueueView<S> {
         lexicon_doc_tools_ozone_queue_defs()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
-        {
-            let value = &self.report_types;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(ConstraintError::MinLength {
-                    path: ValidationPath::from_field("report_types"),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
-        {
-            let value = &self.subject_types;
-            #[allow(unused_comparisons)]
-            if value.len() < 1usize {
-                return Err(ConstraintError::MinLength {
-                    path: ValidationPath::from_field("subject_types"),
-                    min: 1usize,
-                    actual: value.len(),
-                });
-            }
-        }
         Ok(())
     }
 }
@@ -581,8 +564,6 @@ fn lexicon_doc_tools_ozone_queue_defs() -> LexiconDoc<'static> {
                     required: Some(
                         vec![
                             SmolStr::new_static("id"), SmolStr::new_static("name"),
-                            SmolStr::new_static("subjectTypes"),
-                            SmolStr::new_static("reportTypes"),
                             SmolStr::new_static("createdBy"),
                             SmolStr::new_static("createdAt"),
                             SmolStr::new_static("updatedAt"),
@@ -666,6 +647,20 @@ fn lexicon_doc_tools_ozone_queue_defs() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
+                            SmolStr::new_static("recommendedPolicies"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Policy keys recommended when actioning reports in this queue",
+                                    ),
+                                ),
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
                             SmolStr::new_static("reportTypes"),
                             LexObjectProperty::Array(LexArray {
                                 description: Some(
@@ -676,7 +671,6 @@ fn lexicon_doc_tools_ozone_queue_defs() -> LexiconDoc<'static> {
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
-                                min_length: Some(1usize),
                                 ..Default::default()
                             }),
                         );
@@ -696,7 +690,6 @@ fn lexicon_doc_tools_ozone_queue_defs() -> LexiconDoc<'static> {
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
-                                min_length: Some(1usize),
                                 ..Default::default()
                             }),
                         );
@@ -733,9 +726,7 @@ pub mod queue_view_state {
         type Enabled;
         type Id;
         type Name;
-        type ReportTypes;
         type Stats;
-        type SubjectTypes;
         type UpdatedAt;
     }
     /// Empty state - all required fields are unset
@@ -747,9 +738,7 @@ pub mod queue_view_state {
         type Enabled = Unset;
         type Id = Unset;
         type Name = Unset;
-        type ReportTypes = Unset;
         type Stats = Unset;
-        type SubjectTypes = Unset;
         type UpdatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
@@ -761,9 +750,7 @@ pub mod queue_view_state {
         type Enabled = St::Enabled;
         type Id = St::Id;
         type Name = St::Name;
-        type ReportTypes = St::ReportTypes;
         type Stats = St::Stats;
-        type SubjectTypes = St::SubjectTypes;
         type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `created_by` field to Set
@@ -775,9 +762,7 @@ pub mod queue_view_state {
         type Enabled = St::Enabled;
         type Id = St::Id;
         type Name = St::Name;
-        type ReportTypes = St::ReportTypes;
         type Stats = St::Stats;
-        type SubjectTypes = St::SubjectTypes;
         type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `enabled` field to Set
@@ -789,9 +774,7 @@ pub mod queue_view_state {
         type Enabled = Set<members::enabled>;
         type Id = St::Id;
         type Name = St::Name;
-        type ReportTypes = St::ReportTypes;
         type Stats = St::Stats;
-        type SubjectTypes = St::SubjectTypes;
         type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `id` field to Set
@@ -803,9 +786,7 @@ pub mod queue_view_state {
         type Enabled = St::Enabled;
         type Id = Set<members::id>;
         type Name = St::Name;
-        type ReportTypes = St::ReportTypes;
         type Stats = St::Stats;
-        type SubjectTypes = St::SubjectTypes;
         type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `name` field to Set
@@ -817,23 +798,7 @@ pub mod queue_view_state {
         type Enabled = St::Enabled;
         type Id = St::Id;
         type Name = Set<members::name>;
-        type ReportTypes = St::ReportTypes;
         type Stats = St::Stats;
-        type SubjectTypes = St::SubjectTypes;
-        type UpdatedAt = St::UpdatedAt;
-    }
-    ///State transition - sets the `report_types` field to Set
-    pub struct SetReportTypes<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReportTypes<St> {}
-    impl<St: State> State for SetReportTypes<St> {
-        type CreatedAt = St::CreatedAt;
-        type CreatedBy = St::CreatedBy;
-        type Enabled = St::Enabled;
-        type Id = St::Id;
-        type Name = St::Name;
-        type ReportTypes = Set<members::report_types>;
-        type Stats = St::Stats;
-        type SubjectTypes = St::SubjectTypes;
         type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `stats` field to Set
@@ -845,23 +810,7 @@ pub mod queue_view_state {
         type Enabled = St::Enabled;
         type Id = St::Id;
         type Name = St::Name;
-        type ReportTypes = St::ReportTypes;
         type Stats = Set<members::stats>;
-        type SubjectTypes = St::SubjectTypes;
-        type UpdatedAt = St::UpdatedAt;
-    }
-    ///State transition - sets the `subject_types` field to Set
-    pub struct SetSubjectTypes<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubjectTypes<St> {}
-    impl<St: State> State for SetSubjectTypes<St> {
-        type CreatedAt = St::CreatedAt;
-        type CreatedBy = St::CreatedBy;
-        type Enabled = St::Enabled;
-        type Id = St::Id;
-        type Name = St::Name;
-        type ReportTypes = St::ReportTypes;
-        type Stats = St::Stats;
-        type SubjectTypes = Set<members::subject_types>;
         type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
@@ -873,9 +822,7 @@ pub mod queue_view_state {
         type Enabled = St::Enabled;
         type Id = St::Id;
         type Name = St::Name;
-        type ReportTypes = St::ReportTypes;
         type Stats = St::Stats;
-        type SubjectTypes = St::SubjectTypes;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
@@ -891,12 +838,8 @@ pub mod queue_view_state {
         pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `report_types` field
-        pub struct report_types(());
         ///Marker type for the `stats` field
         pub struct stats(());
-        ///Marker type for the `subject_types` field
-        pub struct subject_types(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
     }
@@ -914,6 +857,7 @@ pub struct QueueViewBuilder<St: queue_view_state::State, S: BosStr = DefaultStr>
         Option<bool>,
         Option<i64>,
         Option<S>,
+        Option<Vec<S>>,
         Option<Vec<S>>,
         Option<queue::QueueStats<S>>,
         Option<Vec<S>>,
@@ -942,7 +886,7 @@ impl QueueViewBuilder<queue_view_state::Empty, DefaultStr> {
         QueueViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -955,7 +899,7 @@ impl<S: BosStr> QueueViewBuilder<queue_view_state::Empty, S> {
         QueueViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1093,22 +1037,29 @@ where
     }
 }
 
-impl<St, S: BosStr> QueueViewBuilder<St, S>
-where
-    St: queue_view_state::State,
-    St::ReportTypes: queue_view_state::IsUnset,
-{
-    /// Set the `reportTypes` field (required)
-    pub fn report_types(
-        mut self,
-        value: impl Into<Vec<S>>,
-    ) -> QueueViewBuilder<queue_view_state::SetReportTypes<St>, S> {
-        self._fields.8 = Option::Some(value.into());
-        QueueViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: queue_view_state::State, S: BosStr> QueueViewBuilder<St, S> {
+    /// Set the `recommendedPolicies` field (optional)
+    pub fn recommended_policies(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.8 = value.into();
+        self
+    }
+    /// Set the `recommendedPolicies` field to an Option value (optional)
+    pub fn maybe_recommended_policies(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.8 = value;
+        self
+    }
+}
+
+impl<St: queue_view_state::State, S: BosStr> QueueViewBuilder<St, S> {
+    /// Set the `reportTypes` field (optional)
+    pub fn report_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.9 = value.into();
+        self
+    }
+    /// Set the `reportTypes` field to an Option value (optional)
+    pub fn maybe_report_types(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.9 = value;
+        self
     }
 }
 
@@ -1122,7 +1073,7 @@ where
         mut self,
         value: impl Into<queue::QueueStats<S>>,
     ) -> QueueViewBuilder<queue_view_state::SetStats<St>, S> {
-        self._fields.9 = Option::Some(value.into());
+        self._fields.10 = Option::Some(value.into());
         QueueViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1131,22 +1082,16 @@ where
     }
 }
 
-impl<St, S: BosStr> QueueViewBuilder<St, S>
-where
-    St: queue_view_state::State,
-    St::SubjectTypes: queue_view_state::IsUnset,
-{
-    /// Set the `subjectTypes` field (required)
-    pub fn subject_types(
-        mut self,
-        value: impl Into<Vec<S>>,
-    ) -> QueueViewBuilder<queue_view_state::SetSubjectTypes<St>, S> {
-        self._fields.10 = Option::Some(value.into());
-        QueueViewBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: queue_view_state::State, S: BosStr> QueueViewBuilder<St, S> {
+    /// Set the `subjectTypes` field (optional)
+    pub fn subject_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.11 = value.into();
+        self
+    }
+    /// Set the `subjectTypes` field to an Option value (optional)
+    pub fn maybe_subject_types(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.11 = value;
+        self
     }
 }
 
@@ -1160,7 +1105,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> QueueViewBuilder<queue_view_state::SetUpdatedAt<St>, S> {
-        self._fields.11 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         QueueViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1177,9 +1122,7 @@ where
     St::Enabled: queue_view_state::IsSet,
     St::Id: queue_view_state::IsSet,
     St::Name: queue_view_state::IsSet,
-    St::ReportTypes: queue_view_state::IsSet,
     St::Stats: queue_view_state::IsSet,
-    St::SubjectTypes: queue_view_state::IsSet,
     St::UpdatedAt: queue_view_state::IsSet,
 {
     /// Build the final struct.
@@ -1193,10 +1136,11 @@ where
             enabled: self._fields.5.unwrap(),
             id: self._fields.6.unwrap(),
             name: self._fields.7.unwrap(),
-            report_types: self._fields.8.unwrap(),
-            stats: self._fields.9.unwrap(),
-            subject_types: self._fields.10.unwrap(),
-            updated_at: self._fields.11.unwrap(),
+            recommended_policies: self._fields.8,
+            report_types: self._fields.9,
+            stats: self._fields.10.unwrap(),
+            subject_types: self._fields.11,
+            updated_at: self._fields.12.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1211,10 +1155,11 @@ where
             enabled: self._fields.5.unwrap(),
             id: self._fields.6.unwrap(),
             name: self._fields.7.unwrap(),
-            report_types: self._fields.8.unwrap(),
-            stats: self._fields.9.unwrap(),
-            subject_types: self._fields.10.unwrap(),
-            updated_at: self._fields.11.unwrap(),
+            recommended_policies: self._fields.8,
+            report_types: self._fields.9,
+            stats: self._fields.10.unwrap(),
+            subject_types: self._fields.11,
+            updated_at: self._fields.12.unwrap(),
             extra_data: Some(extra_data),
         }
     }

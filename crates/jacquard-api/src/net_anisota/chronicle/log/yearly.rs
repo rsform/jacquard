@@ -52,6 +52,33 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Per-category counts of activity performed inside anisota, summed across the period and across devices.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
+pub struct InAppCounts<S: BosStr = DefaultStr> {
+    ///Likes created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub likes: Option<i64>,
+    ///Top-level posts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posts: Option<i64>,
+    ///Quote posts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quotes: Option<i64>,
+    ///Replies created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replies: Option<i64>,
+    ///Reposts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reposts: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Yearly aggregation of monthly records. rkey is YYYY. Updated once per month, finalized when year ends.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -68,6 +95,9 @@ pub struct Yearly<S: BosStr = DefaultStr> {
     ///When the yearly record was finalized (end of year)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub finalized_at: Option<Datetime>,
+    ///Rolled-up in-anisota activity for the year (summed daily inApp across devices, per field). Optional and additive; the read side may instead compute this from the year's daily logs.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub in_app: Option<yearly::InAppCounts<S>>,
     ///AT URIs of monthly log records included in this year
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lower_log_refs: Option<Vec<S>>,
@@ -170,6 +200,66 @@ impl<S: BosStr> LexiconSchema for ChronicleSignature<S> {
         lexicon_doc_net_anisota_chronicle_log_yearly()
     }
     fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for InAppCounts<S> {
+    fn nsid() -> &'static str {
+        "net.anisota.chronicle.log.yearly"
+    }
+    fn def_name() -> &'static str {
+        "inAppCounts"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_net_anisota_chronicle_log_yearly()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.likes {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("likes"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("posts"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.quotes {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("quotes"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.replies {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("replies"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.reposts {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("reposts"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
         Ok(())
     }
 }
@@ -756,6 +846,57 @@ fn lexicon_doc_net_anisota_chronicle_log_yearly() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("inAppCounts"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Per-category counts of activity performed inside anisota, summed across the period and across devices.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("likes"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("posts"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("quotes"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("replies"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reposts"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
                     description: Some(
@@ -805,6 +946,13 @@ fn lexicon_doc_net_anisota_chronicle_log_yearly() -> LexiconDoc<'static> {
                                         ),
                                     ),
                                     format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("inApp"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#inAppCounts"),
                                     ..Default::default()
                                 }),
                             );
@@ -1079,6 +1227,7 @@ pub struct YearlyBuilder<St: yearly_state::State, S: BosStr = DefaultStr> {
         Option<yearly::YearlyAggregates<S>>,
         Option<Datetime>,
         Option<Datetime>,
+        Option<yearly::InAppCounts<S>>,
         Option<Vec<S>>,
         Option<yearly::YearlyPatterns<S>>,
         Option<yearly::ChronicleSignature<S>>,
@@ -1107,7 +1256,7 @@ impl YearlyBuilder<yearly_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         YearlyBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1118,7 +1267,7 @@ impl<S: BosStr> YearlyBuilder<yearly_state::Empty, S> {
     pub fn builder() -> Self {
         YearlyBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1176,14 +1325,27 @@ impl<St: yearly_state::State, S: BosStr> YearlyBuilder<St, S> {
 }
 
 impl<St: yearly_state::State, S: BosStr> YearlyBuilder<St, S> {
+    /// Set the `inApp` field (optional)
+    pub fn in_app(mut self, value: impl Into<Option<yearly::InAppCounts<S>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `inApp` field to an Option value (optional)
+    pub fn maybe_in_app(mut self, value: Option<yearly::InAppCounts<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
+impl<St: yearly_state::State, S: BosStr> YearlyBuilder<St, S> {
     /// Set the `lowerLogRefs` field (optional)
     pub fn lower_log_refs(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `lowerLogRefs` field to an Option value (optional)
     pub fn maybe_lower_log_refs(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.3 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -1191,12 +1353,12 @@ impl<St: yearly_state::State, S: BosStr> YearlyBuilder<St, S> {
 impl<St: yearly_state::State, S: BosStr> YearlyBuilder<St, S> {
     /// Set the `patterns` field (optional)
     pub fn patterns(mut self, value: impl Into<Option<yearly::YearlyPatterns<S>>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `patterns` field to an Option value (optional)
     pub fn maybe_patterns(mut self, value: Option<yearly::YearlyPatterns<S>>) -> Self {
-        self._fields.4 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -1211,7 +1373,7 @@ where
         mut self,
         value: impl Into<yearly::ChronicleSignature<S>>,
     ) -> YearlyBuilder<yearly_state::SetSignature<St>, S> {
-        self._fields.5 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         YearlyBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1227,7 +1389,7 @@ where
 {
     /// Set the `status` field (required)
     pub fn status(mut self, value: impl Into<S>) -> YearlyBuilder<yearly_state::SetStatus<St>, S> {
-        self._fields.6 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         YearlyBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1243,7 +1405,7 @@ where
 {
     /// Set the `year` field (required)
     pub fn year(mut self, value: impl Into<S>) -> YearlyBuilder<yearly_state::SetYear<St>, S> {
-        self._fields.7 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         YearlyBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1267,11 +1429,12 @@ where
             aggregates: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
             finalized_at: self._fields.2,
-            lower_log_refs: self._fields.3,
-            patterns: self._fields.4,
-            signature: self._fields.5.unwrap(),
-            status: self._fields.6.unwrap(),
-            year: self._fields.7.unwrap(),
+            in_app: self._fields.3,
+            lower_log_refs: self._fields.4,
+            patterns: self._fields.5,
+            signature: self._fields.6.unwrap(),
+            status: self._fields.7.unwrap(),
+            year: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
@@ -1281,11 +1444,12 @@ where
             aggregates: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
             finalized_at: self._fields.2,
-            lower_log_refs: self._fields.3,
-            patterns: self._fields.4,
-            signature: self._fields.5.unwrap(),
-            status: self._fields.6.unwrap(),
-            year: self._fields.7.unwrap(),
+            in_app: self._fields.3,
+            lower_log_refs: self._fields.4,
+            patterns: self._fields.5,
+            signature: self._fields.6.unwrap(),
+            status: self._fields.7.unwrap(),
+            year: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }

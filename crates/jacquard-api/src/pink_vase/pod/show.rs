@@ -126,6 +126,18 @@ impl<S: BosStr> LexiconSchema for Show<S> {
                 });
             }
         }
+        if let Some(values) = &self.categories {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 100usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("categories"),
+                        max: 100usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.cover_art {
             {
                 let size = value.blob().size;

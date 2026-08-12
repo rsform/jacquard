@@ -404,6 +404,16 @@ impl<S: BosStr> LexiconSchema for Track<S> {
                 });
             }
         }
+        for value in &self.artists {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("artists"),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.title;
             #[allow(unused_comparisons)]

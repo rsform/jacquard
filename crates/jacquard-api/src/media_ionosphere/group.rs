@@ -261,6 +261,18 @@ impl<S: BosStr> LexiconSchema for Group<S> {
                 });
             }
         }
+        if let Some(values) = &self.keywords {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 128usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("keywords"),
+                        max: 128usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         if let Some(ref value) = self.kind {
             #[allow(unused_comparisons)]
             if <str>::len(value.as_ref()) > 128usize {

@@ -48,6 +48,9 @@ pub struct Scan<S: BosStr = DefaultStr> {
     pub manifest: AtUri<S>,
     ///Count of medium severity vulnerabilities
     pub medium: i64,
+    ///Optional human-readable explanation for non-ok status (e.g. 'unscannable artifact type application/vnd.cncf.helm.config.v1+json').
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reason: Option<S>,
     ///Repository name (e.g., myapp)
     pub repository: S,
     ///SBOM blob (SPDX JSON format) uploaded to the hold's blob storage
@@ -57,6 +60,9 @@ pub struct Scan<S: BosStr = DefaultStr> {
     pub scanned_at: Datetime,
     ///Version of the scanner that produced this result (e.g., atcr-scanner-v1.0.0)
     pub scanner_version: S,
+    ///Outcome of the scan attempt. 'ok' (or omitted, for back-compat) means the scanner produced an SBOM. 'failed' means the scanner ran but errored. 'skipped' means the scanner intentionally bypassed this artifact type (e.g. helm charts).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<ScanStatus<S>>,
     ///Total vulnerability count
     pub total: i64,
     ///DID of the image owner
@@ -66,6 +72,89 @@ pub struct Scan<S: BosStr = DefaultStr> {
     pub vuln_report_blob: Option<BlobRef<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Outcome of the scan attempt. 'ok' (or omitted, for back-compat) means the scanner produced an SBOM. 'failed' means the scanner ran but errored. 'skipped' means the scanner intentionally bypassed this artifact type (e.g. helm charts).
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ScanStatus<S: BosStr = DefaultStr> {
+    Ok,
+    Failed,
+    Skipped,
+    Other(S),
+}
+
+impl<S: BosStr> ScanStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ok => "ok",
+            Self::Failed => "failed",
+            Self::Skipped => "skipped",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "ok" => Self::Ok,
+            "failed" => Self::Failed,
+            "skipped" => Self::Skipped,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ScanStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ScanStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ScanStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ScanStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ScanStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ScanStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ScanStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ScanStatus::Ok => ScanStatus::Ok,
+            ScanStatus::Failed => ScanStatus::Failed,
+            ScanStatus::Skipped => ScanStatus::Skipped,
+            ScanStatus::Other(v) => ScanStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -163,6 +252,16 @@ impl<S: BosStr> LexiconSchema for Scan<S> {
                 });
             }
         }
+        if let Some(ref value) = self.reason {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 256usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("reason"),
+                    max: 256usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.repository;
             #[allow(unused_comparisons)]
@@ -204,6 +303,16 @@ impl<S: BosStr> LexiconSchema for Scan<S> {
                 return Err(ConstraintError::MaxLength {
                     path: ValidationPath::from_field("scanner_version"),
                     max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.status {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("status"),
+                    max: 32usize,
                     actual: <str>::len(value.as_ref()),
                 });
             }
@@ -467,9 +576,11 @@ pub struct ScanBuilder<St: scan_state::State, S: BosStr = DefaultStr> {
         Option<AtUri<S>>,
         Option<i64>,
         Option<S>,
+        Option<S>,
         Option<BlobRef<S>>,
         Option<Datetime>,
         Option<S>,
+        Option<ScanStatus<S>>,
         Option<i64>,
         Option<Did<S>>,
         Option<BlobRef<S>>,
@@ -497,7 +608,7 @@ impl ScanBuilder<scan_state::Empty, DefaultStr> {
         ScanBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -510,7 +621,7 @@ impl<S: BosStr> ScanBuilder<scan_state::Empty, S> {
         ScanBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -603,6 +714,19 @@ where
     }
 }
 
+impl<St: scan_state::State, S: BosStr> ScanBuilder<St, S> {
+    /// Set the `reason` field (optional)
+    pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `reason` field to an Option value (optional)
+    pub fn maybe_reason(mut self, value: Option<S>) -> Self {
+        self._fields.5 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> ScanBuilder<St, S>
 where
     St: scan_state::State,
@@ -613,7 +737,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> ScanBuilder<scan_state::SetRepository<St>, S> {
-        self._fields.5 = Option::Some(value.into());
+        self._fields.6 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -625,12 +749,12 @@ where
 impl<St: scan_state::State, S: BosStr> ScanBuilder<St, S> {
     /// Set the `sbomBlob` field (optional)
     pub fn sbom_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `sbomBlob` field to an Option value (optional)
     pub fn maybe_sbom_blob(mut self, value: Option<BlobRef<S>>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -645,7 +769,7 @@ where
         mut self,
         value: impl Into<Datetime>,
     ) -> ScanBuilder<scan_state::SetScannedAt<St>, S> {
-        self._fields.7 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -664,12 +788,25 @@ where
         mut self,
         value: impl Into<S>,
     ) -> ScanBuilder<scan_state::SetScannerVersion<St>, S> {
-        self._fields.8 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
             _fields: self._fields,
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: scan_state::State, S: BosStr> ScanBuilder<St, S> {
+    /// Set the `status` field (optional)
+    pub fn status(mut self, value: impl Into<Option<ScanStatus<S>>>) -> Self {
+        self._fields.10 = value.into();
+        self
+    }
+    /// Set the `status` field to an Option value (optional)
+    pub fn maybe_status(mut self, value: Option<ScanStatus<S>>) -> Self {
+        self._fields.10 = value;
+        self
     }
 }
 
@@ -680,7 +817,7 @@ where
 {
     /// Set the `total` field (required)
     pub fn total(mut self, value: impl Into<i64>) -> ScanBuilder<scan_state::SetTotal<St>, S> {
-        self._fields.9 = Option::Some(value.into());
+        self._fields.11 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -699,7 +836,7 @@ where
         mut self,
         value: impl Into<Did<S>>,
     ) -> ScanBuilder<scan_state::SetUserDid<St>, S> {
-        self._fields.10 = Option::Some(value.into());
+        self._fields.12 = Option::Some(value.into());
         ScanBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -711,12 +848,12 @@ where
 impl<St: scan_state::State, S: BosStr> ScanBuilder<St, S> {
     /// Set the `vulnReportBlob` field (optional)
     pub fn vuln_report_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
-        self._fields.11 = value.into();
+        self._fields.13 = value.into();
         self
     }
     /// Set the `vulnReportBlob` field to an Option value (optional)
     pub fn maybe_vuln_report_blob(mut self, value: Option<BlobRef<S>>) -> Self {
-        self._fields.11 = value;
+        self._fields.13 = value;
         self
     }
 }
@@ -743,13 +880,15 @@ where
             low: self._fields.2.unwrap(),
             manifest: self._fields.3.unwrap(),
             medium: self._fields.4.unwrap(),
-            repository: self._fields.5.unwrap(),
-            sbom_blob: self._fields.6,
-            scanned_at: self._fields.7.unwrap(),
-            scanner_version: self._fields.8.unwrap(),
-            total: self._fields.9.unwrap(),
-            user_did: self._fields.10.unwrap(),
-            vuln_report_blob: self._fields.11,
+            reason: self._fields.5,
+            repository: self._fields.6.unwrap(),
+            sbom_blob: self._fields.7,
+            scanned_at: self._fields.8.unwrap(),
+            scanner_version: self._fields.9.unwrap(),
+            status: self._fields.10,
+            total: self._fields.11.unwrap(),
+            user_did: self._fields.12.unwrap(),
+            vuln_report_blob: self._fields.13,
             extra_data: Default::default(),
         }
     }
@@ -761,13 +900,15 @@ where
             low: self._fields.2.unwrap(),
             manifest: self._fields.3.unwrap(),
             medium: self._fields.4.unwrap(),
-            repository: self._fields.5.unwrap(),
-            sbom_blob: self._fields.6,
-            scanned_at: self._fields.7.unwrap(),
-            scanner_version: self._fields.8.unwrap(),
-            total: self._fields.9.unwrap(),
-            user_did: self._fields.10.unwrap(),
-            vuln_report_blob: self._fields.11,
+            reason: self._fields.5,
+            repository: self._fields.6.unwrap(),
+            sbom_blob: self._fields.7,
+            scanned_at: self._fields.8.unwrap(),
+            scanner_version: self._fields.9.unwrap(),
+            status: self._fields.10,
+            total: self._fields.11.unwrap(),
+            user_did: self._fields.12.unwrap(),
+            vuln_report_blob: self._fields.13,
             extra_data: Some(extra_data),
         }
     }
@@ -849,6 +990,18 @@ fn lexicon_doc_io_atcr_hold_scan() -> LexiconDoc<'static> {
                                 }),
                             );
                             map.insert(
+                                SmolStr::new_static("reason"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Optional human-readable explanation for non-ok status (e.g. 'unscannable artifact type application/vnd.cncf.helm.config.v1+json').",
+                                        ),
+                                    ),
+                                    max_length: Some(256usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("repository"),
                                 LexObjectProperty::String(LexString {
                                     description: Some(
@@ -883,6 +1036,18 @@ fn lexicon_doc_io_atcr_hold_scan() -> LexiconDoc<'static> {
                                         ),
                                     ),
                                     max_length: Some(64usize),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("status"),
+                                LexObjectProperty::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Outcome of the scan attempt. 'ok' (or omitted, for back-compat) means the scanner produced an SBOM. 'failed' means the scanner ran but errored. 'skipped' means the scanner intentionally bypassed this artifact type (e.g. helm charts).",
+                                        ),
+                                    ),
+                                    max_length: Some(32usize),
                                     ..Default::default()
                                 }),
                             );

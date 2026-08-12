@@ -8,6 +8,7 @@ pub mod carving;
 pub mod inkblot;
 pub mod nightsky;
 pub mod petri;
+pub mod plasmodium;
 pub mod poetry;
 pub mod redaction;
 pub mod sigil;

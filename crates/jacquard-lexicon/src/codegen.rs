@@ -384,6 +384,7 @@ impl<'c> CodeGenerator<'c> {
                 // resolver (Phase 5), not generated as code.
                 Ok(GeneratedCode::default())
             }
+            LexUserType::Space(space) => self.generate_space(nsid, def_name, space),
         }
     }
 }

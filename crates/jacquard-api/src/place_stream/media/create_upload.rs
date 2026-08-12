@@ -23,6 +23,9 @@ use serde::{Deserialize, Serialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct CreateUpload<S: BosStr = DefaultStr> {
+    ///Optional ats:// URI of a draft VOD created via place.stream.vod.createDraft. When supplied, the upload's processing fills that draft (rather than creating a new one), so the user can edit metadata while the upload runs and re-upload if it fails. The draft's origin_upload_id is set to this upload.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub draft_uri: Option<S>,
     ///Optional filename hint to attach as upload metadata.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub filename: Option<S>,
@@ -176,7 +179,7 @@ pub mod create_upload_state {
 /// Builder for constructing an instance of this type.
 pub struct CreateUploadBuilder<St: create_upload_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<i64>),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -199,7 +202,7 @@ impl CreateUploadBuilder<create_upload_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         CreateUploadBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -210,21 +213,34 @@ impl<S: BosStr> CreateUploadBuilder<create_upload_state::Empty, S> {
     pub fn builder() -> Self {
         CreateUploadBuilder {
             _state: PhantomData,
-            _fields: (None, None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
 }
 
 impl<St: create_upload_state::State, S: BosStr> CreateUploadBuilder<St, S> {
+    /// Set the `draftUri` field (optional)
+    pub fn draft_uri(mut self, value: impl Into<Option<S>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `draftUri` field to an Option value (optional)
+    pub fn maybe_draft_uri(mut self, value: Option<S>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: create_upload_state::State, S: BosStr> CreateUploadBuilder<St, S> {
     /// Set the `filename` field (optional)
     pub fn filename(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.0 = value.into();
+        self._fields.1 = value.into();
         self
     }
     /// Set the `filename` field to an Option value (optional)
     pub fn maybe_filename(mut self, value: Option<S>) -> Self {
-        self._fields.0 = value;
+        self._fields.1 = value;
         self
     }
 }
@@ -239,7 +255,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> CreateUploadBuilder<create_upload_state::SetMimeType<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         CreateUploadBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -258,7 +274,7 @@ where
         mut self,
         value: impl Into<i64>,
     ) -> CreateUploadBuilder<create_upload_state::SetSize<St>, S> {
-        self._fields.2 = Option::Some(value.into());
+        self._fields.3 = Option::Some(value.into());
         CreateUploadBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -276,18 +292,20 @@ where
     /// Build the final struct.
     pub fn build(self) -> CreateUpload<S> {
         CreateUpload {
-            filename: self._fields.0,
-            mime_type: self._fields.1.unwrap(),
-            size: self._fields.2.unwrap(),
+            draft_uri: self._fields.0,
+            filename: self._fields.1,
+            mime_type: self._fields.2.unwrap(),
+            size: self._fields.3.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateUpload<S> {
         CreateUpload {
-            filename: self._fields.0,
-            mime_type: self._fields.1.unwrap(),
-            size: self._fields.2.unwrap(),
+            draft_uri: self._fields.0,
+            filename: self._fields.1,
+            mime_type: self._fields.2.unwrap(),
+            size: self._fields.3.unwrap(),
             extra_data: Some(extra_data),
         }
     }

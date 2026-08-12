@@ -193,6 +193,18 @@ impl<S: BosStr> LexiconSchema for Document<S> {
                 }
             }
         }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 50usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 50usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
         {
             let value = &self.title;
             #[allow(unused_comparisons)]

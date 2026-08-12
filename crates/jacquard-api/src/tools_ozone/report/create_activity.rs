@@ -31,6 +31,9 @@ use serde::{Deserialize, Serialize};
 pub struct CreateActivity<S: BosStr = DefaultStr> {
     ///The type of activity to record.
     pub activity: CreateActivityActivity<S>,
+    ///ID of the report moderation event. Resolves to the report created from that event. Exactly one of reportId or eventId must be provided.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub event_id: Option<i64>,
     ///Optional moderator-only note. Not visible to reporters.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub internal_note: Option<S>,
@@ -41,8 +44,9 @@ pub struct CreateActivity<S: BosStr = DefaultStr> {
     ///Optional public-facing note, potentially visible to the reporter.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public_note: Option<S>,
-    ///ID of the report to record activity on
-    pub report_id: i64,
+    ///ID of the report to record activity on. Exactly one of reportId or eventId must be provided.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub report_id: Option<i64>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -81,7 +85,7 @@ pub struct CreateActivityOutput<S: BosStr = DefaultStr> {
 )]
 #[serde(tag = "error", content = "message")]
 pub enum CreateActivityError {
-    /// No report exists with the given reportId
+    /// No report exists with the given reportId or eventId
     #[serde(rename = "ReportNotFound")]
     ReportNotFound(Option<SmolStr>),
     /// The requested state transition is not permitted from the report's current status
@@ -178,36 +182,24 @@ pub mod create_activity_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Activity;
-        type ReportId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Activity = Unset;
-        type ReportId = Unset;
     }
     ///State transition - sets the `activity` field to Set
     pub struct SetActivity<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActivity<St> {}
     impl<St: State> State for SetActivity<St> {
         type Activity = Set<members::activity>;
-        type ReportId = St::ReportId;
-    }
-    ///State transition - sets the `report_id` field to Set
-    pub struct SetReportId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReportId<St> {}
-    impl<St: State> State for SetReportId<St> {
-        type Activity = St::Activity;
-        type ReportId = Set<members::report_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `activity` field
         pub struct activity(());
-        ///Marker type for the `report_id` field
-        pub struct report_id(());
     }
 }
 
@@ -216,6 +208,7 @@ pub struct CreateActivityBuilder<St: create_activity_state::State, S: BosStr = D
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<CreateActivityActivity<S>>,
+        Option<i64>,
         Option<S>,
         Option<bool>,
         Option<S>,
@@ -243,7 +236,7 @@ impl CreateActivityBuilder<create_activity_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         CreateActivityBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -254,7 +247,7 @@ impl<S: BosStr> CreateActivityBuilder<create_activity_state::Empty, S> {
     pub fn builder() -> Self {
         CreateActivityBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -280,14 +273,27 @@ where
 }
 
 impl<St: create_activity_state::State, S: BosStr> CreateActivityBuilder<St, S> {
+    /// Set the `eventId` field (optional)
+    pub fn event_id(mut self, value: impl Into<Option<i64>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `eventId` field to an Option value (optional)
+    pub fn maybe_event_id(mut self, value: Option<i64>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: create_activity_state::State, S: BosStr> CreateActivityBuilder<St, S> {
     /// Set the `internalNote` field (optional)
     pub fn internal_note(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `internalNote` field to an Option value (optional)
     pub fn maybe_internal_note(mut self, value: Option<S>) -> Self {
-        self._fields.1 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -295,12 +301,12 @@ impl<St: create_activity_state::State, S: BosStr> CreateActivityBuilder<St, S> {
 impl<St: create_activity_state::State, S: BosStr> CreateActivityBuilder<St, S> {
     /// Set the `isAutomated` field (optional)
     pub fn is_automated(mut self, value: impl Into<Option<bool>>) -> Self {
-        self._fields.2 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `isAutomated` field to an Option value (optional)
     pub fn maybe_is_automated(mut self, value: Option<bool>) -> Self {
-        self._fields.2 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -308,32 +314,26 @@ impl<St: create_activity_state::State, S: BosStr> CreateActivityBuilder<St, S> {
 impl<St: create_activity_state::State, S: BosStr> CreateActivityBuilder<St, S> {
     /// Set the `publicNote` field (optional)
     pub fn public_note(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.3 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `publicNote` field to an Option value (optional)
     pub fn maybe_public_note(mut self, value: Option<S>) -> Self {
-        self._fields.3 = value;
+        self._fields.4 = value;
         self
     }
 }
 
-impl<St, S: BosStr> CreateActivityBuilder<St, S>
-where
-    St: create_activity_state::State,
-    St::ReportId: create_activity_state::IsUnset,
-{
-    /// Set the `reportId` field (required)
-    pub fn report_id(
-        mut self,
-        value: impl Into<i64>,
-    ) -> CreateActivityBuilder<create_activity_state::SetReportId<St>, S> {
-        self._fields.4 = Option::Some(value.into());
-        CreateActivityBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
+impl<St: create_activity_state::State, S: BosStr> CreateActivityBuilder<St, S> {
+    /// Set the `reportId` field (optional)
+    pub fn report_id(mut self, value: impl Into<Option<i64>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `reportId` field to an Option value (optional)
+    pub fn maybe_report_id(mut self, value: Option<i64>) -> Self {
+        self._fields.5 = value;
+        self
     }
 }
 
@@ -341,16 +341,16 @@ impl<St, S: BosStr> CreateActivityBuilder<St, S>
 where
     St: create_activity_state::State,
     St::Activity: create_activity_state::IsSet,
-    St::ReportId: create_activity_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateActivity<S> {
         CreateActivity {
             activity: self._fields.0.unwrap(),
-            internal_note: self._fields.1,
-            is_automated: self._fields.2.or_else(|| Some(false)),
-            public_note: self._fields.3,
-            report_id: self._fields.4.unwrap(),
+            event_id: self._fields.1,
+            internal_note: self._fields.2,
+            is_automated: self._fields.3.or_else(|| Some(false)),
+            public_note: self._fields.4,
+            report_id: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -358,10 +358,11 @@ where
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateActivity<S> {
         CreateActivity {
             activity: self._fields.0.unwrap(),
-            internal_note: self._fields.1,
-            is_automated: self._fields.2.or_else(|| Some(false)),
-            public_note: self._fields.3,
-            report_id: self._fields.4.unwrap(),
+            event_id: self._fields.1,
+            internal_note: self._fields.2,
+            is_automated: self._fields.3.or_else(|| Some(false)),
+            public_note: self._fields.4,
+            report_id: self._fields.5,
             extra_data: Some(extra_data),
         }
     }

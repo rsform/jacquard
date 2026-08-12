@@ -2723,6 +2723,7 @@ dependencies = [
  "jacquard-api",
  "jacquard-common",
  "jacquard-derive",
+ "jacquard-lexicon",
  "k256",
  "miette",
  "multihash",
@@ -2740,6 +2741,7 @@ dependencies = [
  "thiserror 2.0.18",
  "tokio",
  "trait-variant",
+ "url",
 ]
 
 [[package]]

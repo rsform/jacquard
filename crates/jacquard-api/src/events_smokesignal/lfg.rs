@@ -134,6 +134,28 @@ impl<S: BosStr> LexiconSchema for Lfg<S> {
                 });
             }
         }
+        for value in &self.tags {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        for value in &self.tags {
+            {
+                let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                if count > 64usize {
+                    return Err(ConstraintError::MaxGraphemes {
+                        path: ValidationPath::from_field("tags"),
+                        max: 64usize,
+                        actual: count,
+                    });
+                }
+            }
+        }
         Ok(())
     }
 }

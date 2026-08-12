@@ -7,6 +7,7 @@
 
 //! Generated bindings for the `tools.ozone.report` Lexicon namespace/module.
 pub mod assign_moderator;
+pub mod close_reports;
 pub mod create_activity;
 pub mod get_assignments;
 pub mod get_historical_stats;
@@ -1649,6 +1650,10 @@ pub struct ReportView<S: BosStr = DefaultStr> {
     pub event_id: i64,
     ///Report ID
     pub id: i64,
+    ///Whether this report was emitted by automated tooling.  Defaults to `false`.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_report_view_is_automated")]
+    pub is_automated: Option<bool>,
     ///Whether this report is muted. A report is muted if the reporter was muted or the subject was muted at the time the report was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_muted: Option<bool>,
@@ -2820,6 +2825,12 @@ fn lexicon_doc_tools_ozone_report_defs() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
+                            SmolStr::new_static("isAutomated"),
+                            LexObjectProperty::Boolean(LexBoolean {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
                             SmolStr::new_static("isMuted"),
                             LexObjectProperty::Boolean(LexBoolean {
                                 ..Default::default()
@@ -3765,6 +3776,10 @@ where
     }
 }
 
+fn _default_report_view_is_automated() -> Option<bool> {
+    Some(false)
+}
+
 pub mod report_view_state {
 
     pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
@@ -3936,6 +3951,7 @@ pub struct ReportViewBuilder<St: report_view_state::State, S: BosStr = DefaultSt
         Option<i64>,
         Option<i64>,
         Option<bool>,
+        Option<bool>,
         Option<QueueView<S>>,
         Option<Datetime>,
         Option<i64>,
@@ -3971,7 +3987,7 @@ impl ReportViewBuilder<report_view_state::Empty, DefaultStr> {
             _state: PhantomData,
             _fields: (
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None,
+                None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -3985,7 +4001,7 @@ impl<S: BosStr> ReportViewBuilder<report_view_state::Empty, S> {
             _state: PhantomData,
             _fields: (
                 None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None,
+                None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -4115,14 +4131,27 @@ where
 }
 
 impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
+    /// Set the `isAutomated` field (optional)
+    pub fn is_automated(mut self, value: impl Into<Option<bool>>) -> Self {
+        self._fields.8 = value.into();
+        self
+    }
+    /// Set the `isAutomated` field to an Option value (optional)
+    pub fn maybe_is_automated(mut self, value: Option<bool>) -> Self {
+        self._fields.8 = value;
+        self
+    }
+}
+
+impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
     /// Set the `isMuted` field (optional)
     pub fn is_muted(mut self, value: impl Into<Option<bool>>) -> Self {
-        self._fields.8 = value.into();
+        self._fields.9 = value.into();
         self
     }
     /// Set the `isMuted` field to an Option value (optional)
     pub fn maybe_is_muted(mut self, value: Option<bool>) -> Self {
-        self._fields.8 = value;
+        self._fields.9 = value;
         self
     }
 }
@@ -4130,12 +4159,12 @@ impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
 impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
     /// Set the `queue` field (optional)
     pub fn queue(mut self, value: impl Into<Option<QueueView<S>>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `queue` field to an Option value (optional)
     pub fn maybe_queue(mut self, value: Option<QueueView<S>>) -> Self {
-        self._fields.9 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -4143,12 +4172,12 @@ impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
 impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
     /// Set the `queuedAt` field (optional)
     pub fn queued_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.10 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `queuedAt` field to an Option value (optional)
     pub fn maybe_queued_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.10 = value;
+        self._fields.11 = value;
         self
     }
 }
@@ -4156,12 +4185,12 @@ impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
 impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
     /// Set the `relatedReportCount` field (optional)
     pub fn related_report_count(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.11 = value.into();
+        self._fields.12 = value.into();
         self
     }
     /// Set the `relatedReportCount` field to an Option value (optional)
     pub fn maybe_related_report_count(mut self, value: Option<i64>) -> Self {
-        self._fields.11 = value;
+        self._fields.12 = value;
         self
     }
 }
@@ -4176,7 +4205,7 @@ where
         mut self,
         value: impl Into<moderation::ReasonType<S>>,
     ) -> ReportViewBuilder<report_view_state::SetReportType<St>, S> {
-        self._fields.12 = Option::Some(value.into());
+        self._fields.13 = Option::Some(value.into());
         ReportViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -4195,7 +4224,7 @@ where
         mut self,
         value: impl Into<Did<S>>,
     ) -> ReportViewBuilder<report_view_state::SetReportedBy<St>, S> {
-        self._fields.13 = Option::Some(value.into());
+        self._fields.14 = Option::Some(value.into());
         ReportViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -4214,7 +4243,7 @@ where
         mut self,
         value: impl Into<SubjectView<S>>,
     ) -> ReportViewBuilder<report_view_state::SetReporter<St>, S> {
-        self._fields.14 = Option::Some(value.into());
+        self._fields.15 = Option::Some(value.into());
         ReportViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -4233,7 +4262,7 @@ where
         mut self,
         value: impl Into<ReportViewStatus<S>>,
     ) -> ReportViewBuilder<report_view_state::SetStatus<St>, S> {
-        self._fields.15 = Option::Some(value.into());
+        self._fields.16 = Option::Some(value.into());
         ReportViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -4252,7 +4281,7 @@ where
         mut self,
         value: impl Into<SubjectView<S>>,
     ) -> ReportViewBuilder<report_view_state::SetSubject<St>, S> {
-        self._fields.16 = Option::Some(value.into());
+        self._fields.17 = Option::Some(value.into());
         ReportViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -4264,12 +4293,12 @@ where
 impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
     /// Set the `subjectStatus` field (optional)
     pub fn subject_status(mut self, value: impl Into<Option<SubjectStatusView<S>>>) -> Self {
-        self._fields.17 = value.into();
+        self._fields.18 = value.into();
         self
     }
     /// Set the `subjectStatus` field to an Option value (optional)
     pub fn maybe_subject_status(mut self, value: Option<SubjectStatusView<S>>) -> Self {
-        self._fields.17 = value;
+        self._fields.18 = value;
         self
     }
 }
@@ -4277,12 +4306,12 @@ impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
 impl<St: report_view_state::State, S: BosStr> ReportViewBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.18 = value.into();
+        self._fields.19 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.18 = value;
+        self._fields.19 = value;
         self
     }
 }
@@ -4310,17 +4339,18 @@ where
             created_at: self._fields.5.unwrap(),
             event_id: self._fields.6.unwrap(),
             id: self._fields.7.unwrap(),
-            is_muted: self._fields.8,
-            queue: self._fields.9,
-            queued_at: self._fields.10,
-            related_report_count: self._fields.11,
-            report_type: self._fields.12.unwrap(),
-            reported_by: self._fields.13.unwrap(),
-            reporter: self._fields.14.unwrap(),
-            status: self._fields.15.unwrap(),
-            subject: self._fields.16.unwrap(),
-            subject_status: self._fields.17,
-            updated_at: self._fields.18,
+            is_automated: self._fields.8.or_else(|| Some(false)),
+            is_muted: self._fields.9,
+            queue: self._fields.10,
+            queued_at: self._fields.11,
+            related_report_count: self._fields.12,
+            report_type: self._fields.13.unwrap(),
+            reported_by: self._fields.14.unwrap(),
+            reporter: self._fields.15.unwrap(),
+            status: self._fields.16.unwrap(),
+            subject: self._fields.17.unwrap(),
+            subject_status: self._fields.18,
+            updated_at: self._fields.19,
             extra_data: Default::default(),
         }
     }
@@ -4335,17 +4365,18 @@ where
             created_at: self._fields.5.unwrap(),
             event_id: self._fields.6.unwrap(),
             id: self._fields.7.unwrap(),
-            is_muted: self._fields.8,
-            queue: self._fields.9,
-            queued_at: self._fields.10,
-            related_report_count: self._fields.11,
-            report_type: self._fields.12.unwrap(),
-            reported_by: self._fields.13.unwrap(),
-            reporter: self._fields.14.unwrap(),
-            status: self._fields.15.unwrap(),
-            subject: self._fields.16.unwrap(),
-            subject_status: self._fields.17,
-            updated_at: self._fields.18,
+            is_automated: self._fields.8.or_else(|| Some(false)),
+            is_muted: self._fields.9,
+            queue: self._fields.10,
+            queued_at: self._fields.11,
+            related_report_count: self._fields.12,
+            report_type: self._fields.13.unwrap(),
+            reported_by: self._fields.14.unwrap(),
+            reporter: self._fields.15.unwrap(),
+            status: self._fields.16.unwrap(),
+            subject: self._fields.17.unwrap(),
+            subject_status: self._fields.18,
+            updated_at: self._fields.19,
             extra_data: Some(extra_data),
         }
     }

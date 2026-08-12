@@ -21,7 +21,7 @@ use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid};
+use jacquard_common::types::string::{AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -41,6 +41,7 @@ use serde::{Deserialize, Serialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Status<S: BosStr = DefaultStr> {
+    pub created_at: Datetime,
     pub pull: AtUri<S>,
     ///status of the pull request
     pub status: StatusStatus<S>,
@@ -204,6 +205,7 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Pull;
         type Status;
     }
@@ -211,13 +213,23 @@ pub mod status_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Pull = Unset;
         type Status = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type Pull = St::Pull;
+        type Status = St::Status;
     }
     ///State transition - sets the `pull` field to Set
     pub struct SetPull<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPull<St> {}
     impl<St: State> State for SetPull<St> {
+        type CreatedAt = St::CreatedAt;
         type Pull = Set<members::pull>;
         type Status = St::Status;
     }
@@ -225,12 +237,15 @@ pub mod status_state {
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
         type Pull = St::Pull;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `pull` field
         pub struct pull(());
         ///Marker type for the `status` field
@@ -241,7 +256,7 @@ pub mod status_state {
 /// Builder for constructing an instance of this type.
 pub struct StatusBuilder<St: status_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtUri<S>>, Option<StatusStatus<S>>),
+    _fields: (Option<Datetime>, Option<AtUri<S>>, Option<StatusStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -264,7 +279,7 @@ impl StatusBuilder<status_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -275,7 +290,26 @@ impl<S: BosStr> StatusBuilder<status_state::Empty, S> {
     pub fn builder() -> Self {
         StatusBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> StatusBuilder<St, S>
+where
+    St: status_state::State,
+    St::CreatedAt: status_state::IsUnset,
+{
+    /// Set the `createdAt` field (required)
+    pub fn created_at(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> StatusBuilder<status_state::SetCreatedAt<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        StatusBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
             _type: PhantomData,
         }
     }
@@ -291,7 +325,7 @@ where
         mut self,
         value: impl Into<AtUri<S>>,
     ) -> StatusBuilder<status_state::SetPull<St>, S> {
-        self._fields.0 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -310,7 +344,7 @@ where
         mut self,
         value: impl Into<StatusStatus<S>>,
     ) -> StatusBuilder<status_state::SetStatus<St>, S> {
-        self._fields.1 = Option::Some(value.into());
+        self._fields.2 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -322,22 +356,25 @@ where
 impl<St, S: BosStr> StatusBuilder<St, S>
 where
     St: status_state::State,
+    St::CreatedAt: status_state::IsSet,
     St::Pull: status_state::IsSet,
     St::Status: status_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Status<S> {
         Status {
-            pull: self._fields.0.unwrap(),
-            status: self._fields.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            pull: self._fields.1.unwrap(),
+            status: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Status<S> {
         Status {
-            pull: self._fields.0.unwrap(),
-            status: self._fields.1.unwrap(),
+            created_at: self._fields.0.unwrap(),
+            pull: self._fields.1.unwrap(),
+            status: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }
     }
@@ -361,10 +398,18 @@ fn lexicon_doc_sh_tangled_repo_pull_status() -> LexiconDoc<'static> {
                         required: Some(vec![
                             SmolStr::new_static("pull"),
                             SmolStr::new_static("status"),
+                            SmolStr::new_static("createdAt"),
                         ]),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
+                            map.insert(
+                                SmolStr::new_static("createdAt"),
+                                LexObjectProperty::String(LexString {
+                                    format: Some(LexStringFormat::Datetime),
+                                    ..Default::default()
+                                }),
+                            );
                             map.insert(
                                 SmolStr::new_static("pull"),
                                 LexObjectProperty::String(LexString {

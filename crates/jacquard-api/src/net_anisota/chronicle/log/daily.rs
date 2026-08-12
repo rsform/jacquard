@@ -127,6 +127,48 @@ pub struct ExpeditionSummary<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Per-category counts of activity performed inside anisota (never inferred; recorded at write time).
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
+pub struct InAppCounts<S: BosStr = DefaultStr> {
+    ///Likes created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub likes: Option<i64>,
+    ///Top-level posts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub posts: Option<i64>,
+    ///Quote posts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quotes: Option<i64>,
+    ///Replies created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub replies: Option<i64>,
+    ///Reposts created in anisota
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reposts: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// One device's in-anisota activity counts for the day. Keyed by a stable per-install-per-account device id, so concurrent putRecords from different devices never clobber each other. The reserved deviceId 'scheduled' holds scheduled posts published server-side by the cocoon cron worker on their publish day.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
+pub struct InAppDeviceBucket<S: BosStr = DefaultStr> {
+    pub counts: daily::InAppCounts<S>,
+    ///Stable per-install-per-account device id (random; no fingerprinting). Reserved value 'scheduled' for cocoon-published scheduled posts.
+    pub device_id: S,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
 /// Daily activity snapshot. Updated throughout the day via putRecord. rkey is YYYY-MM-DD in user's local timezone.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -149,6 +191,9 @@ pub struct Daily<S: BosStr = DefaultStr> {
     pub expedition_refs: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expeditions: Option<daily::ExpeditionSummary<S>>,
+    ///First-party ledger of activity performed INSIDE anisota this day, one bucket per device. Optional and additive. The cross-device in-app total per field is the SUM over buckets. Used to compute an honest 'outside' floor (max(0, total - inApp)); a device only ever writes its own bucket.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub in_app: Option<Vec<daily::InAppDeviceBucket<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub patterns: Option<daily::PatternsData<S>>,
     pub player: daily::PlayerSnapshot<S>,
@@ -159,6 +204,8 @@ pub struct Daily<S: BosStr = DefaultStr> {
     ///AT URIs of containing logs (weekly, monthly, yearly) this day belongs to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub upper_log_refs: Option<Vec<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub walks: Option<daily::WalkSummary<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -222,6 +269,27 @@ pub struct PlayerSnapshot<S: BosStr = DefaultStr> {
     ///XP gained during this day
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained_today: Option<i64>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Summary of walks for the day (details in chronicle.walk). Parallel to expeditionSummary; both are merged additively.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
+#[serde(
+    rename_all = "camelCase",
+    bound(deserialize = "S: Deserialize<'de> + BosStr")
+)]
+pub struct WalkSummary<S: BosStr = DefaultStr> {
+    ///Number of walks completed today (additive)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub count: Option<i64>,
+    ///Total walk duration in minutes (additive)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_duration: Option<i64>,
+    ///AT URIs of walk records that occurred on this day
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub walk_refs: Option<Vec<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -409,6 +477,81 @@ impl<S: BosStr> LexiconSchema for ExpeditionSummary<S> {
     }
 }
 
+impl<S: BosStr> LexiconSchema for InAppCounts<S> {
+    fn nsid() -> &'static str {
+        "net.anisota.chronicle.log.daily"
+    }
+    fn def_name() -> &'static str {
+        "inAppCounts"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_net_anisota_chronicle_log_daily()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.likes {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("likes"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.posts {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("posts"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.quotes {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("quotes"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.replies {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("replies"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.reposts {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("reposts"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for InAppDeviceBucket<S> {
+    fn nsid() -> &'static str {
+        "net.anisota.chronicle.log.daily"
+    }
+    fn def_name() -> &'static str {
+        "inAppDeviceBucket"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_net_anisota_chronicle_log_daily()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
+}
+
 /// Marker type for deserializing records from this collection.
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -574,6 +717,39 @@ impl<S: BosStr> LexiconSchema for PlayerSnapshot<S> {
             if *value < 0i64 {
                 return Err(ConstraintError::Minimum {
                     path: ValidationPath::from_field("xp_gained_today"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
+impl<S: BosStr> LexiconSchema for WalkSummary<S> {
+    fn nsid() -> &'static str {
+        "net.anisota.chronicle.log.daily"
+    }
+    fn def_name() -> &'static str {
+        "walkSummary"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_net_anisota_chronicle_log_daily()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.count {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("count"),
+                    min: 0i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.total_duration {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("total_duration"),
                     min: 0i64,
                     actual: *value,
                 });
@@ -797,6 +973,97 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("inAppCounts"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Per-category counts of activity performed inside anisota (never inferred; recorded at write time).",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("likes"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("posts"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("quotes"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("replies"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("reposts"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("inAppDeviceBucket"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "One device's in-anisota activity counts for the day. Keyed by a stable per-install-per-account device id, so concurrent putRecords from different devices never clobber each other. The reserved deviceId 'scheduled' holds scheduled posts published server-side by the cocoon cron worker on their publish day.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("deviceId"),
+                            SmolStr::new_static("counts")
+                        ],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("counts"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#inAppCounts"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("deviceId"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Stable per-install-per-account device id (random; no fingerprinting). Reserved value 'scheduled' for cocoon-published scheduled posts.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
                     description: Some(
@@ -876,6 +1143,21 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
                                 }),
                             );
                             map.insert(
+                                SmolStr::new_static("inApp"),
+                                LexObjectProperty::Array(LexArray {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "First-party ledger of activity performed INSIDE anisota this day, one bucket per device. Optional and additive. The cross-device in-app total per field is the SUM over buckets. Used to compute an honest 'outside' floor (max(0, total - inApp)); a device only ever writes its own bucket.",
+                                        ),
+                                    ),
+                                    items: LexArrayItem::Ref(LexRef {
+                                        r#ref: CowStr::new_static("#inAppDeviceBucket"),
+                                        ..Default::default()
+                                    }),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
                                 SmolStr::new_static("patterns"),
                                 LexObjectProperty::Ref(LexRef {
                                     r#ref: CowStr::new_static("#patternsData"),
@@ -917,6 +1199,13 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
                                     items: LexArrayItem::String(LexString {
                                         ..Default::default()
                                     }),
+                                    ..Default::default()
+                                }),
+                            );
+                            map.insert(
+                                SmolStr::new_static("walks"),
+                                LexObjectProperty::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#walkSummary"),
                                     ..Default::default()
                                 }),
                             );
@@ -1030,6 +1319,50 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
                             SmolStr::new_static("xpGainedToday"),
                             LexObjectProperty::Integer(LexInteger {
                                 minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("walkSummary"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "Summary of walks for the day (details in chronicle.walk). Parallel to expeditionSummary; both are merged additively.",
+                        ),
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("count"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("totalDuration"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("walkRefs"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT URIs of walk records that occurred on this day",
+                                    ),
+                                ),
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
+                                }),
                                 ..Default::default()
                             }),
                         );
@@ -1356,6 +1689,155 @@ where
     }
 }
 
+pub mod in_app_device_bucket_state {
+
+    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Counts;
+        type DeviceId;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Counts = Unset;
+        type DeviceId = Unset;
+    }
+    ///State transition - sets the `counts` field to Set
+    pub struct SetCounts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCounts<St> {}
+    impl<St: State> State for SetCounts<St> {
+        type Counts = Set<members::counts>;
+        type DeviceId = St::DeviceId;
+    }
+    ///State transition - sets the `device_id` field to Set
+    pub struct SetDeviceId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDeviceId<St> {}
+    impl<St: State> State for SetDeviceId<St> {
+        type Counts = St::Counts;
+        type DeviceId = Set<members::device_id>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `counts` field
+        pub struct counts(());
+        ///Marker type for the `device_id` field
+        pub struct device_id(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct InAppDeviceBucketBuilder<St: in_app_device_bucket_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<daily::InAppCounts<S>>, Option<S>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl InAppDeviceBucket<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> InAppDeviceBucketBuilder<in_app_device_bucket_state::Empty, DefaultStr> {
+        InAppDeviceBucketBuilder::new()
+    }
+}
+
+impl<S: BosStr> InAppDeviceBucket<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> InAppDeviceBucketBuilder<in_app_device_bucket_state::Empty, S> {
+        InAppDeviceBucketBuilder::builder()
+    }
+}
+
+impl InAppDeviceBucketBuilder<in_app_device_bucket_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        InAppDeviceBucketBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> InAppDeviceBucketBuilder<in_app_device_bucket_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        InAppDeviceBucketBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> InAppDeviceBucketBuilder<St, S>
+where
+    St: in_app_device_bucket_state::State,
+    St::Counts: in_app_device_bucket_state::IsUnset,
+{
+    /// Set the `counts` field (required)
+    pub fn counts(
+        mut self,
+        value: impl Into<daily::InAppCounts<S>>,
+    ) -> InAppDeviceBucketBuilder<in_app_device_bucket_state::SetCounts<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        InAppDeviceBucketBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> InAppDeviceBucketBuilder<St, S>
+where
+    St: in_app_device_bucket_state::State,
+    St::DeviceId: in_app_device_bucket_state::IsUnset,
+{
+    /// Set the `deviceId` field (required)
+    pub fn device_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> InAppDeviceBucketBuilder<in_app_device_bucket_state::SetDeviceId<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        InAppDeviceBucketBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> InAppDeviceBucketBuilder<St, S>
+where
+    St: in_app_device_bucket_state::State,
+    St::Counts: in_app_device_bucket_state::IsSet,
+    St::DeviceId: in_app_device_bucket_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> InAppDeviceBucket<S> {
+        InAppDeviceBucket {
+            counts: self._fields.0.unwrap(),
+            device_id: self._fields.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> InAppDeviceBucket<S> {
+        InAppDeviceBucket {
+            counts: self._fields.0.unwrap(),
+            device_id: self._fields.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
 pub mod daily_state {
 
     pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
@@ -1458,11 +1940,13 @@ pub struct DailyBuilder<St: daily_state::State, S: BosStr = DefaultStr> {
         Option<daily::EngagementCounts<S>>,
         Option<Vec<S>>,
         Option<daily::ExpeditionSummary<S>>,
+        Option<Vec<daily::InAppDeviceBucket<S>>>,
         Option<daily::PatternsData<S>>,
         Option<daily::PlayerSnapshot<S>>,
         Option<daily::ChronicleSignature<S>>,
         Option<Datetime>,
         Option<Vec<S>>,
+        Option<daily::WalkSummary<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -1487,7 +1971,7 @@ impl DailyBuilder<daily_state::Empty, DefaultStr> {
         DailyBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1500,7 +1984,7 @@ impl<S: BosStr> DailyBuilder<daily_state::Empty, S> {
         DailyBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
+                None, None, None, None, None, None, None, None, None, None, None, None, None,
             ),
             _type: PhantomData,
         }
@@ -1601,14 +2085,27 @@ impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
 }
 
 impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
+    /// Set the `inApp` field (optional)
+    pub fn in_app(mut self, value: impl Into<Option<Vec<daily::InAppDeviceBucket<S>>>>) -> Self {
+        self._fields.6 = value.into();
+        self
+    }
+    /// Set the `inApp` field to an Option value (optional)
+    pub fn maybe_in_app(mut self, value: Option<Vec<daily::InAppDeviceBucket<S>>>) -> Self {
+        self._fields.6 = value;
+        self
+    }
+}
+
+impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
     /// Set the `patterns` field (optional)
     pub fn patterns(mut self, value: impl Into<Option<daily::PatternsData<S>>>) -> Self {
-        self._fields.6 = value.into();
+        self._fields.7 = value.into();
         self
     }
     /// Set the `patterns` field to an Option value (optional)
     pub fn maybe_patterns(mut self, value: Option<daily::PatternsData<S>>) -> Self {
-        self._fields.6 = value;
+        self._fields.7 = value;
         self
     }
 }
@@ -1623,7 +2120,7 @@ where
         mut self,
         value: impl Into<daily::PlayerSnapshot<S>>,
     ) -> DailyBuilder<daily_state::SetPlayer<St>, S> {
-        self._fields.7 = Option::Some(value.into());
+        self._fields.8 = Option::Some(value.into());
         DailyBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1642,7 +2139,7 @@ where
         mut self,
         value: impl Into<daily::ChronicleSignature<S>>,
     ) -> DailyBuilder<daily_state::SetSignature<St>, S> {
-        self._fields.8 = Option::Some(value.into());
+        self._fields.9 = Option::Some(value.into());
         DailyBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -1654,12 +2151,12 @@ where
 impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
-        self._fields.9 = value.into();
+        self._fields.10 = value.into();
         self
     }
     /// Set the `updatedAt` field to an Option value (optional)
     pub fn maybe_updated_at(mut self, value: Option<Datetime>) -> Self {
-        self._fields.9 = value;
+        self._fields.10 = value;
         self
     }
 }
@@ -1667,12 +2164,25 @@ impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
 impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
     /// Set the `upperLogRefs` field (optional)
     pub fn upper_log_refs(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
-        self._fields.10 = value.into();
+        self._fields.11 = value.into();
         self
     }
     /// Set the `upperLogRefs` field to an Option value (optional)
     pub fn maybe_upper_log_refs(mut self, value: Option<Vec<S>>) -> Self {
-        self._fields.10 = value;
+        self._fields.11 = value;
+        self
+    }
+}
+
+impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
+    /// Set the `walks` field (optional)
+    pub fn walks(mut self, value: impl Into<Option<daily::WalkSummary<S>>>) -> Self {
+        self._fields.12 = value.into();
+        self
+    }
+    /// Set the `walks` field to an Option value (optional)
+    pub fn maybe_walks(mut self, value: Option<daily::WalkSummary<S>>) -> Self {
+        self._fields.12 = value;
         self
     }
 }
@@ -1695,11 +2205,13 @@ where
             engagement: self._fields.3,
             expedition_refs: self._fields.4,
             expeditions: self._fields.5,
-            patterns: self._fields.6,
-            player: self._fields.7.unwrap(),
-            signature: self._fields.8.unwrap(),
-            updated_at: self._fields.9,
-            upper_log_refs: self._fields.10,
+            in_app: self._fields.6,
+            patterns: self._fields.7,
+            player: self._fields.8.unwrap(),
+            signature: self._fields.9.unwrap(),
+            updated_at: self._fields.10,
+            upper_log_refs: self._fields.11,
+            walks: self._fields.12,
             extra_data: Default::default(),
         }
     }
@@ -1712,11 +2224,13 @@ where
             engagement: self._fields.3,
             expedition_refs: self._fields.4,
             expeditions: self._fields.5,
-            patterns: self._fields.6,
-            player: self._fields.7.unwrap(),
-            signature: self._fields.8.unwrap(),
-            updated_at: self._fields.9,
-            upper_log_refs: self._fields.10,
+            in_app: self._fields.6,
+            patterns: self._fields.7,
+            player: self._fields.8.unwrap(),
+            signature: self._fields.9.unwrap(),
+            updated_at: self._fields.10,
+            upper_log_refs: self._fields.11,
+            walks: self._fields.12,
             extra_data: Some(extra_data),
         }
     }
