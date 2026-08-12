@@ -49,11 +49,13 @@ pub mod error;
 pub mod mst;
 pub mod repo;
 pub mod storage;
+pub mod permissioned;
 
 pub use error::{RepoError, RepoErrorKind, Result};
 pub use mst::{Mst, MstDiff, WriteOp};
 pub use repo::{CommitData, Repository};
 pub use storage::{BlockStore, FileBlockStore, LayeredBlockStore, MemoryBlockStore};
+pub use permissioned::{LtHash, PermissionedPath, SignedCommit};
 
 /// DAG-CBOR codec identifier for CIDs (0x71)
 pub const DAG_CBOR_CID_CODEC: u64 = 0x71;
