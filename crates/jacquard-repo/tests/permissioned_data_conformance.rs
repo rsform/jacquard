@@ -2,20 +2,22 @@
 
 use bytes::Bytes;
 use ed25519_dalek::SigningKey;
+use jacquard_common::SmolStr;
+use jacquard_common::types::aturi::AtSpaceUri;
+use jacquard_common::types::cid::Cid;
+use jacquard_common::types::did::Did;
+use jacquard_common::types::tid::Tid;
+use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_repo::permissioned::{
-    CommitContext, LtHash, PermissionedPath, SignedCommit, SpaceTypeDeclaration, WriteOperation,
-    WriteState, apply_writes, format_cursor, list_repo_ops,
+    CommitContext, LtHash, SignedCommit, SpaceTypeDeclaration, WriteOperation, WriteState,
+    apply_writes, format_cursor, list_repo_ops,
 };
+use std::str::FromStr;
 
 #[test]
 fn permissioned_data_conformance() {
-    let path = PermissionedPath::record(
-        "did:plc:space",
-        "com.example.type",
-        "demo",
-        "did:plc:author",
-        "com.example.record",
-        "rkey",
+    let path: AtSpaceUri<SmolStr> = AtSpaceUri::new_owned(
+        "at://did:plc:space/space/com.example.type/demo/did:plc:author/com.example.record/rkey",
     )
     .unwrap();
     assert_eq!(
@@ -23,15 +25,19 @@ fn permissioned_data_conformance() {
         "at://did:plc:space/space/com.example.type/demo/did:plc:author/com.example.record/rkey"
     );
 
-    let declaration = serde_json::json!({
-        "id": "com.example.type",
-        "defs": { "main": {
-            "type": "space", "key": "demo", "name": "Example",
-            "collections": ["com.example.record"]
-        }}
-    });
+    let declaration: LexiconDoc<'_> = serde_json::from_str(
+        r#"{
+            "lexicon": 1,
+            "id": "com.example.type",
+            "defs": { "main": {
+                "type": "space", "key": "demo", "name": "Example",
+                "collections": ["com.example.record"]
+            }}
+        }"#,
+    )
+    .unwrap();
     let declaration = SpaceTypeDeclaration::from_lexicon("com.example.type", &declaration).unwrap();
-    assert_eq!(declaration.key, "demo");
+    assert_eq!(declaration.key.as_str(), "demo");
 
     let mut hash = LtHash::default();
     hash.add("one");
@@ -42,9 +48,9 @@ fn permissioned_data_conformance() {
     );
 
     let context = CommitContext {
-        space: "at://did:plc:space/space/com.example.type/demo".into(),
-        author: "did:plc:author".into(),
-        rev: "3jzfcijpj2m2a".into(),
+        space: AtSpaceUri::new_owned("at://did:plc:space/space/com.example.type/demo").unwrap(),
+        author: Did::new_owned("did:plc:author").unwrap(),
+        rev: Tid::new("3jzfcijpj2m2a").unwrap(),
     };
     let key = SigningKey::from_bytes(&[11; 32]);
     let commit = SignedCommit::sign_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
@@ -52,8 +58,8 @@ fn permissioned_data_conformance() {
 
     let mut state = WriteState::default();
     let operation = WriteOperation::Create {
-        uri: path.to_string(),
-        cid: "bafybeigdyrzt5o5p4s5x6f7g8h9j0k1l2m3n4o5p6q7r8s9t0u".into(),
+        uri: path.clone(),
+        cid: Cid::from_str("bafybeigdyrzt5o5p4s5x6f7g8h9j0k1l2m3n4o5p6q7r8s9t0u").unwrap(),
         value: Bytes::from_static(b"{}"),
     };
     let applied = apply_writes(&mut state, &context.space, &context.rev, &[operation]).unwrap();

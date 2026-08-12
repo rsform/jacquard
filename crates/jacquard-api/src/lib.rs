@@ -244,6 +244,9 @@ pub mod computer_aesthetic;
 #[cfg(feature = "coop_hypha")]
 pub mod coop_hypha;
 
+#[cfg(feature = "dev_atfs")]
+pub mod dev_atfs;
+
 #[cfg(feature = "dev_baileytownsend")]
 pub mod dev_baileytownsend;
 
@@ -444,6 +447,9 @@ pub mod org_simocracy;
 
 #[cfg(feature = "org_stormlightlabs")]
 pub mod org_stormlightlabs;
+
+#[cfg(feature = "org_tangled")]
+pub mod org_tangled;
 
 #[cfg(feature = "org_user_intents")]
 pub mod org_user_intents;

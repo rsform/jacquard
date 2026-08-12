@@ -4,15 +4,31 @@
 //! atproto `permissioned-data` implementation.  Ordinary repository commits,
 //! MSTs, storage, and CAR APIs intentionally remain separate.
 
-use std::collections::{BTreeMap, BTreeSet};
-use std::fmt;
+use std::collections::{BTreeMap, BTreeSet, HashMap};
+use std::str::FromStr;
 
 use bytes::Bytes;
-use cid::Cid;
+use cid::Cid as IpldCid;
+
+type CarCid = IpldCid;
 use ed25519_dalek::{Signature, Signer, Verifier, VerifyingKey};
 use hmac::{Hmac, Mac};
-use jacquard_common::types::did::validate_did;
-use jacquard_common::types::nsid::validate_nsid;
+use jacquard_common::SmolStr;
+use jacquard_common::types::aturi::AtSpaceUri;
+use jacquard_common::types::cid::Cid as AtCid;
+use jacquard_common::types::did::Did;
+use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::nsid::Nsid;
+use jacquard_common::types::recordkey::Rkey;
+use jacquard_common::types::tid::Tid;
+
+type SpaceUri = AtSpaceUri<SmolStr>;
+type DidOwned = Did<SmolStr>;
+type Identifier = AtIdentifier<SmolStr>;
+type NsidOwned = Nsid<SmolStr>;
+type RkeyOwned = Rkey<SmolStr>;
+type CidOwned = AtCid<SmolStr>;
+use jacquard_lexicon::lexicon::{LexSpace, LexUserType, LexiconDoc};
 use rand::RngCore;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -57,137 +73,53 @@ pub enum PermissionedError {
 /// Result alias for permissioned operations.
 pub type Result<T> = std::result::Result<T, PermissionedError>;
 
-fn valid_component(field: &'static str, value: &str, max: usize) -> Result<()> {
-    if value.is_empty() || value.len() > max || !value.is_char_boundary(value.len()) {
-        return Err(PermissionedError::InvalidComponent {
-            field,
-            value: value.into(),
-        });
-    }
-    Ok(())
-}
-
-fn valid_rkey(field: &'static str, value: &str) -> Result<()> {
-    valid_component(field, value, 512)?;
-    if value == "."
-        || value == ".."
-        || !value
-            .bytes()
-            .all(|b| b.is_ascii_alphanumeric() || b".-_:~".contains(&b))
-    {
-        return Err(PermissionedError::InvalidComponent {
-            field,
-            value: value.into(),
-        });
-    }
-    Ok(())
-}
-
-fn valid_nsid_component(field: &'static str, value: &str) -> Result<()> {
-    valid_component(field, value, 317)?;
-    validate_nsid(value).map_err(|_| PermissionedError::InvalidComponent {
+fn invalid_component(field: &'static str, value: impl Into<String>) -> PermissionedError {
+    PermissionedError::InvalidComponent {
         field,
         value: value.into(),
-    })
-}
-
-fn valid_did_component(field: &'static str, value: &str) -> Result<()> {
-    valid_component(field, value, 2048)?;
-    validate_did(value).map_err(|_| PermissionedError::InvalidComponent {
-        field,
-        value: value.into(),
-    })
-}
-
-/// A canonical permissioned space URI or record URI.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-pub struct PermissionedPath(String);
-
-impl PermissionedPath {
-    /// Build a space URI after validating all of its components.
-    pub fn space(space_did: &str, space_type: &str, skey: &str) -> Result<Self> {
-        valid_did_component("space DID", space_did)?;
-        valid_nsid_component("space type", space_type)?;
-        valid_rkey("skey", skey)?;
-        Ok(Self(format!("at://{space_did}/space/{space_type}/{skey}")))
-    }
-
-    /// Build a record URI after validating space ownership and path components.
-    pub fn record(
-        space_did: &str,
-        space_type: &str,
-        skey: &str,
-        author_did: &str,
-        collection: &str,
-        rkey: &str,
-    ) -> Result<Self> {
-        let space = Self::space(space_did, space_type, skey)?;
-        valid_did_component("author DID", author_did)?;
-        valid_nsid_component("collection", collection)?;
-        valid_rkey("rkey", rkey)?;
-        Ok(Self(format!(
-            "{}/{author_did}/{collection}/{rkey}",
-            space.0
-        )))
-    }
-
-    /// Parse and validate a canonical permissioned URI.
-    pub fn parse(uri: &str) -> Result<Self> {
-        let parts: Vec<_> = uri.split('/').collect();
-        if parts.len() != 6 && parts.len() != 9 || parts.first() != Some(&"at:") {
-            return Err(PermissionedError::InvalidComponent {
-                field: "permissioned URI",
-                value: uri.into(),
-            });
-        }
-        let space = Self::space(parts[2], parts[4], parts[5])?;
-        if parts.len() == 6 {
-            if space.0 != uri {
-                return Err(PermissionedError::InvalidComponent {
-                    field: "permissioned URI",
-                    value: uri.into(),
-                });
-            }
-            return Ok(space);
-        }
-        let record = Self::record(parts[2], parts[4], parts[5], parts[6], parts[7], parts[8])?;
-        if record.0 != uri {
-            return Err(PermissionedError::InvalidComponent {
-                field: "permissioned URI",
-                value: uri.into(),
-            });
-        }
-        Ok(record)
-    }
-
-    /// Return the canonical URI string.
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-
-    /// Whether this path names a record rather than a space.
-    pub fn is_record(&self) -> bool {
-        self.0.split('/').count() == 9
     }
 }
 
-impl fmt::Display for PermissionedPath {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.write_str(&self.0)
-    }
+fn space_uri(uri: impl AsRef<str>) -> Result<SpaceUri> {
+    SpaceUri::new_owned(uri)
+        .map_err(|error| invalid_component("permissioned URI", error.to_string()))
+}
+
+fn parse_did(field: &'static str, value: impl AsRef<str>) -> Result<DidOwned> {
+    DidOwned::from_str(value.as_ref()).map_err(|_| invalid_component(field, value.as_ref()))
+}
+
+fn parse_identifier(field: &'static str, value: impl AsRef<str>) -> Result<Identifier> {
+    Identifier::from_str(value.as_ref()).map_err(|_| invalid_component(field, value.as_ref()))
+}
+
+fn parse_nsid(field: &'static str, value: impl AsRef<str>) -> Result<NsidOwned> {
+    NsidOwned::from_str(value.as_ref()).map_err(|_| invalid_component(field, value.as_ref()))
+}
+
+fn parse_rkey(field: &'static str, value: impl AsRef<str>) -> Result<RkeyOwned> {
+    RkeyOwned::from_str(value.as_ref()).map_err(|_| invalid_component(field, value.as_ref()))
+}
+
+fn parse_cid(field: &'static str, value: impl AsRef<str>) -> Result<CidOwned> {
+    CidOwned::from_str(value.as_ref()).map_err(|_| invalid_component(field, value.as_ref()))
+}
+
+fn parse_tid(field: &'static str, value: impl AsRef<str>) -> Result<Tid> {
+    Tid::from_str(value.as_ref()).map_err(|_| invalid_component(field, value.as_ref()))
 }
 
 /// A validated `type: "space"` Lexicon declaration.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SpaceTypeDeclaration {
     /// Declaration NSID.
-    pub nsid: String,
+    pub nsid: NsidOwned,
     /// Declared stable key.
-    pub key: String,
+    pub key: RkeyOwned,
     /// Human-readable name.
     pub name: String,
     /// Collections accepted by default when issuing OAuth grants.
-    pub collections: Vec<String>,
+    pub collections: Vec<NsidOwned>,
     /// Optional description.
     pub description: Option<String>,
     /// Optional localized names.
@@ -195,87 +127,63 @@ pub struct SpaceTypeDeclaration {
 }
 
 impl SpaceTypeDeclaration {
-    /// Parse a resolved Lexicon document, accepting only a `space` main def.
-    pub fn from_lexicon(nsid: &str, document: &serde_json::Value) -> Result<Self> {
-        valid_nsid_component("space type", nsid)?;
-        let id = document.get("id").and_then(serde_json::Value::as_str);
-        if id != Some(nsid) {
+    /// Build a validated declaration from Jacquard's parsed Lexicon AST.
+    pub fn from_lexicon(nsid: &str, document: &LexiconDoc<'_>) -> Result<Self> {
+        let nsid = parse_nsid("space type", nsid)?;
+        if document.id.as_ref() != nsid.as_str() {
             return Err(PermissionedError::InvalidDeclaration(
                 "document id does not match requested NSID".into(),
             ));
         }
-        let main = document.get("defs").and_then(|v| v.get("main"));
-        if main
-            .and_then(|v| v.get("type"))
-            .and_then(serde_json::Value::as_str)
-            != Some("space")
-        {
+        let Some(LexUserType::Space(LexSpace {
+            key: Some(key),
+            name: Some(name),
+            collections,
+            description,
+            name_lang,
+        })) = document.defs.get("main")
+        else {
             return Err(PermissionedError::InvalidDeclaration(
-                "defs.main is not type space".into(),
+                "defs.main is not a complete space declaration".into(),
             ));
-        }
-        let key = main
-            .and_then(|v| v.get("key"))
-            .and_then(serde_json::Value::as_str)
-            .ok_or_else(|| PermissionedError::InvalidDeclaration("missing string key".into()))?;
-        valid_rkey("key", key)?;
-        let name = main
-            .and_then(|v| v.get("name"))
-            .and_then(serde_json::Value::as_str)
-            .ok_or_else(|| PermissionedError::InvalidDeclaration("missing name".into()))?;
+        };
+        let key = parse_rkey("key", key.as_ref())?;
         let graphemes = name.chars().count();
         if !(1..=64).contains(&graphemes) {
             return Err(PermissionedError::InvalidDeclaration(
                 "name must contain 1..=64 characters".into(),
             ));
         }
-        let values = main
-            .and_then(|v| v.get("collections"))
-            .and_then(serde_json::Value::as_array)
-            .ok_or_else(|| {
-                PermissionedError::InvalidDeclaration("missing collections array".into())
-            })?;
-        let mut collections = Vec::with_capacity(values.len());
-        for value in values {
-            let collection = value.as_str().ok_or_else(|| {
-                PermissionedError::InvalidDeclaration("collection is not a string".into())
-            })?;
-            valid_nsid_component("collection", collection)?;
-            if collections.iter().any(|existing| existing == collection) {
-                return Err(PermissionedError::InvalidDeclaration(
-                    "duplicate collection".into(),
-                ));
-            }
-            collections.push(collection.to_owned());
-        }
         if collections.is_empty() {
             return Err(PermissionedError::InvalidDeclaration(
                 "collections cannot be empty".into(),
             ));
         }
-        let description = main
-            .and_then(|v| v.get("description"))
-            .and_then(serde_json::Value::as_str)
-            .map(str::to_owned);
-        let names = main
-            .and_then(|v| v.get("name:lang"))
-            .and_then(serde_json::Value::as_object)
-            .map(|object| {
-                object
-                    .iter()
-                    .filter_map(|(key, value)| {
-                        value.as_str().map(|value| (key.clone(), value.to_owned()))
-                    })
-                    .collect()
-            })
-            .unwrap_or_default();
+        let mut validated_collections = Vec::with_capacity(collections.len());
+        for collection in collections {
+            let collection = parse_nsid("collection", collection.as_ref())?;
+            if validated_collections
+                .iter()
+                .any(|existing| existing == &collection)
+            {
+                return Err(PermissionedError::InvalidDeclaration(
+                    "duplicate collection".into(),
+                ));
+            }
+            validated_collections.push(collection);
+        }
         Ok(Self {
-            nsid: nsid.into(),
-            key: key.into(),
-            name: name.into(),
-            collections,
-            description,
-            names,
+            nsid,
+            key,
+            name: name.to_string(),
+            collections: validated_collections,
+            description: description.as_ref().map(ToString::to_string),
+            names: name_lang
+                .as_ref()
+                .into_iter()
+                .flat_map(|names| names.iter())
+                .map(|(key, value)| (key.to_string(), value.to_string()))
+                .collect(),
         })
     }
 }
@@ -354,9 +262,9 @@ impl LtHash {
 /// Inputs used to frame a signed permissioned commit context.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CommitContext {
-    pub space: String,
-    pub author: String,
-    pub rev: String,
+    pub space: SpaceUri,
+    pub author: DidOwned,
+    pub rev: Tid,
 }
 
 /// Deniable permissioned commit. `sig` authenticates context only; `mac` binds hash to it.
@@ -374,7 +282,7 @@ pub struct SignedCommit {
     #[serde(with = "serde_bytes")]
     pub sig: Vec<u8>,
     /// Host-assigned revision TID.
-    pub rev: String,
+    pub rev: Tid,
 }
 
 impl SignedCommit {
@@ -469,42 +377,42 @@ fn compute_mac(ikm: &[u8; 32], context: &[u8], hash: &[u8; 32]) -> [u8; 32] {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WriteOperation {
     Create {
-        uri: String,
-        cid: String,
+        uri: SpaceUri,
+        cid: CidOwned,
         value: Bytes,
     },
     Update {
-        uri: String,
-        prev: String,
-        cid: String,
+        uri: SpaceUri,
+        prev: CidOwned,
+        cid: CidOwned,
         value: Bytes,
     },
     Delete {
-        uri: String,
-        prev: String,
+        uri: SpaceUri,
+        prev: CidOwned,
     },
 }
 
 /// Current in-memory values used by pure write validation and conformance tests.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct WriteState {
-    pub records: BTreeMap<String, RecordValue>,
+    pub records: HashMap<SpaceUri, RecordValue>,
     pub lthash: LtHash,
 }
 
 /// A current record value and CID.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RecordValue {
-    pub cid: String,
+    pub cid: CidOwned,
     pub value: Bytes,
-    pub author: String,
+    pub author: Identifier,
 }
 
 /// One write's result in input order.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WriteResult {
-    pub uri: String,
-    pub cid: Option<String>,
+    pub uri: SpaceUri,
+    pub cid: Option<CidOwned>,
 }
 
 /// Oplog action.
@@ -519,21 +427,21 @@ pub enum OplogAction {
 /// Reference-shaped oplog entry.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct OplogEntry {
-    pub space: String,
-    pub rev: String,
+    pub space: SpaceUri,
+    pub rev: Tid,
     pub idx: u32,
     pub action: OplogAction,
-    pub uri: String,
-    pub collection: String,
-    pub rkey: String,
-    pub cid: Option<String>,
-    pub prev: Option<String>,
+    pub uri: SpaceUri,
+    pub collection: NsidOwned,
+    pub rkey: RkeyOwned,
+    pub cid: Option<CidOwned>,
+    pub prev: Option<CidOwned>,
 }
 
 /// Atomic result of validating and applying a write group.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ApplyWritesResult {
-    pub revision: String,
+    pub revision: Tid,
     pub results: Vec<WriteResult>,
     pub oplog: Vec<OplogEntry>,
     pub lthash: LtHash,
@@ -542,31 +450,24 @@ pub struct ApplyWritesResult {
 /// Validate and apply a complete group to a cloned state, swapping only on success.
 pub fn apply_writes(
     state: &mut WriteState,
-    space: &str,
-    revision: &str,
+    space: &SpaceUri,
+    revision: &Tid,
     operations: &[WriteOperation],
 ) -> Result<ApplyWritesResult> {
     if operations.len() > 200 {
         return Err(PermissionedError::InvalidWrite("maximum 200 writes".into()));
     }
-    valid_component("revision", revision, 13)?;
-    if jacquard_common::types::tid::Tid::new(revision).is_err() {
-        return Err(PermissionedError::InvalidWrite(
-            "revision must be a TID".into(),
-        ));
-    }
     let mut candidate = state.clone();
     let mut results = Vec::with_capacity(operations.len());
     let mut oplog = Vec::with_capacity(operations.len());
     for (idx, operation) in operations.iter().enumerate() {
-        let (uri, action, cid, prev, value, author) = match operation {
+        let (uri, action, cid, prev, value) = match operation {
             WriteOperation::Create { uri, cid, value } => (
                 uri,
                 OplogAction::Create,
                 Some(cid.clone()),
                 None,
                 Some(value.clone()),
-                uri.split('/').nth(6).unwrap_or_default().to_owned(),
             ),
             WriteOperation::Update {
                 uri,
@@ -579,24 +480,20 @@ pub fn apply_writes(
                 Some(cid.clone()),
                 Some(prev.clone()),
                 Some(value.clone()),
-                uri.split('/').nth(6).unwrap_or_default().to_owned(),
             ),
-            WriteOperation::Delete { uri, prev } => (
-                uri,
-                OplogAction::Delete,
-                None,
-                Some(prev.clone()),
-                None,
-                uri.split('/').nth(6).unwrap_or_default().to_owned(),
-            ),
+            WriteOperation::Delete { uri, prev } => {
+                (uri, OplogAction::Delete, None, Some(prev.clone()), None)
+            }
         };
-        let path = PermissionedPath::parse(uri)?;
-        if !path.is_record() {
+        if !uri.is_record() {
             return Err(PermissionedError::InvalidWrite(
                 "write URI must name a record".into(),
             ));
         }
-        let key = uri.to_owned();
+        let author = uri
+            .author()
+            .ok_or_else(|| PermissionedError::InvalidWrite("missing author DID".into()))?;
+        let key = uri.clone();
         let existing = candidate.records.get(&key).cloned();
         match operation {
             WriteOperation::Create { .. } if existing.is_some() => {
@@ -633,7 +530,9 @@ pub fn apply_writes(
                     RecordValue {
                         cid: cid_value.clone(),
                         value: record_value.clone(),
-                        author,
+                        author: Identifier::new_owned(author.as_str()).map_err(|_| {
+                            PermissionedError::InvalidWrite("invalid author DID".into())
+                        })?,
                     },
                 );
             } else {
@@ -642,11 +541,11 @@ pub fn apply_writes(
         }
         let (collection, rkey) = (path_collection(uri)?, path_rkey(uri)?);
         oplog.push(OplogEntry {
-            space: space.into(),
-            rev: revision.into(),
+            space: space.clone(),
+            rev: revision.clone(),
             idx: idx as u32,
             action,
-            uri: uri.into(),
+            uri: uri.clone(),
             collection,
             rkey,
             cid,
@@ -661,7 +560,7 @@ pub fn apply_writes(
         });
     }
     let result = ApplyWritesResult {
-        revision: revision.into(),
+        revision: revision.clone(),
         results,
         oplog,
         lthash: candidate.lthash.clone(),
@@ -670,43 +569,45 @@ pub fn apply_writes(
     Ok(result)
 }
 
-fn path_collection(uri: &str) -> Result<String> {
-    uri.split('/')
-        .nth(7)
-        .map(str::to_owned)
+fn path_collection(uri: &SpaceUri) -> Result<NsidOwned> {
+    uri.collection()
+        .map(|collection| parse_nsid("collection", collection.as_str()))
+        .transpose()?
         .ok_or_else(|| PermissionedError::InvalidWrite("missing collection".into()))
 }
-fn path_rkey(uri: &str) -> Result<String> {
-    uri.split('/')
-        .nth(8)
-        .map(str::to_owned)
+fn path_rkey(uri: &SpaceUri) -> Result<RkeyOwned> {
+    uri.rkey()
+        .map(|rkey| parse_rkey("rkey", rkey.as_str()))
+        .transpose()?
         .ok_or_else(|| PermissionedError::InvalidWrite("missing rkey".into()))
 }
 
 /// Parse the normative slash-separated cursor.
-pub fn parse_cursor(cursor: &str) -> Result<(String, u32)> {
+pub fn parse_cursor(cursor: &str) -> Result<(Tid, u32)> {
     let (rev, idx) = cursor
         .split_once('/')
         .ok_or_else(|| PermissionedError::InvalidWrite("cursor must use rev/idx".into()))?;
-    if cursor.matches('/').count() != 1 || jacquard_common::types::tid::Tid::new(rev).is_err() {
+    if cursor.matches('/').count() != 1 {
         return Err(PermissionedError::InvalidWrite("invalid cursor".into()));
     }
+    let rev = parse_tid("cursor revision", rev)
+        .map_err(|_| PermissionedError::InvalidWrite("invalid cursor".into()))?;
     let idx = idx
         .parse::<u32>()
         .map_err(|_| PermissionedError::InvalidWrite("invalid cursor index".into()))?;
-    Ok((rev.into(), idx))
+    Ok((rev, idx))
 }
 
 /// Format a cursor using the normative slash separator.
-pub fn format_cursor(rev: &str, idx: u32) -> String {
-    format!("{rev}/{idx}")
+pub fn format_cursor(rev: &Tid, idx: u32) -> SmolStr {
+    SmolStr::new(format!("{rev}/{idx}"))
 }
 
 /// A page of ordered operations.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct OplogPage {
     pub ops: Vec<OplogEntry>,
-    pub cursor: Option<String>,
+    pub cursor: Option<SmolStr>,
     pub commit: Option<SignedCommit>,
 }
 
@@ -720,29 +621,35 @@ pub fn list_repo_ops(
 ) -> Result<OplogPage> {
     let limit = limit.unwrap_or(100).min(1000);
     let start = if let Some(cursor) = cursor {
-        parse_cursor(cursor)?
+        Some(parse_cursor(cursor)?)
     } else if let Some(since) = since {
-        (
-            jacquard_common::types::tid::Tid::new(since)
-                .map_err(|_| PermissionedError::SinceUnavailable)?
-                .as_str()
-                .into(),
+        Some((
+            parse_tid("since", since).map_err(|_| PermissionedError::SinceUnavailable)?,
             u32::MAX,
-        )
+        ))
     } else {
-        (String::new(), u32::MAX)
+        None
     };
     let mut ordered = entries.to_vec();
     ordered.sort_by(|left, right| left.rev.cmp(&right.rev).then(left.idx.cmp(&right.idx)));
-    if since.is_some()
-        && ordered.first().is_some_and(|entry| entry.rev > start.0)
-        && !ordered.iter().any(|entry| entry.rev == start.0)
-    {
-        return Err(PermissionedError::SinceUnavailable);
+    if let Some((start_rev, _)) = &start {
+        if since.is_some()
+            && ordered
+                .first()
+                .is_some_and(|entry| entry.rev.as_str() > start_rev.as_str())
+            && !ordered.iter().any(|entry| entry.rev == *start_rev)
+        {
+            return Err(PermissionedError::SinceUnavailable);
+        }
     }
     let filtered: Vec<_> = ordered
         .into_iter()
-        .filter(|entry| (entry.rev > start.0) || (entry.rev == start.0 && entry.idx > start.1))
+        .filter(|entry| {
+            start.as_ref().is_none_or(|(start_rev, start_idx)| {
+                (entry.rev.as_str() > start_rev.as_str())
+                    || (entry.rev == *start_rev && entry.idx > *start_idx)
+            })
+        })
         .collect();
     let terminal = filtered.len() <= limit;
     let ops = filtered.into_iter().take(limit).collect::<Vec<_>>();
@@ -770,13 +677,13 @@ pub enum CredentialKind {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CredentialClaims {
     pub typ: CredentialKind,
-    pub iss: String,
-    pub sub: String,
-    pub aud: Option<String>,
+    pub iss: DidOwned,
+    pub sub: SpaceUri,
+    pub aud: Option<Identifier>,
     pub iat: i64,
     pub exp: i64,
-    pub jti: String,
-    pub cnf_jkt: Option<String>,
+    pub jti: SmolStr,
+    pub cnf_jkt: Option<SmolStr>,
 }
 
 impl CredentialClaims {
@@ -788,12 +695,12 @@ impl CredentialClaims {
         expected_audience: Option<&str>,
         required_jkt: Option<&str>,
     ) -> Result<()> {
-        if self.sub != expected_subject || self.exp < now || self.iat > now + 5 {
+        if self.sub.as_str() != expected_subject || self.exp < now || self.iat > now + 5 {
             return Err(PermissionedError::InvalidCredential(
                 "subject or time claim mismatch".into(),
             ));
         }
-        if self.aud.as_deref() != expected_audience {
+        if self.aud.as_ref().map(AsRef::as_ref) != expected_audience {
             return Err(PermissionedError::InvalidCredential(
                 "audience mismatch".into(),
             ));
@@ -810,10 +717,10 @@ impl CredentialClaims {
 /// DPoP proof claims after JWT signature verification.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct DpopProof {
-    pub jti: String,
-    pub htm: String,
-    pub htu: String,
-    pub ath: String,
+    pub jti: SmolStr,
+    pub htm: SmolStr,
+    pub htu: SmolStr,
+    pub ath: SmolStr,
     pub iat: i64,
 }
 
@@ -824,7 +731,7 @@ pub fn verify_dpop(
     url: &str,
     credential: &[u8],
     now: i64,
-    replay: &mut BTreeSet<String>,
+    replay: &mut BTreeSet<SmolStr>,
 ) -> Result<()> {
     if proof.htm != method
         || normalize_htu(&proof.htu) != normalize_htu(url)
@@ -876,43 +783,37 @@ fn base64url(bytes: &[u8]) -> String {
 /// A permissioned-space OAuth resource.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SpacePermission {
-    pub space_type: String,
-    pub authority: Option<String>,
-    pub skey: Option<String>,
-    pub collection: Vec<String>,
-    pub action: Vec<String>,
-    pub manage: Vec<String>,
+    pub space_type: NsidOwned,
+    pub authority: Option<SmolStr>,
+    pub skey: Option<RkeyOwned>,
+    pub collection: Vec<SmolStr>,
+    pub action: Vec<SmolStr>,
+    pub manage: Vec<SmolStr>,
 }
 
 impl SpacePermission {
     /// Validate a permission-set entry; wildcard space types are forbidden in sets.
     pub fn validate(&self, namespace: &str) -> Result<()> {
-        valid_nsid_component("space type", &self.space_type)?;
-        if self.space_type == "*" {
+        if !self.space_type.as_str().starts_with(namespace) {
             return Err(PermissionedError::InvalidCredential(
-                "permission sets require a concrete space type".into(),
+                "permission outside namespace".into(),
             ));
         }
         for collection in &self.collection {
             if collection != "*" {
-                valid_nsid_component("collection", collection)?;
+                parse_nsid("collection", collection)?;
             }
         }
         if let Some(authority) = &self.authority {
             if authority != "self" && authority != "*" {
-                valid_did_component("authority", authority)?;
+                parse_did("authority", authority)?;
             }
-        }
-        if !self.space_type.starts_with(namespace) {
-            return Err(PermissionedError::InvalidCredential(
-                "permission outside namespace".into(),
-            ));
         }
         Ok(())
     }
     /// Match independently against a requested space and action.
     pub fn matches(&self, space_type: &str, collection: &str, action: &str) -> bool {
-        (self.space_type == space_type || self.space_type == "*")
+        (self.space_type.as_str() == space_type || self.space_type.as_str() == "*")
             && (self.collection.is_empty()
                 || self
                     .collection
@@ -930,23 +831,23 @@ impl SpacePermission {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PermissionedCar {
     /// Signed commit root first.
-    pub roots: [Cid; 2],
+    pub roots: [CarCid; 2],
     /// Commit, index, then records in canonical order.
-    pub blocks: Vec<(Cid, Bytes)>,
+    pub blocks: Vec<(CarCid, Bytes)>,
 }
 
 /// Immutable result returned after CAR verification.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidatedRepoSnapshot {
     /// Verified roots.
-    pub roots: [Cid; 2],
+    pub roots: [CarCid; 2],
     /// Verified blocks in input order.
-    pub blocks: Vec<(Cid, Bytes)>,
+    pub blocks: Vec<(CarCid, Bytes)>,
 }
 
 impl PermissionedCar {
     /// Construct and validate a two-root CAR representation.
-    pub fn new(roots: [Cid; 2], blocks: Vec<(Cid, Bytes)>) -> Result<Self> {
+    pub fn new(roots: [CarCid; 2], blocks: Vec<(CarCid, Bytes)>) -> Result<Self> {
         let car = Self { roots, blocks };
         car.validate()?;
         Ok(car)
@@ -993,12 +894,12 @@ impl PermissionedCar {
 
 impl ValidatedRepoSnapshot {
     /// Return the ordered roots.
-    pub fn roots(&self) -> &[Cid; 2] {
+    pub fn roots(&self) -> &[CarCid; 2] {
         &self.roots
     }
 
     /// Return verified blocks without exposing mutable state.
-    pub fn blocks(&self) -> &[(Cid, Bytes)] {
+    pub fn blocks(&self) -> &[(CarCid, Bytes)] {
         &self.blocks
     }
 }
@@ -1041,9 +942,9 @@ mod tests {
     #[test]
     fn signed_commit_context_and_round_trip() {
         let context = CommitContext {
-            space: "at://did:plc:space/space/com.example.type/demo".into(),
-            author: "did:plc:author".into(),
-            rev: "3jzfcijpj2m2a".into(),
+            space: SpaceUri::new_owned("at://did:plc:space/space/com.example.type/demo").unwrap(),
+            author: DidOwned::new_owned("did:plc:author").unwrap(),
+            rev: Tid::new("3jzfcijpj2m2a").unwrap(),
         };
         let key = SigningKey::from_bytes(&[7; 32]);
         let commit = SignedCommit::sign_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
@@ -1054,9 +955,9 @@ mod tests {
     #[test]
     fn signed_commit_mutation_fails() {
         let context = CommitContext {
-            space: "at://did:plc:space/space/com.example.type/demo".into(),
-            author: "did:plc:author".into(),
-            rev: "3jzfcijpj2m2a".into(),
+            space: SpaceUri::new_owned("at://did:plc:space/space/com.example.type/demo").unwrap(),
+            author: DidOwned::new_owned("did:plc:author").unwrap(),
+            rev: Tid::new("3jzfcijpj2m2a").unwrap(),
         };
         let key = SigningKey::from_bytes(&[7; 32]);
         let mut commit = SignedCommit::sign_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
@@ -1065,30 +966,20 @@ mod tests {
     }
     #[test]
     fn write_group_is_atomic_and_cursor_uses_slash() {
-        let uri = PermissionedPath::record(
-            "did:plc:space",
-            "com.example.type",
-            "demo",
-            "did:plc:author",
-            "com.example.record",
-            "r",
+        let uri = SpaceUri::new_owned(
+            "at://did:plc:space/space/com.example.type/demo/did:plc:author/com.example.record/r",
         )
-        .unwrap()
-        .to_string();
+        .unwrap();
         let mut state = WriteState::default();
         let ops = [WriteOperation::Create {
             uri: uri.clone(),
-            cid: "bafybeigdyrzt5o5p4s5x6f7g8h9j0k1l2m3n4o5p6q7r8s9t0u".into(),
+            cid: CidOwned::from_str("bafybeigdyrzt5o5p4s5x6f7g8h9j0k1l2m3n4o5p6q7r8s9t0u").unwrap(),
             value: Bytes::from_static(b"{}"),
         }];
-        let result = apply_writes(
-            &mut state,
-            "at://did:plc:space/space/com.example.type/demo",
-            "3jzfcijpj2m2a",
-            &ops,
-        )
-        .unwrap();
+        let space = SpaceUri::new_owned("at://did:plc:space/space/com.example.type/demo").unwrap();
+        let revision = Tid::new("3jzfcijpj2m2a").unwrap();
+        let result = apply_writes(&mut state, &space, &revision, &ops).unwrap();
         assert_eq!(result.oplog[0].idx, 0);
-        assert_eq!(format_cursor("3jzfcijpj2m2a", 0), "3jzfcijpj2m2a/0");
+        assert_eq!(format_cursor(&revision, 0), "3jzfcijpj2m2a/0");
     }
 }
