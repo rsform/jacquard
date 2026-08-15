@@ -108,6 +108,38 @@ mod tests {
         let _: Option<super::pretty::test_ns3::collision::Foo> = None;
     }
 
+    #[test]
+    fn generated_record_dag_cbor_roundtrip_is_byte_stable() {
+        use jacquard_common::{DefaultStr, deps::smol_str::SmolStr};
+
+        type Record = super::pretty::test_collision::collection::CollectionRecord<DefaultStr>;
+        let record = Record {
+            created_at: None,
+            items: vec![super::pretty::test_collision::collection::Collection {
+                count: None,
+                label: SmolStr::new("nested"),
+                extra_data: None,
+            }],
+            name: SmolStr::new("test"),
+            extra_data: None,
+        };
+        let bytes = serde_ipld_dagcbor::to_vec(&record).expect("serialize generated record");
+        let decoded: Record =
+            serde_ipld_dagcbor::from_slice(&bytes).expect("deserialize generated record");
+        let reencoded =
+            serde_ipld_dagcbor::to_vec(&decoded).expect("re-serialize generated record");
+
+        assert_eq!(
+            decoded.extra_data, None,
+            "$type must not leak into extra_data"
+        );
+        assert_eq!(
+            decoded.items[0].extra_data, None,
+            "empty object extra_data must remain None"
+        );
+        assert_eq!(reencoded, bytes, "generated record encoding must be stable");
+    }
+
     // -- Macro mode type accessibility (same types, different module root) --
 
     #[test]

@@ -139,6 +139,10 @@ impl<'c> CodeGenerator<'c> {
                 let is_none_path = resolved.option_is_none_path();
                 let extra_data_type =
                     resolved.option_type(quote! { #btree_map<#smolstr_type, #data_type> });
+                let deserialize_extra_data_name =
+                    format!("deserialize_{}_extra_data", type_name.to_snake_case());
+                let deserialize_extra_data =
+                    syn::Ident::new(&deserialize_extra_data_name, proc_macro2::Span::call_site());
                 let struct_def = quote! {
                     #doc
                     #derive_attr
@@ -147,8 +151,33 @@ impl<'c> CodeGenerator<'c> {
                     ))]
                     pub struct #ident<S: #bosstr_path = #default_str_path> {
                         #fields
-                        #[serde(flatten, default, skip_serializing_if = #is_none_path)]
+                        #[serde(
+                            flatten,
+                            default,
+                            deserialize_with = #deserialize_extra_data_name,
+                            skip_serializing_if = #is_none_path
+                        )]
                         pub extra_data: #extra_data_type,
+                    }
+                };
+                let extra_data_deserializer = quote! {
+                    fn #deserialize_extra_data<'de, S, D>(
+                        deserializer: D,
+                    ) -> Result<#extra_data_type, D::Error>
+                    where
+                        S: #bosstr_path + serde::Deserialize<'de>,
+                        D: serde::Deserializer<'de>,
+                    {
+                        let mut data = <#extra_data_type as serde::Deserialize<'de>>::deserialize(
+                            deserializer,
+                        )?;
+                        if let Some(extra_data) = &mut data {
+                            extra_data.remove("$type");
+                            if extra_data.is_empty() {
+                                data = None;
+                            }
+                        }
+                        Ok(data)
                     }
                 };
 
@@ -281,6 +310,7 @@ impl<'c> CodeGenerator<'c> {
                 };
 
                 let internals = quote! {
+                    #extra_data_deserializer
                     #(#default_fns)*
                     #manual_default
                     #nested_internals
@@ -349,14 +379,35 @@ impl<'c> CodeGenerator<'c> {
         let is_none_path = resolved.option_is_none_path();
         let extra_data_type =
             resolved.option_type(quote! { #btree_map<#smolstr_type, #data_type> });
+        let deserialize_extra_data_name =
+            format!("deserialize_{}_extra_data", type_name.to_snake_case());
+        let deserialize_extra_data =
+            syn::Ident::new(&deserialize_extra_data_name, proc_macro2::Span::call_site());
         let struct_def = quote! {
             #doc
             #derive_attr
             #[serde(rename_all = "camelCase", bound(deserialize = #serde_de_bound))]
             pub struct #ident<S: #bosstr_path = #default_str_path> {
                 #fields
-                #[serde(flatten, default, skip_serializing_if = #is_none_path)]
+                #[serde(
+                    flatten,
+                    default,
+                    deserialize_with = #deserialize_extra_data_name,
+                    skip_serializing_if = #is_none_path
+                )]
                 pub extra_data: #extra_data_type,
+            }
+        };
+        let extra_data_deserializer = quote! {
+            fn #deserialize_extra_data<'de, S, D>(
+                deserializer: D,
+            ) -> Result<#extra_data_type, D::Error>
+            where
+                S: #bosstr_path + serde::Deserialize<'de>,
+                D: serde::Deserializer<'de>,
+            {
+                let data = <#extra_data_type as serde::Deserialize<'de>>::deserialize(deserializer)?;
+                Ok(data.filter(|extra_data| !extra_data.is_empty()))
             }
         };
 
@@ -400,6 +451,7 @@ impl<'c> CodeGenerator<'c> {
         };
 
         let internals = quote! {
+            #extra_data_deserializer
             #(#default_fns)*
             #manual_default
             #nested_internals
