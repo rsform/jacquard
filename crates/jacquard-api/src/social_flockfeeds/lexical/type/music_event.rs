@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,21 +24,18 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Event type: Music event.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -99,9 +96,13 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_attendee_capacity: Option<EmbeddedMaximumAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum_physical_attendee_capacity: Option<EmbeddedMaximumPhysicalAttendeeCapacity<S>>,
+    pub maximum_physical_attendee_capacity: Option<
+        EmbeddedMaximumPhysicalAttendeeCapacity<S>,
+    >,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum_virtual_attendee_capacity: Option<EmbeddedMaximumVirtualAttendeeCapacity<S>>,
+    pub maximum_virtual_attendee_capacity: Option<
+        EmbeddedMaximumVirtualAttendeeCapacity<S>,
+    >,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<EmbeddedName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -146,9 +147,15 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub work_featured: Option<EmbeddedWorkFeatured<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub work_performed: Option<EmbeddedWorkPerformed<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_embedded_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -162,6 +169,7 @@ pub enum EmbeddedActor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -188,6 +196,7 @@ pub enum EmbeddedAttendee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -197,6 +206,7 @@ pub enum EmbeddedAttendees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -213,6 +223,7 @@ pub enum EmbeddedComposer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -222,6 +233,7 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -235,6 +247,7 @@ pub enum EmbeddedDirector<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -281,6 +294,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -298,6 +312,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -352,6 +367,7 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -361,6 +377,7 @@ pub enum EmbeddedOrganizer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -372,6 +389,7 @@ pub enum EmbeddedPerformer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -381,6 +399,7 @@ pub enum EmbeddedPerformers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -422,6 +441,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -435,6 +455,7 @@ pub enum EmbeddedSubEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -442,6 +463,7 @@ pub enum EmbeddedSubEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -451,6 +473,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -458,6 +481,7 @@ pub enum EmbeddedSuperEvent<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -468,6 +492,7 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -556,9 +581,13 @@ pub struct MusicEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub maximum_attendee_capacity: Option<MusicEventMaximumAttendeeCapacity<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum_physical_attendee_capacity: Option<MusicEventMaximumPhysicalAttendeeCapacity<S>>,
+    pub maximum_physical_attendee_capacity: Option<
+        MusicEventMaximumPhysicalAttendeeCapacity<S>,
+    >,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub maximum_virtual_attendee_capacity: Option<MusicEventMaximumVirtualAttendeeCapacity<S>>,
+    pub maximum_virtual_attendee_capacity: Option<
+        MusicEventMaximumVirtualAttendeeCapacity<S>,
+    >,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<MusicEventName<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -603,9 +632,15 @@ pub struct MusicEvent<S: BosStr = DefaultStr> {
     pub work_featured: Option<MusicEventWorkFeatured<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub work_performed: Option<MusicEventWorkPerformed<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_music_event_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -619,6 +654,7 @@ pub enum MusicEventActor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -645,6 +681,7 @@ pub enum MusicEventAttendee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -654,6 +691,7 @@ pub enum MusicEventAttendees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -670,6 +708,7 @@ pub enum MusicEventComposer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -679,6 +718,7 @@ pub enum MusicEventContributor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -692,6 +732,7 @@ pub enum MusicEventDirector<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -738,6 +779,7 @@ pub enum MusicEventFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -755,6 +797,7 @@ pub enum MusicEventImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -809,6 +852,7 @@ pub enum MusicEventOffers<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -818,6 +862,7 @@ pub enum MusicEventOrganizer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -829,6 +874,7 @@ pub enum MusicEventPerformer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -838,6 +884,7 @@ pub enum MusicEventPerformers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -879,6 +926,7 @@ pub enum MusicEventSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -892,6 +940,7 @@ pub enum MusicEventSubEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -899,6 +948,7 @@ pub enum MusicEventSubEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -908,6 +958,7 @@ pub enum MusicEventSubjectOf<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -915,6 +966,7 @@ pub enum MusicEventSuperEvent<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -925,6 +977,7 @@ pub enum MusicEventTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1019,11 +1072,24 @@ impl<S: BosStr> LexiconSchema for MusicEvent<S> {
     }
 }
 
+fn deserialize_embedded_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.MusicEvent"),
@@ -2175,9 +2241,28 @@ fn lexicon_doc_social_flockfeeds_lexical_type_MusicEvent() -> LexiconDoc<'static
     }
 }
 
+fn deserialize_music_event_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod music_event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2275,10 +2360,59 @@ impl MusicEventBuilder<music_event_state::Empty, DefaultStr> {
         MusicEventBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2291,10 +2425,59 @@ impl<S: BosStr> MusicEventBuilder<music_event_state::Empty, S> {
         MusicEventBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2337,7 +2520,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<MusicEventAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<MusicEventAdditionalType<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2353,7 +2539,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<MusicEventAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<MusicEventAggregateRating<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -2361,12 +2550,18 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<MusicEventAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<MusicEventAlternateName<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(mut self, value: Option<MusicEventAlternateName<S>>) -> Self {
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<MusicEventAlternateName<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -2387,7 +2582,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `attendees` field (optional)
-    pub fn attendees(mut self, value: impl Into<Option<MusicEventAttendees<S>>>) -> Self {
+    pub fn attendees(
+        mut self,
+        value: impl Into<Option<MusicEventAttendees<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -2426,7 +2624,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `contributor` field (optional)
-    pub fn contributor(mut self, value: impl Into<Option<MusicEventContributor<S>>>) -> Self {
+    pub fn contributor(
+        mut self,
+        value: impl Into<Option<MusicEventContributor<S>>>,
+    ) -> Self {
         self._fields.9 = value.into();
         self
     }
@@ -2439,7 +2640,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<MusicEventDescription<S>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<MusicEventDescription<S>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
@@ -2542,12 +2746,18 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `eventSchedule` field (optional)
-    pub fn event_schedule(mut self, value: impl Into<Option<MusicEventEventSchedule<S>>>) -> Self {
+    pub fn event_schedule(
+        mut self,
+        value: impl Into<Option<MusicEventEventSchedule<S>>>,
+    ) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `eventSchedule` field to an Option value (optional)
-    pub fn maybe_event_schedule(mut self, value: Option<MusicEventEventSchedule<S>>) -> Self {
+    pub fn maybe_event_schedule(
+        mut self,
+        value: Option<MusicEventEventSchedule<S>>,
+    ) -> Self {
         self._fields.17 = value;
         self
     }
@@ -2555,12 +2765,18 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `eventStatus` field (optional)
-    pub fn event_status(mut self, value: impl Into<Option<MusicEventEventStatus<S>>>) -> Self {
+    pub fn event_status(
+        mut self,
+        value: impl Into<Option<MusicEventEventStatus<S>>>,
+    ) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `eventStatus` field to an Option value (optional)
-    pub fn maybe_event_status(mut self, value: Option<MusicEventEventStatus<S>>) -> Self {
+    pub fn maybe_event_status(
+        mut self,
+        value: Option<MusicEventEventStatus<S>>,
+    ) -> Self {
         self._fields.18 = value;
         self
     }
@@ -2594,7 +2810,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<MusicEventIdentifier<S>>>) -> Self {
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<MusicEventIdentifier<S>>>,
+    ) -> Self {
         self._fields.21 = value.into();
         self
     }
@@ -2620,7 +2839,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `inLanguage` field (optional)
-    pub fn in_language(mut self, value: impl Into<Option<MusicEventInLanguage<S>>>) -> Self {
+    pub fn in_language(
+        mut self,
+        value: impl Into<Option<MusicEventInLanguage<S>>>,
+    ) -> Self {
         self._fields.23 = value.into();
         self
     }
@@ -2780,7 +3002,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `organizer` field (optional)
-    pub fn organizer(mut self, value: impl Into<Option<MusicEventOrganizer<S>>>) -> Self {
+    pub fn organizer(
+        mut self,
+        value: impl Into<Option<MusicEventOrganizer<S>>>,
+    ) -> Self {
         self._fields.33 = value.into();
         self
     }
@@ -2793,7 +3018,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `performer` field (optional)
-    pub fn performer(mut self, value: impl Into<Option<MusicEventPerformer<S>>>) -> Self {
+    pub fn performer(
+        mut self,
+        value: impl Into<Option<MusicEventPerformer<S>>>,
+    ) -> Self {
         self._fields.34 = value.into();
         self
     }
@@ -2806,7 +3034,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `performers` field (optional)
-    pub fn performers(mut self, value: impl Into<Option<MusicEventPerformers<S>>>) -> Self {
+    pub fn performers(
+        mut self,
+        value: impl Into<Option<MusicEventPerformers<S>>>,
+    ) -> Self {
         self._fields.35 = value.into();
         self
     }
@@ -2827,7 +3058,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<MusicEventPotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<MusicEventPotentialAction<S>>,
+    ) -> Self {
         self._fields.36 = value;
         self
     }
@@ -2854,7 +3088,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `recordedIn` field (optional)
-    pub fn recorded_in(mut self, value: impl Into<Option<MusicEventRecordedIn<S>>>) -> Self {
+    pub fn recorded_in(
+        mut self,
+        value: impl Into<Option<MusicEventRecordedIn<S>>>,
+    ) -> Self {
         self._fields.38 = value.into();
         self
     }
@@ -2925,7 +3162,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `startDate` field (optional)
-    pub fn start_date(mut self, value: impl Into<Option<MusicEventStartDate<S>>>) -> Self {
+    pub fn start_date(
+        mut self,
+        value: impl Into<Option<MusicEventStartDate<S>>>,
+    ) -> Self {
         self._fields.43 = value.into();
         self
     }
@@ -2951,7 +3191,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `subEvents` field (optional)
-    pub fn sub_events(mut self, value: impl Into<Option<MusicEventSubEvents<S>>>) -> Self {
+    pub fn sub_events(
+        mut self,
+        value: impl Into<Option<MusicEventSubEvents<S>>>,
+    ) -> Self {
         self._fields.45 = value.into();
         self
     }
@@ -2964,7 +3207,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<MusicEventSubjectOf<S>>>) -> Self {
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<MusicEventSubjectOf<S>>>,
+    ) -> Self {
         self._fields.46 = value.into();
         self
     }
@@ -2977,7 +3223,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `superEvent` field (optional)
-    pub fn super_event(mut self, value: impl Into<Option<MusicEventSuperEvent<S>>>) -> Self {
+    pub fn super_event(
+        mut self,
+        value: impl Into<Option<MusicEventSuperEvent<S>>>,
+    ) -> Self {
         self._fields.47 = value.into();
         self
     }
@@ -2990,7 +3239,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `translator` field (optional)
-    pub fn translator(mut self, value: impl Into<Option<MusicEventTranslator<S>>>) -> Self {
+    pub fn translator(
+        mut self,
+        value: impl Into<Option<MusicEventTranslator<S>>>,
+    ) -> Self {
         self._fields.48 = value.into();
         self
     }
@@ -3011,7 +3263,10 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
-    pub fn maybe_typical_age_range(mut self, value: Option<MusicEventTypicalAgeRange<S>>) -> Self {
+    pub fn maybe_typical_age_range(
+        mut self,
+        value: Option<MusicEventTypicalAgeRange<S>>,
+    ) -> Self {
         self._fields.49 = value;
         self
     }
@@ -3032,12 +3287,18 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `workFeatured` field (optional)
-    pub fn work_featured(mut self, value: impl Into<Option<MusicEventWorkFeatured<S>>>) -> Self {
+    pub fn work_featured(
+        mut self,
+        value: impl Into<Option<MusicEventWorkFeatured<S>>>,
+    ) -> Self {
         self._fields.51 = value.into();
         self
     }
     /// Set the `workFeatured` field to an Option value (optional)
-    pub fn maybe_work_featured(mut self, value: Option<MusicEventWorkFeatured<S>>) -> Self {
+    pub fn maybe_work_featured(
+        mut self,
+        value: Option<MusicEventWorkFeatured<S>>,
+    ) -> Self {
         self._fields.51 = value;
         self
     }
@@ -3045,12 +3306,18 @@ impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
 
 impl<St: music_event_state::State, S: BosStr> MusicEventBuilder<St, S> {
     /// Set the `workPerformed` field (optional)
-    pub fn work_performed(mut self, value: impl Into<Option<MusicEventWorkPerformed<S>>>) -> Self {
+    pub fn work_performed(
+        mut self,
+        value: impl Into<Option<MusicEventWorkPerformed<S>>>,
+    ) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `workPerformed` field to an Option value (optional)
-    pub fn maybe_work_performed(mut self, value: Option<MusicEventWorkPerformed<S>>) -> Self {
+    pub fn maybe_work_performed(
+        mut self,
+        value: Option<MusicEventWorkPerformed<S>>,
+    ) -> Self {
         self._fields.52 = value;
         self
     }
@@ -3120,7 +3387,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MusicEvent<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MusicEvent<S> {
         MusicEvent {
             about: self._fields.0,
             actor: self._fields.1,

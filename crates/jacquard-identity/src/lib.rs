@@ -78,6 +78,8 @@ use bytes::Bytes;
 use jacquard_common::BosStr;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
+#[cfg(feature = "cache")]
+use jacquard_common::IntoStatic;
 use jacquard_common::bos::Bos;
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::deps::fluent_uri::pct_enc::{
@@ -422,6 +424,7 @@ impl<C: HttpClient> JacquardResolver<C> {
     ///
     /// - `did:web:example.com` → `https://example.com/.well-known/did.json`
     /// - `did:web:example.com:user:alice` → `https://example.com/user/alice/did.json`
+    /// - `did:web:127.0.0.1%3A8080` → `https://127.0.0.1:8080/.well-known/did.json`
     fn did_web_url<S: BosStr + Sync>(&self, did: &Did<S>) -> resolver::Result<Uri<String>> {
         // did:web:example.com[:path:segments]
         let s = did.as_str();
@@ -429,18 +432,24 @@ impl<C: HttpClient> JacquardResolver<C> {
             .strip_prefix("did:web:")
             .ok_or_else(|| IdentityError::unsupported_did_method(s))?;
         let mut parts = rest.split(':');
+        // The host and path segments are percent-encoded per the did:web
+        // spec (e.g. `%3A` for a port colon, `%2F` for a path slash).
         let host = parts
             .next()
+            .map(|h| percent_encoding::percent_decode_str(h).decode_utf8_lossy())
+            .filter(|h| !h.is_empty())
             .ok_or_else(|| IdentityError::unsupported_did_method(s))?;
 
-        let path_segments: Vec<&str> = parts.collect();
+        let path_segments: Vec<std::borrow::Cow<'_, str>> = parts
+            .map(|seg| percent_encoding::percent_decode_str(seg).decode_utf8_lossy())
+            .collect();
 
         // Build the path using fluent-uri builder
         let mut path = String::from("/");
         if path_segments.is_empty() {
             path.push_str(".well-known/did.json");
         } else {
-            for seg in path_segments {
+            for seg in &path_segments {
                 path.push_str(seg);
                 path.push('/');
             }
@@ -1154,7 +1163,7 @@ impl<C: HttpClient + Sync> JacquardResolver<C> {
         nsid: &jacquard_common::types::string::Nsid<S>,
     ) {
         if let Some(caches) = &self.caches {
-            let nsid_key = Nsid::new_owned(nsid.as_str()).expect("already validated NSID");
+            let nsid_key: Nsid = nsid.borrow().into_static();
             if let Some(schema) = cache_impl::get(&caches.nsid_to_schema, &nsid_key) {
                 let authority = SmolStr::from(nsid.domain_authority());
                 cache_impl::invalidate(&caches.authority_to_did, &authority);
@@ -1263,6 +1272,11 @@ mod tests {
         assert_eq!(
             r.test_did_web_url_raw("did:web:example.com:user:alice"),
             "https://example.com/user/alice/did.json"
+        );
+        // Percent-encoded port per the did:web spec.
+        assert_eq!(
+            r.test_did_web_url_raw("did:web:127.0.0.1%3A8080"),
+            "https://127.0.0.1:8080/.well-known/did.json"
         );
     }
 

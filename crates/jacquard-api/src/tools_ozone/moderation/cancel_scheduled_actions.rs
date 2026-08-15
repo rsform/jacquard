@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,44 +21,47 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::tools_ozone::moderation::cancel_scheduled_actions;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::moderation::cancel_scheduled_actions;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancellationResults<S: BosStr = DefaultStr> {
     ///DIDs for which cancellation failed with error details
     pub failed: Vec<cancel_scheduled_actions::FailedCancellation<S>>,
     ///DIDs for which all pending scheduled actions were successfully cancelled
     pub succeeded: Vec<Did<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_cancellation_results_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FailedCancellation<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub error: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_code: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_failed_cancellation_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancelScheduledActions<S: BosStr = DefaultStr> {
     ///Optional comment describing the reason for cancellation
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,11 +72,9 @@ pub struct CancelScheduledActions<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancelScheduledActionsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -124,8 +125,9 @@ impl jacquard_common::xrpc::XrpcResp for CancelScheduledActionsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CancelScheduledActions<S> {
     const NSID: &'static str = "tools.ozone.moderation.cancelScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CancelScheduledActionsResponse;
 }
 
@@ -135,15 +137,29 @@ Path: `/xrpc/tools.ozone.moderation.cancelScheduledActions`. The request payload
 pub struct CancelScheduledActionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CancelScheduledActionsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.cancelScheduledActions";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CancelScheduledActions<S>;
     type Response = CancelScheduledActionsResponse;
 }
 
+fn deserialize_cancellation_results_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod cancellation_results_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -186,8 +202,10 @@ pub mod cancellation_results_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CancellationResultsBuilder<St: cancellation_results_state::State, S: BosStr = DefaultStr>
-{
+pub struct CancellationResultsBuilder<
+    St: cancellation_results_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<cancel_scheduled_actions::FailedCancellation<S>>>,
@@ -198,14 +216,20 @@ pub struct CancellationResultsBuilder<St: cancellation_results_state::State, S: 
 
 impl CancellationResults<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CancellationResultsBuilder<cancellation_results_state::Empty, DefaultStr> {
+    pub fn new() -> CancellationResultsBuilder<
+        cancellation_results_state::Empty,
+        DefaultStr,
+    > {
         CancellationResultsBuilder::new()
     }
 }
 
 impl<S: BosStr> CancellationResults<S> {
     /// Create a new builder for this type
-    pub fn builder() -> CancellationResultsBuilder<cancellation_results_state::Empty, S> {
+    pub fn builder() -> CancellationResultsBuilder<
+        cancellation_results_state::Empty,
+        S,
+    > {
         CancellationResultsBuilder::builder()
     }
 }
@@ -285,7 +309,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CancellationResults<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CancellationResults<S> {
         CancellationResults {
             failed: self._fields.0.unwrap(),
             succeeded: self._fields.1.unwrap(),
@@ -295,10 +322,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.moderation.cancelScheduledActions"),
@@ -354,10 +381,9 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> LexiconDoc<'st
             map.insert(
                 SmolStr::new_static("failedCancellation"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("error"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("did"), SmolStr::new_static("error")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -370,15 +396,11 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> LexiconDoc<'st
                         );
                         map.insert(
                             SmolStr::new_static("error"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("errorCode"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -439,9 +461,22 @@ fn lexicon_doc_tools_ozone_moderation_cancelScheduledActions() -> LexiconDoc<'st
     }
 }
 
+fn deserialize_failed_cancellation_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod failed_cancellation_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -484,7 +519,10 @@ pub mod failed_cancellation_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct FailedCancellationBuilder<St: failed_cancellation_state::State, S: BosStr = DefaultStr> {
+pub struct FailedCancellationBuilder<
+    St: failed_cancellation_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -492,7 +530,10 @@ pub struct FailedCancellationBuilder<St: failed_cancellation_state::State, S: Bo
 
 impl FailedCancellation<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> FailedCancellationBuilder<failed_cancellation_state::Empty, DefaultStr> {
+    pub fn new() -> FailedCancellationBuilder<
+        failed_cancellation_state::Empty,
+        DefaultStr,
+    > {
         FailedCancellationBuilder::new()
     }
 }
@@ -593,7 +634,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FailedCancellation<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FailedCancellation<S> {
         FailedCancellation {
             did: self._fields.0.unwrap(),
             error: self._fields.1.unwrap(),
@@ -605,7 +649,7 @@ where
 
 pub mod cancel_scheduled_actions_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -647,15 +691,20 @@ pub struct CancelScheduledActionsBuilder<
 
 impl CancelScheduledActions<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CancelScheduledActionsBuilder<cancel_scheduled_actions_state::Empty, DefaultStr>
-    {
+    pub fn new() -> CancelScheduledActionsBuilder<
+        cancel_scheduled_actions_state::Empty,
+        DefaultStr,
+    > {
         CancelScheduledActionsBuilder::new()
     }
 }
 
 impl<S: BosStr> CancelScheduledActions<S> {
     /// Create a new builder for this type
-    pub fn builder() -> CancelScheduledActionsBuilder<cancel_scheduled_actions_state::Empty, S> {
+    pub fn builder() -> CancelScheduledActionsBuilder<
+        cancel_scheduled_actions_state::Empty,
+        S,
+    > {
         CancelScheduledActionsBuilder::builder()
     }
 }
@@ -682,7 +731,10 @@ impl<S: BosStr> CancelScheduledActionsBuilder<cancel_scheduled_actions_state::Em
     }
 }
 
-impl<St: cancel_scheduled_actions_state::State, S: BosStr> CancelScheduledActionsBuilder<St, S> {
+impl<
+    St: cancel_scheduled_actions_state::State,
+    S: BosStr,
+> CancelScheduledActionsBuilder<St, S> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -704,7 +756,10 @@ where
     pub fn subjects(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> CancelScheduledActionsBuilder<cancel_scheduled_actions_state::SetSubjects<St>, S> {
+    ) -> CancelScheduledActionsBuilder<
+        cancel_scheduled_actions_state::SetSubjects<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         CancelScheduledActionsBuilder {
             _state: PhantomData,

@@ -10,41 +10,41 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::io_atcr::hold::notify_manifest;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::hold::notify_manifest;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_blob_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChildManifestInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
@@ -54,15 +54,18 @@ pub struct ChildManifestInfo<S: BosStr = DefaultStr> {
     pub platform: Option<notify_manifest::PlatformInfo<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_child_manifest_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LayerInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub digest: Option<S>,
@@ -70,15 +73,18 @@ pub struct LayerInfo<S: BosStr = DefaultStr> {
     pub media_type: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_layer_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyManifest<S: BosStr = DefaultStr> {
     pub manifest: notify_manifest::ManifestInfo<S>,
     ///Manifest digest for building layer record AT-URIs
@@ -171,16 +177,16 @@ where
         match self {
             NotifyManifestOperation::Push => NotifyManifestOperation::Push,
             NotifyManifestOperation::Pull => NotifyManifestOperation::Pull,
-            NotifyManifestOperation::Other(v) => NotifyManifestOperation::Other(v.into_static()),
+            NotifyManifestOperation::Other(v) => {
+                NotifyManifestOperation::Other(v.into_static())
+            }
         }
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotifyManifestOutput<S: BosStr = DefaultStr> {
     ///Number of layer records created (push only)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -201,9 +207,18 @@ pub struct NotifyManifestOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum NotifyManifestError {
     #[serde(rename = "InvalidOperation")]
@@ -214,10 +229,7 @@ pub enum NotifyManifestError {
     QuotaExceeded(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for NotifyManifestError {
@@ -258,10 +270,7 @@ impl core::fmt::Display for NotifyManifestError {
 /// OCI manifest information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ManifestInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<notify_manifest::BlobInfo<S>>,
@@ -273,21 +282,29 @@ pub struct ManifestInfo<S: BosStr = DefaultStr> {
     ///OCI media type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub media_type: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_manifest_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlatformInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub architecture: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub os: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_platform_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -399,8 +416,9 @@ impl jacquard_common::xrpc::XrpcResp for NotifyManifestResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for NotifyManifest<S> {
     const NSID: &'static str = "io.atcr.hold.notifyManifest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = NotifyManifestResponse;
 }
 
@@ -410,8 +428,9 @@ Path: `/xrpc/io.atcr.hold.notifyManifest`. The request payload type is `NotifyMa
 pub struct NotifyManifestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NotifyManifestRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.notifyManifest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = NotifyManifest<S>;
     type Response = NotifyManifestResponse;
 }
@@ -476,11 +495,24 @@ impl<S: BosStr> LexiconSchema for PlatformInfo<S> {
     }
 }
 
+fn deserialize_blob_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_io_atcr_hold_notifyManifest() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.notifyManifest"),
@@ -697,9 +729,9 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("manifests"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Child manifests for multi-arch images",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Child manifests for multi-arch images"),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#childManifestInfo"),
                                     ..Default::default()
@@ -751,9 +783,35 @@ fn lexicon_doc_io_atcr_hold_notifyManifest() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_child_manifest_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_layer_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod notify_manifest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -826,7 +884,10 @@ pub mod notify_manifest_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NotifyManifestBuilder<St: notify_manifest_state::State, S: BosStr = DefaultStr> {
+pub struct NotifyManifestBuilder<
+    St: notify_manifest_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<notify_manifest::ManifestInfo<S>>,
@@ -915,7 +976,10 @@ where
 
 impl<St: notify_manifest_state::State, S: BosStr> NotifyManifestBuilder<St, S> {
     /// Set the `operation` field (optional)
-    pub fn operation(mut self, value: impl Into<Option<NotifyManifestOperation<S>>>) -> Self {
+    pub fn operation(
+        mut self,
+        value: impl Into<Option<NotifyManifestOperation<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -998,7 +1062,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotifyManifest<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotifyManifest<S> {
         NotifyManifest {
             manifest: self._fields.0.unwrap(),
             manifest_digest: self._fields.1.unwrap(),
@@ -1009,4 +1076,30 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_manifest_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_platform_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

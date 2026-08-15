@@ -1,0 +1,95 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.repo.listWebhookDeliveries",
+  "defs": {
+    "delivery": {
+      "type": "object",
+      "required": [
+        "id",
+        "deliveryId",
+        "event",
+        "url",
+        "success",
+        "createdAt"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "deliveryId": {
+          "type": "string",
+          "description": "UUID for tracking this delivery attempt."
+        },
+        "event": {
+          "type": "string",
+          "description": "Event type that triggered the delivery."
+        },
+        "id": {
+          "type": "integer"
+        },
+        "requestBody": {
+          "type": "string"
+        },
+        "responseBody": {
+          "type": "string"
+        },
+        "responseCode": {
+          "type": "integer"
+        },
+        "success": {
+          "type": "boolean"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "List recent delivery attempts for a webhook.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repoDid",
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Webhook ID."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "repoDid": {
+            "type": "string",
+            "description": "DID of the repository as minted by the knot.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "deliveries"
+          ],
+          "properties": {
+            "deliveries": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#delivery"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

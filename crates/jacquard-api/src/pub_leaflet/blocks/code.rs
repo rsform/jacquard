@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -19,20 +19,22 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Code<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<S>,
     pub plaintext: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub syntax_highlighting_theme: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_code_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -51,11 +53,24 @@ impl<S: BosStr> LexiconSchema for Code<S> {
     }
 }
 
+fn deserialize_code_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_pub_leaflet_blocks_code() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.code"),
@@ -70,21 +85,15 @@ fn lexicon_doc_pub_leaflet_blocks_code() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("language"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("plaintext"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("syntaxHighlightingTheme"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },

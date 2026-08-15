@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Update queue properties. Currently only supports updating the name and enabled status to prevent configuration conflicts.",
+      "description": "Update queue properties.",
       "input": {
         "encoding": "application/json",
         "schema": {
@@ -28,6 +28,13 @@
             "queueId": {
               "type": "integer",
               "description": "ID of the queue to update"
+            },
+            "recommendedPolicies": {
+              "type": "array",
+              "description": "Policy keys to recommend when actioning reports in this queue",
+              "items": {
+                "type": "string"
+              }
             }
           }
         }
@@ -46,7 +53,13 @@
             }
           }
         }
-      }
+      },
+      "errors": [
+        {
+          "description": "One or more recommended policy keys do not exist in the configured policy list",
+          "name": "InvalidRecommendedPolicies"
+        }
+      ]
     }
   }
 }

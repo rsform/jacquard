@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_offprint::block::image::AspectRatio;
-use crate::app_offprint::block::image_grid;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_offprint::block::image::AspectRatio;
+use crate::app_offprint::block::image_grid;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GridImage<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -39,15 +36,18 @@ pub struct GridImage<S: BosStr = DefaultStr> {
     pub aspect_ratio: Option<AspectRatio<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<BlobRef<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_grid_image_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageGrid<S: BosStr = DefaultStr> {
     ///Aspect ratio mode
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,7 +60,12 @@ pub struct ImageGrid<S: BosStr = DefaultStr> {
     pub grid_rows: Option<i64>,
     ///Array of images in the grid (2-6)
     pub images: Vec<image_grid::GridImage<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_image_grid_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -103,16 +108,19 @@ impl<S: BosStr> LexiconSchema for GridImage<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -181,11 +189,24 @@ impl<S: BosStr> LexiconSchema for ImageGrid<S> {
     }
 }
 
+fn deserialize_grid_image_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_app_offprint_block_imageGrid() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.imageGrid"),
@@ -207,15 +228,15 @@ fn lexicon_doc_app_offprint_block_imageGrid() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("aspectRatio"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.offprint.block.image#aspectRatio"),
+                                r#ref: CowStr::new_static(
+                                    "app.offprint.block.image#aspectRatio",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -254,9 +275,9 @@ fn lexicon_doc_app_offprint_block_imageGrid() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("images"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Array of images in the grid (2-6)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Array of images in the grid (2-6)"),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#gridImage"),
                                     ..Default::default()
@@ -277,9 +298,22 @@ fn lexicon_doc_app_offprint_block_imageGrid() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_image_grid_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod image_grid_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -312,12 +346,7 @@ pub mod image_grid_state {
 /// Builder for constructing an instance of this type.
 pub struct ImageGridBuilder<St: image_grid_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<i64>,
-        Option<Vec<image_grid::GridImage<S>>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<i64>, Option<Vec<image_grid::GridImage<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -431,7 +460,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageGrid<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageGrid<S> {
         ImageGrid {
             aspect_ratio: self._fields.0,
             caption: self._fields.1,

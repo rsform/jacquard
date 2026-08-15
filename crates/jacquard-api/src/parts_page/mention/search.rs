@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,28 +21,28 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::parts_page::mention::search;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::parts_page::mention::search;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_aspect_ratio_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EmbedInfo<S: BosStr = DefaultStr> {
     ///Aspect ratio of the embed. If provided, takes precedence over width/height for sizing.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,15 +55,18 @@ pub struct EmbedInfo<S: BosStr = DefaultStr> {
     ///Default width of the embed in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_embed_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Search<S: BosStr = DefaultStr> {
     /// Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
@@ -75,34 +78,33 @@ pub struct Search<S: BosStr = DefaultStr> {
     pub service: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchOutput<S: BosStr = DefaultStr> {
     pub results: Vec<search::SearchResult<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MentionLabel<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_mention_label_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchResult<S: BosStr = DefaultStr> {
     ///A description for the mentioned entity
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -126,21 +128,29 @@ pub struct SearchResult<S: BosStr = DefaultStr> {
     pub subscope: Option<search::SubscopeInfo<S>>,
     ///Identifier for the mentioned entity
     pub uri: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_search_result_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscopeInfo<S: BosStr = DefaultStr> {
     ///Display label for the scope-down button (e.g. 'Posts', 'Tracks')
     pub label: S,
     ///Scope identifier passed back to the service in subsequent search queries
     pub scope: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_subscope_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -294,9 +304,22 @@ impl<S: BosStr> LexiconSchema for SubscopeInfo<S> {
     }
 }
 
+fn deserialize_aspect_ratio_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -434,7 +457,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -444,10 +470,10 @@ where
 }
 
 fn lexicon_doc_parts_page_mention_search() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("parts.page.mention.search"),
@@ -456,10 +482,9 @@ fn lexicon_doc_parts_page_mention_search() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("width"),
-                        SmolStr::new_static("height"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -505,9 +530,9 @@ fn lexicon_doc_parts_page_mention_search() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("src"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Source URL for the iframe embed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Source URL for the iframe embed"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -593,9 +618,7 @@ fn lexicon_doc_parts_page_mention_search() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("text"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -739,9 +762,22 @@ fn lexicon_doc_parts_page_mention_search() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_embed_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod embed_info_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -821,7 +857,10 @@ impl<S: BosStr> EmbedInfoBuilder<embed_info_state::Empty, S> {
 
 impl<St: embed_info_state::State, S: BosStr> EmbedInfoBuilder<St, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<search::AspectRatio<S>>>) -> Self {
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<search::AspectRatio<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -893,7 +932,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EmbedInfo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EmbedInfo<S> {
         EmbedInfo {
             aspect_ratio: self._fields.0,
             height: self._fields.1,
@@ -910,7 +952,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1027,7 +1069,10 @@ where
     St::Search: search_state::IsUnset,
 {
     /// Set the `search` field (required)
-    pub fn search(mut self, value: impl Into<S>) -> SearchBuilder<search_state::SetSearch<St>, S> {
+    pub fn search(
+        mut self,
+        value: impl Into<S>,
+    ) -> SearchBuilder<search_state::SetSearch<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SearchBuilder {
             _state: PhantomData,
@@ -1071,4 +1116,43 @@ where
             service: self._fields.3.unwrap(),
         }
     }
+}
+
+fn deserialize_mention_label_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_search_result_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_subscope_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

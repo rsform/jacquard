@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Quest system state for cross-device sync (dismissals, nudge timing, visited routes). Singleton record (rkey: self), overwritten via putRecord. Client-written (no backend signing). Distinct from net.anisota.chronicle.fieldwork (immutable, backend-signed completion records).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -66,7 +66,12 @@ pub struct State<S: BosStr = DefaultStr> {
     ///Object mapping visited app routes (e.g. '/chronicle') to the ISO datetime of the first tracked visit. Drives route-based quest detection.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub visited_routes: Option<Data<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_state_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -129,9 +134,28 @@ impl<S: BosStr> LexiconSchema for State<S> {
     }
 }
 
+fn deserialize_state_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -391,10 +415,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_fieldwork_state() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.fieldwork.state"),

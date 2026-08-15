@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.subscribe",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Subscribe to a community to see its posts in your feed. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "community"
+          ],
+          "properties": {
+            "community": {
+              "type": "string",
+              "description": "DID or handle of the community to subscribe to",
+              "format": "at-identifier"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the created subscription record",
+              "format": "cid"
+            },
+            "existing": {
+              "type": "boolean",
+              "description": "True if item was already subscribed"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the created subscription record",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Community not found",
+          "name": "CommunityNotFound"
+        },
+        {
+          "description": "Cannot subscribe - you are blocked from this community",
+          "name": "Blocked"
+        }
+      ]
+    }
+  }
+}

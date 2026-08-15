@@ -9,6 +9,7 @@
 pub mod get_services;
 pub mod service;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -19,43 +20,43 @@ use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Nsid};
+use jacquard_common::types::string::{AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
-use crate::app_bsky::labeler;
 use crate::com_atproto::label::Label;
 use crate::com_atproto::label::LabelValue;
 use crate::com_atproto::label::LabelValueDefinition;
 use crate::com_atproto::moderation::ReasonType;
 use crate::com_atproto::moderation::SubjectType;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::app_bsky::labeler;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerPolicies<S: BosStr = DefaultStr> {
     ///Label values created by this labeler and scoped exclusively to it. Labels defined here will override global label definitions for this labeler.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label_value_definitions: Option<Vec<LabelValueDefinition<S>>>,
     ///The label values which this labeler publishes. May include global or custom labels.
     pub label_values: Vec<LabelValue<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_labeler_policies_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub creator: ProfileView<S>,
@@ -67,15 +68,18 @@ pub struct LabelerView<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer: Option<labeler::LabelerViewerState<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_labeler_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerViewDetailed<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub creator: ProfileView<S>,
@@ -97,19 +101,27 @@ pub struct LabelerViewDetailed<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer: Option<labeler::LabelerViewerState<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_labeler_view_detailed_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LabelerViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub like: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_labeler_viewer_state_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -191,9 +203,22 @@ impl<S: BosStr> LexiconSchema for LabelerViewerState<S> {
     }
 }
 
+fn deserialize_labeler_policies_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod labeler_policies_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -224,12 +249,12 @@ pub mod labeler_policies_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LabelerPoliciesBuilder<St: labeler_policies_state::State, S: BosStr = DefaultStr> {
+pub struct LabelerPoliciesBuilder<
+    St: labeler_policies_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Vec<LabelValueDefinition<S>>>,
-        Option<Vec<LabelValue<S>>>,
-    ),
+    _fields: (Option<Vec<LabelValueDefinition<S>>>, Option<Vec<LabelValue<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -321,7 +346,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LabelerPolicies<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LabelerPolicies<S> {
         LabelerPolicies {
             label_value_definitions: self._fields.0,
             label_values: self._fields.1.unwrap(),
@@ -331,10 +359,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_labeler_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.labeler.defs"),
@@ -389,12 +417,13 @@ fn lexicon_doc_app_bsky_labeler_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("labelerView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("creator"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("creator"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -408,7 +437,9 @@ fn lexicon_doc_app_bsky_labeler_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileView"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -610,9 +641,22 @@ fn lexicon_doc_app_bsky_labeler_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_labeler_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod labeler_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -839,12 +883,18 @@ where
 
 impl<St: labeler_view_state::State, S: BosStr> LabelerViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<labeler::LabelerViewerState<S>>>) -> Self {
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<labeler::LabelerViewerState<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<labeler::LabelerViewerState<S>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<labeler::LabelerViewerState<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
@@ -872,7 +922,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LabelerView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LabelerView<S> {
         LabelerView {
             cid: self._fields.0.unwrap(),
             creator: self._fields.1.unwrap(),
@@ -886,9 +939,22 @@ where
     }
 }
 
+fn deserialize_labeler_view_detailed_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod labeler_view_detailed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1002,14 +1068,20 @@ pub struct LabelerViewDetailedBuilder<
 
 impl LabelerViewDetailed<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> LabelerViewDetailedBuilder<labeler_view_detailed_state::Empty, DefaultStr> {
+    pub fn new() -> LabelerViewDetailedBuilder<
+        labeler_view_detailed_state::Empty,
+        DefaultStr,
+    > {
         LabelerViewDetailedBuilder::new()
     }
 }
 
 impl<S: BosStr> LabelerViewDetailed<S> {
     /// Create a new builder for this type
-    pub fn builder() -> LabelerViewDetailedBuilder<labeler_view_detailed_state::Empty, S> {
+    pub fn builder() -> LabelerViewDetailedBuilder<
+        labeler_view_detailed_state::Empty,
+        S,
+    > {
         LabelerViewDetailedBuilder::builder()
     }
 }
@@ -1019,9 +1091,7 @@ impl LabelerViewDetailedBuilder<labeler_view_detailed_state::Empty, DefaultStr> 
     pub fn new() -> Self {
         LabelerViewDetailedBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1032,9 +1102,7 @@ impl<S: BosStr> LabelerViewDetailedBuilder<labeler_view_detailed_state::Empty, S
     pub fn builder() -> Self {
         LabelerViewDetailedBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -1097,7 +1165,10 @@ where
     }
 }
 
-impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuilder<St, S> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -1110,7 +1181,10 @@ impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuild
     }
 }
 
-impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuilder<St, S> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -1142,7 +1216,10 @@ where
     }
 }
 
-impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuilder<St, S> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `reasonTypes` field (optional)
     pub fn reason_types(mut self, value: impl Into<Option<Vec<ReasonType<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -1155,9 +1232,15 @@ impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuild
     }
 }
 
-impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuilder<St, S> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `subjectCollections` field (optional)
-    pub fn subject_collections(mut self, value: impl Into<Option<Vec<Nsid<S>>>>) -> Self {
+    pub fn subject_collections(
+        mut self,
+        value: impl Into<Option<Vec<Nsid<S>>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -1168,9 +1251,15 @@ impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuild
     }
 }
 
-impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuilder<St, S> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `subjectTypes` field (optional)
-    pub fn subject_types(mut self, value: impl Into<Option<Vec<SubjectType<S>>>>) -> Self {
+    pub fn subject_types(
+        mut self,
+        value: impl Into<Option<Vec<SubjectType<S>>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
@@ -1200,14 +1289,23 @@ where
     }
 }
 
-impl<St: labeler_view_detailed_state::State, S: BosStr> LabelerViewDetailedBuilder<St, S> {
+impl<
+    St: labeler_view_detailed_state::State,
+    S: BosStr,
+> LabelerViewDetailedBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<labeler::LabelerViewerState<S>>>) -> Self {
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<labeler::LabelerViewerState<S>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<labeler::LabelerViewerState<S>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<labeler::LabelerViewerState<S>>,
+    ) -> Self {
         self._fields.10 = value;
         self
     }
@@ -1240,7 +1338,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LabelerViewDetailed<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LabelerViewDetailed<S> {
         LabelerViewDetailed {
             cid: self._fields.0.unwrap(),
             creator: self._fields.1.unwrap(),
@@ -1256,4 +1357,17 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_labeler_viewer_state_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

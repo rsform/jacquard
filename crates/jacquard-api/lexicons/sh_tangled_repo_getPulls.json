@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.getPulls",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "pulls"
+        ],
+        "properties": {
+          "pulls": {
+            "type": "array",
+            "description": "AT-URIs of the sh.tangled.repo.pull records to fetch. At most 50 per request.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "maxLength": 50
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "items"
+          ],
+          "properties": {
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#recordView"
+              }
+            }
+          }
+        }
+      }
+    },
+    "recordView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "value"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "value": {
+          "type": "unknown",
+          "description": "Embedded sh.tangled.repo.pull record."
+        }
+      }
+    }
+  }
+}

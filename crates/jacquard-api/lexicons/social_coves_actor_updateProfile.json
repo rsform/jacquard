@@ -1,0 +1,72 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.actor.updateProfile",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update the authenticated user's profile",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "avatarBlob": {
+              "type": "string",
+              "description": "Base64-encoded avatar image data (png, jpeg, or webp; decoded size limit 1MB)",
+              "maxLength": 1400000
+            },
+            "avatarMimeType": {
+              "type": "string",
+              "description": "MIME type of the avatar image (image/png, image/jpeg, image/webp)",
+              "maxLength": 128
+            },
+            "bannerBlob": {
+              "type": "string",
+              "description": "Base64-encoded banner image data (png, jpeg, or webp; decoded size limit 2MB)",
+              "maxLength": 2800000
+            },
+            "bannerMimeType": {
+              "type": "string",
+              "description": "MIME type of the banner image (image/png, image/jpeg, image/webp)",
+              "maxLength": 128
+            },
+            "bio": {
+              "type": "string",
+              "description": "User bio. Stored as the `description` field of the social.coves.actor.profile record.",
+              "maxLength": 2560,
+              "maxGraphemes": 256
+            },
+            "displayName": {
+              "type": "string",
+              "description": "Optional display name",
+              "maxLength": 640,
+              "maxGraphemes": 64
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the updated profile record",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the updated profile record",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

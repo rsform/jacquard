@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckUserAccess<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_id: Option<S>,
@@ -30,11 +27,9 @@ pub struct CheckUserAccess<S: BosStr = DefaultStr> {
     pub user: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckUserAccessOutput<S: BosStr = DefaultStr> {
     ///Whether the managing app authorizes the request.
     pub authorized: bool,
@@ -72,7 +67,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CheckUserAccessRequest {
 
 pub mod check_user_access_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,7 +110,10 @@ pub mod check_user_access_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CheckUserAccessBuilder<St: check_user_access_state::State, S: BosStr = DefaultStr> {
+pub struct CheckUserAccessBuilder<
+    St: check_user_access_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtSpaceUri<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,35 +20,41 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::chat_bsky::group::DisabledJoinLinkPreviewView;
 use crate::chat_bsky::group::InvalidJoinLinkPreviewView;
 use crate::chat_bsky::group::JoinLinkPreviewView;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JoinLink<S: BosStr = DefaultStr> {
     ///The join link code.
     pub code: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_join_link_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     pub join_link_preview: ViewJoinLinkPreview<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -92,11 +98,24 @@ impl<S: BosStr> LexiconSchema for View<S> {
     }
 }
 
+fn deserialize_join_link_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_chat_bsky_embed_joinLink() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("chat.bsky.embed.joinLink"),
@@ -112,7 +131,9 @@ fn lexicon_doc_chat_bsky_embed_joinLink() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("code"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The join link code.")),
+                                description: Some(
+                                    CowStr::new_static("The join link code."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -133,12 +154,8 @@ fn lexicon_doc_chat_bsky_embed_joinLink() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("chat.bsky.group.defs#joinLinkPreviewView"),
-                                    CowStr::new_static(
-                                        "chat.bsky.group.defs#disabledJoinLinkPreviewView",
-                                    ),
-                                    CowStr::new_static(
-                                        "chat.bsky.group.defs#invalidJoinLinkPreviewView",
-                                    ),
+                                    CowStr::new_static("chat.bsky.group.defs#disabledJoinLinkPreviewView"),
+                                    CowStr::new_static("chat.bsky.group.defs#invalidJoinLinkPreviewView")
                                 ],
                                 ..Default::default()
                             }),
@@ -154,9 +171,22 @@ fn lexicon_doc_chat_bsky_embed_joinLink() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

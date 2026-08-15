@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_tangled::temp::notification::list_notifications;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_tangled::temp::notification::list_notifications;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotifications<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -43,11 +40,9 @@ pub struct ListNotifications<S: BosStr = DefaultStr> {
     pub read: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -58,19 +53,15 @@ pub struct ListNotificationsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Notification<S: BosStr = DefaultStr> {
     ///DID of the user who triggered this notification.
     pub actor_did: Did<S>,
     ///Broad category: 'social' or 'work'.
     pub category: S,
     pub created_at: Datetime,
-    ///Stable numeric ID for this notification.
-    pub id: i64,
     ///AT-URI of the related org.tangled.issue.issue record, if applicable.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub issue_at: Option<AtUri<S>>,
@@ -83,7 +74,14 @@ pub struct Notification<S: BosStr = DefaultStr> {
     pub repo_did: Option<Did<S>>,
     ///Notification type: repo_starred, issue_created, issue_commented, issue_closed, issue_reopen, issue_assigned, issue_unassigned, pull_created, pull_commented, pull_merged, pull_closed, pull_reopen, pull_assigned, pull_unassigned, followed, user_mentioned.
     pub r#type: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    ///at-uri of this notification; the stable key for read/unread state.
+    pub uri: AtUri<S>,
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_notification_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -132,7 +130,7 @@ impl<S: BosStr> LexiconSchema for Notification<S> {
 
 pub mod list_notifications_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -150,7 +148,10 @@ pub mod list_notifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListNotificationsBuilder<St: list_notifications_state::State, S: BosStr = DefaultStr> {
+pub struct ListNotificationsBuilder<
+    St: list_notifications_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -158,7 +159,10 @@ pub struct ListNotificationsBuilder<St: list_notifications_state::State, S: BosS
 
 impl ListNotifications<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListNotificationsBuilder<list_notifications_state::Empty, DefaultStr> {
+    pub fn new() -> ListNotificationsBuilder<
+        list_notifications_state::Empty,
+        DefaultStr,
+    > {
         ListNotificationsBuilder::new()
     }
 }
@@ -259,9 +263,22 @@ where
     }
 }
 
+fn deserialize_notification_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod notification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -272,9 +289,9 @@ pub mod notification_state {
         type ActorDid;
         type Category;
         type CreatedAt;
-        type Id;
         type Read;
         type Type;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -283,9 +300,9 @@ pub mod notification_state {
         type ActorDid = Unset;
         type Category = Unset;
         type CreatedAt = Unset;
-        type Id = Unset;
         type Read = Unset;
         type Type = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `actor_did` field to Set
     pub struct SetActorDid<St: State = Empty>(PhantomData<fn() -> St>);
@@ -294,9 +311,9 @@ pub mod notification_state {
         type ActorDid = Set<members::actor_did>;
         type Category = St::Category;
         type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
         type Read = St::Read;
         type Type = St::Type;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `category` field to Set
     pub struct SetCategory<St: State = Empty>(PhantomData<fn() -> St>);
@@ -305,9 +322,9 @@ pub mod notification_state {
         type ActorDid = St::ActorDid;
         type Category = Set<members::category>;
         type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
         type Read = St::Read;
         type Type = St::Type;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -316,20 +333,9 @@ pub mod notification_state {
         type ActorDid = St::ActorDid;
         type Category = St::Category;
         type CreatedAt = Set<members::created_at>;
-        type Id = St::Id;
         type Read = St::Read;
         type Type = St::Type;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type ActorDid = St::ActorDid;
-        type Category = St::Category;
-        type CreatedAt = St::CreatedAt;
-        type Id = Set<members::id>;
-        type Read = St::Read;
-        type Type = St::Type;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `read` field to Set
     pub struct SetRead<St: State = Empty>(PhantomData<fn() -> St>);
@@ -338,9 +344,9 @@ pub mod notification_state {
         type ActorDid = St::ActorDid;
         type Category = St::Category;
         type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
         type Read = Set<members::read>;
         type Type = St::Type;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
@@ -349,9 +355,20 @@ pub mod notification_state {
         type ActorDid = St::ActorDid;
         type Category = St::Category;
         type CreatedAt = St::CreatedAt;
-        type Id = St::Id;
         type Read = St::Read;
         type Type = Set<members::r#type>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type ActorDid = St::ActorDid;
+        type Category = St::Category;
+        type CreatedAt = St::CreatedAt;
+        type Read = St::Read;
+        type Type = St::Type;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -362,12 +379,12 @@ pub mod notification_state {
         pub struct category(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `read` field
         pub struct read(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -378,12 +395,12 @@ pub struct NotificationBuilder<St: notification_state::State, S: BosStr = Defaul
         Option<Did<S>>,
         Option<S>,
         Option<Datetime>,
-        Option<i64>,
         Option<AtUri<S>>,
         Option<AtUri<S>>,
         Option<bool>,
         Option<Did<S>>,
         Option<S>,
+        Option<AtUri<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -481,34 +498,15 @@ where
     }
 }
 
-impl<St, S: BosStr> NotificationBuilder<St, S>
-where
-    St: notification_state::State,
-    St::Id: notification_state::IsUnset,
-{
-    /// Set the `id` field (required)
-    pub fn id(
-        mut self,
-        value: impl Into<i64>,
-    ) -> NotificationBuilder<notification_state::SetId<St>, S> {
-        self._fields.3 = Option::Some(value.into());
-        NotificationBuilder {
-            _state: PhantomData,
-            _fields: self._fields,
-            _type: PhantomData,
-        }
-    }
-}
-
 impl<St: notification_state::State, S: BosStr> NotificationBuilder<St, S> {
     /// Set the `issueAt` field (optional)
     pub fn issue_at(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.3 = value.into();
         self
     }
     /// Set the `issueAt` field to an Option value (optional)
     pub fn maybe_issue_at(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.4 = value;
+        self._fields.3 = value;
         self
     }
 }
@@ -516,12 +514,12 @@ impl<St: notification_state::State, S: BosStr> NotificationBuilder<St, S> {
 impl<St: notification_state::State, S: BosStr> NotificationBuilder<St, S> {
     /// Set the `pullAt` field (optional)
     pub fn pull_at(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.4 = value.into();
         self
     }
     /// Set the `pullAt` field to an Option value (optional)
     pub fn maybe_pull_at(mut self, value: Option<AtUri<S>>) -> Self {
-        self._fields.5 = value;
+        self._fields.4 = value;
         self
     }
 }
@@ -536,7 +534,7 @@ where
         mut self,
         value: impl Into<bool>,
     ) -> NotificationBuilder<notification_state::SetRead<St>, S> {
-        self._fields.6 = Option::Some(value.into());
+        self._fields.5 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -548,12 +546,12 @@ where
 impl<St: notification_state::State, S: BosStr> NotificationBuilder<St, S> {
     /// Set the `repoDid` field (optional)
     pub fn repo_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
-        self._fields.7 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `repoDid` field to an Option value (optional)
     pub fn maybe_repo_did(mut self, value: Option<Did<S>>) -> Self {
-        self._fields.7 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -568,6 +566,25 @@ where
         mut self,
         value: impl Into<S>,
     ) -> NotificationBuilder<notification_state::SetType<St>, S> {
+        self._fields.7 = Option::Some(value.into());
+        NotificationBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> NotificationBuilder<St, S>
+where
+    St: notification_state::State,
+    St::Uri: notification_state::IsUnset,
+{
+    /// Set the `uri` field (required)
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> NotificationBuilder<notification_state::SetUri<St>, S> {
         self._fields.8 = Option::Some(value.into());
         NotificationBuilder {
             _state: PhantomData,
@@ -583,9 +600,9 @@ where
     St::ActorDid: notification_state::IsSet,
     St::Category: notification_state::IsSet,
     St::CreatedAt: notification_state::IsSet,
-    St::Id: notification_state::IsSet,
     St::Read: notification_state::IsSet,
     St::Type: notification_state::IsSet,
+    St::Uri: notification_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Notification<S> {
@@ -593,37 +610,40 @@ where
             actor_did: self._fields.0.unwrap(),
             category: self._fields.1.unwrap(),
             created_at: self._fields.2.unwrap(),
-            id: self._fields.3.unwrap(),
-            issue_at: self._fields.4,
-            pull_at: self._fields.5,
-            read: self._fields.6.unwrap(),
-            repo_did: self._fields.7,
-            r#type: self._fields.8.unwrap(),
+            issue_at: self._fields.3,
+            pull_at: self._fields.4,
+            read: self._fields.5.unwrap(),
+            repo_did: self._fields.6,
+            r#type: self._fields.7.unwrap(),
+            uri: self._fields.8.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Notification<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Notification<S> {
         Notification {
             actor_did: self._fields.0.unwrap(),
             category: self._fields.1.unwrap(),
             created_at: self._fields.2.unwrap(),
-            id: self._fields.3.unwrap(),
-            issue_at: self._fields.4,
-            pull_at: self._fields.5,
-            read: self._fields.6.unwrap(),
-            repo_did: self._fields.7,
-            r#type: self._fields.8.unwrap(),
+            issue_at: self._fields.3,
+            pull_at: self._fields.4,
+            read: self._fields.5.unwrap(),
+            repo_did: self._fields.6,
+            r#type: self._fields.7.unwrap(),
+            uri: self._fields.8.unwrap(),
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_org_tangled_temp_notification_listNotifications() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.tangled.temp.notification.listNotifications"),
@@ -632,44 +652,50 @@ fn lexicon_doc_org_tangled_temp_notification_listNotifications() -> LexiconDoc<'
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("category"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Filter by category: 'all', 'social', or 'work'.",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("read"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Filter by read state: 'all' or 'unread'.",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("category"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Filter by category: 'all', 'social', or 'work'.",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("read"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Filter by read state: 'all' or 'unread'.",
+                                            ),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -678,7 +704,7 @@ fn lexicon_doc_org_tangled_temp_notification_listNotifications() -> LexiconDoc<'
                 LexUserType::Object(LexObject {
                     required: Some(
                         vec![
-                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("uri"), SmolStr::new_static("type"),
                             SmolStr::new_static("category"),
                             SmolStr::new_static("actorDid"), SmolStr::new_static("read"),
                             SmolStr::new_static("createdAt")
@@ -712,12 +738,6 @@ fn lexicon_doc_org_tangled_temp_notification_listNotifications() -> LexiconDoc<'
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
                                 format: Some(LexStringFormat::Datetime),
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("id"),
-                            LexObjectProperty::Integer(LexInteger {
                                 ..Default::default()
                             }),
                         );
@@ -771,6 +791,18 @@ fn lexicon_doc_org_tangled_temp_notification_listNotifications() -> LexiconDoc<'
                                         "Notification type: repo_starred, issue_created, issue_commented, issue_closed, issue_reopen, issue_assigned, issue_unassigned, pull_created, pull_commented, pull_merged, pull_closed, pull_reopen, pull_assigned, pull_unassigned, followed, user_mentioned.",
                                     ),
                                 ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("uri"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "at-uri of this notification; the stable key for read/unread state.",
+                                    ),
+                                ),
+                                format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
                         );

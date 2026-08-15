@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,34 +25,40 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::place_wisp::fs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_wisp::fs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Directory<S: BosStr = DefaultStr> {
     pub entries: Vec<fs::Entry<S>>,
     pub r#type: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_directory_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Entry<S: BosStr = DefaultStr> {
     pub name: S,
     pub node: EntryNode<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_entry_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -66,11 +72,9 @@ pub enum EntryNode<S: BosStr = DefaultStr> {
     Subfs(Box<fs::Subfs<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct File<S: BosStr = DefaultStr> {
     ///True if blob content is base64-encoded (used to bypass PDS content sniffing)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -84,7 +88,12 @@ pub struct File<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mime_type: Option<S>,
     pub r#type: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_file_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -103,7 +112,12 @@ pub struct Fs<S: BosStr = DefaultStr> {
     pub file_count: Option<i64>,
     pub root: fs::Directory<S>,
     pub site: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_fs_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -118,11 +132,9 @@ pub struct FsGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Fs<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Subfs<S: BosStr = DefaultStr> {
     ///If true, the subfs record's root entries are merged (flattened) into the parent directory, replacing the subfs entry. If false (default), the subfs entries are placed in a subdirectory with the subfs entry's name. Flat merging is useful for splitting large directories across multiple records while maintaining a flat structure.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -130,7 +142,12 @@ pub struct Subfs<S: BosStr = DefaultStr> {
     ///AT-URI pointing to a place.wisp.subfs record containing this subtree.
     pub subject: AtUri<S>,
     pub r#type: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_subfs_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -221,16 +238,19 @@ impl<S: BosStr> LexiconSchema for File<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -319,9 +339,22 @@ impl<S: BosStr> LexiconSchema for Subfs<S> {
     }
 }
 
+fn deserialize_directory_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod directory_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -459,7 +492,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Directory<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Directory<S> {
         Directory {
             entries: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -469,10 +505,10 @@ where
 }
 
 fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.wisp.fs"),
@@ -481,10 +517,9 @@ fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("directory"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("entries"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("type"), SmolStr::new_static("entries")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -501,9 +536,7 @@ fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -513,10 +546,9 @@ fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("entry"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("node"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("node")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -533,7 +565,7 @@ fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#file"),
                                     CowStr::new_static("#directory"),
-                                    CowStr::new_static("#subfs"),
+                                    CowStr::new_static("#subfs")
                                 ],
                                 ..Default::default()
                             }),
@@ -546,10 +578,9 @@ fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("file"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("blob"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("type"), SmolStr::new_static("blob")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -561,33 +592,31 @@ fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("encoding"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content encoding (e.g., gzip for compressed files)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Content encoding (e.g., gzip for compressed files)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("mimeType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Original MIME type before compression",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Original MIME type before compression"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -597,15 +626,16 @@ fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Virtual filesystem manifest for a Wisp site",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Virtual filesystem manifest for a Wisp site"),
+                    ),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("site"),
-                            SmolStr::new_static("root"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("site"), SmolStr::new_static("root"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -686,9 +716,22 @@ fn lexicon_doc_place_wisp_fs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_entry_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -779,7 +822,10 @@ where
     St::Name: entry_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> EntryBuilder<entry_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> EntryBuilder<entry_state::SetName<St>, S> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -832,9 +878,22 @@ where
     }
 }
 
+fn deserialize_file_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod file_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -879,13 +938,7 @@ pub mod file_state {
 /// Builder for constructing an instance of this type.
 pub struct FileBuilder<St: file_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<bool>,
-        Option<BlobRef<S>>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-    ),
+    _fields: (Option<bool>, Option<BlobRef<S>>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -944,7 +997,10 @@ where
     St::Blob: file_state::IsUnset,
 {
     /// Set the `blob` field (required)
-    pub fn blob(mut self, value: impl Into<BlobRef<S>>) -> FileBuilder<file_state::SetBlob<St>, S> {
+    pub fn blob(
+        mut self,
+        value: impl Into<BlobRef<S>>,
+    ) -> FileBuilder<file_state::SetBlob<St>, S> {
         self._fields.1 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -986,7 +1042,10 @@ where
     St::Type: file_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(mut self, value: impl Into<S>) -> FileBuilder<file_state::SetType<St>, S> {
+    pub fn r#type(
+        mut self,
+        value: impl Into<S>,
+    ) -> FileBuilder<file_state::SetType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -1026,9 +1085,28 @@ where
     }
 }
 
+fn deserialize_fs_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod fs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1087,12 +1165,7 @@ pub mod fs_state {
 /// Builder for constructing an instance of this type.
 pub struct FsBuilder<St: fs_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<i64>,
-        Option<fs::Directory<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<Datetime>, Option<i64>, Option<fs::Directory<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1228,9 +1301,22 @@ where
     }
 }
 
+fn deserialize_subfs_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod subfs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1353,7 +1439,10 @@ where
     St::Type: subfs_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(mut self, value: impl Into<S>) -> SubfsBuilder<subfs_state::SetType<St>, S> {
+    pub fn r#type(
+        mut self,
+        value: impl Into<S>,
+    ) -> SubfsBuilder<subfs_state::SetType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SubfsBuilder {
             _state: PhantomData,

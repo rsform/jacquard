@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,27 +25,29 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::ch_indiemusi::alpha::actor::artist;
-use crate::ch_indiemusi::alpha::actor::master_owner::MasterOwner;
-use crate::ch_indiemusi::alpha::recording;
-use crate::ch_indiemusi::alpha::song::Song;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ch_indiemusi::alpha::actor::master_owner::MasterOwner;
+use crate::ch_indiemusi::alpha::song::Song;
+use crate::ch_indiemusi::alpha::actor::artist;
+use crate::ch_indiemusi::alpha::recording;
 /// Information about an artist contributing to the recording
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Artist<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist: Option<artist::Artist<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
     pub name: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_artist_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -73,7 +75,12 @@ pub struct Recording<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub song: Option<Song<S>>,
     pub title: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_recording_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -91,10 +98,7 @@ pub struct RecordingGetRecordOutput<S: BosStr = DefaultStr> {
 /// Information about the master owner
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MasterOwnerInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
@@ -102,7 +106,12 @@ pub struct MasterOwnerInfo<S: BosStr = DefaultStr> {
     pub master_owner: Option<MasterOwner<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_master_owner_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -237,11 +246,24 @@ impl<S: BosStr> LexiconSchema for MasterOwnerInfo<S> {
     }
 }
 
+fn deserialize_artist_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.recording"),
@@ -250,9 +272,11 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("artist"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Information about an artist contributing to the recording",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Information about an artist contributing to the recording",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("name")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -260,7 +284,9 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("artist"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("ch.indiemusi.alpha.actor.artist"),
+                                r#ref: CowStr::new_static(
+                                    "ch.indiemusi.alpha.actor.artist",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -365,7 +391,9 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("masterOwnerInfo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Information about the master owner")),
+                    description: Some(
+                        CowStr::new_static("Information about the master owner"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -379,7 +407,9 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("masterOwner"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("ch.indiemusi.alpha.actor.masterOwner"),
+                                r#ref: CowStr::new_static(
+                                    "ch.indiemusi.alpha.actor.masterOwner",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -401,9 +431,28 @@ fn lexicon_doc_ch_indiemusi_alpha_recording() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_recording_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod recording_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -556,12 +605,18 @@ impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
 
 impl<St: recording_state::State, S: BosStr> RecordingBuilder<St, S> {
     /// Set the `masterOwner` field (optional)
-    pub fn master_owner(mut self, value: impl Into<Option<recording::MasterOwnerInfo<S>>>) -> Self {
+    pub fn master_owner(
+        mut self,
+        value: impl Into<Option<recording::MasterOwnerInfo<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `masterOwner` field to an Option value (optional)
-    pub fn maybe_master_owner(mut self, value: Option<recording::MasterOwnerInfo<S>>) -> Self {
+    pub fn maybe_master_owner(
+        mut self,
+        value: Option<recording::MasterOwnerInfo<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -619,7 +674,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Recording<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Recording<S> {
         Recording {
             artists: self._fields.0.unwrap(),
             audio_file: self._fields.1,
@@ -631,4 +689,17 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_master_owner_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

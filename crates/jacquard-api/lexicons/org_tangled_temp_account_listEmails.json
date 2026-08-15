@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.account.listEmails",
+  "defs": {
+    "email": {
+      "type": "object",
+      "required": [
+        "address",
+        "verified",
+        "primary",
+        "createdAt"
+      ],
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "Email address."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "Whether this is the primary email address."
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Whether the address has been verified."
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "List all email addresses associated with the authenticated account.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "emails"
+          ],
+          "properties": {
+            "emails": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#email"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -74,7 +74,7 @@
     },
     "main": {
       "type": "record",
-      "description": "Consolidated achievement record. Replaces 30 beta achievement lexicons. rkey is the achievement ID (e.g. followers2500, level50). Created once with createRecord when achievement is unlocked. Immutable.",
+      "description": "DEPRECATED - superseded by net.anisota.chronicle.milestone. No new records are written to this collection; the schema is kept because earlier records still exist on users' PDSes and remain readable. rkey is the achievement ID (e.g. followers2500, level50). Immutable.",
       "key": "any",
       "record": {
         "type": "object",

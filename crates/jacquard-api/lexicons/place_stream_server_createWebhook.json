@@ -33,7 +33,8 @@
                   "chat",
                   "livestream",
                   "follow",
-                  "mention"
+                  "mention",
+                  "stream.received"
                 ]
               }
             },

@@ -1,0 +1,129 @@
+# Private per-run e2e topology. The lifecycle controller (scripts/e2e.sh)
+# generates a per-run override that pins provider images to resolved digests
+# and injects run coordinates. Provider PDS ports are not published.
+#
+# Services attach to Docker's default bridge because the native ingress must be
+# reachable through this host's docker0 gateway. Service IPs are discovered
+# after start; unique project, volume, and artifact names keep runs separate.
+#
+# Profiles: `tranquil` (PDS + Postgres), `reference` (spaces-alpha PDS only).
+name: ${E2E_RUN_ID}
+
+services:
+  # Digest-pinned fixture DNS. A records for fixture hostnames point at the
+  # TCP passthrough below, which forwards to the native ingress on docker0.
+  # Unknown names return NXDOMAIN; this keeps provider resolution inside the
+  # fixture namespace even though the Docker bridge itself is shared.
+  # webproc hot-reloads the mounted config when the controller rewrites it
+  # after discovering service IPs.
+  e2e-dns:
+    image: jpillora/dnsmasq@sha256:98b69ad825942089fb7c4b9153e3c5af0205eda3a103c691e30b1a13fd912830
+    profiles: ["tranquil", "reference"]
+    network_mode: bridge
+    entrypoint: ["dnsmasq", "--no-daemon", "--conf-file=/etc/dnsmasq.conf"]
+    volumes:
+      - ${E2E_FIXTURE_ROOT}/dnsmasq.conf:/etc/dnsmasq.conf:ro
+
+  # did:web resolution always targets port 443, and the host's own reverse
+  # proxy owns 0.0.0.0:443. This passthrough owns 443 on its own bridge
+  # address and forwards raw TCP to the native ingress; TLS still terminates
+  # at the ingress with the per-run CA, so no certificate material exists
+  # inside the bridge.
+  e2e-ingress-proxy:
+    image: alpine/socat@sha256:3ed1cd38741bd445ebffa3aecb9d80c46a83db45f5b5ef03332976c7ca9814af
+    profiles: ["tranquil", "reference"]
+    network_mode: bridge
+    # The image entrypoint is `socat`, so a multi-process form needs an
+    # explicit shell entrypoint. Forwards 443 → native ingress TLS (did:web
+    # + PDS service endpoint) and 80 → the ingress HTTP listener
+    # (Tranquil's localhost-prefix did:web exception fetches plain HTTP on
+    # the default port).
+    entrypoint: ["sh", "-c"]
+    command:
+      - socat tcp-listen:443,fork,reuseaddr tcp-connect:${E2E_GATEWAY}:${E2E_INGRESS_PORT} &
+        socat tcp-listen:80,fork,reuseaddr tcp-connect:${E2E_GATEWAY}:${E2E_INGRESS_HTTP_PORT} &
+        wait
+
+  # Reference PDS (spaces-alpha). Resolved digest injected by the controller.
+  reference-pds:
+    image: ${E2E_REFERENCE_IMAGE}
+    profiles: ["reference"]
+    network_mode: bridge
+    dns: ${E2E_DNS_IP}
+    environment:
+      PDS_HOSTNAME: pds.reference.jacquard-e2e.test
+      PDS_ADMIN_PASSWORD: ${E2E_REFERENCE_ADMIN_PASSWORD}
+      PDS_SERVICE_DID: did:web:pds.reference.jacquard-e2e.test
+      PDS_DATA_DIRECTORY: /app/data
+      PDS_BLOBSTORE_DISK_LOCATION: /app/data/blobs
+      PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX: ${E2E_REFERENCE_ROTATION_KEY}
+      PDS_JWT_SECRET: ${E2E_REFERENCE_JWT_SECRET}
+      PDS_INVITE_REQUIRED: "false"
+      # The bootstrap rotates the DID document; with default cache TTLs the
+      # PDS would keep serving the pre-rotation copy for minutes.
+      PDS_DID_CACHE_STALE_TTL: "1"
+      PDS_DID_CACHE_MAX_TTL: "2"
+      # The OAuth client-metadata fetch is SSRF-guarded against private
+      # addresses; the fixture ingress is intentionally local to this test
+      # topology, so the provider's test configuration disables that guard.
+      PDS_DISABLE_SSRF_PROTECTION: "true"
+      # Space-scope validation resolves the space type's lexicon declaration
+      # from this authority DID (skips `_lexicon.*` DNS; the declaration
+      # record itself is published into that identity's repo by the scenario).
+      PDS_LEXICON_AUTHORITY_DID: did:web:reference-identity.jacquard-e2e.test
+      NODE_EXTRA_CA_CERTS: /fixtures/e2e-ca.pem
+      LOG_LEVEL: "info"
+      LOG_ENABLED: "true"
+      LOG_DESTINATION: "2"
+    volumes:
+      - reference-data:/app/data
+      - ${E2E_FIXTURE_ROOT}:/fixtures:ro
+
+  # Tranquil PDS. Resolved digest injected by the controller. The database
+  # address is injected from the discovered tranquil-db container IP (no
+  # docker DNS on the default bridge); the controller starts the database
+  # first.
+  tranquil-pds:
+    image: ${E2E_TRANQUIL_IMAGE}
+    profiles: ["tranquil"]
+    network_mode: bridge
+    dns: ${E2E_DNS_IP}
+    environment:
+      PDS_HOSTNAME: pds.tranquil.jacquard-e2e.test
+      SERVER_HOST: 0.0.0.0
+      SERVER_PORT: "3000"
+      PDS_USER_HANDLE_DOMAINS: tranquil.jacquard-e2e.test
+      DATABASE_URL: ${E2E_TRANQUIL_DATABASE_URL}
+      JWT_SECRET: ${E2E_TRANQUIL_JWT_SECRET}
+      DPOP_SECRET: ${E2E_TRANQUIL_DPOP_SECRET}
+      MASTER_KEY: ${E2E_TRANQUIL_MASTER_KEY}
+      TRANQUIL_PDS_ALLOW_INSECURE_SECRETS: "true"
+      INVITE_CODE_REQUIRED: "false"
+      DISABLE_RATE_LIMITING: "true"
+      DISABLE_ACCOUNT_VERIFICATION_GATE: "true"
+      ALLOW_HTTP_PROXY: "true"
+      PLC_DIRECTORY_URL: http://plc.invalid
+      CRAWLERS: ""
+    volumes:
+      - tranquil-blobs:/var/lib/tranquil-pds/blobs
+
+  tranquil-db:
+    image: postgres@sha256:18cfe3ef5e6815560c98237d6216d1e5119702fb0f3894c8785dd58b8bbe5d73
+    profiles: ["tranquil"]
+    network_mode: bridge
+    environment:
+      POSTGRES_USER: tranquil
+      POSTGRES_PASSWORD: tranquil
+      POSTGRES_DB: tranquil
+    volumes:
+      - tranquil-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tranquil"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  reference-data:
+  tranquil-blobs:
+  tranquil-db:

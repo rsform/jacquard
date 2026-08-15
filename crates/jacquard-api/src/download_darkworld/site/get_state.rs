@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,16 +20,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::download_darkworld::site::get_state;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::download_darkworld::site::get_state;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetStateOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -37,11 +34,9 @@ pub struct GetStateOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Output<S: BosStr = DefaultStr> {
     pub favorite_albums: Vec<S>,
     pub favorite_artists: Vec<S>,
@@ -51,7 +46,12 @@ pub struct Output<S: BosStr = DefaultStr> {
     pub title_colors: OutputTitleColors<S>,
     ///Whether to show Susie instead of Kris in prophecy content.
     pub use_susie_prophecy: bool,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_output_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -167,6 +167,12 @@ impl jacquard_common::xrpc::XrpcRequest for GetState {
     const NSID: &'static str = "download.darkworld.site.getState";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStateResponse;
+    fn encode_body(
+        &self,
+        _buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+        Ok(())
+    }
 }
 
 /** Endpoint marker for the `download.darkworld.site.getState` query.
@@ -195,9 +201,22 @@ impl<S: BosStr> LexiconSchema for Output<S> {
     }
 }
 
+fn deserialize_output_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod output_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -246,7 +265,9 @@ pub mod output_state {
         type UseSusieProphecy = St::UseSusieProphecy;
     }
     ///State transition - sets the `favorite_deltarune_characters` field to Set
-    pub struct SetFavoriteDeltaruneCharacters<St: State = Empty>(PhantomData<fn() -> St>);
+    pub struct SetFavoriteDeltaruneCharacters<St: State = Empty>(
+        PhantomData<fn() -> St>,
+    );
     impl<St: State> sealed::Sealed for SetFavoriteDeltaruneCharacters<St> {}
     impl<St: State> State for SetFavoriteDeltaruneCharacters<St> {
         type FavoriteAlbums = St::FavoriteAlbums;
@@ -508,10 +529,10 @@ where
 }
 
 fn lexicon_doc_download_darkworld_site_getState() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("download.darkworld.site.getState"),
@@ -527,14 +548,16 @@ fn lexicon_doc_download_darkworld_site_getState() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("output"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("useSusieProphecy"),
-                        SmolStr::new_static("titleColors"),
-                        SmolStr::new_static("favoriteGames"),
-                        SmolStr::new_static("favoriteArtists"),
-                        SmolStr::new_static("favoriteAlbums"),
-                        SmolStr::new_static("favoriteDeltaruneCharacters"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("useSusieProphecy"),
+                            SmolStr::new_static("titleColors"),
+                            SmolStr::new_static("favoriteGames"),
+                            SmolStr::new_static("favoriteArtists"),
+                            SmolStr::new_static("favoriteAlbums"),
+                            SmolStr::new_static("favoriteDeltaruneCharacters")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -577,9 +600,9 @@ fn lexicon_doc_download_darkworld_site_getState() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("titleColors"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Named title color mode for the site.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Named title color mode for the site."),
+                                ),
                                 ..Default::default()
                             }),
                         );

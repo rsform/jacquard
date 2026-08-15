@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Handle, UriValue};
+use jacquard_common::types::string::{Handle, AtUri, Cid, UriValue};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A declaration of a Tangled account profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,7 +62,12 @@ pub struct Profile<S: BosStr = DefaultStr> {
     pub pronouns: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stats: Option<Vec<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_profile_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -137,20 +142,25 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -284,9 +294,28 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
     }
 }
 
+fn deserialize_profile_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -530,10 +559,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_actor_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.actor.profile"),

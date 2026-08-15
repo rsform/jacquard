@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An entry marking a show as a favorite.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -40,7 +40,12 @@ pub struct Favorite<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///The AT-URI of the haus.opn.mic.show record.
     pub subject: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_favorite_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -103,9 +108,28 @@ impl<S: BosStr> LexiconSchema for Favorite<S> {
     }
 }
 
+fn deserialize_favorite_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod favorite_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -253,10 +277,10 @@ where
 }
 
 fn lexicon_doc_haus_opn_mic_show_favorite() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("haus.opn.mic.show.favorite"),
@@ -265,13 +289,17 @@ fn lexicon_doc_haus_opn_mic_show_favorite() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("An entry marking a show as a favorite.")),
+                    description: Some(
+                        CowStr::new_static("An entry marking a show as a favorite."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subject"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -285,9 +313,11 @@ fn lexicon_doc_haus_opn_mic_show_favorite() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("subject"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The AT-URI of the haus.opn.mic.show record.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The AT-URI of the haus.opn.mic.show record.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

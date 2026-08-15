@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A song included in a game hosting leaderboards via Tsunagite.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -59,7 +59,12 @@ pub struct Song<S: BosStr = DefaultStr> {
     pub subtitle: Option<Data<S>>,
     ///The human-readable title of this song in UI. Translations will typically be listed alongside the default.
     pub title: Data<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_song_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -133,25 +138,31 @@ impl<S: BosStr> LexiconSchema for Song<S> {
         if let Some(ref value) = self.jacket {
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/jxl", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/jxl",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("jacket"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/jxl".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/jxl".to_string(), "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -162,9 +173,28 @@ impl<S: BosStr> LexiconSchema for Song<S> {
     }
 }
 
+fn deserialize_song_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod song_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -381,7 +411,10 @@ where
     St::Title: song_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<Data<S>>) -> SongBuilder<song_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> SongBuilder<song_state::SetTitle<St>, S> {
         self._fields.7 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
@@ -429,10 +462,10 @@ where
 }
 
 fn lexicon_doc_dev_tsunagite_song() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.tsunagite.song"),

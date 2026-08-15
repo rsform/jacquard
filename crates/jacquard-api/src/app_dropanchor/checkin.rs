@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +25,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_dropanchor::checkin;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_dropanchor::checkin;
 /// Street address (based on community.lexicon.location.address)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Address<S: BosStr = DefaultStr> {
     ///The ISO 3166 country code (preferably 2-letter)
     pub country: S,
@@ -54,17 +51,19 @@ pub struct Address<S: BosStr = DefaultStr> {
     ///The street address
     #[serde(skip_serializing_if = "Option::is_none")]
     pub street: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_address_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Image attachment with thumbnail and full-size versions
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CheckinImage<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,17 +72,19 @@ pub struct CheckinImage<S: BosStr = DefaultStr> {
     pub fullsize: BlobRef<S>,
     ///Thumbnail version (max 800px width, ~300KB)
     pub thumb: BlobRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_checkin_image_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Foursquare venue data (based on community.lexicon.location.fsq)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FsqPlace<S: BosStr = DefaultStr> {
     ///The unique identifier of a Foursquare POI
     pub fsq_place_id: S,
@@ -96,17 +97,19 @@ pub struct FsqPlace<S: BosStr = DefaultStr> {
     ///The name of the location
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_fsq_place_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Geographic coordinates in WGS84 (based on community.lexicon.location.geo)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Geo<S: BosStr = DefaultStr> {
     ///Altitude in meters
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -118,7 +121,12 @@ pub struct Geo<S: BosStr = DefaultStr> {
     ///Name of the location
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_geo_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -155,7 +163,12 @@ pub struct Checkin<S: BosStr = DefaultStr> {
     pub image: Option<checkin::CheckinImage<S>>,
     ///The check-in message or note
     pub text: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_checkin_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -302,23 +315,25 @@ impl<S: BosStr> LexiconSchema for CheckinImage<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/jpeg", "image/png", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("fullsize"),
                         accepted: vec![
-                            "image/jpeg".to_string(),
-                            "image/png".to_string(),
-                            "image/webp".to_string(),
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -343,23 +358,25 @@ impl<S: BosStr> LexiconSchema for CheckinImage<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/jpeg", "image/png", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
                         accepted: vec![
-                            "image/jpeg".to_string(),
-                            "image/png".to_string(),
-                            "image/webp".to_string(),
+                            "image/jpeg".to_string(), "image/png".to_string(),
+                            "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -566,11 +583,24 @@ impl<S: BosStr> LexiconSchema for Checkin<S> {
     }
 }
 
+fn deserialize_address_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.dropanchor.checkin"),
@@ -579,9 +609,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("address"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Street address (based on community.lexicon.location.address)",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Street address (based on community.lexicon.location.address)",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("country")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -589,9 +621,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("country"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The ISO 3166 country code (preferably 2-letter)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The ISO 3166 country code (preferably 2-letter)",
+                                    ),
+                                ),
                                 min_length: Some(2usize),
                                 max_length: Some(10usize),
                                 ..Default::default()
@@ -600,9 +634,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("locality"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The locality (city, town, etc.)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The locality (city, town, etc.)"),
+                                ),
                                 max_length: Some(200usize),
                                 ..Default::default()
                             }),
@@ -610,7 +644,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The name of the location")),
+                                description: Some(
+                                    CowStr::new_static("The name of the location"),
+                                ),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -626,9 +662,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("region"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The administrative region (state, province, etc.)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The administrative region (state, province, etc.)",
+                                    ),
+                                ),
                                 max_length: Some(200usize),
                                 ..Default::default()
                             }),
@@ -649,35 +687,36 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("checkinImage"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Image attachment with thumbnail and full-size versions",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("thumb"),
-                        SmolStr::new_static("fullsize"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Image attachment with thumbnail and full-size versions",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("thumb"), SmolStr::new_static("fullsize")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Alt text for accessibility")),
+                                description: Some(
+                                    CowStr::new_static("Alt text for accessibility"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("fullsize"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("thumb"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -687,9 +726,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("fsqPlace"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Foursquare venue data (based on community.lexicon.location.fsq)",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Foursquare venue data (based on community.lexicon.location.fsq)",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("fsqPlaceId")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -697,9 +738,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("fsqPlaceId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of a Foursquare POI",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The unique identifier of a Foursquare POI",
+                                    ),
+                                ),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -707,9 +750,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("latitude"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Latitude in decimal degrees",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Latitude in decimal degrees"),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -717,9 +760,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("longitude"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Longitude in decimal degrees",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Longitude in decimal degrees"),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -727,7 +770,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The name of the location")),
+                                description: Some(
+                                    CowStr::new_static("The name of the location"),
+                                ),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -740,13 +785,17 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("geo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Geographic coordinates in WGS84 (based on community.lexicon.location.geo)",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("latitude"),
-                        SmolStr::new_static("longitude"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Geographic coordinates in WGS84 (based on community.lexicon.location.geo)",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("latitude"),
+                            SmolStr::new_static("longitude")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -761,9 +810,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("latitude"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Latitude in decimal degrees (range: -90 to 90)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Latitude in decimal degrees (range: -90 to 90)",
+                                    ),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -771,9 +822,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("longitude"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Longitude in decimal degrees (range: -180 to 180)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Longitude in decimal degrees (range: -180 to 180)",
+                                    ),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -781,7 +834,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Name of the location")),
+                                description: Some(
+                                    CowStr::new_static("Name of the location"),
+                                ),
                                 max_length: Some(500usize),
                                 ..Default::default()
                             }),
@@ -794,17 +849,20 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A location check-in record for the Anchor app",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A location check-in record for the Anchor app",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("text"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("address"),
-                            SmolStr::new_static("geo"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("text"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("address"), SmolStr::new_static("geo")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -818,9 +876,11 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("category"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Place category (e.g., cafe, restaurant)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Place category (e.g., cafe, restaurant)",
+                                        ),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -828,9 +888,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("categoryGroup"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Category group for organization",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Category group for organization"),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -838,9 +898,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("categoryIcon"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Emoji icon for the category",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Emoji icon for the category"),
+                                    ),
                                     max_length: Some(10usize),
                                     ..Default::default()
                                 }),
@@ -848,9 +908,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the check-in was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When the check-in was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -879,9 +939,9 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("text"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The check-in message or note",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The check-in message or note"),
+                                    ),
                                     max_length: Some(3000usize),
                                     ..Default::default()
                                 }),
@@ -899,9 +959,22 @@ fn lexicon_doc_app_dropanchor_checkin() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_checkin_image_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod checkin_image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1053,7 +1126,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CheckinImage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CheckinImage<S> {
         CheckinImage {
             alt: self._fields.0,
             fullsize: self._fields.1.unwrap(),
@@ -1063,9 +1139,54 @@ where
     }
 }
 
+fn deserialize_fsq_place_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_geo_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_checkin_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod checkin_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1318,7 +1439,10 @@ where
     St::Text: checkin_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> CheckinBuilder<checkin_state::SetText<St>, S> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> CheckinBuilder<checkin_state::SetText<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,

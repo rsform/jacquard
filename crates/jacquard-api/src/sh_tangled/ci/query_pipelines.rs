@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_tangled::ci::pipeline::Pipeline;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::ci::pipeline::Pipeline;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryPipelines<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub commits: Option<Vec<S>>,
@@ -37,11 +34,9 @@ pub struct QueryPipelines<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryPipelinesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -52,9 +47,18 @@ pub struct QueryPipelinesOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum QueryPipelinesError {
     /// Invalid request parameters
@@ -62,10 +66,7 @@ pub enum QueryPipelinesError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for QueryPipelinesError {
@@ -123,7 +124,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod query_pipelines_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -154,15 +155,12 @@ pub mod query_pipelines_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct QueryPipelinesBuilder<St: query_pipelines_state::State, S: BosStr = DefaultStr> {
+pub struct QueryPipelinesBuilder<
+    St: query_pipelines_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Vec<S>>,
-        Option<S>,
-        Option<Vec<S>>,
-        Option<i64>,
-        Option<Did<S>>,
-    ),
+    _fields: (Option<Vec<S>>, Option<S>, Option<Vec<S>>, Option<i64>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 

@@ -4,15 +4,13 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Create a new moderation queue. Will fail if the queue configuration conflicts with an existing queue.",
+      "description": "Create a new moderation queue. A queue can have optional matching criteria that ozone's queue router will use to match reports. A queue with no criteria must have reports assigned to it manually via (1) `modTool.meta.queueId` in `tools.ozone.moderation.emitEvent` or (2) `tools.ozone.report.reassignQueue`.",
       "input": {
         "encoding": "application/json",
         "schema": {
           "type": "object",
           "required": [
-            "name",
-            "subjectTypes",
-            "reportTypes"
+            "name"
           ],
           "properties": {
             "collection": {
@@ -28,13 +26,19 @@
               "type": "string",
               "description": "Display name for the queue (must be unique)"
             },
+            "recommendedPolicies": {
+              "type": "array",
+              "description": "Policy keys to recommend when actioning reports in this queue",
+              "items": {
+                "type": "string"
+              }
+            },
             "reportTypes": {
               "type": "array",
               "description": "Report reason types (fully qualified NSIDs)",
               "items": {
                 "type": "string"
               },
-              "minLength": 1,
               "maxLength": 25
             },
             "subjectTypes": {
@@ -45,10 +49,10 @@
                 "knownValues": [
                   "account",
                   "record",
-                  "message"
+                  "message",
+                  "conversation"
                 ]
-              },
-              "minLength": 1
+              }
             }
           }
         }
@@ -69,6 +73,10 @@
         }
       },
       "errors": [
+        {
+          "description": "One or more recommended policy keys do not exist in the configured policy list",
+          "name": "InvalidRecommendedPolicies"
+        },
         {
           "description": "The queue configuration conflicts with an existing queue",
           "name": "ConflictingQueue"

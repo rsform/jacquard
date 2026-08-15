@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// An item in a collection linking to a post
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -46,7 +46,12 @@ pub struct CollectionItem<S: BosStr = DefaultStr> {
     pub order: Option<i64>,
     ///Reference to the post
     pub post: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_collection_item_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -118,9 +123,28 @@ impl<S: BosStr> LexiconSchema for CollectionItem<S> {
     }
 }
 
+fn deserialize_collection_item_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod collection_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -177,14 +201,12 @@ pub mod collection_item_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CollectionItemBuilder<St: collection_item_state::State, S: BosStr = DefaultStr> {
+pub struct CollectionItemBuilder<
+    St: collection_item_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<StrongRef<S>>,
-        Option<Datetime>,
-        Option<i64>,
-        Option<StrongRef<S>>,
-    ),
+    _fields: (Option<StrongRef<S>>, Option<Datetime>, Option<i64>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -312,7 +334,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CollectionItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollectionItem<S> {
         CollectionItem {
             collection: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -324,10 +349,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_kaku_collectionItem() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.kaku.collectionItem"),
@@ -336,16 +361,18 @@ fn lexicon_doc_tech_tokimeki_kaku_collectionItem() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "An item in a collection linking to a post",
-                    )),
+                    description: Some(
+                        CowStr::new_static("An item in a collection linking to a post"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("collection"),
-                            SmolStr::new_static("post"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("collection"),
+                                SmolStr::new_static("post"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

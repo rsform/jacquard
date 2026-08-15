@@ -35,6 +35,10 @@
           "type": "ref",
           "ref": "#bskyAppProgressGuide"
         },
+        "isBetaUser": {
+          "type": "boolean",
+          "description": "Indicates if the user is participating in the beta features program."
+        },
         "nuxs": {
           "type": "array",
           "description": "Storage for NUXs the user has encountered.",
@@ -968,11 +972,20 @@
           "ref": "#knownFollowers"
         },
         "muted": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Whether the account is fully muted, directly or via a mutelist. False when the mute is scoped to specific kinds; see mutedOnlyReposts and mutedOnlyQuoteposts."
         },
         "mutedByList": {
           "type": "ref",
           "ref": "app.bsky.graph.defs#listViewBasic"
+        },
+        "mutedOnlyQuoteposts": {
+          "type": "boolean",
+          "description": "Whether the account's quote posts are muted. Scoped mutes are exclusive with muted: this can be true while muted is false. If muted is true, this will be false."
+        },
+        "mutedOnlyReposts": {
+          "type": "boolean",
+          "description": "Whether the account's reposts are muted. Scoped mutes are exclusive with muted: this can be true while muted is false. If muted is true, this will be false."
         }
       }
     }

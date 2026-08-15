@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.knot.ban",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Block an account from creating repositories or pushing on this knot",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "subject"
+          ],
+          "properties": {
+            "subject": {
+              "type": "string",
+              "description": "DID of the account to block",
+              "format": "did"
+            }
+          }
+        }
+      }
+    }
+  }
+}

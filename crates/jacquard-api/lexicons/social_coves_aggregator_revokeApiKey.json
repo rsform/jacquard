@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.revokeApiKey",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Revoke the authenticated aggregator's API key. After revocation, the aggregator must complete OAuth flow again to create a new API key. This action cannot be undone.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "No input required. Revokes the key for the authenticated aggregator.",
+          "properties": {}
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "revokedAt"
+          ],
+          "properties": {
+            "revokedAt": {
+              "type": "string",
+              "description": "ISO8601 timestamp when the key was revoked",
+              "format": "datetime"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Authentication is required to revoke an API key",
+          "name": "AuthenticationRequired"
+        },
+        {
+          "description": "Only registered aggregators can revoke API keys",
+          "name": "AggregatorRequired"
+        },
+        {
+          "description": "Aggregator not found",
+          "name": "AggregatorNotFound"
+        },
+        {
+          "description": "No API key exists to revoke",
+          "name": "ApiKeyNotFound"
+        },
+        {
+          "description": "API key has already been revoked",
+          "name": "ApiKeyAlreadyRevoked"
+        },
+        {
+          "description": "Failed to revoke the API key",
+          "name": "RevocationFailed"
+        }
+      ]
+    }
+  }
+}

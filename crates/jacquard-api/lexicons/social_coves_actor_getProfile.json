@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.actor.getProfile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a user's profile with aggregated statistics",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "DID or handle of the user",
+            "format": "at-identifier"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "description": "Detailed profile view with stats and viewer state",
+          "ref": "social.coves.actor.defs#profileViewDetailed"
+        }
+      }
+    }
+  }
+}

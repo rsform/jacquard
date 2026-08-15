@@ -8,12 +8,13 @@
 //! Generated bindings for the `app.greengale.blog` Lexicon namespace/module.
 pub mod entry;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,17 +26,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_greengale::blog;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_greengale::blog;
 /// Metadata for uploaded binary content
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlobMetadata<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,17 +46,19 @@ pub struct BlobMetadata<S: BosStr = DefaultStr> {
     ///Original filename
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_blob_metadata_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Custom color values (CSS color strings)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CustomColors<S: BosStr = DefaultStr> {
     ///Accent/link color
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -72,17 +72,19 @@ pub struct CustomColors<S: BosStr = DefaultStr> {
     ///Primary text color
     #[serde(skip_serializing_if = "Option::is_none")]
     pub text: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_custom_colors_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Open Graph Protocol metadata for social sharing
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Ogp<S: BosStr = DefaultStr> {
     ///Image height in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,44 +94,50 @@ pub struct Ogp<S: BosStr = DefaultStr> {
     ///Image width in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_ogp_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata tag on an atproto resource, published by the author
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SelfLabel<S: BosStr = DefaultStr> {
     ///The short string name of the value or type of this label
     pub val: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_self_label_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata tags on an atproto resource, published by the author
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SelfLabels<S: BosStr = DefaultStr> {
     pub values: Vec<blog::SelfLabel<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_self_labels_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Theme configuration for a blog entry
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Theme<S: BosStr = DefaultStr> {
     ///Custom color overrides
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -137,17 +145,19 @@ pub struct Theme<S: BosStr = DefaultStr> {
     ///Predefined color theme
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preset: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_theme_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Voice theme configuration for TTS playback
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VoiceTheme<S: BosStr = DefaultStr> {
     ///Pitch multiplier x100 (100 = normal, range 50-150)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -158,7 +168,12 @@ pub struct VoiceTheme<S: BosStr = DefaultStr> {
     ///Voice ID for TTS (e.g., 'af_heart', 'am_adam')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub voice: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_voice_theme_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -188,16 +203,19 @@ impl<S: BosStr> LexiconSchema for BlobMetadata<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blobref"),
@@ -404,9 +422,22 @@ impl<S: BosStr> LexiconSchema for VoiceTheme<S> {
     }
 }
 
+fn deserialize_blob_metadata_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod blob_metadata_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -439,12 +470,7 @@ pub mod blob_metadata_state {
 /// Builder for constructing an instance of this type.
 pub struct BlobMetadataBuilder<St: blob_metadata_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<BlobRef<S>>,
-        Option<blog::SelfLabels<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<BlobRef<S>>, Option<blog::SelfLabels<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -558,7 +584,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlobMetadata<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlobMetadata<S> {
         BlobMetadata {
             alt: self._fields.0,
             blobref: self._fields.1.unwrap(),
@@ -570,10 +599,10 @@ where
 }
 
 fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.greengale.blog.defs"),
@@ -582,7 +611,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blobMetadata"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Metadata for uploaded binary content")),
+                    description: Some(
+                        CowStr::new_static("Metadata for uploaded binary content"),
+                    ),
                     required: Some(vec![SmolStr::new_static("blobref")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -590,16 +621,16 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Alt text for accessibility")),
+                                description: Some(
+                                    CowStr::new_static("Alt text for accessibility"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("blobref"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("labels"),
@@ -624,9 +655,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("customColors"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Custom color values (CSS color strings)",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Custom color values (CSS color strings)"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -649,9 +680,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("codeBackground"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Code block background color",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Code block background color"),
+                                ),
                                 max_length: Some(64usize),
                                 ..Default::default()
                             }),
@@ -672,9 +703,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("ogp"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Open Graph Protocol metadata for social sharing",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Open Graph Protocol metadata for social sharing",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("url")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -688,7 +721,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("URL of the OGP image")),
+                                description: Some(
+                                    CowStr::new_static("URL of the OGP image"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 max_length: Some(2048usize),
                                 ..Default::default()
@@ -708,9 +743,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("selfLabel"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Metadata tag on an atproto resource, published by the author",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Metadata tag on an atproto resource, published by the author",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("val")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -718,9 +755,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("val"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The short string name of the value or type of this label",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The short string name of the value or type of this label",
+                                    ),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -733,9 +772,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("selfLabels"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Metadata tags on an atproto resource, published by the author",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Metadata tags on an atproto resource, published by the author",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("values")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -759,7 +800,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("theme"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Theme configuration for a blog entry")),
+                    description: Some(
+                        CowStr::new_static("Theme configuration for a blog entry"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -773,7 +816,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("preset"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Predefined color theme")),
+                                description: Some(
+                                    CowStr::new_static("Predefined color theme"),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -786,9 +831,9 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("voiceTheme"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Voice theme configuration for TTS playback",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Voice theme configuration for TTS playback"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -807,9 +852,11 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("voice"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Voice ID for TTS (e.g., 'af_heart', 'am_adam')",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Voice ID for TTS (e.g., 'af_heart', 'am_adam')",
+                                    ),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -825,9 +872,35 @@ fn lexicon_doc_app_greengale_blog_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_custom_colors_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_ogp_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod ogp_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -919,7 +992,10 @@ where
     St::Url: ogp_state::IsUnset,
 {
     /// Set the `url` field (required)
-    pub fn url(mut self, value: impl Into<UriValue<S>>) -> OgpBuilder<ogp_state::SetUrl<St>, S> {
+    pub fn url(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> OgpBuilder<ogp_state::SetUrl<St>, S> {
         self._fields.1 = Option::Some(value.into());
         OgpBuilder {
             _state: PhantomData,
@@ -967,9 +1043,35 @@ where
     }
 }
 
+fn deserialize_self_label_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_self_labels_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod self_labels_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1074,10 +1176,39 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SelfLabels<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SelfLabels<S> {
         SelfLabels {
             values: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_theme_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_voice_theme_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

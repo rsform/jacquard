@@ -2,12 +2,31 @@
   "lexicon": 1,
   "id": "pub.leaflet.theme.wordmark",
   "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer"
+        },
+        "width": {
+          "type": "integer"
+        }
+      }
+    },
     "main": {
       "type": "object",
       "required": [
         "image"
       ],
       "properties": {
+        "aspectRatio": {
+          "type": "ref",
+          "ref": "#aspectRatio"
+        },
         "image": {
           "type": "blob",
           "accept": [

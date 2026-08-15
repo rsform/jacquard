@@ -1,0 +1,10 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.push",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Authorizes a git push to a knot over HTTP. A client mints a service-auth token with this method with the knot as its audience, then gives it on git-receive-pack & LFS object requests!"
+    }
+  }
+}

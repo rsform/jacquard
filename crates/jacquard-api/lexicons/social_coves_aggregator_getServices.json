@@ -1,0 +1,54 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.getServices",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get information about aggregator services. Can fetch one or multiple aggregators by DID. Authentication optional.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "dids"
+        ],
+        "properties": {
+          "detailed": {
+            "type": "boolean",
+            "description": "Include usage statistics in response",
+            "default": false
+          },
+          "dids": {
+            "type": "array",
+            "description": "Array of aggregator DIDs to fetch",
+            "items": {
+              "type": "string",
+              "format": "did"
+            },
+            "maxLength": 25
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "views"
+          ],
+          "properties": {
+            "views": {
+              "type": "array",
+              "description": "Array of aggregator views. Returns aggregatorView if detailed=false, aggregatorViewDetailed if detailed=true.",
+              "items": {
+                "type": "union",
+                "refs": [
+                  "social.coves.aggregator.defs#aggregatorView",
+                  "social.coves.aggregator.defs#aggregatorViewDetailed"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

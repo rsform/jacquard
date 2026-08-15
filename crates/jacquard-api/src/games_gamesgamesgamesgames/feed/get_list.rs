@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::games_gamesgamesgamesgames::feed::get_list;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::games_gamesgamesgamesgames::feed::get_list;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreatorView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<Data<S>>,
@@ -38,15 +35,18 @@ pub struct CreatorView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
     pub handle: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_creator_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListDetailView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub creator: get_list::CreatorView<S>,
@@ -55,24 +55,25 @@ pub struct ListDetailView<S: BosStr = DefaultStr> {
     pub item_count: i64,
     pub name: S,
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_list_detail_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetList<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetListOutput<S: BosStr = DefaultStr> {
     pub list: get_list::ListDetailView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -137,9 +138,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetListRequest {
     type Response = GetListResponse;
 }
 
+fn deserialize_creator_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod creator_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -305,7 +319,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreatorView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreatorView<S> {
         CreatorView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -317,10 +334,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_feed_getList() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.feed.getList"),
@@ -329,10 +346,9 @@ fn lexicon_doc_games_gamesgamesgamesgames_feed_getList() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("creatorView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("handle"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("did"), SmolStr::new_static("handle")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -351,15 +367,11 @@ fn lexicon_doc_games_gamesgamesgamesgames_feed_getList() -> LexiconDoc<'static> 
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -369,13 +381,14 @@ fn lexicon_doc_games_gamesgamesgamesgames_feed_getList() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("listDetailView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("itemCount"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("creator"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("name"),
+                            SmolStr::new_static("itemCount"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("creator")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -395,9 +408,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_feed_getList() -> LexiconDoc<'static> 
                         );
                         map.insert(
                             SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("itemCount"),
@@ -407,9 +418,7 @@ fn lexicon_doc_games_gamesgamesgamesgames_feed_getList() -> LexiconDoc<'static> 
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("uri"),
@@ -426,25 +435,27 @@ fn lexicon_doc_games_gamesgamesgamesgames_feed_getList() -> LexiconDoc<'static> 
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("uri")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("uri"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The AT-URI of the list record.",
-                                    )),
-                                    format: Some(LexStringFormat::AtUri),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("uri")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("uri"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("The AT-URI of the list record."),
+                                        ),
+                                        format: Some(LexStringFormat::AtUri),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -454,9 +465,22 @@ fn lexicon_doc_games_gamesgamesgamesgames_feed_getList() -> LexiconDoc<'static> 
     }
 }
 
+fn deserialize_list_detail_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod list_detail_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -547,7 +571,10 @@ pub mod list_detail_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListDetailViewBuilder<St: list_detail_view_state::State, S: BosStr = DefaultStr> {
+pub struct ListDetailViewBuilder<
+    St: list_detail_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -726,7 +753,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListDetailView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ListDetailView<S> {
         ListDetailView {
             created_at: self._fields.0.unwrap(),
             creator: self._fields.1.unwrap(),
@@ -741,7 +771,7 @@ where
 
 pub mod get_list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

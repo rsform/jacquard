@@ -9,12 +9,13 @@
 pub mod closed;
 pub mod open;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,7 +31,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -44,7 +45,12 @@ pub struct State<S: BosStr = DefaultStr> {
     pub issue: AtUri<S>,
     ///state of the issue
     pub state: StateState<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_state_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -120,8 +126,12 @@ where
     type Output = StateState<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            StateState::ShTangledRepoIssueStateOpen => StateState::ShTangledRepoIssueStateOpen,
-            StateState::ShTangledRepoIssueStateClosed => StateState::ShTangledRepoIssueStateClosed,
+            StateState::ShTangledRepoIssueStateOpen => {
+                StateState::ShTangledRepoIssueStateOpen
+            }
+            StateState::ShTangledRepoIssueStateClosed => {
+                StateState::ShTangledRepoIssueStateClosed
+            }
             StateState::Other(v) => StateState::Other(v.into_static()),
         }
     }
@@ -186,9 +196,28 @@ impl<S: BosStr> LexiconSchema for State<S> {
     }
 }
 
+fn deserialize_state_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -372,10 +401,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_issue_state() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.issue.state"),
@@ -386,11 +415,12 @@ fn lexicon_doc_sh_tangled_repo_issue_state() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("issue"),
-                            SmolStr::new_static("state"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("issue"), SmolStr::new_static("state"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

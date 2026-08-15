@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "test.blobby.put",
+  "description": "Curated procedure for the Axum fixture: writes a blobby record.",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create or replace a blob-bearing record.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "At-uri at which to store the record."
+            },
+            "value": {
+              "type": "ref",
+              "ref": "test.blobby.record"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Canonical at-uri of the written record."
+            },
+            "cid": {
+              "type": "cid-link",
+              "description": "CID of the written record."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "InvalidBlob",
+          "description": "The submitted record failed blob constraints."
+        }
+      ]
+    }
+  }
+}

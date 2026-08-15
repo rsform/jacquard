@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,21 +21,18 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::ThreadgateView;
 use crate::app_bsky::unspecced::ThreadItemBlocked;
 use crate::app_bsky::unspecced::ThreadItemNoUnauthenticated;
 use crate::app_bsky::unspecced::ThreadItemNotFound;
 use crate::app_bsky::unspecced::ThreadItemPost;
 use crate::app_bsky::unspecced::get_post_thread_v2;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThreadV2<S: BosStr = DefaultStr> {
     ///  Defaults to `true`.
     #[serde(default = "_default_above")]
@@ -56,11 +53,9 @@ pub struct GetPostThreadV2<S: BosStr = DefaultStr> {
     pub sort: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetPostThreadV2Output<S: BosStr = DefaultStr> {
     ///Whether this thread has additional replies. If true, a call can be made to the `getPostThreadOtherV2` endpoint to retrieve them.
     pub has_other_replies: bool,
@@ -72,19 +67,23 @@ pub struct GetPostThreadV2Output<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThreadItem<S: BosStr = DefaultStr> {
     ///The nesting level of this item in the thread. Depth 0 means the anchor item. Items above have negative depths, items below have positive depths.
     pub depth: i64,
     pub uri: AtUri<S>,
     pub value: ThreadItemValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_thread_item_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -161,7 +160,7 @@ fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_post_thread_v2_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -192,15 +191,12 @@ pub mod get_post_thread_v2_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetPostThreadV2Builder<St: get_post_thread_v2_state::State, S: BosStr = DefaultStr> {
+pub struct GetPostThreadV2Builder<
+    St: get_post_thread_v2_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<bool>,
-        Option<AtUri<S>>,
-        Option<i64>,
-        Option<i64>,
-        Option<S>,
-    ),
+    _fields: (Option<bool>, Option<AtUri<S>>, Option<i64>, Option<i64>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -328,9 +324,22 @@ where
     }
 }
 
+fn deserialize_thread_item_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod thread_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -503,7 +512,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ThreadItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ThreadItem<S> {
         ThreadItem {
             depth: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -514,10 +526,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_unspecced_getPostThreadV2() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.unspecced.getPostThreadV2"),
@@ -582,11 +594,12 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadV2() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("threadItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("depth"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("depth"),
+                            SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -608,13 +621,9 @@ fn lexicon_doc_app_bsky_unspecced_getPostThreadV2() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("app.bsky.unspecced.defs#threadItemPost"),
-                                    CowStr::new_static(
-                                        "app.bsky.unspecced.defs#threadItemNoUnauthenticated",
-                                    ),
-                                    CowStr::new_static(
-                                        "app.bsky.unspecced.defs#threadItemNotFound",
-                                    ),
-                                    CowStr::new_static("app.bsky.unspecced.defs#threadItemBlocked"),
+                                    CowStr::new_static("app.bsky.unspecced.defs#threadItemNoUnauthenticated"),
+                                    CowStr::new_static("app.bsky.unspecced.defs#threadItemNotFound"),
+                                    CowStr::new_static("app.bsky.unspecced.defs#threadItemBlocked")
                                 ],
                                 ..Default::default()
                             }),

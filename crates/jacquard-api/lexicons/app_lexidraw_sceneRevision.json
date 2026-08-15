@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "app.lexidraw.sceneRevision",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An immutable checkpoint of a app.lexidraw.scene record. Captured periodically alongside the mutable scene record; the scene blob is content-addressed and shared with the scene record, so no data is duplicated.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "scene",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "scene": {
+            "type": "blob",
+            "description": "Gzipped Excalidraw scene JSON (serializeAsJSON output, gzip level 6), as captured at checkpoint time.",
+            "accept": [
+              "application/gzip"
+            ],
+            "maxSize": 50000000
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Strong reference (uri + record cid) to the parent app.lexidraw.scene record at checkpoint time.",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "thumb": {
+            "type": "blob",
+            "description": "WebP preview of the scene (max 1024px on the longest side).",
+            "accept": [
+              "image/webp"
+            ],
+            "maxSize": 2000000
+          }
+        }
+      }
+    }
+  }
+}

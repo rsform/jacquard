@@ -99,10 +99,12 @@
           },
           "subjectType": {
             "type": "string",
-            "description": "If specified, reports of the given type (account or record) will be returned.",
+            "description": "If specified, reports of the given subject type will be returned.",
             "knownValues": [
               "account",
-              "record"
+              "record",
+              "message",
+              "conversation"
             ]
           }
         }

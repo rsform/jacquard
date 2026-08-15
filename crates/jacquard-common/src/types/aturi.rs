@@ -874,6 +874,14 @@ fn extract_space_indices(uri: &str) -> AtSpaceUriIndices {
 }
 
 impl<S: Bos<str> + AsRef<str>> AtSpaceUri<S> {
+    /// Borrow this URI with a `&str` backing, analogous to [`Did::borrow`].
+    ///
+    /// Reuses the already-validated component indices: no re-parsing occurs.
+    pub fn borrow(&self) -> AtSpaceUri<&str> {
+        // SAFETY: self is already validated.
+        unsafe { AtSpaceUri::unchecked(self.uri.as_ref()) }
+    }
+
     /// Construct from a pre-validated URI and compute component indices.
     ///
     /// # Safety

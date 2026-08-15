@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "stream.kralsei.pushInteraction",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Send an interaction to the server",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "character": {
+              "type": "string",
+              "description": "The character the interaction with is",
+              "knownValues": [
+                "kris",
+                "ralsei"
+              ]
+            },
+            "interaction": {
+              "type": "string",
+              "description": "Type of interaction",
+              "knownValues": [
+                "boop",
+                "hug"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

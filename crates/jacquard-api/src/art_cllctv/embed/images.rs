@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,18 +22,15 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::embed::AspectRatio;
 use crate::art_cllctv::embed::Tombstone;
 use crate::art_cllctv::embed::images;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     pub alt: S,
@@ -44,37 +41,46 @@ pub struct Image<S: BosStr = DefaultStr> {
     pub image_hash: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tombstone: Option<Tombstone<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_image_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Images<S: BosStr = DefaultStr> {
     pub images: Vec<images::Image<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_images_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct View<S: BosStr = DefaultStr> {
     pub images: Vec<images::ViewImage<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewImage<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     pub alt: S,
@@ -86,7 +92,12 @@ pub struct ViewImage<S: BosStr = DefaultStr> {
     pub thumb: UriValue<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tombstone: Option<Tombstone<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_view_image_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -119,16 +130,19 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -231,9 +245,22 @@ impl<S: BosStr> LexiconSchema for ViewImage<S> {
     }
 }
 
+fn deserialize_image_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -330,7 +357,10 @@ where
     St::Alt: image_state::IsUnset,
 {
     /// Set the `alt` field (required)
-    pub fn alt(mut self, value: impl Into<S>) -> ImageBuilder<image_state::SetAlt<St>, S> {
+    pub fn alt(
+        mut self,
+        value: impl Into<S>,
+    ) -> ImageBuilder<image_state::SetAlt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
@@ -429,10 +459,10 @@ where
 }
 
 fn lexicon_doc_art_cllctv_embed_images() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("art.cllctv.embed.images"),
@@ -441,34 +471,35 @@ fn lexicon_doc_art_cllctv_embed_images() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("image"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("image"),
-                        SmolStr::new_static("alt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("image"), SmolStr::new_static("alt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text description of the image, for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("aspectRatio"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.embed.defs#aspectRatio"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.embed.defs#aspectRatio",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("imageHash"),
@@ -481,7 +512,9 @@ fn lexicon_doc_art_cllctv_embed_images() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("tombstone"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("art.cllctv.embed.defs#tombstone"),
+                                r#ref: CowStr::new_static(
+                                    "art.cllctv.embed.defs#tombstone",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -612,9 +645,22 @@ fn lexicon_doc_art_cllctv_embed_images() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_images_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod images_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -727,9 +773,22 @@ where
     }
 }
 
+fn deserialize_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -842,9 +901,22 @@ where
     }
 }
 
+fn deserialize_view_image_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod view_image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -955,7 +1027,10 @@ where
     St::Alt: view_image_state::IsUnset,
 {
     /// Set the `alt` field (required)
-    pub fn alt(mut self, value: impl Into<S>) -> ViewImageBuilder<view_image_state::SetAlt<St>, S> {
+    pub fn alt(
+        mut self,
+        value: impl Into<S>,
+    ) -> ViewImageBuilder<view_image_state::SetAlt<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ViewImageBuilder {
             _state: PhantomData,
@@ -1048,7 +1123,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ViewImage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ViewImage<S> {
         ViewImage {
             alt: self._fields.0.unwrap(),
             aspect_ratio: self._fields.1,

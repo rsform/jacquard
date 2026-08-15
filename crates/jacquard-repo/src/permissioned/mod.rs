@@ -263,119 +263,94 @@ pub struct CommitContext {
     pub rev: Tid,
 }
 
-/// Deniable permissioned commit. `sig` authenticates context only; `mac` binds hash to it.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SignedCommit {
-    /// Commit version, currently 1.
-    pub ver: u8,
-    /// SHA-256 digest of the LtHash state.
-    pub hash: [u8; 32],
-    /// Per-commit input keying material.
-    pub ikm: [u8; 32],
-    /// HMAC over hash with the context-derived key.
-    pub mac: [u8; 32],
-    /// Ed25519 signature over the framed context.
-    #[serde(with = "serde_bytes")]
-    pub sig: Vec<u8>,
-    /// Host-assigned revision TID.
-    pub rev: Tid,
+/// Generated wire representation of a permissioned commit.
+pub use jacquard_api::com_atproto::space::SignedCommit;
+
+fn commit_bytes(field: &'static str, value: &Bytes) -> Result<[u8; 32]> {
+    value
+        .as_ref()
+        .try_into()
+        .map_err(|_| PermissionedError::InvalidCommit(format!("{field} must contain 32 bytes")))
 }
 
-impl TryFrom<jacquard_api::com_atproto::space::SignedCommit> for SignedCommit {
-    type Error = PermissionedError;
-
-    fn try_from(value: jacquard_api::com_atproto::space::SignedCommit) -> Result<Self> {
-        fn array32(field: &'static str, value: Bytes) -> Result<[u8; 32]> {
-            value.as_ref().try_into().map_err(|_| {
-                PermissionedError::InvalidCommit(format!("{field} must contain 32 bytes"))
-            })
-        }
-        let ver = u8::try_from(value.ver)
-            .map_err(|_| PermissionedError::InvalidCommit("version is out of range".into()))?;
-        Ok(Self {
-            ver,
-            hash: array32("hash", value.hash)?,
-            ikm: array32("ikm", value.ikm)?,
-            mac: array32("mac", value.mac)?,
-            sig: value.sig.to_vec(),
-            rev: value.rev,
-        })
+fn commit_fields(commit: &SignedCommit) -> Result<([u8; 32], [u8; 32], [u8; 32])> {
+    if commit.ver != 1 {
+        return Err(PermissionedError::InvalidCommit(
+            "version or revision mismatch".into(),
+        ));
     }
+    Ok((
+        commit_bytes("hash", &commit.hash)?,
+        commit_bytes("ikm", &commit.ikm)?,
+        commit_bytes("mac", &commit.mac)?,
+    ))
 }
 
-impl From<SignedCommit> for jacquard_api::com_atproto::space::SignedCommit {
-    fn from(value: SignedCommit) -> Self {
-        Self {
-            hash: Bytes::copy_from_slice(&value.hash),
-            ikm: Bytes::copy_from_slice(&value.ikm),
-            mac: Bytes::copy_from_slice(&value.mac),
-            rev: value.rev,
-            sig: Bytes::from(value.sig),
-            ver: i64::from(value.ver),
-            extra_data: None,
-        }
-    }
+/// Sign a commit with fresh random IKM.
+pub fn sign_commit(
+    hash: [u8; 32],
+    context: &CommitContext,
+    key: &ed25519_dalek::SigningKey,
+) -> Result<SignedCommit> {
+    let mut ikm = [0; 32];
+    rand::thread_rng().fill_bytes(&mut ikm);
+    sign_commit_with_ikm(hash, context, key, ikm)
 }
 
-impl SignedCommit {
-    /// Sign a commit with fresh random IKM.
-    pub fn sign(
-        hash: [u8; 32],
-        context: &CommitContext,
-        key: &ed25519_dalek::SigningKey,
-    ) -> Result<Self> {
-        let mut ikm = [0; 32];
-        rand::thread_rng().fill_bytes(&mut ikm);
-        Self::sign_with_ikm(hash, context, key, ikm)
+/// Sign a commit with explicit IKM, used for independent conformance vectors.
+pub fn sign_commit_with_ikm(
+    hash: [u8; 32],
+    context: &CommitContext,
+    key: &ed25519_dalek::SigningKey,
+    ikm: [u8; 32],
+) -> Result<SignedCommit> {
+    let context_bytes = encode_commit_context(context, &ikm)?;
+    let mac = compute_mac(&ikm, &context_bytes, &hash);
+    Ok(SignedCommit {
+        hash: Bytes::copy_from_slice(&hash),
+        ikm: Bytes::copy_from_slice(&ikm),
+        mac: Bytes::copy_from_slice(&mac),
+        rev: context.rev.clone(),
+        sig: Bytes::copy_from_slice(&key.sign(&context_bytes).to_bytes()),
+        ver: 1,
+        extra_data: None,
+    })
+}
+
+/// Verify the commit version, revision, MAC, and Ed25519 context signature.
+pub fn verify_commit(
+    commit: &SignedCommit,
+    context: &CommitContext,
+    key: &VerifyingKey,
+) -> Result<()> {
+    let (hash, ikm, mac) = commit_fields(commit)?;
+    if commit.rev != context.rev {
+        return Err(PermissionedError::InvalidCommit(
+            "version or revision mismatch".into(),
+        ));
     }
-    /// Sign a commit with explicit IKM, used for independent conformance vectors.
-    pub fn sign_with_ikm(
-        hash: [u8; 32],
-        context: &CommitContext,
-        key: &ed25519_dalek::SigningKey,
-        ikm: [u8; 32],
-    ) -> Result<Self> {
-        let context_bytes = encode_commit_context(context, &ikm)?;
-        let mac = compute_mac(&ikm, &context_bytes, &hash);
-        Ok(Self {
-            ver: 1,
-            hash,
-            ikm,
-            mac,
-            sig: key.sign(&context_bytes).to_bytes().to_vec(),
-            rev: context.rev.clone(),
-        })
+    let context_bytes = encode_commit_context(context, &ikm)?;
+    if compute_mac(&ikm, &context_bytes, &hash) != mac {
+        return Err(PermissionedError::InvalidCommit("MAC mismatch".into()));
     }
-    /// Verify version, revision, MAC, and Ed25519 context signature.
-    pub fn verify(&self, context: &CommitContext, key: &VerifyingKey) -> Result<()> {
-        if self.ver != 1 || self.rev != context.rev {
-            return Err(PermissionedError::InvalidCommit(
-                "version or revision mismatch".into(),
-            ));
-        }
-        let context_bytes = encode_commit_context(context, &self.ikm)?;
-        let expected = compute_mac(&self.ikm, &context_bytes, &self.hash);
-        if expected != self.mac {
-            return Err(PermissionedError::InvalidCommit("MAC mismatch".into()));
-        }
-        let signature = Signature::from_slice(&self.sig)
-            .map_err(|_| PermissionedError::InvalidCommit("invalid signature bytes".into()))?;
-        key.verify(&context_bytes, &signature)
-            .map_err(|_| PermissionedError::InvalidCommit("signature mismatch".into()))
-    }
-    /// Encode the commit as canonical DAG-CBOR using generated byte-string fields.
-    pub fn to_cbor(&self) -> Result<Vec<u8>> {
-        let generated: jacquard_api::com_atproto::space::SignedCommit = self.clone().into();
-        serde_ipld_dagcbor::to_vec(&generated)
-            .map_err(|error| PermissionedError::Serialization(error.to_string()))
-    }
-    /// Decode and length-check a generated DAG-CBOR commit.
-    pub fn from_cbor(bytes: &[u8]) -> Result<Self> {
-        let generated: jacquard_api::com_atproto::space::SignedCommit =
-            serde_ipld_dagcbor::from_slice(bytes)
-                .map_err(|error| PermissionedError::Serialization(error.to_string()))?;
-        Self::try_from(generated)
-    }
+    let signature = Signature::from_slice(&commit.sig)
+        .map_err(|_| PermissionedError::InvalidCommit("invalid signature bytes".into()))?;
+    key.verify(&context_bytes, &signature)
+        .map_err(|_| PermissionedError::InvalidCommit("signature mismatch".into()))
+}
+
+/// Encode a generated permissioned commit as canonical DAG-CBOR.
+pub fn commit_to_cbor(commit: &SignedCommit) -> Result<Vec<u8>> {
+    serde_ipld_dagcbor::to_vec(commit)
+        .map_err(|error| PermissionedError::Serialization(error.to_string()))
+}
+
+/// Decode and validate a generated DAG-CBOR permissioned commit.
+pub fn commit_from_cbor(bytes: &[u8]) -> Result<SignedCommit> {
+    let commit: SignedCommit = serde_ipld_dagcbor::from_slice(bytes)
+        .map_err(|error| PermissionedError::Serialization(error.to_string()))?;
+    commit_fields(&commit)?;
+    Ok(commit)
 }
 
 fn encode_commit_context(context: &CommitContext, ikm: &[u8; 32]) -> Result<Vec<u8>> {
@@ -782,10 +757,10 @@ pub const CLOCK_SKEW_SEC: i64 = 5;
 ///
 /// Issuer and subject remain strings because client attestations use a client
 /// ID URL for both, while delegation and space credentials use DID/space values.
+/// The JWT `typ` lives in the protected header (per the reference
+/// implementation), so it is supplied by the caller alongside the claims.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CredentialClaims {
-    /// The protected JWT `typ` header.
-    pub typ: SmolStr,
     /// Token issuer: a DID except for client attestations.
     pub iss: SmolStr,
     /// Token subject: a space URI except for client attestations.
@@ -798,13 +773,21 @@ pub struct CredentialClaims {
     pub exp: i64,
     /// Unique token identifier.
     pub jti: SmolStr,
-    /// Optional DPoP JWK thumbprint from `cnf.jkt`.
-    pub cnf_jkt: Option<SmolStr>,
+    /// Optional DPoP JWK thumbprint, flattened from the wire's `cnf.jkt`.
+    #[serde(rename = "cnf")]
+    pub cnf_jkt: Option<CnfJkt>,
+}
+
+/// The `cnf` (confirmation) claim carrying the DPoP key thumbprint.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CnfJkt {
+    /// RFC 8747 JWK thumbprint of the bound proof key.
+    pub jkt: SmolStr,
 }
 
 impl CredentialClaims {
-    fn validate_common(&self, typ: &str, now: i64) -> Result<()> {
-        if self.typ != typ || self.jti.is_empty() {
+    fn validate_common(&self, now: i64) -> Result<()> {
+        if self.jti.is_empty() {
             return Err(PermissionedError::InvalidCredential(
                 "token type or jti mismatch".into(),
             ));
@@ -825,7 +808,7 @@ impl CredentialClaims {
         expected_subject: &AtSpaceUri<&str>,
         replay: &mut BTreeSet<SmolStr>,
     ) -> Result<()> {
-        self.validate_common(DELEGATION_TOKEN_TYP, now)?;
+        self.validate_common(now)?;
         let expected_audience = format!("{}#atproto_space_host", expected_subject.did_authority());
         if self.iss != expected_issuer.as_str()
             || self.sub != expected_subject.as_str()
@@ -848,11 +831,11 @@ impl CredentialClaims {
         expected_subject: &AtSpaceUri<&str>,
         required_jkt: &str,
     ) -> Result<()> {
-        self.validate_common(SPACE_CREDENTIAL_TYP, now)?;
+        self.validate_common(now)?;
         if self.iss != expected_issuer.as_str()
             || self.sub != expected_subject.as_str()
             || self.aud.is_some()
-            || self.cnf_jkt.as_deref() != Some(required_jkt)
+            || self.cnf_jkt.as_ref().map(|c| c.jkt.as_str()) != Some(required_jkt)
         {
             return Err(PermissionedError::InvalidCredential(
                 "space credential claims mismatch".into(),
@@ -869,7 +852,7 @@ impl CredentialClaims {
         expected_authority: &Did<&str>,
         replay: &mut BTreeSet<SmolStr>,
     ) -> Result<()> {
-        self.validate_common(CLIENT_ATTESTATION_TYP, now)?;
+        self.validate_common(now)?;
         let client_id = url::Url::parse(expected_client_id).map_err(|_| {
             PermissionedError::InvalidCredential("client_id must be an absolute URL".into())
         })?;
@@ -981,116 +964,6 @@ fn base64url(bytes: &[u8]) -> String {
     out
 }
 
-/// Authority selector used by a permissioned-space OAuth resource.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum AuthoritySelector {
-    /// Resolve the authority from the requesting user.
-    Self_,
-    /// Match any authority.
-    Any,
-    /// Match one concrete DID.
-    Did(DidOwned),
-}
-
-/// Collection selector used by a permissioned-space OAuth resource.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum CollectionSelector {
-    /// Match any collection.
-    Any,
-    /// Match one concrete NSID.
-    Nsid(NsidOwned),
-}
-
-/// Record action granted by a permissioned-space OAuth resource.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum PermissionAction {
-    /// Read only records authored by the requesting user.
-    ReadSelf,
-    /// Read all records covered by the resource.
-    Read,
-    /// Create records.
-    Create,
-    /// Update records.
-    Update,
-    /// Delete records.
-    Delete,
-}
-
-/// Management action granted by a permissioned-space OAuth resource.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum ManageAction {
-    /// Create a space.
-    Create,
-    /// Update a space.
-    Update,
-    /// Delete a space.
-    Delete,
-}
-
-/// A permissioned-space OAuth resource.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct SpacePermission {
-    /// Concrete space type. Wildcard space types are not valid in a set.
-    pub space_type: NsidOwned,
-    /// Optional authority selector.
-    pub authority: Option<AuthoritySelector>,
-    /// Optional stable space key.
-    pub skey: Option<RkeyOwned>,
-    /// Collections covered by this resource; empty means any collection.
-    pub collection: Vec<CollectionSelector>,
-    /// Record actions covered by this resource; empty means any action.
-    pub action: Vec<PermissionAction>,
-    /// Management actions covered by this resource.
-    pub manage: Vec<ManageAction>,
-}
-
-impl SpacePermission {
-    /// Validate a permission-set entry; wildcard space types are forbidden in sets.
-    pub fn validate(&self, namespace: &str) -> Result<()> {
-        let space_type = self.space_type.as_str();
-        if space_type != namespace
-            && !space_type
-                .strip_prefix(namespace)
-                .is_some_and(|suffix| suffix.starts_with('.'))
-        {
-            return Err(PermissionedError::InvalidCredential(
-                "permission outside namespace".into(),
-            ));
-        }
-        Ok(())
-    }
-
-    /// Match independently against a requested space, collection, and action.
-    pub fn matches(&self, space_type: &str, collection: &str, action: &str) -> bool {
-        self.space_type.as_str() == space_type
-            && (self.collection.is_empty()
-                || self.collection.iter().any(|value| match value {
-                    CollectionSelector::Any => true,
-                    CollectionSelector::Nsid(nsid) => nsid.as_str() == collection,
-                }))
-            && (self.action.is_empty()
-                || self
-                    .action
-                    .iter()
-                    .any(|value| permission_action_matches(*value, action)))
-    }
-}
-
-fn permission_action_matches(action: PermissionAction, requested: &str) -> bool {
-    match (action, requested) {
-        (PermissionAction::Read, "read" | "read_self")
-        | (PermissionAction::ReadSelf, "read_self")
-        | (PermissionAction::Create, "create")
-        | (PermissionAction::Update, "update")
-        | (PermissionAction::Delete, "delete") => true,
-        _ => false,
-    }
-}
-
 /// Ordered two-root permissioned CAR representation.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PermissionedCar {
@@ -1162,10 +1035,9 @@ impl PermissionedCar {
     ) -> Result<ValidatedRepoSnapshot> {
         self.validate_structure()?;
 
-        let commit = SignedCommit::from_cbor(&self.blocks[0].1)
+        let commit = commit_from_cbor(&self.blocks[0].1)
             .map_err(|error| PermissionedError::InvalidCar(error.to_string()))?;
-        let commit_bytes = commit
-            .to_cbor()
+        let commit_bytes = commit_to_cbor(&commit)
             .map_err(|error| PermissionedError::InvalidCar(error.to_string()))?;
         if commit_bytes.as_slice() != self.blocks[0].1.as_ref() {
             return Err(PermissionedError::InvalidCar(
@@ -1177,8 +1049,7 @@ impl PermissionedCar {
             author: author.clone(),
             rev: commit.rev.clone(),
         };
-        commit
-            .verify(&context, key)
+        verify_commit(&commit, &context, key)
             .map_err(|error| PermissionedError::InvalidCar(error.to_string()))?;
 
         let decoded: BTreeMap<SmolStr, CidLink<SmolStr>> =
@@ -1224,7 +1095,7 @@ impl PermissionedCar {
         for (path, cid) in &index {
             lthash.add(&format!("{path}/{cid}"));
         }
-        if lthash.digest() != commit.hash {
+        if commit.hash.as_ref() != lthash.digest().as_slice() {
             return Err(PermissionedError::InvalidCar(
                 "index does not match commit hash".into(),
             ));
@@ -1335,10 +1206,10 @@ mod tests {
             rev: Tid::new("3jzfcijpj2m2a").unwrap(),
         };
         let key = SigningKey::from_bytes(&[7; 32]);
-        let commit = SignedCommit::sign_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
-        commit.verify(&context, &key.verifying_key()).unwrap();
-        let bytes = commit.to_cbor().unwrap();
-        assert_eq!(SignedCommit::from_cbor(&bytes).unwrap(), commit);
+        let commit = sign_commit_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
+        verify_commit(&commit, &context, &key.verifying_key()).unwrap();
+        let bytes = commit_to_cbor(&commit).unwrap();
+        assert_eq!(commit_from_cbor(&bytes).unwrap(), commit);
     }
     #[test]
     fn signed_commit_all_mutation_paths_fail() {
@@ -1348,45 +1219,49 @@ mod tests {
             rev: Tid::new("3jzfcijpj2m2a").unwrap(),
         };
         let key = SigningKey::from_bytes(&[7; 32]);
-        let commit = SignedCommit::sign_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
+        let commit = sign_commit_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
 
         let mut changed_context = context.clone();
         changed_context.space =
             SpaceUri::new_owned("at://did:plc:other/space/com.example.type/demo").unwrap();
-        assert!(
-            commit
-                .verify(&changed_context, &key.verifying_key())
-                .is_err()
-        );
+        assert!(verify_commit(&commit, &changed_context, &key.verifying_key()).is_err());
         changed_context = context.clone();
         changed_context.author = DidOwned::new_owned("did:plc:other").unwrap();
-        assert!(
-            commit
-                .verify(&changed_context, &key.verifying_key())
-                .is_err()
-        );
+        assert!(verify_commit(&commit, &changed_context, &key.verifying_key()).is_err());
         changed_context = context.clone();
         changed_context.rev = Tid::new("3jzfcijpj2m2b").unwrap();
-        assert!(
-            commit
-                .verify(&changed_context, &key.verifying_key())
-                .is_err()
-        );
+        assert!(verify_commit(&commit, &changed_context, &key.verifying_key()).is_err());
 
         for mutate in [
-            |value: &mut SignedCommit| value.hash[0] ^= 1,
-            |value: &mut SignedCommit| value.ikm[0] ^= 1,
-            |value: &mut SignedCommit| value.mac[0] ^= 1,
-            |value: &mut SignedCommit| value.sig[0] ^= 1,
+            |value: &mut SignedCommit| {
+                let mut bytes = value.hash.to_vec();
+                bytes[0] ^= 1;
+                value.hash = Bytes::from(bytes);
+            },
+            |value: &mut SignedCommit| {
+                let mut bytes = value.ikm.to_vec();
+                bytes[0] ^= 1;
+                value.ikm = Bytes::from(bytes);
+            },
+            |value: &mut SignedCommit| {
+                let mut bytes = value.mac.to_vec();
+                bytes[0] ^= 1;
+                value.mac = Bytes::from(bytes);
+            },
+            |value: &mut SignedCommit| {
+                let mut bytes = value.sig.to_vec();
+                bytes[0] ^= 1;
+                value.sig = Bytes::from(bytes);
+            },
             |value: &mut SignedCommit| value.ver += 1,
         ] {
             let mut changed = commit.clone();
             mutate(&mut changed);
-            assert!(changed.verify(&context, &key.verifying_key()).is_err());
+            assert!(verify_commit(&changed, &context, &key.verifying_key()).is_err());
         }
         let mut changed = commit.clone();
         changed.rev = Tid::new("3jzfcijpj2m2b").unwrap();
-        assert!(changed.verify(&context, &key.verifying_key()).is_err());
+        assert!(verify_commit(&changed, &context, &key.verifying_key()).is_err());
     }
     #[test]
     fn write_group_is_atomic_and_cursor_uses_slash() {
@@ -1408,21 +1283,21 @@ mod tests {
     }
 
     fn credential_claims(
-        typ: &'static str,
         iss: &str,
         sub: &str,
         aud: Option<&str>,
         cnf_jkt: Option<&str>,
     ) -> CredentialClaims {
         CredentialClaims {
-            typ: SmolStr::new_static(typ),
             iss: SmolStr::new(iss),
             sub: SmolStr::new(sub),
             aud: aud.map(SmolStr::new),
             iat: 100,
             exp: 160,
             jti: SmolStr::new_static("unique"),
-            cnf_jkt: cnf_jkt.map(SmolStr::new),
+            cnf_jkt: cnf_jkt.map(|jkt| CnfJkt {
+                jkt: SmolStr::new(jkt),
+            }),
         }
     }
 
@@ -1436,7 +1311,6 @@ mod tests {
         let space_ref = AtSpaceUri::new(space.as_str()).unwrap();
         let mut replay = BTreeSet::new();
         let delegation = credential_claims(
-            DELEGATION_TOKEN_TYP,
             user.as_str(),
             space.as_str(),
             Some("did:plc:space#atproto_space_host"),
@@ -1451,13 +1325,8 @@ mod tests {
                 .is_err()
         );
 
-        let credential = credential_claims(
-            SPACE_CREDENTIAL_TYP,
-            authority.as_str(),
-            space.as_str(),
-            None,
-            Some("thumbprint"),
-        );
+        let credential =
+            credential_claims(authority.as_str(), space.as_str(), None, Some("thumbprint"));
         credential
             .validate_space_credential(100, &authority_ref, &space_ref, "thumbprint")
             .unwrap();
@@ -1469,7 +1338,6 @@ mod tests {
 
         let client_id = "https://client.example/metadata.json";
         let attestation = credential_claims(
-            CLIENT_ATTESTATION_TYP,
             client_id,
             client_id,
             Some("did:plc:space#atproto_space_host"),
@@ -1497,13 +1365,8 @@ mod tests {
         let authority = DidOwned::new_owned("did:plc:space").unwrap();
         let authority_ref = Did::new(authority.as_str()).unwrap();
         let space_ref = AtSpaceUri::new(space.as_str()).unwrap();
-        let mut credential = credential_claims(
-            SPACE_CREDENTIAL_TYP,
-            authority.as_str(),
-            space.as_str(),
-            None,
-            Some("thumbprint"),
-        );
+        let mut credential =
+            credential_claims(authority.as_str(), space.as_str(), None, Some("thumbprint"));
         credential.exp = 100;
         assert!(
             credential
@@ -1538,9 +1401,8 @@ mod tests {
             author: author.clone(),
             rev: Tid::new("3jzfcijpj2m2a").unwrap(),
         };
-        let commit =
-            SignedCommit::sign_with_ikm(lthash.digest(), &context, &key, [0x20; 32]).unwrap();
-        let commit_bytes = commit.to_cbor().unwrap();
+        let commit = sign_commit_with_ikm(lthash.digest(), &context, &key, [0x20; 32]).unwrap();
+        let commit_bytes = commit_to_cbor(&commit).unwrap();
         let commit_cid = crate::mst::util::compute_cid(&commit_bytes).unwrap();
         let car = PermissionedCar::new(
             [commit_cid, index_cid],
@@ -1562,15 +1424,13 @@ mod tests {
             .unwrap();
         assert_eq!(snapshot.index().len(), 1);
         assert_eq!(snapshot.records().len(), 1);
-        assert_eq!(snapshot.commit().hash, {
-            let mut hash = LtHash::default();
-            hash.add(&format!(
-                "{}/{}",
-                snapshot.index()[0].0,
-                snapshot.index()[0].1
-            ));
-            hash.digest()
-        });
+        let mut hash = LtHash::default();
+        hash.add(&format!(
+            "{}/{}",
+            snapshot.index()[0].0,
+            snapshot.index()[0].1
+        ));
+        assert_eq!(snapshot.commit().hash.as_ref(), hash.digest().as_slice());
 
         let roots_only = car.exclude_values();
         assert!(

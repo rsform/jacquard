@@ -1,0 +1,70 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.createApiKey",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create an API key for the authenticated aggregator. Requires OAuth authentication. The API key is returned ONCE and cannot be retrieved again. Store it securely.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "No input required. The key is generated server-side for the authenticated aggregator.",
+          "properties": {}
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "key",
+            "keyPrefix",
+            "did",
+            "createdAt"
+          ],
+          "properties": {
+            "createdAt": {
+              "type": "string",
+              "description": "ISO8601 timestamp when the key was created",
+              "format": "datetime"
+            },
+            "did": {
+              "type": "string",
+              "description": "DID of the aggregator that owns this key",
+              "format": "did"
+            },
+            "key": {
+              "type": "string",
+              "description": "The plain-text API key. This is shown ONCE and cannot be retrieved again. Format: ckapi_<64-hex-chars> (32 bytes hex-encoded)",
+              "maxLength": 256
+            },
+            "keyPrefix": {
+              "type": "string",
+              "description": "First 12 characters of the key (e.g., 'ckapi_ab12cd') for identification in logs and UI",
+              "maxLength": 64
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "OAuth authentication is required to create an API key",
+          "name": "AuthenticationRequired"
+        },
+        {
+          "description": "OAuth session is required (not service JWT) to create an API key",
+          "name": "OAuthSessionRequired"
+        },
+        {
+          "description": "Only registered aggregators can create API keys",
+          "name": "AggregatorRequired"
+        },
+        {
+          "description": "Failed to generate the API key",
+          "name": "KeyGenerationFailed"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.updateConfig",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update configuration for an enabled aggregator. Updates the authorization record's config field. Requires moderator permissions.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "community",
+            "aggregatorDid",
+            "config"
+          ],
+          "properties": {
+            "aggregatorDid": {
+              "type": "string",
+              "description": "DID of the aggregator",
+              "format": "did"
+            },
+            "community": {
+              "type": "string",
+              "description": "DID or handle of the community",
+              "format": "at-identifier"
+            },
+            "config": {
+              "type": "unknown",
+              "description": "New aggregator-specific configuration. Must conform to the aggregator's configSchema."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "authorization"
+          ],
+          "properties": {
+            "authorization": {
+              "type": "ref",
+              "description": "The updated authorization details",
+              "ref": "social.coves.aggregator.defs#authorizationView"
+            },
+            "cid": {
+              "type": "string",
+              "description": "CID of the updated authorization record",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the updated authorization record",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Caller is not a moderator of this community",
+          "name": "NotAuthorized"
+        },
+        {
+          "description": "Aggregator is not enabled for this community",
+          "name": "AuthorizationNotFound"
+        },
+        {
+          "description": "Config does not match aggregator's configSchema",
+          "name": "InvalidConfig"
+        }
+      ]
+    }
+  }
+}

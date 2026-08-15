@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::verification::VerificationView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did};
+use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::verification::VerificationView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListVerifications<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_after: Option<Datetime>,
@@ -46,11 +43,9 @@ pub struct ListVerifications<S: BosStr = DefaultStr> {
     pub subjects: Option<Vec<Did<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListVerificationsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -97,7 +92,7 @@ fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod list_verifications_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -115,7 +110,10 @@ pub mod list_verifications_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListVerificationsBuilder<St: list_verifications_state::State, S: BosStr = DefaultStr> {
+pub struct ListVerificationsBuilder<
+    St: list_verifications_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -132,7 +130,10 @@ pub struct ListVerificationsBuilder<St: list_verifications_state::State, S: BosS
 
 impl ListVerifications<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListVerificationsBuilder<list_verifications_state::Empty, DefaultStr> {
+    pub fn new() -> ListVerificationsBuilder<
+        list_verifications_state::Empty,
+        DefaultStr,
+    > {
         ListVerificationsBuilder::new()
     }
 }

@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Nsid};
+use jacquard_common::types::string::{Did, AtUri, Nsid, Cid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::search::query;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::search::query;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Hit<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -41,15 +38,18 @@ pub struct Hit<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     ///Embedded matched record.
     pub value: Data<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_hit_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Query<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<Did<S>>,
@@ -70,11 +70,9 @@ pub struct Query<S: BosStr = DefaultStr> {
     pub until: Option<Datetime>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -126,9 +124,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryRequest {
     type Response = QueryResponse;
 }
 
+fn deserialize_hit_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod hit_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -268,7 +279,10 @@ where
     St::Nsid: hit_state::IsUnset,
 {
     /// Set the `nsid` field (required)
-    pub fn nsid(mut self, value: impl Into<Nsid<S>>) -> HitBuilder<hit_state::SetNsid<St>, S> {
+    pub fn nsid(
+        mut self,
+        value: impl Into<Nsid<S>>,
+    ) -> HitBuilder<hit_state::SetNsid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         HitBuilder {
             _state: PhantomData,
@@ -284,7 +298,10 @@ where
     St::Score: hit_state::IsUnset,
 {
     /// Set the `score` field (required)
-    pub fn score(mut self, value: impl Into<Data<S>>) -> HitBuilder<hit_state::SetScore<St>, S> {
+    pub fn score(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> HitBuilder<hit_state::SetScore<St>, S> {
         self._fields.2 = Option::Some(value.into());
         HitBuilder {
             _state: PhantomData,
@@ -300,7 +317,10 @@ where
     St::Uri: hit_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> HitBuilder<hit_state::SetUri<St>, S> {
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> HitBuilder<hit_state::SetUri<St>, S> {
         self._fields.3 = Option::Some(value.into());
         HitBuilder {
             _state: PhantomData,
@@ -316,7 +336,10 @@ where
     St::Value: hit_state::IsUnset,
 {
     /// Set the `value` field (required)
-    pub fn value(mut self, value: impl Into<Data<S>>) -> HitBuilder<hit_state::SetValue<St>, S> {
+    pub fn value(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> HitBuilder<hit_state::SetValue<St>, S> {
         self._fields.4 = Option::Some(value.into());
         HitBuilder {
             _state: PhantomData,
@@ -359,10 +382,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_search_query() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.search.query"),
@@ -371,12 +394,12 @@ fn lexicon_doc_sh_tangled_search_query() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("hit"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("nsid"),
-                        SmolStr::new_static("score"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("nsid"),
+                            SmolStr::new_static("score"), SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -390,9 +413,9 @@ fn lexicon_doc_sh_tangled_search_query() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("nsid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Collection of the matched record.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Collection of the matched record."),
+                                ),
                                 format: Some(LexStringFormat::Nsid),
                                 ..Default::default()
                             }),
@@ -424,88 +447,100 @@ fn lexicon_doc_sh_tangled_search_query() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("q")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("author"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Restrict to records authored by this DID.",
-                                    )),
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Pagination cursor")),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("nsid"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Restrict to records of this collection.",
-                                    )),
-                                    format: Some(LexStringFormat::Nsid),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("q"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Full-text search query.",
-                                    )),
-                                    min_length: Some(1usize),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repo"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Restrict to records under this repo DID.",
-                                    )),
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("since"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Restrict to records created at or after this time.",
-                                    )),
-                                    format: Some(LexStringFormat::Datetime),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("until"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Restrict to records created at or before this time.",
-                                    )),
-                                    format: Some(LexStringFormat::Datetime),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("q")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("author"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Restrict to records authored by this DID.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(CowStr::new_static("Pagination cursor")),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("nsid"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Restrict to records of this collection.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Nsid),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("q"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Full-text search query."),
+                                        ),
+                                        min_length: Some(1usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repo"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Restrict to records under this repo DID.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("since"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Restrict to records created at or after this time.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Datetime),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("until"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Restrict to records created at or before this time.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Datetime),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -521,7 +556,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod query_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

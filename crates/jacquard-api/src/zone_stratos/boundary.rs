@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,35 +20,39 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::zone_stratos::boundary;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::zone_stratos::boundary;
 /// A specific domain to define exposure boundary.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Domain<S: BosStr = DefaultStr> {
     ///Domain identifier for boundary. Must be a valid domain name.
     pub value: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_domain_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A collection of domains that define the exposure boundary for a record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Domains<S: BosStr = DefaultStr> {
     ///List of domains that can access this record.
     pub values: Vec<boundary::Domain<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_domains_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -104,11 +108,24 @@ impl<S: BosStr> LexiconSchema for Domains<S> {
     }
 }
 
+fn deserialize_domain_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.boundary.defs"),
@@ -117,9 +134,11 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("Domain"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A specific domain to define exposure boundary.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A specific domain to define exposure boundary.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("value")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -127,9 +146,11 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("value"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Domain identifier for boundary. Must be a valid domain name.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Domain identifier for boundary. Must be a valid domain name.",
+                                    ),
+                                ),
                                 max_length: Some(253usize),
                                 ..Default::default()
                             }),
@@ -142,9 +163,11 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("Domains"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A collection of domains that define the exposure boundary for a record.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A collection of domains that define the exposure boundary for a record.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("values")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -152,9 +175,11 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("values"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of domains that can access this record.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "List of domains that can access this record.",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#Domain"),
                                     ..Default::default()
@@ -174,9 +199,22 @@ fn lexicon_doc_zone_stratos_boundary_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_domains_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod domains_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

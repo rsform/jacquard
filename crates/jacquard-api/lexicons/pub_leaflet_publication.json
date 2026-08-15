@@ -44,6 +44,14 @@
     "preferences": {
       "type": "object",
       "properties": {
+        "prevNextDirection": {
+          "type": "string",
+          "default": "rtl",
+          "knownValues": [
+            "ltr",
+            "rtl"
+          ]
+        },
         "showComments": {
           "type": "boolean",
           "default": true

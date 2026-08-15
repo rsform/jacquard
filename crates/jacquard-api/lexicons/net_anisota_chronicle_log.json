@@ -29,7 +29,12 @@
             "description": "Event type. Extensible — new values added as features grow.",
             "enum": [
               "moth_sighted",
-              "item_found"
+              "item_found",
+              "fieldwork_completed",
+              "milestone_reached",
+              "achievement_earned",
+              "level_up",
+              "anomaly_sighted"
             ]
           },
           "expeditionRef": {

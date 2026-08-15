@@ -10,6 +10,7 @@ pub mod get_pipeline;
 pub mod pipeline;
 pub mod query_pipelines;
 
+
 #[cfg(feature = "streaming")]
 pub mod subscribe_pipeline_logs;
 pub mod trigger;

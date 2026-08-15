@@ -32,25 +32,32 @@ pub mod search_posts_v2;
 pub mod send_interactions;
 pub mod threadgate;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, UriValue};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor;
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 use crate::app_bsky::actor::ProfileViewBasic;
+use crate::app_bsky::graph::ListViewBasic;
+use crate::app_bsky::richtext::facet::Facet;
+use crate::com_atproto::label::Label;
+use crate::app_bsky::actor;
 use crate::app_bsky::embed::external;
 use crate::app_bsky::embed::gallery;
 use crate::app_bsky::embed::images;
@@ -58,36 +65,35 @@ use crate::app_bsky::embed::record;
 use crate::app_bsky::embed::record_with_media;
 use crate::app_bsky::embed::video;
 use crate::app_bsky::feed;
-use crate::app_bsky::graph::ListViewBasic;
-use crate::app_bsky::richtext::facet::Facet;
-use crate::com_atproto::label::Label;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlockedAuthor<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer: Option<actor::ViewerState<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_blocked_author_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlockedPost<S: BosStr = DefaultStr> {
     pub author: feed::BlockedAuthor<S>,
     pub blocked: bool,
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_blocked_post_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -151,11 +157,9 @@ impl core::fmt::Display for ContentModeVideo {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedViewPost<S: BosStr = DefaultStr> {
     ///Context provided by feed generator that may be passed back alongside interactions.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -168,9 +172,15 @@ pub struct FeedViewPost<S: BosStr = DefaultStr> {
     ///Unique identifier per request that may be passed back alongside interactions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub req_id: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_feed_view_post_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -182,11 +192,9 @@ pub enum FeedViewPostReason<S: BosStr = DefaultStr> {
     ReasonPin(Box<feed::ReasonPin<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GeneratorView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepts_interactions: Option<bool>,
@@ -210,9 +218,15 @@ pub struct GeneratorView<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer: Option<feed::GeneratorViewerState<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_generator_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GeneratorViewContentMode<S: BosStr = DefaultStr> {
@@ -260,7 +274,8 @@ impl<S: BosStr> Serialize for GeneratorViewContentMode<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GeneratorViewContentMode<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for GeneratorViewContentMode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -290,28 +305,31 @@ where
             GeneratorViewContentMode::ContentModeVideo => {
                 GeneratorViewContentMode::ContentModeVideo
             }
-            GeneratorViewContentMode::Other(v) => GeneratorViewContentMode::Other(v.into_static()),
+            GeneratorViewContentMode::Other(v) => {
+                GeneratorViewContentMode::Other(v.into_static())
+            }
         }
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GeneratorViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub like: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_generator_viewer_state_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Interaction<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub event: Option<InteractionEvent<S>>,
@@ -323,9 +341,15 @@ pub struct Interaction<S: BosStr = DefaultStr> {
     ///Unique identifier per request that may be passed back alongside interactions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub req_id: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_interaction_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InteractionEvent<S: BosStr = DefaultStr> {
@@ -431,7 +455,9 @@ where
             InteractionEvent::RequestMore => InteractionEvent::RequestMore,
             InteractionEvent::ClickthroughItem => InteractionEvent::ClickthroughItem,
             InteractionEvent::ClickthroughAuthor => InteractionEvent::ClickthroughAuthor,
-            InteractionEvent::ClickthroughReposter => InteractionEvent::ClickthroughReposter,
+            InteractionEvent::ClickthroughReposter => {
+                InteractionEvent::ClickthroughReposter
+            }
             InteractionEvent::ClickthroughEmbed => InteractionEvent::ClickthroughEmbed,
             InteractionEvent::InteractionSeen => InteractionEvent::InteractionSeen,
             InteractionEvent::InteractionLike => InteractionEvent::InteractionLike,
@@ -504,23 +530,24 @@ impl core::fmt::Display for InteractionShare {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NotFoundPost<S: BosStr = DefaultStr> {
     pub not_found: bool,
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_not_found_post_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PostView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -548,9 +575,15 @@ pub struct PostView<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer: Option<feed::ViewerState<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_post_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -570,21 +603,22 @@ pub enum PostViewEmbed<S: BosStr = DefaultStr> {
     RecordWithMediaView(Box<record_with_media::View<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReasonPin<S: BosStr = DefaultStr> {
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_reason_pin_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReasonRepost<S: BosStr = DefaultStr> {
     pub by: ProfileViewBasic<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -592,24 +626,33 @@ pub struct ReasonRepost<S: BosStr = DefaultStr> {
     pub indexed_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_reason_repost_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReplyRef<S: BosStr = DefaultStr> {
     ///When parent is a reply to another post, this is the author of that post.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grandparent_author: Option<ProfileViewBasic<S>>,
     pub parent: ReplyRefParent<S>,
     pub root: ReplyRefRoot<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_reply_ref_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -622,6 +665,7 @@ pub enum ReplyRefParent<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
     BlockedPost(Box<feed::BlockedPost<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -655,11 +699,9 @@ impl core::fmt::Display for RequestMore {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SkeletonFeedPost<S: BosStr = DefaultStr> {
     ///Context that will be passed through to client and may be passed to feed generator back alongside interactions.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -667,9 +709,15 @@ pub struct SkeletonFeedPost<S: BosStr = DefaultStr> {
     pub post: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<SkeletonFeedPostReason<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_skeleton_feed_post_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -681,46 +729,52 @@ pub enum SkeletonFeedPostReason<S: BosStr = DefaultStr> {
     SkeletonReasonPin(Box<feed::SkeletonReasonPin<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SkeletonReasonPin<S: BosStr = DefaultStr> {
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_skeleton_reason_pin_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SkeletonReasonRepost<S: BosStr = DefaultStr> {
     pub repost: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_skeleton_reason_repost_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata about this post within the context of the thread it is in.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThreadContext<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub root_author_like: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_thread_context_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThreadViewPost<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<ThreadViewPostParent<S>>,
@@ -729,9 +783,15 @@ pub struct ThreadViewPost<S: BosStr = DefaultStr> {
     pub replies: Option<Vec<ThreadViewPostRepliesItem<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thread_context: Option<feed::ThreadContext<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_thread_view_post_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -745,6 +805,7 @@ pub enum ThreadViewPostParent<S: BosStr = DefaultStr> {
     BlockedPost(Box<feed::BlockedPost<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -757,11 +818,9 @@ pub enum ThreadViewPostRepliesItem<S: BosStr = DefaultStr> {
     BlockedPost(Box<feed::BlockedPost<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ThreadgateView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -771,17 +830,19 @@ pub struct ThreadgateView<S: BosStr = DefaultStr> {
     pub record: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_threadgate_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata about the requesting account's relationship with the subject content. Only has meaningful content for authed requests.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bookmarked: Option<bool>,
@@ -797,7 +858,12 @@ pub struct ViewerState<S: BosStr = DefaultStr> {
     pub repost: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thread_muted: Option<bool>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_viewer_state_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -1152,9 +1218,22 @@ impl<S: BosStr> LexiconSchema for ViewerState<S> {
     }
 }
 
+fn deserialize_blocked_author_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod blocked_author_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1185,7 +1264,10 @@ pub mod blocked_author_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct BlockedAuthorBuilder<St: blocked_author_state::State, S: BosStr = DefaultStr> {
+pub struct BlockedAuthorBuilder<
+    St: blocked_author_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<actor::ViewerState<S>>),
     _type: PhantomData<fn() -> S>,
@@ -1273,7 +1355,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockedAuthor<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlockedAuthor<S> {
         BlockedAuthor {
             did: self._fields.0.unwrap(),
             viewer: self._fields.1,
@@ -1283,10 +1368,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.feed.defs"),
@@ -1309,7 +1394,9 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("viewer"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#viewerState"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#viewerState",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1321,11 +1408,12 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("blockedPost"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("blocked"),
-                        SmolStr::new_static("author"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("blocked"),
+                            SmolStr::new_static("author")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1356,39 +1444,27 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("clickthroughAuthor"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("clickthroughEmbed"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("clickthroughItem"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("clickthroughReposter"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("contentModeUnspecified"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("contentModeVideo"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("feedViewPost"),
@@ -1453,14 +1529,14 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("generatorView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("creator"),
-                        SmolStr::new_static("displayName"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("did"), SmolStr::new_static("creator"),
+                            SmolStr::new_static("displayName"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1486,14 +1562,14 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("contentMode"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("creator"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileView"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileView",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1524,9 +1600,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("indexedAt"),
@@ -1637,47 +1711,34 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("interactionLike"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("interactionQuote"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("interactionReply"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("interactionRepost"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("interactionSeen"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("interactionShare"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("notFoundPost"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("notFound"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("notFound")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1702,20 +1763,22 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("postView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("record"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("author"), SmolStr::new_static("record"),
+                            SmolStr::new_static("indexedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1747,7 +1810,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                                     CowStr::new_static("app.bsky.embed.gallery#view"),
                                     CowStr::new_static("app.bsky.embed.external#view"),
                                     CowStr::new_static("app.bsky.embed.record#view"),
-                                    CowStr::new_static("app.bsky.embed.recordWithMedia#view"),
+                                    CowStr::new_static("app.bsky.embed.recordWithMedia#view")
                                 ],
                                 ..Default::default()
                             }),
@@ -1839,17 +1902,18 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("reasonRepost"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("by"),
-                        SmolStr::new_static("indexedAt"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("by"), SmolStr::new_static("indexedAt")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("by"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1882,17 +1946,18 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("replyRef"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("root"),
-                        SmolStr::new_static("parent"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("root"), SmolStr::new_static("parent")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("grandparentAuthor"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1902,7 +1967,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#postView"),
                                     CowStr::new_static("#notFoundPost"),
-                                    CowStr::new_static("#blockedPost"),
+                                    CowStr::new_static("#blockedPost")
                                 ],
                                 ..Default::default()
                             }),
@@ -1913,7 +1978,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#postView"),
                                     CowStr::new_static("#notFoundPost"),
-                                    CowStr::new_static("#blockedPost"),
+                                    CowStr::new_static("#blockedPost")
                                 ],
                                 ..Default::default()
                             }),
@@ -1925,15 +1990,11 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("requestLess"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("requestMore"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("skeletonFeedPost"),
@@ -2009,9 +2070,11 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("threadContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Metadata about this post within the context of the thread it is in.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Metadata about this post within the context of the thread it is in.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -2040,7 +2103,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                                 refs: vec![
                                     CowStr::new_static("#threadViewPost"),
                                     CowStr::new_static("#notFoundPost"),
-                                    CowStr::new_static("#blockedPost"),
+                                    CowStr::new_static("#blockedPost")
                                 ],
                                 ..Default::default()
                             }),
@@ -2059,7 +2122,7 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                                     refs: vec![
                                         CowStr::new_static("#threadViewPost"),
                                         CowStr::new_static("#notFoundPost"),
-                                        CowStr::new_static("#blockedPost"),
+                                        CowStr::new_static("#blockedPost")
                                     ],
                                     ..Default::default()
                                 }),
@@ -2095,7 +2158,9 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
                             SmolStr::new_static("lists"),
                             LexObjectProperty::Array(LexArray {
                                 items: LexArrayItem::Ref(LexRef {
-                                    r#ref: CowStr::new_static("app.bsky.graph.defs#listViewBasic"),
+                                    r#ref: CowStr::new_static(
+                                        "app.bsky.graph.defs#listViewBasic",
+                                    ),
                                     ..Default::default()
                                 }),
                                 ..Default::default()
@@ -2185,9 +2250,22 @@ fn lexicon_doc_app_bsky_feed_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_blocked_post_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod blocked_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2246,11 +2324,7 @@ pub mod blocked_post_state {
 /// Builder for constructing an instance of this type.
 pub struct BlockedPostBuilder<St: blocked_post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<feed::BlockedAuthor<S>>,
-        Option<bool>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<feed::BlockedAuthor<S>>, Option<bool>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -2364,7 +2438,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BlockedPost<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlockedPost<S> {
         BlockedPost {
             author: self._fields.0.unwrap(),
             blocked: self._fields.1.unwrap(),
@@ -2374,9 +2451,22 @@ where
     }
 }
 
+fn deserialize_feed_view_post_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod feed_view_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2543,7 +2633,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FeedViewPost<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FeedViewPost<S> {
         FeedViewPost {
             feed_context: self._fields.0,
             post: self._fields.1.unwrap(),
@@ -2555,9 +2648,22 @@ where
     }
 }
 
+fn deserialize_generator_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod generator_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2668,7 +2774,10 @@ pub mod generator_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GeneratorViewBuilder<St: generator_view_state::State, S: BosStr = DefaultStr> {
+pub struct GeneratorViewBuilder<
+    St: generator_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -2709,7 +2818,20 @@ impl GeneratorViewBuilder<generator_view_state::Empty, DefaultStr> {
         GeneratorViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2722,7 +2844,20 @@ impl<S: BosStr> GeneratorViewBuilder<generator_view_state::Empty, S> {
         GeneratorViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2776,12 +2911,18 @@ where
 
 impl<St: generator_view_state::State, S: BosStr> GeneratorViewBuilder<St, S> {
     /// Set the `contentMode` field (optional)
-    pub fn content_mode(mut self, value: impl Into<Option<GeneratorViewContentMode<S>>>) -> Self {
+    pub fn content_mode(
+        mut self,
+        value: impl Into<Option<GeneratorViewContentMode<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `contentMode` field to an Option value (optional)
-    pub fn maybe_content_mode(mut self, value: Option<GeneratorViewContentMode<S>>) -> Self {
+    pub fn maybe_content_mode(
+        mut self,
+        value: Option<GeneratorViewContentMode<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -2821,7 +2962,10 @@ impl<St: generator_view_state::State, S: BosStr> GeneratorViewBuilder<St, S> {
 
 impl<St: generator_view_state::State, S: BosStr> GeneratorViewBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -2936,7 +3080,10 @@ where
 
 impl<St: generator_view_state::State, S: BosStr> GeneratorViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<feed::GeneratorViewerState<S>>>) -> Self {
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<feed::GeneratorViewerState<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
@@ -2978,7 +3125,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GeneratorView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GeneratorView<S> {
         GeneratorView {
             accepts_interactions: self._fields.0,
             avatar: self._fields.1,
@@ -2999,9 +3149,48 @@ where
     }
 }
 
+fn deserialize_generator_viewer_state_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_interaction_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_not_found_post_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod not_found_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3139,7 +3328,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NotFoundPost<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotFoundPost<S> {
         NotFoundPost {
             not_found: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -3148,9 +3340,22 @@ where
     }
 }
 
+fn deserialize_post_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod post_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3283,7 +3488,20 @@ impl PostViewBuilder<post_view_state::Empty, DefaultStr> {
         PostViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -3297,7 +3515,20 @@ impl<S: BosStr> PostViewBuilder<post_view_state::Empty, S> {
         PostViewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -3487,7 +3718,10 @@ impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
 
 impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
     /// Set the `threadgate` field (optional)
-    pub fn threadgate(mut self, value: impl Into<Option<feed::ThreadgateView<S>>>) -> Self {
+    pub fn threadgate(
+        mut self,
+        value: impl Into<Option<feed::ThreadgateView<S>>>,
+    ) -> Self {
         self._fields.12 = value.into();
         self
     }
@@ -3583,9 +3817,35 @@ where
     }
 }
 
+fn deserialize_reason_pin_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_reason_repost_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod reason_repost_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3756,7 +4016,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReasonRepost<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReasonRepost<S> {
         ReasonRepost {
             by: self._fields.0.unwrap(),
             cid: self._fields.1,
@@ -3767,9 +4030,22 @@ where
     }
 }
 
+fn deserialize_reply_ref_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod reply_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3860,12 +4136,18 @@ impl<S: BosStr> ReplyRefBuilder<reply_ref_state::Empty, S> {
 
 impl<St: reply_ref_state::State, S: BosStr> ReplyRefBuilder<St, S> {
     /// Set the `grandparentAuthor` field (optional)
-    pub fn grandparent_author(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
+    pub fn grandparent_author(
+        mut self,
+        value: impl Into<Option<ProfileViewBasic<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `grandparentAuthor` field to an Option value (optional)
-    pub fn maybe_grandparent_author(mut self, value: Option<ProfileViewBasic<S>>) -> Self {
+    pub fn maybe_grandparent_author(
+        mut self,
+        value: Option<ProfileViewBasic<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -3935,9 +4217,22 @@ where
     }
 }
 
+fn deserialize_skeleton_feed_post_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod skeleton_feed_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3968,19 +4263,21 @@ pub mod skeleton_feed_post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SkeletonFeedPostBuilder<St: skeleton_feed_post_state::State, S: BosStr = DefaultStr> {
+pub struct SkeletonFeedPostBuilder<
+    St: skeleton_feed_post_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<AtUri<S>>,
-        Option<SkeletonFeedPostReason<S>>,
-    ),
+    _fields: (Option<S>, Option<AtUri<S>>, Option<SkeletonFeedPostReason<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl SkeletonFeedPost<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SkeletonFeedPostBuilder<skeleton_feed_post_state::Empty, DefaultStr> {
+    pub fn new() -> SkeletonFeedPostBuilder<
+        skeleton_feed_post_state::Empty,
+        DefaultStr,
+    > {
         SkeletonFeedPostBuilder::new()
     }
 }
@@ -4048,7 +4345,10 @@ where
 
 impl<St: skeleton_feed_post_state::State, S: BosStr> SkeletonFeedPostBuilder<St, S> {
     /// Set the `reason` field (optional)
-    pub fn reason(mut self, value: impl Into<Option<SkeletonFeedPostReason<S>>>) -> Self {
+    pub fn reason(
+        mut self,
+        value: impl Into<Option<SkeletonFeedPostReason<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -4074,7 +4374,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SkeletonFeedPost<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SkeletonFeedPost<S> {
         SkeletonFeedPost {
             feed_context: self._fields.0,
             post: self._fields.1.unwrap(),
@@ -4084,9 +4387,35 @@ where
     }
 }
 
+fn deserialize_skeleton_reason_pin_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_skeleton_reason_repost_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod skeleton_reason_repost_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4128,14 +4457,20 @@ pub struct SkeletonReasonRepostBuilder<
 
 impl SkeletonReasonRepost<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SkeletonReasonRepostBuilder<skeleton_reason_repost_state::Empty, DefaultStr> {
+    pub fn new() -> SkeletonReasonRepostBuilder<
+        skeleton_reason_repost_state::Empty,
+        DefaultStr,
+    > {
         SkeletonReasonRepostBuilder::new()
     }
 }
 
 impl<S: BosStr> SkeletonReasonRepost<S> {
     /// Create a new builder for this type
-    pub fn builder() -> SkeletonReasonRepostBuilder<skeleton_reason_repost_state::Empty, S> {
+    pub fn builder() -> SkeletonReasonRepostBuilder<
+        skeleton_reason_repost_state::Empty,
+        S,
+    > {
         SkeletonReasonRepostBuilder::builder()
     }
 }
@@ -4205,9 +4540,35 @@ where
     }
 }
 
+fn deserialize_thread_context_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_thread_view_post_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod thread_view_post_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4238,7 +4599,10 @@ pub mod thread_view_post_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ThreadViewPostBuilder<St: thread_view_post_state::State, S: BosStr = DefaultStr> {
+pub struct ThreadViewPostBuilder<
+    St: thread_view_post_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ThreadViewPostParent<S>>,
@@ -4319,12 +4683,18 @@ where
 
 impl<St: thread_view_post_state::State, S: BosStr> ThreadViewPostBuilder<St, S> {
     /// Set the `replies` field (optional)
-    pub fn replies(mut self, value: impl Into<Option<Vec<ThreadViewPostRepliesItem<S>>>>) -> Self {
+    pub fn replies(
+        mut self,
+        value: impl Into<Option<Vec<ThreadViewPostRepliesItem<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `replies` field to an Option value (optional)
-    pub fn maybe_replies(mut self, value: Option<Vec<ThreadViewPostRepliesItem<S>>>) -> Self {
+    pub fn maybe_replies(
+        mut self,
+        value: Option<Vec<ThreadViewPostRepliesItem<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -4332,12 +4702,18 @@ impl<St: thread_view_post_state::State, S: BosStr> ThreadViewPostBuilder<St, S> 
 
 impl<St: thread_view_post_state::State, S: BosStr> ThreadViewPostBuilder<St, S> {
     /// Set the `threadContext` field (optional)
-    pub fn thread_context(mut self, value: impl Into<Option<feed::ThreadContext<S>>>) -> Self {
+    pub fn thread_context(
+        mut self,
+        value: impl Into<Option<feed::ThreadContext<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `threadContext` field to an Option value (optional)
-    pub fn maybe_thread_context(mut self, value: Option<feed::ThreadContext<S>>) -> Self {
+    pub fn maybe_thread_context(
+        mut self,
+        value: Option<feed::ThreadContext<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -4359,7 +4735,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ThreadViewPost<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ThreadViewPost<S> {
         ThreadViewPost {
             parent: self._fields.0,
             post: self._fields.1.unwrap(),
@@ -4368,4 +4747,30 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_threadgate_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_viewer_state_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

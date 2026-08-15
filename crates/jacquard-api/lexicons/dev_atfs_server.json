@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "dev.atfs.server",
+  "description": "An atfs instance's own configuration, read at boot — and re-read whenever it changes, the instance having subscribed to the owner's repo — by the instance whose libp2p peer ID is the record key (rkey) — at://{owner-did}/dev.atfs.server/{peer-id}. One owner repo can configure many instances this way. Changes to accounts, serviceDid and follows apply without a restart; the did:web document atfs serves for a bare-domain serviceDid is bound at startup and needs one to pick up a change. Unknown fields are tolerated and ignored, so a running instance is never broken by a schema field it predates. An absent record is not an error — the instance runs with defaults, and uploads stay disabled until accounts and serviceDid are both set.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "accounts"
+        ],
+        "properties": {
+          "accounts": {
+            "type": "array",
+            "description": "The complete upload allowlist: atproto accounts permitted to call uploadFile/uploadBlob and pinFile. Required, and the owner is NOT implicitly included — an operator who wants to upload to their own instance must list themselves like any other account. DIDs only, never handles: an entry then survives a handle change, and a reverse index over accounts can answer 'which atfs instances can this person use' without resolving anything first.",
+            "items": {
+              "type": "string",
+              "format": "did"
+            }
+          },
+          "follows": {
+            "type": "array",
+            "description": "Other atfs instances this one mirrors, each named by the at-uri of that instance's own dev.atfs.server record (at://{their-owner}/dev.atfs.server/{their-peer-id}). Identity rather than a URL, so a followed instance can move without breaking the follow: the follower resolves this record to learn where to poll (its bare-domain did:web serviceDid, derived the same way as above) and whose name to hold the mirrored claims under (that same serviceDid, or an identity derived from its peer ID when it declares none). The follower periodically walks the followed instance's dev.atfs.repo.listFiles, pins whatever is new, and releases whatever has been absent from two consecutive listings. Following is unilateral and needs no consent: listFiles is public and every pinned cid is already a DHT provider record, so an opt-in would be unenforceable. Only directly-claimed content is exported by listFiles, so following an instance never transitively mirrors what *it* follows — follow each origin you want. Removing an entry releases every claim that instance's mirror held here, and the content is deleted once nothing else claims it.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "requestBodyCap": {
+            "type": "integer",
+            "description": "An operator-declared ceiling on the request bodies this instance's ingress will actually let through, in bytes. atfs cannot discover this on its own — it never sees its own ingress, only what a fronting proxy or tunnel lets past — so this is one of three sources describeServer combines with the lowest winning, alongside the ATFS_MAX_REQUEST_BODY env var and headers sniffed off arriving requests (e.g. Cloudflare's CF-Ray, read as at least its Free/Pro plan figure). Set this when those under- or over-report — for example a Cloudflare zone on a paid plan above the Free/Pro figure sniffing assumes.",
+            "minimum": 1
+          },
+          "serviceDid": {
+            "type": "string",
+            "description": "This instance's own identity and address. It's the `aud` uploaders must address in their inter-service auth JWTs, and — only when it's a bare-domain did:web (exactly one segment after `did:web:`, so no path and no port suffix: `did:web:atfs.example.com`, never `did:web:atfs.example.com:user:alice` or an encoded-port form) — it also doubles as this instance's single HTTPS base URL, and atfs serves its own DID document at that domain's /.well-known/did.json. Uploads stay disabled until this is a bare-domain did:web and accounts names at least one account.",
+            "format": "did"
+          }
+        }
+      }
+    }
+  }
+}

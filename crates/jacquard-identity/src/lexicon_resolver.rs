@@ -486,7 +486,7 @@ impl<C: HttpClient + Sync> LexiconSchemaResolver for crate::JacquardResolver<C> 
         use jacquard_common::{IntoStatic, xrpc::XrpcExt};
 
         let nsid_str = nsid.as_str();
-        let owned_nsid: Nsid = Nsid::new_owned(nsid_str).expect("already validated NSID");
+        let owned_nsid: Nsid = nsid.borrow().into_static();
 
         // Try cache first
         #[cfg(feature = "cache")]

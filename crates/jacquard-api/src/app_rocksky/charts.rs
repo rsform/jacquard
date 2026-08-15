@@ -10,6 +10,7 @@ pub mod get_scrobbles_chart;
 pub mod get_top_artists;
 pub mod get_top_tracks;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
@@ -23,28 +24,28 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_rocksky::charts;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_rocksky::charts;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChartsView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scrobbles: Option<Vec<charts::ScrobbleViewBasic<S>>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_charts_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScrobbleViewBasic<S: BosStr = DefaultStr> {
     ///The number of scrobbles on this date.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -52,7 +53,12 @@ pub struct ScrobbleViewBasic<S: BosStr = DefaultStr> {
     ///The date of the scrobble.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date: Option<Datetime>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_scrobble_view_basic_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -86,11 +92,24 @@ impl<S: BosStr> LexiconSchema for ScrobbleViewBasic<S> {
     }
 }
 
+fn deserialize_charts_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_app_rocksky_charts_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.charts.defs"),
@@ -134,7 +153,9 @@ fn lexicon_doc_app_rocksky_charts_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("date"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The date of the scrobble.")),
+                                description: Some(
+                                    CowStr::new_static("The date of the scrobble."),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -148,4 +169,17 @@ fn lexicon_doc_app_rocksky_charts_defs() -> LexiconDoc<'static> {
         },
         ..Default::default()
     }
+}
+
+fn deserialize_scrobble_view_basic_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.notification.getUnreadCount",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the total number of unread notifications for the authenticated user. Used to drive the bell badge.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "count"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    }
+  }
+}

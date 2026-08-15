@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.countPullsBy",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "Actor DID whose pull authorings to list",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "count",
+            "distinctAuthors"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "Total number of matching records.",
+              "minimum": 0
+            },
+            "distinctAuthors": {
+              "type": "integer",
+              "description": "Number of distinct authors among the matching records.",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

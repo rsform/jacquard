@@ -12,6 +12,7 @@ pub mod deck;
 pub mod richtext;
 pub mod social;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -30,21 +31,23 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Reference to a Magic: The Gathering card with printing and oracle identifiers.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardRef<S: BosStr = DefaultStr> {
     /**Oracle card URI (oracle:<uuid>) - for external indexing.
-    Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
+Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     pub oracle_uri: UriValue<S>,
     ///Scryfall printing URI (scry:<uuid>) - authoritative identifier
     pub scryfall_uri: UriValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_card_ref_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,9 +66,22 @@ impl<S: BosStr> LexiconSchema for CardRef<S> {
     }
 }
 
+fn deserialize_card_ref_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod card_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -213,10 +229,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.defs"),

@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::feed::PostView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Language, UriValue};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::PostView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchPostsV2<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub all_time: Option<bool>,
@@ -87,11 +84,9 @@ pub struct SearchPostsV2<S: BosStr = DefaultStr> {
     pub urls: Option<Vec<UriValue<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchPostsV2Output<S: BosStr = DefaultStr> {
     ///Cursor for the next page of results.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -108,19 +103,25 @@ pub struct SearchPostsV2Output<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SearchPostsV2Error {
     #[serde(rename = "BadQueryString")]
     BadQueryString(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SearchPostsV2Error {
@@ -178,7 +179,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod search_posts_v2_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -196,7 +197,10 @@ pub mod search_posts_v2_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SearchPostsV2Builder<St: search_posts_v2_state::State, S: BosStr = DefaultStr> {
+pub struct SearchPostsV2Builder<
+    St: search_posts_v2_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
@@ -252,8 +256,34 @@ impl SearchPostsV2Builder<search_posts_v2_state::Empty, DefaultStr> {
         SearchPostsV2Builder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -267,8 +297,34 @@ impl<S: BosStr> SearchPostsV2Builder<search_posts_v2_state::Empty, S> {
         SearchPostsV2Builder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -343,7 +399,10 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
 
 impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
     /// Set the `excludeAuthors` field (optional)
-    pub fn exclude_authors(mut self, value: impl Into<Option<Vec<AtIdentifier<S>>>>) -> Self {
+    pub fn exclude_authors(
+        mut self,
+        value: impl Into<Option<Vec<AtIdentifier<S>>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -369,12 +428,18 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
 
 impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
     /// Set the `excludeEmbeddedAtUris` field (optional)
-    pub fn exclude_embedded_at_uris(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
+    pub fn exclude_embedded_at_uris(
+        mut self,
+        value: impl Into<Option<Vec<AtUri<S>>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `excludeEmbeddedAtUris` field to an Option value (optional)
-    pub fn maybe_exclude_embedded_at_uris(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
+    pub fn maybe_exclude_embedded_at_uris(
+        mut self,
+        value: Option<Vec<AtUri<S>>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }
@@ -408,12 +473,18 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
 
 impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
     /// Set the `excludeMentions` field (optional)
-    pub fn exclude_mentions(mut self, value: impl Into<Option<Vec<AtIdentifier<S>>>>) -> Self {
+    pub fn exclude_mentions(
+        mut self,
+        value: impl Into<Option<Vec<AtIdentifier<S>>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `excludeMentions` field to an Option value (optional)
-    pub fn maybe_exclude_mentions(mut self, value: Option<Vec<AtIdentifier<S>>>) -> Self {
+    pub fn maybe_exclude_mentions(
+        mut self,
+        value: Option<Vec<AtIdentifier<S>>>,
+    ) -> Self {
         self._fields.10 = value;
         self
     }

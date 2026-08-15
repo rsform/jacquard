@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Create<S: BosStr = DefaultStr> {
     ///Default branch to push to
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,11 +37,9 @@ pub struct Create<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateOutput<S: BosStr = DefaultStr> {
     ///Multibase-encoded public signing key the knot holds for this repository
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,8 +63,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Create<S> {
     const NSID: &'static str = "sh.tangled.repo.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateResponse;
 }
 
@@ -79,15 +75,16 @@ Path: `/xrpc/sh.tangled.repo.create`. The request payload type is `Create<S>`; s
 pub struct CreateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.create";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Create<S>;
     type Response = CreateResponse;
 }
 
 pub mod create_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -197,7 +194,10 @@ where
     St::Name: create_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> CreateBuilder<create_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> CreateBuilder<create_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         CreateBuilder {
             _state: PhantomData,

@@ -12,9 +12,10 @@ pub mod get_top_releases;
 pub mod get_user_top_artists;
 pub mod get_user_top_releases;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,13 +28,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ArtistView<S: BosStr = DefaultStr> {
     ///MusicBrainz artist ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,15 +42,18 @@ pub struct ArtistView<S: BosStr = DefaultStr> {
     ///Total number of plays for this artist
     #[serde(skip_serializing_if = "Option::is_none")]
     pub play_count: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_artist_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordingView<S: BosStr = DefaultStr> {
     ///MusicBrainz recording ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,15 +64,18 @@ pub struct RecordingView<S: BosStr = DefaultStr> {
     ///Total number of plays for this recording
     #[serde(skip_serializing_if = "Option::is_none")]
     pub play_count: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_recording_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReleaseView<S: BosStr = DefaultStr> {
     ///MusicBrainz release ID URI, formatted as mbid:<uuid>
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -82,7 +86,12 @@ pub struct ReleaseView<S: BosStr = DefaultStr> {
     ///Total number of plays for this release
     #[serde(skip_serializing_if = "Option::is_none")]
     pub play_count: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_release_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -131,11 +140,24 @@ impl<S: BosStr> LexiconSchema for ReleaseView<S> {
     }
 }
 
+fn deserialize_artist_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("fm.teal.alpha.stats.defs"),
@@ -150,9 +172,11 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MusicBrainz artist ID URI, formatted as mbid:<uuid>",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "MusicBrainz artist ID URI, formatted as mbid:<uuid>",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -184,9 +208,11 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MusicBrainz recording ID URI, formatted as mbid:<uuid>",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "MusicBrainz recording ID URI, formatted as mbid:<uuid>",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -194,7 +220,9 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Recording/track name")),
+                                description: Some(
+                                    CowStr::new_static("Recording/track name"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -218,9 +246,11 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("mbid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MusicBrainz release ID URI, formatted as mbid:<uuid>",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "MusicBrainz release ID URI, formatted as mbid:<uuid>",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -247,4 +277,30 @@ fn lexicon_doc_fm_teal_alpha_stats_defs() -> LexiconDoc<'static> {
         },
         ..Default::default()
     }
+}
+
+fn deserialize_recording_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_release_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

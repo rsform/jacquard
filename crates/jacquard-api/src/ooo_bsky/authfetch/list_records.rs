@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::ooo_bsky::authfetch::list_records;
-use crate::ooo_bsky::authfetch::strategy::Strategy;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::ooo_bsky::authfetch::strategy::Strategy;
+use crate::ooo_bsky::authfetch::list_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRecords<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,11 +41,9 @@ pub struct ListRecords<S: BosStr = DefaultStr> {
     pub reverse: Option<bool>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRecordsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -60,10 +55,7 @@ pub struct ListRecordsOutput<S: BosStr = DefaultStr> {
 /// A record in the hidden repository.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Record<S: BosStr = DefaultStr> {
     ///The strategy used to authenticate fetch requests for this record.
     pub strategy: Strategy<S>,
@@ -71,7 +63,12 @@ pub struct Record<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     ///The stored private record value.
     pub value: Data<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_record_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -124,7 +121,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -271,9 +268,22 @@ where
     }
 }
 
+fn deserialize_record_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -397,7 +407,10 @@ where
     St::Uri: record_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<AtUri<S>>) -> RecordBuilder<record_state::SetUri<St>, S> {
+    pub fn uri(
+        mut self,
+        value: impl Into<AtUri<S>>,
+    ) -> RecordBuilder<record_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
@@ -454,10 +467,10 @@ where
 }
 
 fn lexicon_doc_ooo_bsky_authfetch_listRecords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ooo.bsky.authfetch.listRecords"),
@@ -466,55 +479,60 @@ fn lexicon_doc_ooo_bsky_authfetch_listRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("collection")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("collection"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The NSID of the record collection.",
-                                    )),
-                                    format: Some(LexStringFormat::Nsid),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("reverse"),
-                                LexXrpcParametersProperty::Boolean(LexBoolean {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("collection")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("collection"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("The NSID of the record collection."),
+                                        ),
+                                        format: Some(LexStringFormat::Nsid),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("reverse"),
+                                    LexXrpcParametersProperty::Boolean(LexBoolean {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("record"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A record in the hidden repository.")),
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("strategy"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("A record in the hidden repository."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("strategy"),
+                            SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -528,7 +546,9 @@ fn lexicon_doc_ooo_bsky_authfetch_listRecords() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The AT URI of the record.")),
+                                description: Some(
+                                    CowStr::new_static("The AT URI of the record."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

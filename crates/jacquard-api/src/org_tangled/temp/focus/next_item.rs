@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
-use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::{Did, AtUri};
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NextItem<S: BosStr = DefaultStr> {
     ///ID of the notification just addressed, to be marked read.
     pub current_id: i64,
@@ -29,11 +26,9 @@ pub struct NextItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NextItemOutput<S: BosStr = DefaultStr> {
     ///AT-URI of the issue to navigate to, if the item is an issue.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,8 +59,9 @@ impl jacquard_common::xrpc::XrpcResp for NextItemResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for NextItem<S> {
     const NSID: &'static str = "org.tangled.temp.focus.nextItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = NextItemResponse;
 }
 
@@ -75,15 +71,16 @@ Path: `/xrpc/org.tangled.temp.focus.nextItem`. The request payload type is `Next
 pub struct NextItemRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for NextItemRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.focus.nextItem";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = NextItem<S>;
     type Response = NextItemResponse;
 }
 
 pub mod next_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

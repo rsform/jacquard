@@ -8,6 +8,7 @@ pub mod delete_notification;
 pub mod get_preferences;
 pub mod get_unread_count;
 pub mod list_notifications;
+pub mod list_recipients;
 pub mod mark_all_read;
 pub mod update_preferences;
 pub mod update_seen;

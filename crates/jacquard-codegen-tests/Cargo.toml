@@ -17,13 +17,16 @@ thiserror = { workspace = true }
 miette = { workspace = true }
 
 [dev-dependencies]
+ipld-core = { workspace = true }
+jacquard-api = { path = "../jacquard-api", features = ["bluesky"] }
 serde_json = { workspace = true, features = ["std"] }
 serde_ipld_dagcbor = { workspace = true }
 
 [features]
-default = ["app_bsky", "com_atproto", "test_collision", "test_ns1", "test_ns2", "test_ns3"]
+default = ["app_bsky", "com_atproto", "test_blobby", "test_collision", "test_ns1", "test_ns2", "test_ns3"]
 app_bsky = ["com_atproto"]
 com_atproto = []
+test_blobby = []
 test_collision = []
 test_ns1 = []
 test_ns2 = ["test_ns1"]
@@ -35,3 +38,7 @@ jacquard-lexicon = { path = "../jacquard-lexicon", features = ["codegen"] }
 
 [lints.rust]
 dead_code = "allow"
+# just so that my rust-analyzer shuts up about the module name for 2048.blue's namespace
+non_snake_case = "allow"
+# and because pretty mode still imports a *couple* extra things...
+unused_imports = "allow"

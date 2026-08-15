@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.space.getLatestCommit",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the current signed commit for an account's permissioned repo within a space. Served by a repo host. Throws RepoNotFound when the account holds no repo in the space, including the case of a member that has never written to it. Callable with either OAuth (for the authenticated user's own data) or a space credential (for syncing services).",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "space",
+          "repo"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "The DID of the account whose latest commit to retrieve.",
+            "format": "did"
+          },
+          "space": {
+            "type": "string",
+            "description": "Reference to the space.",
+            "format": "space-ref"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "commit"
+          ],
+          "properties": {
+            "commit": {
+              "type": "ref",
+              "description": "The account's current signed commit.",
+              "ref": "com.atproto.space.defs#signedCommit"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "SpaceNotFound"
+        },
+        {
+          "name": "RepoNotFound"
+        },
+        {
+          "name": "RepoTakendown"
+        },
+        {
+          "name": "RepoSuspended"
+        },
+        {
+          "name": "RepoDeactivated"
+        }
+      ]
+    }
+  }
+}

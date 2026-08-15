@@ -16,12 +16,13 @@ pub mod remove_shout;
 pub mod reply_shout;
 pub mod report_shout;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +37,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_rocksky::shout;
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::app_rocksky::shout;
 /// A declaration of a shout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -58,7 +59,12 @@ pub struct Shout<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<StrongRef<S>>,
     pub subject: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_shout_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -73,11 +79,9 @@ pub struct ShoutGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Shout<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Author<S: BosStr = DefaultStr> {
     ///The URL of the author's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -94,15 +98,18 @@ pub struct Author<S: BosStr = DefaultStr> {
     ///The unique identifier of the author.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_author_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ShoutView<S: BosStr = DefaultStr> {
     ///The author of the shout.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -119,7 +126,12 @@ pub struct ShoutView<S: BosStr = DefaultStr> {
     ///The ID of the parent shout if this is a reply, otherwise null.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_shout_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -223,9 +235,28 @@ impl<S: BosStr> LexiconSchema for ShoutView<S> {
     }
 }
 
+fn deserialize_shout_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod shout_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -284,12 +315,7 @@ pub mod shout_state {
 /// Builder for constructing an instance of this type.
 pub struct ShoutBuilder<St: shout_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<StrongRef<S>>,
-        Option<StrongRef<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<StrongRef<S>>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -354,7 +380,10 @@ where
     St::Message: shout_state::IsUnset,
 {
     /// Set the `message` field (required)
-    pub fn message(mut self, value: impl Into<S>) -> ShoutBuilder<shout_state::SetMessage<St>, S> {
+    pub fn message(
+        mut self,
+        value: impl Into<S>,
+    ) -> ShoutBuilder<shout_state::SetMessage<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ShoutBuilder {
             _state: PhantomData,
@@ -426,10 +455,10 @@ where
 }
 
 fn lexicon_doc_app_rocksky_shout() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.shout"),
@@ -441,20 +470,22 @@ fn lexicon_doc_app_rocksky_shout() -> LexiconDoc<'static> {
                     description: Some(CowStr::new_static("A declaration of a shout.")),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("message"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("subject"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("message"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("subject")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The date when the shout was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The date when the shout was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -462,9 +493,9 @@ fn lexicon_doc_app_rocksky_shout() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("message"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The message of the shout.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The message of the shout."),
+                                    ),
                                     min_length: Some(1usize),
                                     max_length: Some(1000usize),
                                     ..Default::default()
@@ -497,11 +528,24 @@ fn lexicon_doc_app_rocksky_shout() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_author_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_app_rocksky_shout_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.shout.defs"),
@@ -516,9 +560,9 @@ fn lexicon_doc_app_rocksky_shout_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("avatar"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the author's avatar image.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The URL of the author's avatar image."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -526,9 +570,11 @@ fn lexicon_doc_app_rocksky_shout_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The decentralized identifier (DID) of the author.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The decentralized identifier (DID) of the author.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtIdentifier),
                                 ..Default::default()
                             }),
@@ -536,16 +582,18 @@ fn lexicon_doc_app_rocksky_shout_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("displayName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The display name of the author.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The display name of the author."),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The handle of the author.")),
+                                description: Some(
+                                    CowStr::new_static("The handle of the author."),
+                                ),
                                 format: Some(LexStringFormat::AtIdentifier),
                                 ..Default::default()
                             }),
@@ -553,9 +601,9 @@ fn lexicon_doc_app_rocksky_shout_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("id"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The unique identifier of the author.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The unique identifier of the author."),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -627,4 +675,17 @@ fn lexicon_doc_app_rocksky_shout_defs() -> LexiconDoc<'static> {
         },
         ..Default::default()
     }
+}
+
+fn deserialize_shout_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

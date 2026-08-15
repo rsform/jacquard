@@ -26,6 +26,24 @@
             "description": "Default hold DID for blob storage. If null, user has opted out of defaults.",
             "format": "did"
           },
+          "ociClient": {
+            "type": "string",
+            "description": "Preferred client for pull commands (docker, podman, buildah, nerdctl, crane). 'none' shows the image reference only. Defaults to docker if empty.",
+            "maxLength": 32,
+            "knownValues": [
+              "docker",
+              "podman",
+              "buildah",
+              "nerdctl",
+              "crane",
+              "none"
+            ]
+          },
+          "registryDomain": {
+            "type": "string",
+            "description": "Preferred registry domain for UI display. Must be one of the appview's configured registry domains. Empty means the primary (first configured) domain.",
+            "maxLength": 255
+          },
           "updatedAt": {
             "type": "string",
             "description": "Profile last updated timestamp",

@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.repo.updateSiteConfig",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create or update the site configuration for a repository and trigger a deployment.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repoDid",
+            "branch",
+            "dir"
+          ],
+          "properties": {
+            "branch": {
+              "type": "string",
+              "description": "Branch to deploy from."
+            },
+            "dir": {
+              "type": "string",
+              "description": "Directory within the repository to deploy (e.g. '/' or '/docs')."
+            },
+            "isIndex": {
+              "type": "boolean",
+              "description": "Whether this repo should serve as the index (root) for the claimed domain."
+            },
+            "repoDid": {
+              "type": "string",
+              "description": "DID of the repository as minted by the knot.",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The account does not have an active domain claim.",
+          "name": "NoDomainClaim"
+        }
+      ]
+    }
+  }
+}

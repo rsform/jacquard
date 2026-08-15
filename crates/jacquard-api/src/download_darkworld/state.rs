@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,24 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::download_darkworld::state;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::download_darkworld::state;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Favorite<S: BosStr = DefaultStr> {
     pub album: Vec<S>,
     pub artist: Vec<S>,
     pub deltarune_character: Vec<S>,
     pub game: Vec<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_favorite_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -57,7 +59,12 @@ pub struct State<S: BosStr = DefaultStr> {
     pub favorite: state::Favorite<S>,
     ///Describe the site's content/look.
     pub site: state::Site<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_state_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -72,18 +79,21 @@ pub struct StateGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: State<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Site<S: BosStr = DefaultStr> {
     ///Swap out Kris with Susie in the prophecy panel.
     pub susie_prophecy: bool,
     ///TBD
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title_colors: Option<SiteTitleColors<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_site_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -252,9 +262,22 @@ impl<S: BosStr> LexiconSchema for Site<S> {
     }
 }
 
+fn deserialize_favorite_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod favorite_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -329,12 +352,7 @@ pub mod favorite_state {
 /// Builder for constructing an instance of this type.
 pub struct FavoriteBuilder<St: favorite_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Vec<S>>,
-        Option<Vec<S>>,
-        Option<Vec<S>>,
-        Option<Vec<S>>,
-    ),
+    _fields: (Option<Vec<S>>, Option<Vec<S>>, Option<Vec<S>>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -481,10 +499,10 @@ where
 }
 
 fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("download.darkworld.state"),
@@ -493,12 +511,13 @@ fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("favorite"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("game"),
-                        SmolStr::new_static("artist"),
-                        SmolStr::new_static("album"),
-                        SmolStr::new_static("deltaruneCharacter"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("game"), SmolStr::new_static("artist"),
+                            SmolStr::new_static("album"),
+                            SmolStr::new_static("deltaruneCharacter")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -546,24 +565,29 @@ fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "The record used by darkworld.download to determine the website's content.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "The record used by darkworld.download to determine the website's content.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("site"),
-                            SmolStr::new_static("favorite"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("site"), SmolStr::new_static("favorite")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("favorite"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "The user's favorites/likes/preferences.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The user's favorites/likes/preferences.",
+                                        ),
+                                    ),
                                     refs: vec![CowStr::new_static("#favorite")],
                                     closed: Some(true),
                                     ..Default::default()
@@ -572,9 +596,9 @@ fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("site"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "Describe the site's content/look.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Describe the site's content/look."),
+                                    ),
                                     refs: vec![CowStr::new_static("#site")],
                                     closed: Some(true),
                                     ..Default::default()
@@ -618,9 +642,28 @@ fn lexicon_doc_download_darkworld_state() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_state_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod state_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -767,9 +810,22 @@ where
     }
 }
 
+fn deserialize_site_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod site_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

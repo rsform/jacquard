@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReserveKey<S: BosStr = DefaultStr> {
     ///The did:web identity the repository will use.
     pub repo_did: Did<S>,
@@ -29,11 +26,9 @@ pub struct ReserveKey<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReserveKeyOutput<S: BosStr = DefaultStr> {
     ///Multibase-encoded public key to publish in the did:web document.
     pub key: S,
@@ -55,8 +50,9 @@ impl jacquard_common::xrpc::XrpcResp for ReserveKeyResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ReserveKey<S> {
     const NSID: &'static str = "sh.tangled.repo.reserveKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ReserveKeyResponse;
 }
 
@@ -66,15 +62,16 @@ Path: `/xrpc/sh.tangled.repo.reserveKey`. The request payload type is `ReserveKe
 pub struct ReserveKeyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReserveKeyRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.reserveKey";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ReserveKey<S>;
     type Response = ReserveKeyResponse;
 }
 
 pub mod reserve_key_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -179,7 +176,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReserveKey<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReserveKey<S> {
         ReserveKey {
             repo_did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

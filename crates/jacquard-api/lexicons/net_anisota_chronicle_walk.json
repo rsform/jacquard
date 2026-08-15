@@ -1,0 +1,399 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.walk",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "deviceProgress": {
+      "type": "object",
+      "description": "Per-device progress bucket. Buckets are summed across devices (not max-merged) so in-app activity spread over multiple devices is fully counted.",
+      "properties": {
+        "counts": {
+          "type": "ref",
+          "ref": "#heartbeatProgress"
+        },
+        "deviceId": {
+          "type": "string",
+          "description": "Random per-install device id from userScopedStorage. No fingerprinting."
+        }
+      }
+    },
+    "heartbeatLight": {
+      "type": "object",
+      "description": "Light state at heartbeat time",
+      "properties": {
+        "current": {
+          "type": "integer",
+          "description": "Current light level"
+        },
+        "drainActive": {
+          "type": "boolean",
+          "description": "Whether drain is actively ticking (true while exploring, false while resting or camping). Walks have no frozen state."
+        },
+        "drainRate": {
+          "type": "integer",
+          "description": "Current drain rate as percentage"
+        }
+      }
+    },
+    "heartbeatProgress": {
+      "type": "object",
+      "description": "Session progress counters at heartbeat time (per-device bucket contents)",
+      "properties": {
+        "itemsCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "likesSent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mothsSeenCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "postsRead": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "repostsSent": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "specimensCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "xpGained": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Walk record. Created with status 'active' at first engagement (first tracked action on the feed), kept current with putRecord, and updated to 'completed' when the walk closes (idle auto-close, light depletion, or a manual wrap-up). rkey is a TID. Walks are the everyday unit and are never numbered; identity is the record key and display identity is the walk's time. Tracks the full lifecycle of a walk including camps, gathered findings, light consumption, and conditions.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "status",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "activeDuration": {
+            "type": "integer",
+            "description": "Active exploring time in minutes (excludes camp/rest time)",
+            "minimum": 0
+          },
+          "campsCount": {
+            "type": "integer",
+            "description": "Number of camps made during the walk",
+            "minimum": 0
+          },
+          "closedBy": {
+            "type": "string",
+            "description": "How the walk closed. Known values: 'user' (manual 'that's enough for now' tap), 'auto' (idle auto-close after the inactivity window), and 'lamp' (light depleted). Free string with no enum so future close reasons need no lexicon change. Unset while the walk is active."
+          },
+          "completedAt": {
+            "type": "string",
+            "description": "When the walk ended. For idle auto-closes this is the last tracked activity, clamped to be no earlier than startedAt.",
+            "format": "datetime"
+          },
+          "conditions": {
+            "type": "ref",
+            "ref": "#walkConditions"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was created",
+            "format": "datetime"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Total walk duration in minutes",
+            "minimum": 0
+          },
+          "elsewhereActivity": {
+            "type": "ref",
+            "ref": "#walkElsewhereActivity"
+          },
+          "findings": {
+            "type": "ref",
+            "ref": "#walkFindings"
+          },
+          "heartbeat": {
+            "type": "ref",
+            "ref": "#walkHeartbeat"
+          },
+          "light": {
+            "type": "ref",
+            "ref": "#walkLight"
+          },
+          "restDuration": {
+            "type": "integer",
+            "description": "Total camp/rest time in minutes",
+            "minimum": 0
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "When the walk started (first engagement)",
+            "format": "datetime"
+          },
+          "status": {
+            "type": "string",
+            "description": "Current walk status. A walk is 'active' while open and 'completed' once it closes; there is no 'abandoned' state because a walk never fails.",
+            "enum": [
+              "active",
+              "completed"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the record was last updated",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "walkConditions": {
+      "type": "object",
+      "description": "Environmental conditions during the walk",
+      "properties": {
+        "biome": {
+          "type": "string",
+          "description": "Forest biome type"
+        },
+        "lightLevel": {
+          "type": "string",
+          "description": "Time-of-day light condition at walk start",
+          "enum": [
+            "dawn",
+            "morning",
+            "midday",
+            "afternoon",
+            "dusk",
+            "night",
+            "deepnight"
+          ]
+        },
+        "moonPhase": {
+          "type": "string",
+          "description": "Moon phase condition (nighttime only)",
+          "enum": [
+            "full_moon",
+            "new_moon"
+          ]
+        },
+        "userState": {
+          "type": "string",
+          "description": "User fatigue state at walk start",
+          "enum": [
+            "well_rested",
+            "tired",
+            "exhausted",
+            "first_expedition"
+          ]
+        },
+        "weather": {
+          "type": "string",
+          "description": "Weather condition during the walk",
+          "enum": [
+            "clear",
+            "overcast",
+            "rainy",
+            "stormy",
+            "foggy"
+          ]
+        }
+      }
+    },
+    "walkElsewhereActivity": {
+      "type": "object",
+      "description": "Cross-client activity during the walk window that did NOT happen in anisota: the PDS scan of app.bsky posts/likes/reposts in the walk window minus the in-app per-device summed totals, floored at 0 per field. Because likes and reposts carry no client marker this is a subtraction estimate, so the elsewhere panel labels it 'at least'. This block NEVER earns XP or findings; it is data for the panel only. Optional; unset when there was no elsewhere activity or the scan was unavailable.",
+      "properties": {
+        "likesSent": {
+          "type": "integer",
+          "description": "Likes sent elsewhere during the walk window (scan minus in-app; at-least estimate)",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "description": "Posts created elsewhere during the walk window (scan minus in-app)",
+          "minimum": 0
+        },
+        "repostsSent": {
+          "type": "integer",
+          "description": "Reposts sent elsewhere during the walk window (scan minus in-app; at-least estimate)",
+          "minimum": 0
+        }
+      }
+    },
+    "walkFindings": {
+      "type": "object",
+      "description": "What was found/gathered during the walk",
+      "properties": {
+        "itemsCollected": {
+          "type": "integer",
+          "description": "Number of items collected",
+          "minimum": 0
+        },
+        "likesSent": {
+          "type": "integer",
+          "description": "Likes sent during the walk",
+          "minimum": 0
+        },
+        "mothsSeen": {
+          "type": "integer",
+          "description": "Total moth encounters (caught + escaped)",
+          "minimum": 0
+        },
+        "postsCreated": {
+          "type": "integer",
+          "description": "Posts created during the walk",
+          "minimum": 0
+        },
+        "postsRead": {
+          "type": "integer",
+          "description": "Posts read during the walk",
+          "minimum": 0
+        },
+        "repostsSent": {
+          "type": "integer",
+          "description": "Reposts sent during the walk",
+          "minimum": 0
+        },
+        "specimensFound": {
+          "type": "integer",
+          "description": "Number of specimens successfully caught",
+          "minimum": 0
+        },
+        "xpGained": {
+          "type": "integer",
+          "description": "XP gained from the walk",
+          "minimum": 0
+        }
+      }
+    },
+    "walkHeartbeat": {
+      "type": "object",
+      "description": "Periodic snapshot of walk progress for cross-device sync",
+      "properties": {
+        "lastActivityAt": {
+          "type": "string",
+          "description": "Timestamp of the last tracked activity. Drives the idle clock and is max-merged across devices (heartbeats themselves fire on a timer, so idle detection must key on this field, not updatedAt).",
+          "format": "datetime"
+        },
+        "light": {
+          "type": "ref",
+          "ref": "#heartbeatLight"
+        },
+        "progress": {
+          "type": "array",
+          "description": "Per-device progress buckets, one entry per device that has contributed to this walk. In-app totals are the SUM across buckets, not a max-merge: per-device buckets exist deliberately so multi-device in-app activity is never undercounted (an undercount would falsely inflate the elsewhere figure).",
+          "items": {
+            "type": "ref",
+            "ref": "#deviceProgress"
+          }
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "When this heartbeat was written",
+          "format": "datetime"
+        }
+      }
+    },
+    "walkLight": {
+      "type": "object",
+      "description": "Light resource tracking for the walk",
+      "properties": {
+        "atEnd": {
+          "type": "integer",
+          "description": "Light level when the walk ended (in minutes)",
+          "minimum": 0
+        },
+        "atStart": {
+          "type": "integer",
+          "description": "Light level when the walk started (in minutes)",
+          "minimum": 0
+        },
+        "consumed": {
+          "type": "integer",
+          "description": "Total light consumed during the walk",
+          "minimum": 0
+        },
+        "drainRate": {
+          "type": "integer",
+          "description": "Effective drain rate as a percentage (80 = 0.8x drain). Multiply by 0.01 to get the float multiplier."
+        },
+        "regenerated": {
+          "type": "integer",
+          "description": "Total light regenerated during the walk's camps",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "description": "Light status at start of the walk",
+          "enum": [
+            "bright",
+            "steady",
+            "dim",
+            "flickering",
+            "dying",
+            "fullCharge",
+            "charged",
+            "low",
+            "critical",
+            "dead"
+          ]
+        }
+      }
+    }
+  }
+}

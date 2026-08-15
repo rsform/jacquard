@@ -10,14 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -25,11 +25,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::richtext::facet::Facet;
-use crate::com_atproto::label::SelfLabels;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::com_atproto::label::SelfLabels;
 /// Record declaring of the existence of a feed generator, and containing metadata about it. The record can exist in any repository.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -57,9 +57,15 @@ pub struct Generator<S: BosStr = DefaultStr> {
     ///Self-label values
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_generator_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum GeneratorContentMode<S: BosStr = DefaultStr> {
@@ -134,8 +140,12 @@ where
             GeneratorContentMode::ContentModeUnspecified => {
                 GeneratorContentMode::ContentModeUnspecified
             }
-            GeneratorContentMode::ContentModeVideo => GeneratorContentMode::ContentModeVideo,
-            GeneratorContentMode::Other(v) => GeneratorContentMode::Other(v.into_static()),
+            GeneratorContentMode::ContentModeVideo => {
+                GeneratorContentMode::ContentModeVideo
+            }
+            GeneratorContentMode::Other(v) => {
+                GeneratorContentMode::Other(v.into_static())
+            }
         }
     }
 }
@@ -211,20 +221,25 @@ impl<S: BosStr> LexiconSchema for Generator<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("avatar"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -280,9 +295,28 @@ impl<S: BosStr> LexiconSchema for Generator<S> {
     }
 }
 
+fn deserialize_generator_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod generator_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -419,7 +453,10 @@ impl<St: generator_state::State, S: BosStr> GeneratorBuilder<St, S> {
 
 impl<St: generator_state::State, S: BosStr> GeneratorBuilder<St, S> {
     /// Set the `contentMode` field (optional)
-    pub fn content_mode(mut self, value: impl Into<Option<GeneratorContentMode<S>>>) -> Self {
+    pub fn content_mode(
+        mut self,
+        value: impl Into<Option<GeneratorContentMode<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -464,7 +501,10 @@ impl<St: generator_state::State, S: BosStr> GeneratorBuilder<St, S> {
 
 impl<St: generator_state::State, S: BosStr> GeneratorBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -549,7 +589,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Generator<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Generator<S> {
         Generator {
             accepts_interactions: self._fields.0,
             avatar: self._fields.1,
@@ -566,10 +609,10 @@ where
 }
 
 fn lexicon_doc_app_bsky_feed_generator() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.feed.generator"),

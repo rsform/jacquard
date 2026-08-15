@@ -1,0 +1,144 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.actor.defs",
+  "defs": {
+    "profileStats": {
+      "type": "object",
+      "description": "Aggregated statistics for a user profile",
+      "properties": {
+        "commentCount": {
+          "type": "integer",
+          "description": "Total number of comments made",
+          "minimum": 0
+        },
+        "communityCount": {
+          "type": "integer",
+          "description": "Number of communities subscribed to",
+          "minimum": 0
+        },
+        "membershipCount": {
+          "type": "integer",
+          "description": "Number of communities with membership status",
+          "minimum": 0
+        },
+        "postCount": {
+          "type": "integer",
+          "description": "Total number of posts created",
+          "minimum": 0
+        },
+        "reputation": {
+          "type": "integer",
+          "description": "Global reputation score"
+        }
+      }
+    },
+    "profileView": {
+      "type": "object",
+      "description": "Basic profile view with essential information",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "description": "URL to avatar image",
+          "format": "uri"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "description": "Current handle resolved from DID",
+          "format": "handle"
+        }
+      }
+    },
+    "profileViewDetailed": {
+      "type": "object",
+      "description": "Detailed profile view with stats and viewer state",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "description": "URL to avatar image",
+          "format": "uri"
+        },
+        "banner": {
+          "type": "string",
+          "description": "URL to banner image",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "descriptionFacets": {
+          "type": "array",
+          "description": "Rich text annotations for the description",
+          "items": {
+            "type": "ref",
+            "ref": "social.coves.richtext.facet"
+          },
+          "maxLength": 50
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "handle": {
+          "type": "string",
+          "description": "Current handle resolved from DID",
+          "format": "handle"
+        },
+        "stats": {
+          "type": "ref",
+          "description": "Aggregated statistics",
+          "ref": "#profileStats"
+        },
+        "viewer": {
+          "type": "ref",
+          "description": "Viewer's relationship to this profile",
+          "ref": "#viewerState"
+        }
+      }
+    },
+    "viewerState": {
+      "type": "object",
+      "description": "The viewing user's relationship to this profile",
+      "properties": {
+        "blocked": {
+          "type": "boolean",
+          "description": "Whether the viewer has blocked this user"
+        },
+        "blockedBy": {
+          "type": "boolean",
+          "description": "Whether the viewer is blocked by this user"
+        },
+        "blocking": {
+          "type": "string",
+          "description": "AT-URI of the block record if the viewer has blocked this user",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

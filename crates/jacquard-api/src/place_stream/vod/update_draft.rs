@@ -8,26 +8,23 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::blob::BlobRef;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::place_stream::ActivityGame;
 use crate::place_stream::ActivityLabel;
 use crate::place_stream::metadata::content_rights::ContentRights;
 use crate::place_stream::metadata::content_warnings::ContentWarnings;
 use crate::place_stream::richtext::video_facet::VideoFacet;
 use crate::place_stream::vod::draft_defs::DraftView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::blob::BlobRef;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateDraft<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<UpdateDraftActivity<S>>,
@@ -51,6 +48,7 @@ pub struct UpdateDraft<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -61,20 +59,27 @@ pub enum UpdateDraftActivity<S: BosStr = DefaultStr> {
     ActivityLabel(Box<ActivityLabel<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateDraftOutput<S: BosStr = DefaultStr> {
     pub draft: DraftView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum UpdateDraftError {
     /// No draft exists with the given URI for the authenticated user.
@@ -82,10 +87,7 @@ pub enum UpdateDraftError {
     NotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for UpdateDraftError {
@@ -122,8 +124,9 @@ impl jacquard_common::xrpc::XrpcResp for UpdateDraftResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateDraft<S> {
     const NSID: &'static str = "place.stream.vod.updateDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateDraftResponse;
 }
 
@@ -133,8 +136,9 @@ Path: `/xrpc/place.stream.vod.updateDraft`. The request payload type is `UpdateD
 pub struct UpdateDraftRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateDraftRequest {
     const PATH: &'static str = "/xrpc/place.stream.vod.updateDraft";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateDraft<S>;
     type Response = UpdateDraftResponse;
 }

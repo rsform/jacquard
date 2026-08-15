@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Tid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CancelPipeline<S: BosStr = DefaultStr> {
     ///pipeline TID
     pub pipeline: Tid,
@@ -43,12 +40,25 @@ impl jacquard_common::xrpc::XrpcResp for CancelPipelineResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CancelPipeline<S> {
     const NSID: &'static str = "sh.tangled.ci.cancelPipeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CancelPipelineResponse;
 }
 
@@ -58,15 +68,16 @@ Path: `/xrpc/sh.tangled.ci.cancelPipeline`. The request payload type is `CancelP
 pub struct CancelPipelineRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CancelPipelineRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.ci.cancelPipeline";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CancelPipeline<S>;
     type Response = CancelPipelineResponse;
 }
 
 pub mod cancel_pipeline_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -109,7 +120,10 @@ pub mod cancel_pipeline_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CancelPipelineBuilder<St: cancel_pipeline_state::State, S: BosStr = DefaultStr> {
+pub struct CancelPipelineBuilder<
+    St: cancel_pipeline_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Tid>, Option<Did<S>>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
@@ -218,7 +232,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CancelPipeline<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CancelPipeline<S> {
         CancelPipeline {
             pipeline: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

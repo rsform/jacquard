@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,21 +24,24 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_weaver::edit::cursor;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_weaver::edit::cursor;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContainerId<S: BosStr = DefaultStr> {
     pub value: ContainerIdValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_container_id_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -50,27 +53,33 @@ pub enum ContainerIdValue<S: BosStr = DefaultStr> {
     RootContainerId(Box<cursor::RootContainerId<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CursorSide<S: BosStr = DefaultStr> {
     ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
     pub value: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_cursor_side_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Id<S: BosStr = DefaultStr> {
     pub counter: i64,
     pub peer: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_id_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -88,7 +97,12 @@ pub struct Cursor<S: BosStr = DefaultStr> {
     pub id: cursor::Id<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub side: Option<cursor::CursorSide<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_cursor_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -103,28 +117,34 @@ pub struct CursorGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Cursor<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NormalContainerId<S: BosStr = DefaultStr> {
     pub container_type: S,
     pub counter: i64,
     pub peer: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_normal_container_id_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RootContainerId<S: BosStr = DefaultStr> {
     pub container_type: S,
     pub name: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_root_container_id_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -251,9 +271,22 @@ impl<S: BosStr> LexiconSchema for RootContainerId<S> {
     }
 }
 
+fn deserialize_container_id_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod container_id_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -358,7 +391,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContainerId<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContainerId<S> {
         ContainerId {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -367,10 +403,10 @@ where
 }
 
 fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.weaver.edit.cursor"),
@@ -388,7 +424,7 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
                             LexObjectProperty::Union(LexRefUnion {
                                 refs: vec![
                                     CowStr::new_static("#normalContainerId"),
-                                    CowStr::new_static("#rootContainerId"),
+                                    CowStr::new_static("#rootContainerId")
                                 ],
                                 ..Default::default()
                             }),
@@ -419,10 +455,9 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("id"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("peer"),
-                        SmolStr::new_static("counter"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("peer"), SmolStr::new_static("counter")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -446,13 +481,16 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("An edit record for a notebook.")),
+                    description: Some(
+                        CowStr::new_static("An edit record for a notebook."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("container"),
-                            SmolStr::new_static("id"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("container"), SmolStr::new_static("id")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -487,19 +525,18 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("normalContainerId"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("peer"),
-                        SmolStr::new_static("counter"),
-                        SmolStr::new_static("container_type"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("peer"), SmolStr::new_static("counter"),
+                            SmolStr::new_static("container_type")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("container_type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("counter"),
@@ -521,24 +558,22 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("rootContainerId"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("container_type"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"),
+                            SmolStr::new_static("container_type")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("container_type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -551,9 +586,22 @@ fn lexicon_doc_sh_weaver_edit_cursor() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_cursor_side_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod cursor_side_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -658,7 +706,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CursorSide<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CursorSide<S> {
         CursorSide {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -666,9 +717,22 @@ where
     }
 }
 
+fn deserialize_id_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod id_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -759,7 +823,10 @@ where
     St::Counter: id_state::IsUnset,
 {
     /// Set the `counter` field (required)
-    pub fn counter(mut self, value: impl Into<i64>) -> IdBuilder<id_state::SetCounter<St>, S> {
+    pub fn counter(
+        mut self,
+        value: impl Into<i64>,
+    ) -> IdBuilder<id_state::SetCounter<St>, S> {
         self._fields.0 = Option::Some(value.into());
         IdBuilder {
             _state: PhantomData,
@@ -809,9 +876,28 @@ where
     }
 }
 
+fn deserialize_cursor_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod cursor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -977,9 +1063,22 @@ where
     }
 }
 
+fn deserialize_normal_container_id_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod normal_container_id_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1036,7 +1135,10 @@ pub mod normal_container_id_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct NormalContainerIdBuilder<St: normal_container_id_state::State, S: BosStr = DefaultStr> {
+pub struct NormalContainerIdBuilder<
+    St: normal_container_id_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -1044,7 +1146,10 @@ pub struct NormalContainerIdBuilder<St: normal_container_id_state::State, S: Bos
 
 impl NormalContainerId<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> NormalContainerIdBuilder<normal_container_id_state::Empty, DefaultStr> {
+    pub fn new() -> NormalContainerIdBuilder<
+        normal_container_id_state::Empty,
+        DefaultStr,
+    > {
         NormalContainerIdBuilder::new()
     }
 }
@@ -1152,7 +1257,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NormalContainerId<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NormalContainerId<S> {
         NormalContainerId {
             container_type: self._fields.0.unwrap(),
             counter: self._fields.1.unwrap(),
@@ -1160,4 +1268,17 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_root_container_id_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

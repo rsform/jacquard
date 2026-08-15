@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -37,13 +37,32 @@ impl jacquard_common::xrpc::XrpcResp for SeekResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl jacquard_common::xrpc::XrpcRequest for Seek {
     const NSID: &'static str = "app.rocksky.player.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SeekResponse;
+    fn encode_body(
+        &self,
+        _buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+        Ok(())
+    }
 }
 
 /** Endpoint marker for the `app.rocksky.player.seek` procedure.
@@ -52,15 +71,16 @@ Path: `/xrpc/app.rocksky.player.seek`. The request payload type is `Seek`; use t
 pub struct SeekRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.seek";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Seek;
     type Response = SeekResponse;
 }
 
 pub mod seek_params_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

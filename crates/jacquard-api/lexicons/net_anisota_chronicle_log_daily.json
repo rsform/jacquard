@@ -124,6 +124,55 @@
         }
       }
     },
+    "inAppCounts": {
+      "type": "object",
+      "description": "Per-category counts of activity performed inside anisota (never inferred; recorded at write time).",
+      "properties": {
+        "likes": {
+          "type": "integer",
+          "description": "Likes created in anisota",
+          "minimum": 0
+        },
+        "posts": {
+          "type": "integer",
+          "description": "Top-level posts created in anisota",
+          "minimum": 0
+        },
+        "quotes": {
+          "type": "integer",
+          "description": "Quote posts created in anisota",
+          "minimum": 0
+        },
+        "replies": {
+          "type": "integer",
+          "description": "Replies created in anisota",
+          "minimum": 0
+        },
+        "reposts": {
+          "type": "integer",
+          "description": "Reposts created in anisota",
+          "minimum": 0
+        }
+      }
+    },
+    "inAppDeviceBucket": {
+      "type": "object",
+      "description": "One device's in-anisota activity counts for the day. Keyed by a stable per-install-per-account device id, so concurrent putRecords from different devices never clobber each other. The reserved deviceId 'scheduled' holds scheduled posts published server-side by the cocoon cron worker on their publish day.",
+      "required": [
+        "deviceId",
+        "counts"
+      ],
+      "properties": {
+        "counts": {
+          "type": "ref",
+          "ref": "#inAppCounts"
+        },
+        "deviceId": {
+          "type": "string",
+          "description": "Stable per-install-per-account device id (random; no fingerprinting). Reserved value 'scheduled' for cocoon-published scheduled posts."
+        }
+      }
+    },
     "main": {
       "type": "record",
       "description": "Daily activity snapshot. Updated throughout the day via putRecord. rkey is YYYY-MM-DD in user's local timezone.",
@@ -166,6 +215,14 @@
             "type": "ref",
             "ref": "#expeditionSummary"
           },
+          "inApp": {
+            "type": "array",
+            "description": "First-party ledger of activity performed INSIDE anisota this day, one bucket per device. Optional and additive. The cross-device in-app total per field is the SUM over buckets. Used to compute an honest 'outside' floor (max(0, total - inApp)); a device only ever writes its own bucket.",
+            "items": {
+              "type": "ref",
+              "ref": "#inAppDeviceBucket"
+            }
+          },
           "patterns": {
             "type": "ref",
             "ref": "#patternsData"
@@ -189,6 +246,10 @@
             "items": {
               "type": "string"
             }
+          },
+          "walks": {
+            "type": "ref",
+            "ref": "#walkSummary"
           }
         }
       }
@@ -260,6 +321,29 @@
           "type": "integer",
           "description": "XP gained during this day",
           "minimum": 0
+        }
+      }
+    },
+    "walkSummary": {
+      "type": "object",
+      "description": "Summary of walks for the day (details in chronicle.walk). Parallel to expeditionSummary; both are merged additively.",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "description": "Number of walks completed today (additive)",
+          "minimum": 0
+        },
+        "totalDuration": {
+          "type": "integer",
+          "description": "Total walk duration in minutes (additive)",
+          "minimum": 0
+        },
+        "walkRefs": {
+          "type": "array",
+          "description": "AT URIs of walk records that occurred on this day",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CloseReports<S: BosStr = DefaultStr> {
     ///Optional moderator-only note recorded on each close activity. Not visible to reporters.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,11 +36,9 @@ pub struct CloseReports<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CloseReportsOutput<S: BosStr = DefaultStr> {
     ///Number of reports that were transitioned to closed.
     pub closed_count: i64,
@@ -66,8 +61,9 @@ impl jacquard_common::xrpc::XrpcResp for CloseReportsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CloseReports<S> {
     const NSID: &'static str = "tools.ozone.report.closeReports";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CloseReportsResponse;
 }
 
@@ -77,8 +73,9 @@ Path: `/xrpc/tools.ozone.report.closeReports`. The request payload type is `Clos
 pub struct CloseReportsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CloseReportsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.report.closeReports";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CloseReports<S>;
     type Response = CloseReportsResponse;
 }
@@ -89,7 +86,7 @@ fn _default_close_reports_is_automated() -> Option<bool> {
 
 pub mod close_reports_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -236,7 +233,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CloseReports<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CloseReports<S> {
         CloseReports {
             internal_note: self._fields.0,
             is_automated: self._fields.1.or_else(|| Some(false)),

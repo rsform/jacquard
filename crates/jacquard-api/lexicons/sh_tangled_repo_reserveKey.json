@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.repo.reserveKey",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Reserve a signing key for a bring-your-own did:web repository identity. The knot seals the key and returns its multibase encoding so the owner can publish it in their did:web document before calling sh.tangled.repo.create.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repoDid"
+          ],
+          "properties": {
+            "repoDid": {
+              "type": "string",
+              "description": "The did:web identity the repository will use.",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repoDid",
+            "key"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Multibase-encoded public key to publish in the did:web document."
+            },
+            "repoDid": {
+              "type": "string",
+              "format": "did"
+            }
+          }
+        }
+      }
+    }
+  }
+}

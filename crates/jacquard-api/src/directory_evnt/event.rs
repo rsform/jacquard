@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,13 +22,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Address<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub addr: Option<S>,
@@ -36,39 +33,48 @@ pub struct Address<S: BosStr = DefaultStr> {
     pub country_code: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub postal_code: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_address_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Coordinates<S: BosStr = DefaultStr> {
     pub lat: i64,
     pub lng: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_coordinates_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventComponent<S: BosStr = DefaultStr> {
     pub data: Data<S>,
     pub r#type: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_event_component_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventInstance<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end: Option<S>,
@@ -78,9 +84,15 @@ pub struct EventInstance<S: BosStr = DefaultStr> {
     pub status: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venue_ids: Option<Vec<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_event_instance_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum EventStatus<S: BosStr = DefaultStr> {
@@ -165,26 +177,27 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct OnlineVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
     pub r#type: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_online_venue_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PhysicalVenue<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address: Option<Data<S>>,
@@ -193,28 +206,34 @@ pub struct PhysicalVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
     pub r#type: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_physical_venue_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnknownVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
     pub r#type: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_unknown_venue_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Event<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub components: Option<Vec<Data<S>>>,
@@ -228,9 +247,15 @@ pub struct Event<S: BosStr = DefaultStr> {
     pub v: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub venues: Option<Vec<EventVenuesItem<S>>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_event_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -356,11 +381,24 @@ impl<S: BosStr> LexiconSchema for Event<S> {
     }
 }
 
+fn deserialize_address_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("directory.evnt.event"),
@@ -374,21 +412,15 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addr"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("countryCode"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("postalCode"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -398,7 +430,9 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("Coordinates"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("lat"), SmolStr::new_static("lng")]),
+                    required: Some(
+                        vec![SmolStr::new_static("lat"), SmolStr::new_static("lng")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -422,10 +456,9 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("EventComponent"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("data"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("type"), SmolStr::new_static("data")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -437,9 +470,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -454,15 +485,11 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("end"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("start"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("status"),
@@ -487,26 +514,23 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("EventStatus"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("OnlineVenue"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("name"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("name")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
@@ -516,15 +540,11 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("url"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -534,11 +554,12 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("PhysicalVenue"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("name"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("name")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -558,9 +579,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
@@ -570,9 +589,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -582,19 +599,18 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("UnknownVenue"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("name"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("type"),
+                            SmolStr::new_static("name")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
@@ -604,9 +620,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -616,7 +630,9 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("v"), SmolStr::new_static("name")]),
+                    required: Some(
+                        vec![SmolStr::new_static("v"), SmolStr::new_static("name")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -672,7 +688,7 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
                                     refs: vec![
                                         CowStr::new_static("#physicalVenue"),
                                         CowStr::new_static("#onlineVenue"),
-                                        CowStr::new_static("#unknownVenue"),
+                                        CowStr::new_static("#unknownVenue")
                                     ],
                                     ..Default::default()
                                 }),
@@ -690,9 +706,22 @@ fn lexicon_doc_directory_evnt_event() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_coordinates_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod coordinates_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -830,7 +859,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Coordinates<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Coordinates<S> {
         Coordinates {
             lat: self._fields.0.unwrap(),
             lng: self._fields.1.unwrap(),
@@ -839,9 +871,22 @@ where
     }
 }
 
+fn deserialize_event_component_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod event_component_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -884,7 +929,10 @@ pub mod event_component_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct EventComponentBuilder<St: event_component_state::State, S: BosStr = DefaultStr> {
+pub struct EventComponentBuilder<
+    St: event_component_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -979,7 +1027,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EventComponent<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EventComponent<S> {
         EventComponent {
             data: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -988,9 +1039,35 @@ where
     }
 }
 
+fn deserialize_event_instance_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_online_venue_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod online_venue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1177,7 +1254,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> OnlineVenue<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OnlineVenue<S> {
         OnlineVenue {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1188,9 +1268,22 @@ where
     }
 }
 
+fn deserialize_physical_venue_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod physical_venue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1247,15 +1340,12 @@ pub mod physical_venue_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PhysicalVenueBuilder<St: physical_venue_state::State, S: BosStr = DefaultStr> {
+pub struct PhysicalVenueBuilder<
+    St: physical_venue_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Data<S>>,
-        Option<Data<S>>,
-        Option<S>,
-        Option<Data<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<Data<S>>, Option<Data<S>>, Option<S>, Option<Data<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1397,7 +1487,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PhysicalVenue<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PhysicalVenue<S> {
         PhysicalVenue {
             address: self._fields.0,
             coordinates: self._fields.1,
@@ -1409,9 +1502,22 @@ where
     }
 }
 
+fn deserialize_unknown_venue_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod unknown_venue_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1584,7 +1690,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnknownVenue<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnknownVenue<S> {
         UnknownVenue {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1594,9 +1703,22 @@ where
     }
 }
 
+fn deserialize_event_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1734,7 +1856,10 @@ where
     St::Name: event_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<Data<S>>) -> EventBuilder<event_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> EventBuilder<event_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,

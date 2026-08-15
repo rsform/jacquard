@@ -10,17 +10,14 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetUploadLimitsOutput<S: BosStr = DefaultStr> {
     pub can_upload: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,6 +53,12 @@ impl jacquard_common::xrpc::XrpcRequest for GetUploadLimits {
     const NSID: &'static str = "app.bsky.video.getUploadLimits";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetUploadLimitsResponse;
+    fn encode_body(
+        &self,
+        _buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+        Ok(())
+    }
 }
 
 /** Endpoint marker for the `app.bsky.video.getUploadLimits` query.

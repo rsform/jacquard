@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,6 +24,9 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::article;
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
@@ -32,16 +35,10 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// An organization such as a school, NGO, corporation, club, etc.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
@@ -221,9 +218,15 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vat_id: Option<EmbeddedVatId<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_embedded_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -268,6 +271,7 @@ pub enum EmbeddedAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -292,6 +296,7 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     Embedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -321,6 +326,7 @@ pub enum EmbeddedDepartment<S: BosStr = DefaultStr> {
     Embedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -349,6 +355,7 @@ pub enum EmbeddedDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -367,6 +374,7 @@ pub enum EmbeddedEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -374,6 +382,7 @@ pub enum EmbeddedEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -388,6 +397,7 @@ pub enum EmbeddedEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -395,6 +405,7 @@ pub enum EmbeddedEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -411,6 +422,7 @@ pub enum EmbeddedFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -418,6 +430,7 @@ pub enum EmbeddedFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -438,6 +451,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -507,6 +521,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -555,6 +570,7 @@ pub enum EmbeddedLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -573,6 +589,7 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -586,6 +603,7 @@ pub enum EmbeddedMakesOffer<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -596,6 +614,7 @@ pub enum EmbeddedMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -603,6 +622,7 @@ pub enum EmbeddedMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     Embedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -613,6 +633,7 @@ pub enum EmbeddedMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -647,6 +668,7 @@ pub enum EmbeddedOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -654,6 +676,7 @@ pub enum EmbeddedParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     Embedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -710,6 +733,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -718,6 +742,7 @@ pub enum EmbeddedSubOrganization<S: BosStr = DefaultStr> {
     Embedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -725,6 +750,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -937,9 +963,15 @@ pub struct Organization<S: BosStr = DefaultStr> {
     pub url: Option<OrganizationUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vat_id: Option<OrganizationVatId<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_organization_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -984,6 +1016,7 @@ pub enum OrganizationAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1008,6 +1041,7 @@ pub enum OrganizationBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     Embedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1037,6 +1071,7 @@ pub enum OrganizationDepartment<S: BosStr = DefaultStr> {
     Embedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1065,6 +1100,7 @@ pub enum OrganizationDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1083,6 +1119,7 @@ pub enum OrganizationEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1090,6 +1127,7 @@ pub enum OrganizationEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1104,6 +1142,7 @@ pub enum OrganizationEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1111,6 +1150,7 @@ pub enum OrganizationEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1127,6 +1167,7 @@ pub enum OrganizationFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1134,6 +1175,7 @@ pub enum OrganizationFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1154,6 +1196,7 @@ pub enum OrganizationFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1223,6 +1266,7 @@ pub enum OrganizationImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1271,6 +1315,7 @@ pub enum OrganizationLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1289,6 +1334,7 @@ pub enum OrganizationLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1302,6 +1348,7 @@ pub enum OrganizationMakesOffer<S: BosStr = DefaultStr> {
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1312,6 +1359,7 @@ pub enum OrganizationMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1319,6 +1367,7 @@ pub enum OrganizationMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     Embedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1329,6 +1378,7 @@ pub enum OrganizationMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1363,6 +1413,7 @@ pub enum OrganizationOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1370,6 +1421,7 @@ pub enum OrganizationParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     Embedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1426,6 +1478,7 @@ pub enum OrganizationSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1434,6 +1487,7 @@ pub enum OrganizationSubOrganization<S: BosStr = DefaultStr> {
     Embedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1441,6 +1495,7 @@ pub enum OrganizationSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1540,11 +1595,24 @@ impl<S: BosStr> LexiconSchema for Organization<S> {
     }
 }
 
+fn deserialize_embedded_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_social_flockfeeds_lexical_type_Organization() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Organization"),
@@ -3452,9 +3520,28 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Organization() -> LexiconDoc<'stat
     }
 }
 
+fn deserialize_organization_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod organization_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -3588,13 +3675,95 @@ impl OrganizationBuilder<organization_state::Empty, DefaultStr> {
         OrganizationBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -3607,13 +3776,95 @@ impl<S: BosStr> OrganizationBuilder<organization_state::Empty, S> {
         OrganizationBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -3668,7 +3919,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<OrganizationAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<OrganizationAdditionalType<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -3716,7 +3970,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<OrganizationAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<OrganizationAggregateRating<S>>,
+    ) -> Self {
         self._fields.5 = value;
         self
     }
@@ -3732,7 +3989,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(mut self, value: Option<OrganizationAlternateName<S>>) -> Self {
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<OrganizationAlternateName<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
@@ -3753,12 +4013,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `areaServed` field (optional)
-    pub fn area_served(mut self, value: impl Into<Option<OrganizationAreaServed<S>>>) -> Self {
+    pub fn area_served(
+        mut self,
+        value: impl Into<Option<OrganizationAreaServed<S>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `areaServed` field to an Option value (optional)
-    pub fn maybe_area_served(mut self, value: Option<OrganizationAreaServed<S>>) -> Self {
+    pub fn maybe_area_served(
+        mut self,
+        value: Option<OrganizationAreaServed<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -3824,12 +4090,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `contactPoint` field (optional)
-    pub fn contact_point(mut self, value: impl Into<Option<OrganizationContactPoint<S>>>) -> Self {
+    pub fn contact_point(
+        mut self,
+        value: impl Into<Option<OrganizationContactPoint<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `contactPoint` field to an Option value (optional)
-    pub fn maybe_contact_point(mut self, value: Option<OrganizationContactPoint<S>>) -> Self {
+    pub fn maybe_contact_point(
+        mut self,
+        value: Option<OrganizationContactPoint<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
@@ -3845,7 +4117,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `contactPoints` field to an Option value (optional)
-    pub fn maybe_contact_points(mut self, value: Option<OrganizationContactPoints<S>>) -> Self {
+    pub fn maybe_contact_points(
+        mut self,
+        value: Option<OrganizationContactPoints<S>>,
+    ) -> Self {
         self._fields.14 = value;
         self
     }
@@ -3872,7 +4147,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `department` field (optional)
-    pub fn department(mut self, value: impl Into<Option<OrganizationDepartment<S>>>) -> Self {
+    pub fn department(
+        mut self,
+        value: impl Into<Option<OrganizationDepartment<S>>>,
+    ) -> Self {
         self._fields.16 = value.into();
         self
     }
@@ -3885,12 +4163,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<OrganizationDescription<S>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<OrganizationDescription<S>>>,
+    ) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `description` field to an Option value (optional)
-    pub fn maybe_description(mut self, value: Option<OrganizationDescription<S>>) -> Self {
+    pub fn maybe_description(
+        mut self,
+        value: Option<OrganizationDescription<S>>,
+    ) -> Self {
         self._fields.17 = value;
         self
     }
@@ -3925,7 +4209,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
-    pub fn maybe_dissolution_date(mut self, value: Option<OrganizationDissolutionDate<S>>) -> Self {
+    pub fn maybe_dissolution_date(
+        mut self,
+        value: Option<OrganizationDissolutionDate<S>>,
+    ) -> Self {
         self._fields.19 = value;
         self
     }
@@ -3941,7 +4228,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
-    pub fn maybe_diversity_policy(mut self, value: Option<OrganizationDiversityPolicy<S>>) -> Self {
+    pub fn maybe_diversity_policy(
+        mut self,
+        value: Option<OrganizationDiversityPolicy<S>>,
+    ) -> Self {
         self._fields.20 = value;
         self
     }
@@ -3994,7 +4284,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `employee` field (optional)
-    pub fn employee(mut self, value: impl Into<Option<OrganizationEmployee<S>>>) -> Self {
+    pub fn employee(
+        mut self,
+        value: impl Into<Option<OrganizationEmployee<S>>>,
+    ) -> Self {
         self._fields.24 = value.into();
         self
     }
@@ -4007,7 +4300,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `employees` field (optional)
-    pub fn employees(mut self, value: impl Into<Option<OrganizationEmployees<S>>>) -> Self {
+    pub fn employees(
+        mut self,
+        value: impl Into<Option<OrganizationEmployees<S>>>,
+    ) -> Self {
         self._fields.25 = value.into();
         self
     }
@@ -4020,12 +4316,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `ethicsPolicy` field (optional)
-    pub fn ethics_policy(mut self, value: impl Into<Option<OrganizationEthicsPolicy<S>>>) -> Self {
+    pub fn ethics_policy(
+        mut self,
+        value: impl Into<Option<OrganizationEthicsPolicy<S>>>,
+    ) -> Self {
         self._fields.26 = value.into();
         self
     }
     /// Set the `ethicsPolicy` field to an Option value (optional)
-    pub fn maybe_ethics_policy(mut self, value: Option<OrganizationEthicsPolicy<S>>) -> Self {
+    pub fn maybe_ethics_policy(
+        mut self,
+        value: Option<OrganizationEthicsPolicy<S>>,
+    ) -> Self {
         self._fields.26 = value;
         self
     }
@@ -4059,7 +4361,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `faxNumber` field (optional)
-    pub fn fax_number(mut self, value: impl Into<Option<OrganizationFaxNumber<S>>>) -> Self {
+    pub fn fax_number(
+        mut self,
+        value: impl Into<Option<OrganizationFaxNumber<S>>>,
+    ) -> Self {
         self._fields.29 = value.into();
         self
     }
@@ -4085,7 +4390,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `founders` field (optional)
-    pub fn founders(mut self, value: impl Into<Option<OrganizationFounders<S>>>) -> Self {
+    pub fn founders(
+        mut self,
+        value: impl Into<Option<OrganizationFounders<S>>>,
+    ) -> Self {
         self._fields.31 = value.into();
         self
     }
@@ -4098,12 +4406,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `foundingDate` field (optional)
-    pub fn founding_date(mut self, value: impl Into<Option<OrganizationFoundingDate<S>>>) -> Self {
+    pub fn founding_date(
+        mut self,
+        value: impl Into<Option<OrganizationFoundingDate<S>>>,
+    ) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `foundingDate` field to an Option value (optional)
-    pub fn maybe_founding_date(mut self, value: Option<OrganizationFoundingDate<S>>) -> Self {
+    pub fn maybe_founding_date(
+        mut self,
+        value: Option<OrganizationFoundingDate<S>>,
+    ) -> Self {
         self._fields.32 = value;
         self
     }
@@ -4202,7 +4516,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `hasCredential` field to an Option value (optional)
-    pub fn maybe_has_credential(mut self, value: Option<OrganizationHasCredential<S>>) -> Self {
+    pub fn maybe_has_credential(
+        mut self,
+        value: Option<OrganizationHasCredential<S>>,
+    ) -> Self {
         self._fields.38 = value;
         self
     }
@@ -4337,7 +4654,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `identifier` field (optional)
-    pub fn identifier(mut self, value: impl Into<Option<OrganizationIdentifier<S>>>) -> Self {
+    pub fn identifier(
+        mut self,
+        value: impl Into<Option<OrganizationIdentifier<S>>>,
+    ) -> Self {
         self._fields.46 = value.into();
         self
     }
@@ -4395,12 +4715,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `iso6523Code` field (optional)
-    pub fn iso6523_code(mut self, value: impl Into<Option<OrganizationIso6523Code<S>>>) -> Self {
+    pub fn iso6523_code(
+        mut self,
+        value: impl Into<Option<OrganizationIso6523Code<S>>>,
+    ) -> Self {
         self._fields.50 = value.into();
         self
     }
     /// Set the `iso6523Code` field to an Option value (optional)
-    pub fn maybe_iso6523_code(mut self, value: Option<OrganizationIso6523Code<S>>) -> Self {
+    pub fn maybe_iso6523_code(
+        mut self,
+        value: Option<OrganizationIso6523Code<S>>,
+    ) -> Self {
         self._fields.50 = value;
         self
     }
@@ -4408,7 +4734,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `keywords` field (optional)
-    pub fn keywords(mut self, value: impl Into<Option<OrganizationKeywords<S>>>) -> Self {
+    pub fn keywords(
+        mut self,
+        value: impl Into<Option<OrganizationKeywords<S>>>,
+    ) -> Self {
         self._fields.51 = value.into();
         self
     }
@@ -4421,12 +4750,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `knowsAbout` field (optional)
-    pub fn knows_about(mut self, value: impl Into<Option<OrganizationKnowsAbout<S>>>) -> Self {
+    pub fn knows_about(
+        mut self,
+        value: impl Into<Option<OrganizationKnowsAbout<S>>>,
+    ) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `knowsAbout` field to an Option value (optional)
-    pub fn maybe_knows_about(mut self, value: Option<OrganizationKnowsAbout<S>>) -> Self {
+    pub fn maybe_knows_about(
+        mut self,
+        value: Option<OrganizationKnowsAbout<S>>,
+    ) -> Self {
         self._fields.52 = value;
         self
     }
@@ -4442,7 +4777,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `knowsLanguage` field to an Option value (optional)
-    pub fn maybe_knows_language(mut self, value: Option<OrganizationKnowsLanguage<S>>) -> Self {
+    pub fn maybe_knows_language(
+        mut self,
+        value: Option<OrganizationKnowsLanguage<S>>,
+    ) -> Self {
         self._fields.53 = value;
         self
     }
@@ -4450,12 +4788,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `legalAddress` field (optional)
-    pub fn legal_address(mut self, value: impl Into<Option<OrganizationLegalAddress<S>>>) -> Self {
+    pub fn legal_address(
+        mut self,
+        value: impl Into<Option<OrganizationLegalAddress<S>>>,
+    ) -> Self {
         self._fields.54 = value.into();
         self
     }
     /// Set the `legalAddress` field to an Option value (optional)
-    pub fn maybe_legal_address(mut self, value: Option<OrganizationLegalAddress<S>>) -> Self {
+    pub fn maybe_legal_address(
+        mut self,
+        value: Option<OrganizationLegalAddress<S>>,
+    ) -> Self {
         self._fields.54 = value;
         self
     }
@@ -4463,7 +4807,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `legalName` field (optional)
-    pub fn legal_name(mut self, value: impl Into<Option<OrganizationLegalName<S>>>) -> Self {
+    pub fn legal_name(
+        mut self,
+        value: impl Into<Option<OrganizationLegalName<S>>>,
+    ) -> Self {
         self._fields.55 = value.into();
         self
     }
@@ -4508,7 +4855,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `location` field (optional)
-    pub fn location(mut self, value: impl Into<Option<OrganizationLocation<S>>>) -> Self {
+    pub fn location(
+        mut self,
+        value: impl Into<Option<OrganizationLocation<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
@@ -4553,12 +4903,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `makesOffer` field (optional)
-    pub fn makes_offer(mut self, value: impl Into<Option<OrganizationMakesOffer<S>>>) -> Self {
+    pub fn makes_offer(
+        mut self,
+        value: impl Into<Option<OrganizationMakesOffer<S>>>,
+    ) -> Self {
         self._fields.61 = value.into();
         self
     }
     /// Set the `makesOffer` field to an Option value (optional)
-    pub fn maybe_makes_offer(mut self, value: Option<OrganizationMakesOffer<S>>) -> Self {
+    pub fn maybe_makes_offer(
+        mut self,
+        value: Option<OrganizationMakesOffer<S>>,
+    ) -> Self {
         self._fields.61 = value;
         self
     }
@@ -4579,7 +4935,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `memberOf` field (optional)
-    pub fn member_of(mut self, value: impl Into<Option<OrganizationMemberOf<S>>>) -> Self {
+    pub fn member_of(
+        mut self,
+        value: impl Into<Option<OrganizationMemberOf<S>>>,
+    ) -> Self {
         self._fields.63 = value.into();
         self
     }
@@ -4639,7 +4998,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
-    pub fn maybe_nonprofit_status(mut self, value: Option<OrganizationNonprofitStatus<S>>) -> Self {
+    pub fn maybe_nonprofit_status(
+        mut self,
+        value: Option<OrganizationNonprofitStatus<S>>,
+    ) -> Self {
         self._fields.67 = value;
         self
     }
@@ -4725,7 +5087,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<OrganizationPotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<OrganizationPotentialAction<S>>,
+    ) -> Self {
         self._fields.72 = value;
         self
     }
@@ -4804,12 +5169,18 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `serviceArea` field (optional)
-    pub fn service_area(mut self, value: impl Into<Option<OrganizationServiceArea<S>>>) -> Self {
+    pub fn service_area(
+        mut self,
+        value: impl Into<Option<OrganizationServiceArea<S>>>,
+    ) -> Self {
         self._fields.78 = value.into();
         self
     }
     /// Set the `serviceArea` field to an Option value (optional)
-    pub fn maybe_service_area(mut self, value: Option<OrganizationServiceArea<S>>) -> Self {
+    pub fn maybe_service_area(
+        mut self,
+        value: Option<OrganizationServiceArea<S>>,
+    ) -> Self {
         self._fields.78 = value;
         self
     }
@@ -4864,7 +5235,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
-    pub fn maybe_sub_organization(mut self, value: Option<OrganizationSubOrganization<S>>) -> Self {
+    pub fn maybe_sub_organization(
+        mut self,
+        value: Option<OrganizationSubOrganization<S>>,
+    ) -> Self {
         self._fields.82 = value;
         self
     }
@@ -4872,7 +5246,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `subjectOf` field (optional)
-    pub fn subject_of(mut self, value: impl Into<Option<OrganizationSubjectOf<S>>>) -> Self {
+    pub fn subject_of(
+        mut self,
+        value: impl Into<Option<OrganizationSubjectOf<S>>>,
+    ) -> Self {
         self._fields.83 = value.into();
         self
     }
@@ -4898,7 +5275,10 @@ impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
 
 impl<St: organization_state::State, S: BosStr> OrganizationBuilder<St, S> {
     /// Set the `telephone` field (optional)
-    pub fn telephone(mut self, value: impl Into<Option<OrganizationTelephone<S>>>) -> Self {
+    pub fn telephone(
+        mut self,
+        value: impl Into<Option<OrganizationTelephone<S>>>,
+    ) -> Self {
         self._fields.85 = value.into();
         self
     }
@@ -5054,7 +5434,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Organization<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Organization<S> {
         Organization {
             accepted_payment_method: self._fields.0,
             actionable_feedback_policy: self._fields.1,

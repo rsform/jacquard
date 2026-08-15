@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::tech_tokimeki::takibi::log;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::tech_tokimeki::takibi::log;
 /// A log record - adding wood to the fire. Implicitly records visible sparks as a form of 'silent appreciation'.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -43,7 +43,12 @@ pub struct Log<S: BosStr = DefaultStr> {
     ///Sparks visible at the moment of adding wood, with elapsed time for decay scoring
     #[serde(skip_serializing_if = "Option::is_none")]
     pub visible_sparks: Option<Vec<log::SparkRef<S>>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_log_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -61,16 +66,18 @@ pub struct LogGetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a visible spark with timing information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SparkRef<S: BosStr = DefaultStr> {
     ///Milliseconds since the spark appeared on screen (0-10000)
     pub elapsed: i64,
     ///Strong reference to the spark record
     pub spark: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_spark_ref_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -167,9 +174,28 @@ impl<S: BosStr> LexiconSchema for SparkRef<S> {
     }
 }
 
+fn deserialize_log_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -263,7 +289,10 @@ where
 
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `visibleSparks` field (optional)
-    pub fn visible_sparks(mut self, value: impl Into<Option<Vec<log::SparkRef<S>>>>) -> Self {
+    pub fn visible_sparks(
+        mut self,
+        value: impl Into<Option<Vec<log::SparkRef<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -298,10 +327,10 @@ where
 }
 
 fn lexicon_doc_tech_tokimeki_takibi_log() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.tokimeki.takibi.log"),
@@ -354,13 +383,16 @@ fn lexicon_doc_tech_tokimeki_takibi_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sparkRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to a visible spark with timing information",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("spark"),
-                        SmolStr::new_static("elapsed"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to a visible spark with timing information",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("spark"), SmolStr::new_static("elapsed")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -390,9 +422,22 @@ fn lexicon_doc_tech_tokimeki_takibi_log() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_spark_ref_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod spark_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

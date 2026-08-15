@@ -1,0 +1,94 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.vod.updateDraft",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update a draft VOD's editable metadata. Server-authoritative fields (source, durationMs, status) are preserved. Editing is allowed in any status, so the user can pre-fill metadata while processing. All fields except uri are optional (partial update).",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "activity": {
+              "type": "union",
+              "refs": [
+                "place.stream.defs#activityGame",
+                "place.stream.defs#activityLabel"
+              ]
+            },
+            "contentRights": {
+              "type": "ref",
+              "ref": "place.stream.metadata.contentRights"
+            },
+            "contentWarnings": {
+              "type": "ref",
+              "ref": "place.stream.metadata.contentWarnings"
+            },
+            "description": {
+              "type": "string",
+              "maxLength": 50000,
+              "maxGraphemes": 5000
+            },
+            "descriptionFacets": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "place.stream.richtext.videoFacet"
+              }
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 640,
+                "maxGraphemes": 64
+              },
+              "maxLength": 10
+            },
+            "thumb": {
+              "type": "blob",
+              "accept": [
+                "image/*"
+              ],
+              "maxSize": 1000000
+            },
+            "title": {
+              "type": "string",
+              "maxLength": 1400,
+              "maxGraphemes": 140
+            },
+            "uri": {
+              "type": "string",
+              "description": "The ats:// URI of the draft to update."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "draft"
+          ],
+          "properties": {
+            "draft": {
+              "type": "ref",
+              "ref": "place.stream.vod.draftDefs#draftView"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "No draft exists with the given URI for the authenticated user.",
+          "name": "NotFound"
+        }
+      ]
+    }
+  }
+}

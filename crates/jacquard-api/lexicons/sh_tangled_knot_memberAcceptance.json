@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.knot.memberAcceptance",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Acceptance of a knot's membership offer, w/ knot-DID as rkey",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Invite acceptance timestamp",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

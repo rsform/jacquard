@@ -10,11 +10,11 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /** Request marker for the `org.tangled.temp.notification.markAllRead` procedure.
 
 This endpoint has no request parameters or input body; send this marker with `jacquard::Client`.*/
@@ -30,13 +30,32 @@ impl jacquard_common::xrpc::XrpcResp for MarkAllReadResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl jacquard_common::xrpc::XrpcRequest for MarkAllRead {
     const NSID: &'static str = "org.tangled.temp.notification.markAllRead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MarkAllReadResponse;
+    fn encode_body(
+        &self,
+        _buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+        Ok(())
+    }
 }
 
 /** Endpoint marker for the `org.tangled.temp.notification.markAllRead` procedure.
@@ -45,8 +64,9 @@ Path: `/xrpc/org.tangled.temp.notification.markAllRead`. The request payload typ
 pub struct MarkAllReadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MarkAllReadRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.notification.markAllRead";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = MarkAllRead;
     type Response = MarkAllReadResponse;
 }

@@ -302,6 +302,9 @@ pub enum DecodeError {
         #[source]
         serde_json::Error,
     ),
+    /// A 2xx response carried a body where the endpoint expects none
+    #[error("Expected an empty response body for this endpoint")]
+    UnexpectedBody,
     /// CBOR deserialization failed (local I/O)
     #[cfg(feature = "std")]
     #[error("Failed to deserialize CBOR: {0}")]

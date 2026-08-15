@@ -1,0 +1,45 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.embed.video",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Video embed with metadata",
+      "required": [
+        "video"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text describing video content",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        },
+        "duration": {
+          "type": "integer",
+          "description": "Duration in seconds",
+          "minimum": 0
+        },
+        "thumbnail": {
+          "type": "blob",
+          "description": "Video thumbnail image",
+          "accept": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ],
+          "maxSize": 1000000
+        },
+        "video": {
+          "type": "blob",
+          "description": "Video blob reference",
+          "accept": [
+            "video/mp4",
+            "video/webm"
+          ],
+          "maxSize": 100000000
+        }
+      }
+    }
+  }
+}

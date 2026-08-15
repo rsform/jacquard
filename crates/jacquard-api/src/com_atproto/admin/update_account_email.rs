@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateAccountEmail<S: BosStr = DefaultStr> {
     ///The handle or DID of the repo.
     pub account: AtIdentifier<S>,
@@ -39,12 +36,25 @@ impl jacquard_common::xrpc::XrpcResp for UpdateAccountEmailResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountEmail<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateAccountEmailResponse;
 }
 
@@ -54,15 +64,16 @@ Path: `/xrpc/com.atproto.admin.updateAccountEmail`. The request payload type is 
 pub struct UpdateAccountEmailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountEmailRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.updateAccountEmail";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateAccountEmail<S>;
     type Response = UpdateAccountEmailResponse;
 }
 
 pub mod update_account_email_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -105,8 +116,10 @@ pub mod update_account_email_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateAccountEmailBuilder<St: update_account_email_state::State, S: BosStr = DefaultStr>
-{
+pub struct UpdateAccountEmailBuilder<
+    St: update_account_email_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -114,7 +127,10 @@ pub struct UpdateAccountEmailBuilder<St: update_account_email_state::State, S: B
 
 impl UpdateAccountEmail<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UpdateAccountEmailBuilder<update_account_email_state::Empty, DefaultStr> {
+    pub fn new() -> UpdateAccountEmailBuilder<
+        update_account_email_state::Empty,
+        DefaultStr,
+    > {
         UpdateAccountEmailBuilder::new()
     }
 }
@@ -201,7 +217,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateAccountEmail<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateAccountEmail<S> {
         UpdateAccountEmail {
             account: self._fields.0.unwrap(),
             email: self._fields.1.unwrap(),

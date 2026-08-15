@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,16 +24,13 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue_linkat::board;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue_linkat::board;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Card<S: BosStr = DefaultStr> {
     ///Emoji of the card
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,7 +41,12 @@ pub struct Card<S: BosStr = DefaultStr> {
     ///URL of the link
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_card_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -60,7 +62,12 @@ pub struct Card<S: BosStr = DefaultStr> {
 pub struct Board<S: BosStr = DefaultStr> {
     ///List of cards in the board.
     pub cards: Vec<board::Card<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_board_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -138,11 +145,24 @@ impl<S: BosStr> LexiconSchema for Board<S> {
     }
 }
 
+fn deserialize_card_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_blue_linkat_board() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.linkat.board"),
@@ -183,9 +203,9 @@ fn lexicon_doc_blue_linkat_board() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Record containing a cards of your profile.",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Record containing a cards of your profile."),
+                    ),
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("cards")]),
@@ -195,9 +215,9 @@ fn lexicon_doc_blue_linkat_board() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("cards"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "List of cards in the board.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("List of cards in the board."),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#card"),
                                         ..Default::default()
@@ -218,9 +238,28 @@ fn lexicon_doc_blue_linkat_board() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_board_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod board_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

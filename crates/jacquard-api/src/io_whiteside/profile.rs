@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Profile information (bio, skills, etc.)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -43,7 +43,12 @@ pub struct Profile<S: BosStr = DefaultStr> {
     pub heading: S,
     ///Last update timestamp in ISO 8601 format
     pub updated_at: Datetime,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_profile_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -128,9 +133,28 @@ impl<S: BosStr> LexiconSchema for Profile<S> {
     }
 }
 
+fn deserialize_profile_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -314,10 +338,10 @@ where
 }
 
 fn lexicon_doc_io_whiteside_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.whiteside.profile"),
@@ -326,25 +350,29 @@ fn lexicon_doc_io_whiteside_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Profile information (bio, skills, etc.)",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Profile information (bio, skills, etc.)"),
+                    ),
                     key: Some(CowStr::new_static("literal:bio")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("heading"),
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("updatedAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("heading"),
+                                SmolStr::new_static("content"),
+                                SmolStr::new_static("updatedAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Profile content in plain text or markdown format",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Profile content in plain text or markdown format",
+                                        ),
+                                    ),
                                     max_length: Some(5000usize),
                                     ..Default::default()
                                 }),
@@ -352,9 +380,11 @@ fn lexicon_doc_io_whiteside_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("heading"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Profile section heading (e.g. 'Hey, I'm John')",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Profile section heading (e.g. 'Hey, I'm John')",
+                                        ),
+                                    ),
                                     max_length: Some(200usize),
                                     ..Default::default()
                                 }),
@@ -362,9 +392,11 @@ fn lexicon_doc_io_whiteside_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("updatedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Last update timestamp in ISO 8601 format",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Last update timestamp in ISO 8601 format",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

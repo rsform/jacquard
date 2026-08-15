@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "dev.atfs.describeServer",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Report what this instance can accept and how to reach it over libp2p, before a client hands it a single byte. Sits beside dev.atfs.server rather than under dev.atfs.repo.* with the file methods, because it describes the instance itself, not a repo. Deliberately a separate call from the did:web identity document: a DID document is an identity record, not a capability advertisement, and mixing the two would constrain both — this one is free to grow new capability fields without touching identity resolution. Public and unauthenticated: everything it reports is either already public elsewhere (serviceDid, the instance's own hard size ceiling) or is freely offered to any libp2p peer that connects anyway (a peer ID and its addresses are exchanged on every connection's identify handshake) — there is nothing here an allowlist would protect.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "serviceDid",
+            "maxBlobSize",
+            "peerId",
+            "multiaddrs"
+          ],
+          "properties": {
+            "maxBlobSize": {
+              "type": "integer",
+              "description": "The largest single blob this instance will ever accept, whether uploaded or pinned — atfs's own fixed ceiling, not configurable per instance. A caller planning a large upload should check this before trying, since a blob over it fails fast with BlobTooLarge rather than partway through a transfer.",
+              "minimum": 1
+            },
+            "maxRequestBody": {
+              "type": "integer",
+              "description": "This instance's best current guess at the largest HTTP request body its own ingress will actually let through, in bytes — learned from an operator-set override, the dev.atfs.server record, or headers sniffed off arriving requests (see dev.atfs.server's requestBodyCap field for the full list, lowest wins). Absent means genuinely unknown: no source has reported anything yet, which is a legitimate answer a client must be prepared to handle, not an oversight — it does not mean unlimited, and it does not mean zero. A client that needs a real answer before deciding how to transfer a large file should treat an absent value the same as a value it cannot rely on, and prefer sending bytes over libp2p (see maxBlobSize) rather than a single HTTP request body of unknown fate.",
+              "minimum": 1
+            },
+            "multiaddrs": {
+              "type": "array",
+              "description": "The multiaddrs this instance currently has announced as reachable — today typically TCP and QUIC listen addresses; more transports (for example a browser-dialable WebSocket address) are expected to appear here automatically as this instance gains them, with no client-side change needed. An empty array is itself a meaningful, honest answer: this instance currently has nothing dialable over libp2p, and a client should say so rather than hang waiting for a connection that will never come. Read live on every call, not cached at boot, since the announced set can grow after startup as NAT traversal completes.",
+              "items": {
+                "type": "string",
+                "description": "A single multiaddr this instance has announced, e.g. `/ip4/203.0.113.7/tcp/4001` — transport-only, with no `/p2p/<peerId>` suffix; combine with the peerId field above to dial it."
+              }
+            },
+            "peerId": {
+              "type": "string",
+              "description": "This instance's libp2p peer ID, exchanged on every libp2p connection anyway. Combine with each entry in multiaddrs to form a dialable address (append `/p2p/<peerId>` to a bare multiaddr, or supply both to a libp2p AddrInfo)."
+            },
+            "serviceDid": {
+              "type": "string",
+              "description": "This instance's own identity — the same value as its dev.atfs.server record's serviceDid, and the `aud` an uploader's inter-service auth JWT must name. May be empty when the instance hasn't been configured with one yet, in which case uploads are disabled instance-wide (see dev.atfs.server).",
+              "format": "did"
+            }
+          }
+        }
+      }
+    }
+  }
+}

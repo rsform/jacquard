@@ -1,0 +1,220 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.lab.plasmodium",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A Physarum (slime-mould) organism grown in the Anisota Lab's Plasmodium workbench and saved to the owner's collection. Stored as its recipe rather than its pixels: a 'seed', the simulation 'gridSize', a 'genome' of behavioural parameters (all continuous 0..1 tunables scaled to integers 0..1000, since atproto lexicons have no float type), and the ordered 'foods' and 'inoculations' the grower placed. Because the GPU agent simulation is deterministic given the same seed, genome and placements, replaying the recipe regrows the organism. A small PNG thumbnail is kept for display.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "seed",
+          "gridSize",
+          "genome",
+          "createdAt"
+        ],
+        "properties": {
+          "agentTier": {
+            "type": "integer",
+            "description": "Agent-count tier that grew it (0=small, 1=medium, 2=large). A reopen may cap lower on a weaker device."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the organism was saved",
+            "format": "datetime"
+          },
+          "foods": {
+            "type": "array",
+            "description": "Ordered food drops the grower placed; each replayed at its step so growth rebuilds identically.",
+            "items": {
+              "type": "object",
+              "required": [
+                "x",
+                "y",
+                "atStep"
+              ],
+              "properties": {
+                "atStep": {
+                  "type": "integer",
+                  "description": "Sim step at which it was dropped"
+                },
+                "r": {
+                  "type": "integer",
+                  "description": "Radius in cells"
+                },
+                "x": {
+                  "type": "integer",
+                  "description": "Normalised x scaled 0..1000"
+                },
+                "y": {
+                  "type": "integer",
+                  "description": "Normalised y scaled 0..1000"
+                }
+              }
+            },
+            "maxLength": 256
+          },
+          "genome": {
+            "type": "object",
+            "description": "Behavioural parameters. Global tunables plus one species entry (two when multiSpecies). Continuous values are scaled to integers 0..1000; enumerated traits (spawn, interMode, renderMode) are small raw integer indices.",
+            "required": [
+              "species"
+            ],
+            "properties": {
+              "blur": {
+                "type": "integer",
+                "description": "Diffusion (3x3 blur) strength, 0..1000"
+              },
+              "foodWeight": {
+                "type": "integer",
+                "description": "How strongly agents are drawn to the food channel, 0..1000"
+              },
+              "interMode": {
+                "type": "integer",
+                "description": "Cross-species interaction index: 0 ignore, 1 attract, 2 repel, 3 predator/prey, 4 symbiosis, 5 competition"
+              },
+              "interStrength": {
+                "type": "integer",
+                "description": "Cross-species coupling strength, 0..1000"
+              },
+              "spawn": {
+                "type": "integer",
+                "description": "Initial spawn pattern index: 0 scatter, 1 ring, 2 spore, 3 colonies, 4 poles, 5 spiral"
+              },
+              "species": {
+                "type": "array",
+                "description": "One entry per agent population",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "sensorAngle",
+                    "rotationAngle",
+                    "sensorOffset",
+                    "step",
+                    "deposit",
+                    "decay",
+                    "density"
+                  ],
+                  "properties": {
+                    "decay": {
+                      "type": "integer",
+                      "description": "Trail persistence, 0..1000 = 0.80..1.00 retained"
+                    },
+                    "density": {
+                      "type": "integer",
+                      "description": "Fraction of the agent budget this species occupies, 0..1000"
+                    },
+                    "deposit": {
+                      "type": "integer",
+                      "description": "Trail deposit amount, 0..1000"
+                    },
+                    "hue": {
+                      "type": "integer",
+                      "description": "Per-species colour hue, 0..1000 = 0..360 degrees"
+                    },
+                    "renderMode": {
+                      "type": "integer",
+                      "description": "Render mode index: 0 filament, 1 veil, 2 crystal, 3 plasma, 4 flow"
+                    },
+                    "rotationAngle": {
+                      "type": "integer",
+                      "description": "Rotation angle RA, 0..1000 = 0..90 degrees"
+                    },
+                    "sensorAngle": {
+                      "type": "integer",
+                      "description": "Sensor angle SA, 0..1000 = 0..90 degrees"
+                    },
+                    "sensorOffset": {
+                      "type": "integer",
+                      "description": "Sensor distance SO, 0..1000 = 0..32 cells"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "description": "Step size per move, 0..1000 = 0..4 cells"
+                    }
+                  }
+                },
+                "maxLength": 2
+              }
+            }
+          },
+          "gridSize": {
+            "type": "integer",
+            "description": "Trail-field grid resolution in cells (square)"
+          },
+          "image": {
+            "type": "string",
+            "description": "A PNG data URL thumbnail of the organism",
+            "maxLength": 120000
+          },
+          "inoculations": {
+            "type": "array",
+            "description": "Ordered inoculation taps (respawned agent patches).",
+            "items": {
+              "type": "object",
+              "required": [
+                "x",
+                "y",
+                "species",
+                "atStep"
+              ],
+              "properties": {
+                "atStep": {
+                  "type": "integer",
+                  "description": "Sim step at which it was placed"
+                },
+                "r": {
+                  "type": "integer",
+                  "description": "Radius in cells"
+                },
+                "species": {
+                  "type": "integer",
+                  "description": "0 or 1"
+                },
+                "x": {
+                  "type": "integer",
+                  "description": "Normalised x scaled 0..1000"
+                },
+                "y": {
+                  "type": "integer",
+                  "description": "Normalised y scaled 0..1000"
+                }
+              }
+            },
+            "maxLength": 256
+          },
+          "lastTickAt": {
+            "type": "string",
+            "description": "When the organism last advanced, used to grow it forward on reopen",
+            "format": "datetime"
+          },
+          "multiSpecies": {
+            "type": "boolean",
+            "description": "Whether a second agent population was active"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the organism",
+            "maxLength": 800,
+            "maxGraphemes": 100
+          },
+          "palette": {
+            "type": "string",
+            "description": "Colour palette id (amber, ember, lichen, frost, mono)",
+            "maxLength": 40
+          },
+          "seed": {
+            "type": "integer",
+            "description": "PRNG seed the simulation and genome were initialised with"
+          },
+          "steps": {
+            "type": "integer",
+            "description": "How many simulation steps the organism had grown when saved"
+          }
+        }
+      }
+    }
+  }
+}

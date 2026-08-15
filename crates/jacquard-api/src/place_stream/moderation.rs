@@ -17,6 +17,7 @@ pub mod delete_vod_gate;
 pub mod permission;
 pub mod update_livestream;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -33,16 +34,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::actor::ProfileViewBasic;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PermissionView<S: BosStr = DefaultStr> {
     ///The streamer who granted these permissions
     pub author: ProfileViewBasic<S>,
@@ -52,7 +50,12 @@ pub struct PermissionView<S: BosStr = DefaultStr> {
     pub record: Data<S>,
     ///AT-URI of the permission record
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_permission_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -71,9 +74,22 @@ impl<S: BosStr> LexiconSchema for PermissionView<S> {
     }
 }
 
+fn deserialize_permission_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod permission_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -146,7 +162,10 @@ pub mod permission_view_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PermissionViewBuilder<St: permission_view_state::State, S: BosStr = DefaultStr> {
+pub struct PermissionViewBuilder<
+    St: permission_view_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
@@ -288,7 +307,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PermissionView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PermissionView<S> {
         PermissionView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -300,10 +322,10 @@ where
 }
 
 fn lexicon_doc_place_stream_moderation_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.moderation.defs"),
@@ -312,28 +334,32 @@ fn lexicon_doc_place_stream_moderation_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("permissionView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("record"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("author"), SmolStr::new_static("record")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.actor.defs#profileViewBasic"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.actor.defs#profileViewBasic",
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content identifier of the permission record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Content identifier of the permission record",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -347,9 +373,9 @@ fn lexicon_doc_place_stream_moderation_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the permission record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the permission record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),

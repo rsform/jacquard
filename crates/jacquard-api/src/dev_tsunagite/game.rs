@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,18 +25,15 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::dev_tsunagite::game;
-use crate::dev_tsunagite::types::Indexable;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::dev_tsunagite::types::Indexable;
+use crate::dev_tsunagite::game;
 /// A closed set of indexable named values.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Enum<S: BosStr = DefaultStr> {
     ///The internal ID of this component, limited to the RecordKey characterset.
     pub id: RecordKey<Rkey<S>>,
@@ -44,7 +41,12 @@ pub struct Enum<S: BosStr = DefaultStr> {
     pub name: Data<S>,
     ///The allowed values for this enum to take.
     pub values: Vec<Indexable<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_enum_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -75,9 +77,15 @@ pub struct Game<S: BosStr = DefaultStr> {
     pub name: Data<S>,
     ///All the components of a score in the game, including grades, lamps, EX score, and whatever other constructs are used.
     pub score_components: Vec<GameScoreComponentsItem<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_game_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -107,10 +115,7 @@ pub struct GameGetRecordOutput<S: BosStr = DefaultStr> {
 /// A percentage score with customizable precision.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Percentage<S: BosStr = DefaultStr> {
     ///The internal ID of this component, limited to the RecordKey characterset.
     pub id: RecordKey<Rkey<S>>,
@@ -122,17 +127,19 @@ pub struct Percentage<S: BosStr = DefaultStr> {
     ///The number of decimal places to include in the percentage.  Defaults to `2`.
     #[serde(default = "_default_percentage_precision")]
     pub precision: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_percentage_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An integer point score, with or without a cap.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Points<S: BosStr = DefaultStr> {
     ///The internal ID of this component, limited to the RecordKey characterset.
     pub id: RecordKey<Rkey<S>>,
@@ -141,23 +148,30 @@ pub struct Points<S: BosStr = DefaultStr> {
     pub maximum: Option<i64>,
     ///The human-readable name of this component in UI.
     pub name: Data<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_points_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A fallback component for displaying arbitrary text.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Text<S: BosStr = DefaultStr> {
     ///The internal ID of this component, limited to the RecordKey characterset.
     pub id: RecordKey<Rkey<S>>,
     ///The human-readable name of this component in UI.
     pub name: Data<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_text_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -257,25 +271,31 @@ impl<S: BosStr> LexiconSchema for Game<S> {
         if let Some(ref value) = self.logo {
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/png", "image/jpeg", "image/jxl", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let accepted: &[&str] = &[
+                    "image/png",
+                    "image/jpeg",
+                    "image/jxl",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("logo"),
                         accepted: vec![
-                            "image/png".to_string(),
-                            "image/jpeg".to_string(),
-                            "image/jxl".to_string(),
-                            "image/webp".to_string(),
+                            "image/png".to_string(), "image/jpeg".to_string(),
+                            "image/jxl".to_string(), "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -397,9 +417,22 @@ impl<S: BosStr> LexiconSchema for Text<S> {
     }
 }
 
+fn deserialize_enum_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod enum_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -458,11 +491,7 @@ pub mod enum_state {
 /// Builder for constructing an instance of this type.
 pub struct EnumBuilder<St: enum_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<RecordKey<Rkey<S>>>,
-        Option<Data<S>>,
-        Option<Vec<Indexable<S>>>,
-    ),
+    _fields: (Option<RecordKey<Rkey<S>>>, Option<Data<S>>, Option<Vec<Indexable<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -527,7 +556,10 @@ where
     St::Name: enum_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<Data<S>>) -> EnumBuilder<enum_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> EnumBuilder<enum_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EnumBuilder {
             _state: PhantomData,
@@ -584,10 +616,10 @@ where
 }
 
 fn lexicon_doc_dev_tsunagite_game() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.tsunagite.game"),
@@ -916,9 +948,28 @@ fn lexicon_doc_dev_tsunagite_game() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_game_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod game_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1124,7 +1175,10 @@ where
     St::Name: game_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<Data<S>>) -> GameBuilder<game_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> GameBuilder<game_state::SetName<St>, S> {
         self._fields.5 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
@@ -1189,6 +1243,19 @@ where
     }
 }
 
+fn deserialize_percentage_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn _default_percentage_maximum() -> i64 {
     100i64
 }
@@ -1199,7 +1266,7 @@ fn _default_percentage_precision() -> i64 {
 
 pub mod percentage_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1274,12 +1341,7 @@ pub mod percentage_state {
 /// Builder for constructing an instance of this type.
 pub struct PercentageBuilder<St: percentage_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<RecordKey<Rkey<S>>>,
-        Option<i64>,
-        Option<Data<S>>,
-        Option<i64>,
-    ),
+    _fields: (Option<RecordKey<Rkey<S>>>, Option<i64>, Option<Data<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1414,7 +1476,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Percentage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Percentage<S> {
         Percentage {
             id: self._fields.0.unwrap(),
             maximum: self._fields.1.unwrap(),
@@ -1425,9 +1490,22 @@ where
     }
 }
 
+fn deserialize_points_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod points_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1589,9 +1667,22 @@ where
     }
 }
 
+fn deserialize_text_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod text_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1701,7 +1792,10 @@ where
     St::Name: text_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<Data<S>>) -> TextBuilder<text_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> TextBuilder<text_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TextBuilder {
             _state: PhantomData,

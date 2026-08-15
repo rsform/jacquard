@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Unban<S: BosStr = DefaultStr> {
     ///DID of the account to unblock
     pub subject: Did<S>,
@@ -38,12 +35,25 @@ impl jacquard_common::xrpc::XrpcResp for UnbanResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Unban<S> {
     const NSID: &'static str = "sh.tangled.knot.unban";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UnbanResponse;
 }
 
@@ -53,15 +63,16 @@ Path: `/xrpc/sh.tangled.knot.unban`. The request payload type is `Unban<S>`; sen
 pub struct UnbanRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnbanRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.knot.unban";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Unban<S>;
     type Response = UnbanResponse;
 }
 
 pub mod unban_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

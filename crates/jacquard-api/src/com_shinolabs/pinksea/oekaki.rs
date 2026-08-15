@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,37 +25,41 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::com_shinolabs::pinksea::oekaki;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_shinolabs::pinksea::oekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///The actual atproto image blob.
     pub blob: BlobRef<S>,
     pub image_link: oekaki::ImageLink<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_image_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A link to the image, it can be either directly to the PDS or to a CDN.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageLink<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_image_link_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -81,7 +85,12 @@ pub struct Oekaki<S: BosStr = DefaultStr> {
     ///An array of tags this image had.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_oekaki_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -131,16 +140,19 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -233,9 +245,22 @@ impl<S: BosStr> LexiconSchema for Oekaki<S> {
     }
 }
 
+fn deserialize_image_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -383,10 +408,10 @@ where
 }
 
 fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.shinolabs.pinksea.oekaki"),
@@ -395,18 +420,17 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("image"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("blob"),
-                        SmolStr::new_static("imageLink"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("blob"), SmolStr::new_static("imageLink")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("imageLink"),
@@ -423,9 +447,11 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("imageLink"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A link to the image, it can be either directly to the PDS or to a CDN.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A link to the image, it can be either directly to the PDS or to a CDN.",
+                        ),
+                    ),
                     required: Some(vec![]),
                     properties: {
                         #[allow(unused_mut)]
@@ -433,9 +459,11 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Alt text description of the image, for accessibility.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Alt text description of the image, for accessibility.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -449,19 +477,21 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     description: Some(CowStr::new_static("An oekaki post.")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("image"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("image"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The timestamp of creation.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The timestamp of creation."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -489,9 +519,9 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("tags"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "An array of tags this image had.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("An array of tags this image had."),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(640usize),
                                         ..Default::default()
@@ -513,9 +543,41 @@ fn lexicon_doc_com_shinolabs_pinksea_oekaki() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_image_link_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_oekaki_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod oekaki_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

@@ -8,6 +8,13 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::tools_ozone::report::AssignmentActivity;
 use crate::tools_ozone::report::CloseActivity;
 use crate::tools_ozone::report::EscalationActivity;
@@ -15,19 +22,9 @@ use crate::tools_ozone::report::NoteActivity;
 use crate::tools_ozone::report::QueueActivity;
 use crate::tools_ozone::report::ReopenActivity;
 use crate::tools_ozone::report::ReportActivityView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateActivity<S: BosStr = DefaultStr> {
     ///The type of activity to record.
     pub activity: CreateActivityActivity<S>,
@@ -51,6 +48,7 @@ pub struct CreateActivity<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -69,20 +67,27 @@ pub enum CreateActivityActivity<S: BosStr = DefaultStr> {
     NoteActivity(Box<NoteActivity<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreateActivityOutput<S: BosStr = DefaultStr> {
     pub activity: ReportActivityView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum CreateActivityError {
     /// No report exists with the given reportId or eventId
@@ -96,10 +101,7 @@ pub enum CreateActivityError {
     AlreadyInTargetState(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for CreateActivityError {
@@ -150,8 +152,9 @@ impl jacquard_common::xrpc::XrpcResp for CreateActivityResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateActivity<S> {
     const NSID: &'static str = "tools.ozone.report.createActivity";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = CreateActivityResponse;
 }
 
@@ -161,8 +164,9 @@ Path: `/xrpc/tools.ozone.report.createActivity`. The request payload type is `Cr
 pub struct CreateActivityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CreateActivityRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.report.createActivity";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = CreateActivity<S>;
     type Response = CreateActivityResponse;
 }
@@ -173,7 +177,7 @@ fn _default_create_activity_is_automated() -> Option<bool> {
 
 pub mod create_activity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -204,7 +208,10 @@ pub mod create_activity_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CreateActivityBuilder<St: create_activity_state::State, S: BosStr = DefaultStr> {
+pub struct CreateActivityBuilder<
+    St: create_activity_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<CreateActivityActivity<S>>,
@@ -355,7 +362,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CreateActivity<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateActivity<S> {
         CreateActivity {
             activity: self._fields.0.unwrap(),
             event_id: self._fields.1,

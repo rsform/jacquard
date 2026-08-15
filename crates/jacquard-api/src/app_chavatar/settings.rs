@@ -8,12 +8,13 @@
 //! Generated bindings for the `app.chavatar.settings` Lexicon namespace/module.
 pub mod executor;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,32 +28,31 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_chavatar::settings;
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::community_lexicon::location::geo::Geo;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::community_lexicon::location::geo::Geo;
+use crate::app_chavatar::settings;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AvatarItem<S: BosStr = DefaultStr> {
     pub id: S,
     pub image: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_avatar_item_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A date range condition. The 'type' field is the discriminator.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DateRange<S: BosStr = DefaultStr> {
     ///Absolute end datetime (ISO 8601). Omit for open-ended. Applies when type='absolute'.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,7 +74,12 @@ pub struct DateRange<S: BosStr = DefaultStr> {
     pub start_month: Option<i64>,
     ///Kind of date range. 'annual' recurs every year; 'absolute' is a one-time range.
     pub r#type: DateRangeType<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_date_range_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -160,10 +165,7 @@ where
 /// Geographic and timezone context used for schedule evaluation and solar event calculation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GeoContext<S: BosStr = DefaultStr> {
     ///WGS84 geographic location. Required for sunrise/sunset/solar-noon time references.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -171,7 +173,12 @@ pub struct GeoContext<S: BosStr = DefaultStr> {
     ///IANA timezone identifier (e.g. 'Asia/Tokyo'). Required for timeWindow and daysOfWeek schedule evaluation.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub timezone: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_geo_context_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -199,7 +206,12 @@ pub struct Settings<S: BosStr = DefaultStr> {
     pub interval: SettingsInterval<S>,
     ///The default rotation mode used when a schedule does not specify its own mode.
     pub mode: SettingsMode<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_settings_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -395,10 +407,7 @@ pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
 /// An ordered list of avatar items with optional rotation mode and interval overrides.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RotationList<S: BosStr = DefaultStr> {
     ///Ordered list of avatar items.
     pub avatars: Vec<settings::AvatarItem<S>>,
@@ -408,7 +417,12 @@ pub struct RotationList<S: BosStr = DefaultStr> {
     ///Rotation mode override. Falls back to the top-level settings.mode when absent.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mode: Option<RotationListMode<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_rotation_list_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -506,7 +520,9 @@ where
             RotationListInterval::_1d => RotationListInterval::_1d,
             RotationListInterval::_1w => RotationListInterval::_1w,
             RotationListInterval::_1mo => RotationListInterval::_1mo,
-            RotationListInterval::Other(v) => RotationListInterval::Other(v.into_static()),
+            RotationListInterval::Other(v) => {
+                RotationListInterval::Other(v.into_static())
+            }
         }
     }
 }
@@ -593,10 +609,7 @@ where
 /// A named rotation schedule with an optional activation condition.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RotationSchedule<S: BosStr = DefaultStr> {
     ///TID-format unique identifier for this schedule.
     pub id: S,
@@ -614,7 +627,12 @@ pub struct RotationSchedule<S: BosStr = DefaultStr> {
     ///Time-of-day windows for 'timed' kind. The schedule is active when the current time falls within any window.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub windows: Option<Vec<settings::TimeWindow<S>>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_rotation_schedule_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -696,7 +714,9 @@ where
             RotationScheduleKind::Default => RotationScheduleKind::Default,
             RotationScheduleKind::Period => RotationScheduleKind::Period,
             RotationScheduleKind::Timed => RotationScheduleKind::Timed,
-            RotationScheduleKind::Other(v) => RotationScheduleKind::Other(v.into_static()),
+            RotationScheduleKind::Other(v) => {
+                RotationScheduleKind::Other(v.into_static())
+            }
         }
     }
 }
@@ -704,10 +724,7 @@ where
 /// A time reference for schedule boundaries. The 'type' field is the discriminator.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TimeReference<S: BosStr = DefaultStr> {
     ///Offset in minutes from the solar event. Negative values are before the event. Applies to sunrise/sunset/solar-noon.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -717,7 +734,12 @@ pub struct TimeReference<S: BosStr = DefaultStr> {
     pub time: Option<S>,
     ///Kind of time reference. 'fixed' requires the 'time' field; solar types use geoContext.location.
     pub r#type: TimeReferenceType<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_time_reference_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -811,10 +833,7 @@ where
 /// A time window defined by start and end time references, with its own avatar list.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TimeWindow<S: BosStr = DefaultStr> {
     ///Window end time reference. Omit for open-ended windows.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -823,17 +842,19 @@ pub struct TimeWindow<S: BosStr = DefaultStr> {
     pub list: settings::RotationList<S>,
     ///Window start time reference.
     pub start: settings::TimeReference<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_time_window_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Activation timing for a period schedule. All fields are optional; specified conditions are evaluated with AND semantics.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Timing<S: BosStr = DefaultStr> {
     ///Date range condition.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -844,7 +865,12 @@ pub struct Timing<S: BosStr = DefaultStr> {
     ///Seconds after dateRange.endAt before automatically reverting to the next active schedule.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ttl_sec: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_timing_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -1111,9 +1137,22 @@ impl<S: BosStr> LexiconSchema for Timing<S> {
     }
 }
 
+fn deserialize_avatar_item_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod avatar_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1204,7 +1243,10 @@ where
     St::Id: avatar_item_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<S>) -> AvatarItemBuilder<avatar_item_state::SetId<St>, S> {
+    pub fn id(
+        mut self,
+        value: impl Into<S>,
+    ) -> AvatarItemBuilder<avatar_item_state::SetId<St>, S> {
         self._fields.0 = Option::Some(value.into());
         AvatarItemBuilder {
             _state: PhantomData,
@@ -1248,7 +1290,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AvatarItem<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AvatarItem<S> {
         AvatarItem {
             id: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -1258,10 +1303,10 @@ where
 }
 
 fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.chavatar.settings"),
@@ -1270,10 +1315,9 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("avatarItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("image"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("id"), SmolStr::new_static("image")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1767,9 +1811,54 @@ fn lexicon_doc_app_chavatar_settings() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_date_range_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_geo_context_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_settings_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1944,7 +2033,10 @@ impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
 
 impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `geoContext` field (optional)
-    pub fn geo_context(mut self, value: impl Into<Option<settings::GeoContext<S>>>) -> Self {
+    pub fn geo_context(
+        mut self,
+        value: impl Into<Option<settings::GeoContext<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -2027,9 +2119,22 @@ where
     }
 }
 
+fn deserialize_rotation_list_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod rotation_list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2127,7 +2232,10 @@ where
 
 impl<St: rotation_list_state::State, S: BosStr> RotationListBuilder<St, S> {
     /// Set the `interval` field (optional)
-    pub fn interval(mut self, value: impl Into<Option<RotationListInterval<S>>>) -> Self {
+    pub fn interval(
+        mut self,
+        value: impl Into<Option<RotationListInterval<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -2166,7 +2274,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RotationList<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RotationList<S> {
         RotationList {
             avatars: self._fields.0.unwrap(),
             interval: self._fields.1,
@@ -2176,9 +2287,48 @@ where
     }
 }
 
+fn deserialize_rotation_schedule_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_time_reference_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_time_window_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod time_window_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2334,7 +2484,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TimeWindow<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TimeWindow<S> {
         TimeWindow {
             end: self._fields.0,
             list: self._fields.1.unwrap(),
@@ -2342,4 +2495,17 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_timing_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

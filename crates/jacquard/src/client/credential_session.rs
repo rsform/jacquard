@@ -866,7 +866,7 @@ where
                 AuthorizationToken::Bearer(t) => {
                     http::HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
                 }
-                AuthorizationToken::Dpop(t) => {
+                AuthorizationToken::Dpop(t) | AuthorizationToken::Delegation(t) => {
                     http::HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
                 }
             }
@@ -925,7 +925,7 @@ where
                     AuthorizationToken::Bearer(t) => {
                         http::HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
                     }
-                    AuthorizationToken::Dpop(t) => {
+                    AuthorizationToken::Dpop(t) | AuthorizationToken::Delegation(t) => {
                         http::HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
                     }
                 }
@@ -1069,7 +1069,9 @@ where
         if let Some(token) = self.access_token().await {
             let auth_value = match token {
                 AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_str()),
-                AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_str()),
+                AuthorizationToken::Dpop(t) | AuthorizationToken::Delegation(t) => {
+                    format!("DPoP {}", t.as_str())
+                }
             };
             opts.headers
                 .push((CowStr::from("Authorization"), CowStr::from(auth_value)));

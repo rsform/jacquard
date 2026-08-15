@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "io.atcr.hold.getLayersForManifest",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Returns layer records for a specific manifest AT-URI.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "manifest"
+        ],
+        "properties": {
+          "manifest": {
+            "type": "string",
+            "description": "AT-URI of the manifest to get layers for",
+            "format": "at-uri"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "layers"
+          ],
+          "properties": {
+            "layers": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "io.atcr.hold.layer"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

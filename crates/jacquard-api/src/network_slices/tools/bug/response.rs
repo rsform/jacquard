@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -47,9 +47,15 @@ pub struct Response<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message_facets: Option<Vec<Facet<S>>>,
     pub status: ResponseStatus<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_response_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ResponseStatus<S: BosStr = DefaultStr> {
@@ -221,9 +227,28 @@ impl<S: BosStr> LexiconSchema for Response<S> {
     }
 }
 
+fn deserialize_response_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod response_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -443,10 +468,10 @@ where
 }
 
 fn lexicon_doc_network_slices_tools_bug_response() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.tools.bug.response"),
@@ -457,20 +482,21 @@ fn lexicon_doc_network_slices_tools_bug_response() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("bug"),
-                            SmolStr::new_static("status"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("bug"), SmolStr::new_static("status"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("bug"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Reference to the bug report",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Reference to the bug report"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -485,9 +511,9 @@ fn lexicon_doc_network_slices_tools_bug_response() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("message"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional explanation or link to fix",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional explanation or link to fix"),
+                                    ),
                                     max_length: Some(3000usize),
                                     max_graphemes: Some(1000usize),
                                     ..Default::default()
@@ -496,9 +522,11 @@ fn lexicon_doc_network_slices_tools_bug_response() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("messageFacets"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Annotations of message (mentions and links)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Annotations of message (mentions and links)",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("app.bsky.richtext.facet"),
                                         ..Default::default()

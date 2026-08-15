@@ -1,0 +1,62 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.feed.subscription",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "createdAt"
+        ],
+        "properties": {
+          "collections": {
+            "type": "array",
+            "description": "Optional collection NSIDs to filter which notifications are sent. Empty or absent means all collections.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "subject": {
+            "type": "union",
+            "refs": [
+              "#uri",
+              "#repo"
+            ],
+            "closed": true
+          }
+        }
+      }
+    },
+    "repo": {
+      "type": "object",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "uri": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

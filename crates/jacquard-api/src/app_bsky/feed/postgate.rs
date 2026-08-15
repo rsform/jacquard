@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,19 +24,21 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::feed::postgate;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::feed::postgate;
 /// Disables embedding of this post.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DisableRule<S: BosStr = DefaultStr> {
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_disable_rule_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,7 +61,12 @@ pub struct Postgate<S: BosStr = DefaultStr> {
     pub embedding_rules: Option<Vec<postgate::DisableRule<S>>>,
     ///Reference (AT-URI) to the post record.
     pub post: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_postgate_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -157,11 +164,24 @@ impl<S: BosStr> LexiconSchema for Postgate<S> {
     }
 }
 
+fn deserialize_disable_rule_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_app_bsky_feed_postgate() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.feed.postgate"),
@@ -170,7 +190,9 @@ fn lexicon_doc_app_bsky_feed_postgate() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("disableRule"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Disables embedding of this post.")),
+                    description: Some(
+                        CowStr::new_static("Disables embedding of this post."),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -260,9 +282,28 @@ fn lexicon_doc_app_bsky_feed_postgate() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_postgate_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod postgate_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -373,12 +414,18 @@ where
 
 impl<St: postgate_state::State, S: BosStr> PostgateBuilder<St, S> {
     /// Set the `detachedEmbeddingUris` field (optional)
-    pub fn detached_embedding_uris(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
+    pub fn detached_embedding_uris(
+        mut self,
+        value: impl Into<Option<Vec<AtUri<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `detachedEmbeddingUris` field to an Option value (optional)
-    pub fn maybe_detached_embedding_uris(mut self, value: Option<Vec<AtUri<S>>>) -> Self {
+    pub fn maybe_detached_embedding_uris(
+        mut self,
+        value: Option<Vec<AtUri<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -394,7 +441,10 @@ impl<St: postgate_state::State, S: BosStr> PostgateBuilder<St, S> {
         self
     }
     /// Set the `embeddingRules` field to an Option value (optional)
-    pub fn maybe_embedding_rules(mut self, value: Option<Vec<postgate::DisableRule<S>>>) -> Self {
+    pub fn maybe_embedding_rules(
+        mut self,
+        value: Option<Vec<postgate::DisableRule<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }

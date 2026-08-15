@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A poll within a chat channel. Lives in the creator's repo.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -52,7 +52,12 @@ pub struct Poll<S: BosStr = DefaultStr> {
     pub options: Vec<S>,
     ///The poll question.
     pub question: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_poll_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -133,6 +138,16 @@ impl<S: BosStr> LexiconSchema for Poll<S> {
                 });
             }
         }
+        for value in &self.options {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 100usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("options"),
+                    max: 100usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
         {
             let value = &self.question;
             #[allow(unused_comparisons)]
@@ -148,13 +163,32 @@ impl<S: BosStr> LexiconSchema for Poll<S> {
     }
 }
 
+fn deserialize_poll_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 fn _default_poll_allow_multiple() -> Option<bool> {
     Some(false)
 }
 
 pub mod poll_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -365,7 +399,10 @@ where
     St::Question: poll_state::IsUnset,
 {
     /// Set the `question` field (required)
-    pub fn question(mut self, value: impl Into<S>) -> PollBuilder<poll_state::SetQuestion<St>, S> {
+    pub fn question(
+        mut self,
+        value: impl Into<S>,
+    ) -> PollBuilder<poll_state::SetQuestion<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PollBuilder {
             _state: PhantomData,
@@ -410,10 +447,10 @@ where
 }
 
 fn lexicon_doc_app_protoimsg_chat_poll() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.protoimsg.chat.poll"),
@@ -422,17 +459,21 @@ fn lexicon_doc_app_protoimsg_chat_poll() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A poll within a chat channel. Lives in the creator's repo.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A poll within a chat channel. Lives in the creator's repo.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("channel"),
-                            SmolStr::new_static("question"),
-                            SmolStr::new_static("options"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("channel"),
+                                SmolStr::new_static("question"),
+                                SmolStr::new_static("options"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -445,9 +486,11 @@ fn lexicon_doc_app_protoimsg_chat_poll() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("channel"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "AT-URI of the channel this poll belongs to.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "AT-URI of the channel this poll belongs to.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -455,9 +498,9 @@ fn lexicon_doc_app_protoimsg_chat_poll() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp of poll creation.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp of poll creation."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -465,9 +508,11 @@ fn lexicon_doc_app_protoimsg_chat_poll() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("expiresAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When the poll closes. Omit for no expiry.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "When the poll closes. Omit for no expiry.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -475,7 +520,9 @@ fn lexicon_doc_app_protoimsg_chat_poll() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("options"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static("Poll answer options.")),
+                                    description: Some(
+                                        CowStr::new_static("Poll answer options."),
+                                    ),
                                     items: LexArrayItem::String(LexString {
                                         max_length: Some(100usize),
                                         ..Default::default()

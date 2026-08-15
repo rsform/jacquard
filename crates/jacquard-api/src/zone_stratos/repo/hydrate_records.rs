@@ -21,16 +21,13 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::zone_stratos::repo::hydrate_records;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::zone_stratos::repo::hydrate_records;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydrateRecords<S: BosStr = DefaultStr> {
     ///Array of AT-URIs to hydrate (max 100)
     pub uris: Vec<AtUri<S>>,
@@ -38,11 +35,9 @@ pub struct HydrateRecords<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HydrateRecordsOutput<S: BosStr = DefaultStr> {
     ///URIs blocked due to boundary restrictions
     pub blocked: Vec<AtUri<S>>,
@@ -54,16 +49,19 @@ pub struct HydrateRecordsOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
     pub value: Data<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_record_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -80,8 +78,9 @@ impl jacquard_common::xrpc::XrpcResp for HydrateRecordsResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for HydrateRecords<S> {
     const NSID: &'static str = "zone.stratos.repo.hydrateRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = HydrateRecordsResponse;
 }
 
@@ -91,8 +90,9 @@ Path: `/xrpc/zone.stratos.repo.hydrateRecords`. The request payload type is `Hyd
 pub struct HydrateRecordsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HydrateRecordsRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.repo.hydrateRecords";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = HydrateRecords<S>;
     type Response = HydrateRecordsResponse;
 }
@@ -114,7 +114,7 @@ impl<S: BosStr> LexiconSchema for RecordView<S> {
 
 pub mod hydrate_records_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -145,7 +145,10 @@ pub mod hydrate_records_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct HydrateRecordsBuilder<St: hydrate_records_state::State, S: BosStr = DefaultStr> {
+pub struct HydrateRecordsBuilder<
+    St: hydrate_records_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
     _type: PhantomData<fn() -> S>,
@@ -219,7 +222,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HydrateRecords<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HydrateRecords<S> {
         HydrateRecords {
             uris: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -227,9 +233,22 @@ where
     }
 }
 
+fn deserialize_record_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod record_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -402,7 +421,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RecordView<S> {
         RecordView {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -413,10 +435,10 @@ where
 }
 
 fn lexicon_doc_zone_stratos_repo_hydrateRecords() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("zone.stratos.repo.hydrateRecords"),
@@ -427,29 +449,31 @@ fn lexicon_doc_zone_stratos_repo_hydrateRecords() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("uris")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("uris"),
-                                    LexObjectProperty::Array(LexArray {
-                                        description: Some(CowStr::new_static(
-                                            "Array of AT-URIs to hydrate (max 100)",
-                                        )),
-                                        items: LexArrayItem::String(LexString {
-                                            format: Some(LexStringFormat::AtUri),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("uris")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("uris"),
+                                        LexObjectProperty::Array(LexArray {
+                                            description: Some(
+                                                CowStr::new_static("Array of AT-URIs to hydrate (max 100)"),
+                                            ),
+                                            items: LexArrayItem::String(LexString {
+                                                format: Some(LexStringFormat::AtUri),
+                                                ..Default::default()
+                                            }),
+                                            max_length: Some(100usize),
                                             ..Default::default()
                                         }),
-                                        max_length: Some(100usize),
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()
@@ -458,11 +482,12 @@ fn lexicon_doc_zone_stratos_repo_hydrateRecords() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("uri"),
-                        SmolStr::new_static("cid"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("uri"), SmolStr::new_static("cid"),
+                            SmolStr::new_static("value")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();

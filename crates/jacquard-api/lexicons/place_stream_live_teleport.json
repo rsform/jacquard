@@ -19,6 +19,11 @@
             "minimum": 60,
             "maximum": 32400
           },
+          "livestream": {
+            "type": "ref",
+            "description": "The source livestream this teleport is sending viewers away from. When the teleport fires, this is the livestream that gets ended (the same update place.stream.live.stopLivestream performs), so the source streamer returns to pre-live. Teleports without an origin livestream are treated as a no-op.",
+            "ref": "com.atproto.repo.strongRef"
+          },
           "startsAt": {
             "type": "string",
             "description": "The time the teleport becomes active.",

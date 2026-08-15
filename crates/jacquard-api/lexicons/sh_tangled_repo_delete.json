@@ -10,23 +10,31 @@
         "schema": {
           "type": "object",
           "required": [
-            "did",
-            "name",
-            "rkey"
+            "repo"
           ],
           "properties": {
             "did": {
               "type": "string",
-              "description": "DID of the repository owner",
+              "description": "DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.",
               "format": "did"
+            },
+            "force": {
+              "type": "boolean",
+              "description": "Admin-only. Delete even though the repository record still exists on the owner's PDS."
             },
             "name": {
               "type": "string",
-              "description": "Name of the repository to delete"
+              "description": "Name of the repository to delete. A knot without the repo-did-input capability reads this and DID in place of repo."
+            },
+            "repo": {
+              "type": "string",
+              "description": "DID of the repository to delete",
+              "format": "did"
             },
             "rkey": {
               "type": "string",
-              "description": "Rkey of the repository record"
+              "description": "Rkey of the repository record. A knot without the repo-did-input capability checks this against the owner's PDS.",
+              "format": "record-key"
             }
           }
         }

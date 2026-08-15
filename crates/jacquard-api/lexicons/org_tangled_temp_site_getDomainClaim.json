@@ -1,0 +1,22 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.site.getDomainClaim",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the active sites domain claim for the authenticated user, if any.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "domain": {
+              "type": "string",
+              "description": "The claimed domain (e.g. 'alice.sites.tangled.sh'). Absent if no active claim."
+            }
+          }
+        }
+      }
+    }
+  }
+}

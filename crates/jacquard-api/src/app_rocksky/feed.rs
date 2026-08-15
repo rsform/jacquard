@@ -15,9 +15,10 @@ pub mod get_now_playings;
 pub mod get_stories;
 pub mod search;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,21 +30,18 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_rocksky::actor::ProfileViewBasic;
 use crate::app_rocksky::album::AlbumViewBasic;
 use crate::app_rocksky::artist::ArtistViewBasic;
-use crate::app_rocksky::feed;
 use crate::app_rocksky::playlist::PlaylistViewBasic;
 use crate::app_rocksky::song::SongViewBasic;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::app_rocksky::feed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NowPlayingView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
@@ -75,27 +73,33 @@ pub struct NowPlayingView<S: BosStr = DefaultStr> {
     pub track_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_now_playing_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NowPlayingsView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub now_playings: Option<Vec<feed::NowPlayingView<S>>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_now_playings_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchResultsView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimated_total_hits: Option<i64>,
@@ -107,9 +111,15 @@ pub struct SearchResultsView<S: BosStr = DefaultStr> {
     pub offset: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub processing_time_ms: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_search_results_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -172,11 +182,24 @@ impl<S: BosStr> LexiconSchema for SearchResultsView<S> {
     }
 }
 
+fn deserialize_now_playing_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_app_rocksky_feed_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.rocksky.feed.defs"),
@@ -190,9 +213,7 @@ fn lexicon_doc_app_rocksky_feed_defs() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("album"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("albumArt"),
@@ -203,9 +224,7 @@ fn lexicon_doc_app_rocksky_feed_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("albumArtist"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("albumUri"),
@@ -216,9 +235,7 @@ fn lexicon_doc_app_rocksky_feed_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("artist"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("artistUri"),
@@ -236,9 +253,7 @@ fn lexicon_doc_app_rocksky_feed_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("createdAt"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -249,27 +264,19 @@ fn lexicon_doc_app_rocksky_feed_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("trackId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("trackUri"),
@@ -332,15 +339,9 @@ fn lexicon_doc_app_rocksky_feed_defs() -> LexiconDoc<'static> {
                                     refs: vec![
                                         CowStr::new_static("app.rocksky.song.defs#songViewBasic"),
                                         CowStr::new_static("app.rocksky.album.defs#albumViewBasic"),
-                                        CowStr::new_static(
-                                            "app.rocksky.artist.defs#artistViewBasic",
-                                        ),
-                                        CowStr::new_static(
-                                            "app.rocksky.playlist.defs#playlistViewBasic",
-                                        ),
-                                        CowStr::new_static(
-                                            "app.rocksky.actor.defs#profileViewBasic",
-                                        ),
+                                        CowStr::new_static("app.rocksky.artist.defs#artistViewBasic"),
+                                        CowStr::new_static("app.rocksky.playlist.defs#playlistViewBasic"),
+                                        CowStr::new_static("app.rocksky.actor.defs#profileViewBasic")
                                     ],
                                     ..Default::default()
                                 }),
@@ -374,4 +375,30 @@ fn lexicon_doc_app_rocksky_feed_defs() -> LexiconDoc<'static> {
         },
         ..Default::default()
     }
+}
+
+fn deserialize_now_playings_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_search_results_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

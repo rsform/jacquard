@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A record of completing a goal on a specific day.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -60,7 +60,12 @@ pub struct Completion<S: BosStr = DefaultStr> {
     pub sequence_num: Option<i64>,
     ///Year of the completion
     pub year: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_completion_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -196,16 +201,19 @@ impl<S: BosStr> LexiconSchema for Completion<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("photo_blob"),
@@ -238,9 +246,28 @@ impl<S: BosStr> LexiconSchema for Completion<S> {
     }
 }
 
+fn deserialize_completion_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod completion_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -555,7 +582,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Completion<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Completion<S> {
         Completion {
             completed_at: self._fields.0.unwrap(),
             day: self._fields.1.unwrap(),
@@ -572,10 +602,10 @@ where
 }
 
 fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("garden.goals.completion"),
@@ -584,27 +614,31 @@ fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A record of completing a goal on a specific day.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A record of completing a goal on a specific day.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("goalId"),
-                            SmolStr::new_static("year"),
-                            SmolStr::new_static("month"),
-                            SmolStr::new_static("day"),
-                            SmolStr::new_static("completedAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("goalId"), SmolStr::new_static("year"),
+                                SmolStr::new_static("month"), SmolStr::new_static("day"),
+                                SmolStr::new_static("completedAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("completedAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the completion was recorded",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when the completion was recorded",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -620,9 +654,11 @@ fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("goalId"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "UUID of the goal this completion belongs to",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "UUID of the goal this completion belongs to",
+                                        ),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -630,9 +666,11 @@ fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("goalUri"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "AT Protocol URI reference to the goal record",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "AT Protocol URI reference to the goal record",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -648,18 +686,16 @@ fn lexicon_doc_garden_goals_completion() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("notes"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Optional notes for this completion",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Optional notes for this completion"),
+                                    ),
                                     max_length: Some(99usize),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("photoBlob"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("sequenceNum"),

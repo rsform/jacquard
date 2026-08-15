@@ -1,0 +1,69 @@
+{
+  "lexicon": 1,
+  "id": "com.atproto.space.listSpaces",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List the spaces the authenticated user holds a repo in (i.e. spaces the user has written data to), optionally filtered by type and/or authority DID. Note this is not 'spaces I'm a member of' — a member's PDS only tracks spaces its user has written to. Requires auth, implemented by PDS.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "did": {
+            "type": "string",
+            "description": "Filter to spaces under this authority DID.",
+            "format": "did"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "The number of spaces to return.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "type": {
+            "type": "string",
+            "description": "Filter to spaces of this type.",
+            "format": "nsid"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "spaces"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "spaces": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#spaceView"
+              }
+            }
+          }
+        }
+      }
+    },
+    "spaceView": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI of the space.",
+          "format": "space-ref"
+        }
+      }
+    }
+  }
+}

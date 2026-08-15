@@ -52,7 +52,7 @@
           },
           "subject": {
             "type": "string",
-            "description": "Record AT-URI the comments are attached to.",
+            "description": "Record AT-URI the comments attach to.",
             "format": "at-uri"
           }
         }

@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,16 +23,13 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::space::list_repos;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::space::list_repos;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListRepos<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -43,11 +40,9 @@ pub struct ListRepos<S: BosStr = DefaultStr> {
     pub space: AtSpaceUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListReposOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -56,19 +51,25 @@ pub struct ListReposOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ListReposError {
     #[serde(rename = "SpaceNotFound")]
     SpaceNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListReposError {
@@ -92,11 +93,9 @@ impl core::fmt::Display for ListReposError {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Repo<S: BosStr = DefaultStr> {
     ///The DID of a repo that holds data in the space.
     pub did: Did<S>,
@@ -105,7 +104,12 @@ pub struct Repo<S: BosStr = DefaultStr> {
     pub hash: Bytes,
     ///The repo's current revision (TID), as last reported to the authority. May lag the repo host, which is the source of truth.
     pub rev: Tid,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_repo_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -158,7 +162,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_repos_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -291,9 +295,22 @@ where
     }
 }
 
+fn deserialize_repo_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -398,7 +415,10 @@ where
     St::Did: repo_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<Did<S>>) -> RepoBuilder<repo_state::SetDid<St>, S> {
+    pub fn did(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> RepoBuilder<repo_state::SetDid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
@@ -414,7 +434,10 @@ where
     St::Hash: repo_state::IsUnset,
 {
     /// Set the `hash` field (required)
-    pub fn hash(mut self, value: impl Into<Bytes>) -> RepoBuilder<repo_state::SetHash<St>, S> {
+    pub fn hash(
+        mut self,
+        value: impl Into<Bytes>,
+    ) -> RepoBuilder<repo_state::SetHash<St>, S> {
         self._fields.1 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
@@ -430,7 +453,10 @@ where
     St::Rev: repo_state::IsUnset,
 {
     /// Set the `rev` field (required)
-    pub fn rev(mut self, value: impl Into<Tid>) -> RepoBuilder<repo_state::SetRev<St>, S> {
+    pub fn rev(
+        mut self,
+        value: impl Into<Tid>,
+    ) -> RepoBuilder<repo_state::SetRev<St>, S> {
         self._fields.2 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
@@ -468,10 +494,10 @@ where
 }
 
 fn lexicon_doc_com_atproto_space_listRepos() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.atproto.space.listRepos"),
@@ -480,37 +506,39 @@ fn lexicon_doc_com_atproto_space_listRepos() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("space")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("space"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Reference to the space.",
-                                    )),
-                                    format: Some(LexStringFormat::SpaceRef),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("space")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("space"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Reference to the space."),
+                                        ),
+                                        format: Some(LexStringFormat::SpaceRef),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );

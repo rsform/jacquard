@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,49 +24,55 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_deckbelcher::CardRef;
 use crate::com_deckbelcher::richtext::Document;
 use crate::com_deckbelcher::social::comment;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Subject: a card (global comment on the card itself).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardSubject<S: BosStr = DefaultStr> {
     pub r#ref: CardRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_card_subject_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Target: a card (in a deck or collection).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CardTarget<S: BosStr = DefaultStr> {
     pub r#ref: CardRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_card_target_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Target: a deck (in a collection).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeckTarget<S: BosStr = DefaultStr> {
     pub r#ref: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_deck_target_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -90,9 +96,15 @@ pub struct Comment<S: BosStr = DefaultStr> {
     pub target: Option<CommentTarget<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_comment_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -103,6 +115,7 @@ pub enum CommentSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "com.deckbelcher.social.comment#recordSubject")]
     RecordSubject(Box<comment::RecordSubject<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -132,39 +145,45 @@ pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
 /// Subject: an ATProto record (deck, collection).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RecordSubject<S: BosStr = DefaultStr> {
     pub r#ref: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_record_subject_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Target: a deck section (mainboard, sideboard, etc).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SectionTarget<S: BosStr = DefaultStr> {
     pub section: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_section_target_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Target: a tag package (ramp, removal, wincons, etc).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TagTarget<S: BosStr = DefaultStr> {
     pub tag: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_tag_target_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -354,9 +373,22 @@ impl<S: BosStr> LexiconSchema for TagTarget<S> {
     }
 }
 
+fn deserialize_card_subject_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod card_subject_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -461,7 +493,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CardSubject<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CardSubject<S> {
         CardSubject {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -470,10 +505,10 @@ where
 }
 
 fn lexicon_doc_com_deckbelcher_social_comment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.deckbelcher.social.comment"),
@@ -482,9 +517,11 @@ fn lexicon_doc_com_deckbelcher_social_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cardSubject"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Subject: a card (global comment on the card itself).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Subject: a card (global comment on the card itself).",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("ref")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -504,9 +541,9 @@ fn lexicon_doc_com_deckbelcher_social_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cardTarget"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Target: a card (in a deck or collection).",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Target: a card (in a deck or collection)."),
+                    ),
                     required: Some(vec![SmolStr::new_static("ref")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -526,7 +563,9 @@ fn lexicon_doc_com_deckbelcher_social_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("deckTarget"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Target: a deck (in a collection).")),
+                    description: Some(
+                        CowStr::new_static("Target: a deck (in a collection)."),
+                    ),
                     required: Some(vec![SmolStr::new_static("ref")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -626,9 +665,11 @@ fn lexicon_doc_com_deckbelcher_social_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("recordSubject"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Subject: an ATProto record (deck, collection).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Subject: an ATProto record (deck, collection).",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("ref")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -648,9 +689,11 @@ fn lexicon_doc_com_deckbelcher_social_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sectionTarget"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Target: a deck section (mainboard, sideboard, etc).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Target: a deck section (mainboard, sideboard, etc).",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("section")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -671,9 +714,11 @@ fn lexicon_doc_com_deckbelcher_social_comment() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tagTarget"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Target: a tag package (ramp, removal, wincons, etc).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Target: a tag package (ramp, removal, wincons, etc).",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("tag")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -697,9 +742,22 @@ fn lexicon_doc_com_deckbelcher_social_comment() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_card_target_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod card_target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -804,7 +862,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CardTarget<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CardTarget<S> {
         CardTarget {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -812,9 +873,22 @@ where
     }
 }
 
+fn deserialize_deck_target_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod deck_target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -919,7 +993,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeckTarget<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeckTarget<S> {
         DeckTarget {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -927,9 +1004,28 @@ where
     }
 }
 
+fn deserialize_comment_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1148,9 +1244,22 @@ where
     }
 }
 
+fn deserialize_record_subject_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod record_subject_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1181,7 +1290,10 @@ pub mod record_subject_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RecordSubjectBuilder<St: record_subject_state::State, S: BosStr = DefaultStr> {
+pub struct RecordSubjectBuilder<
+    St: record_subject_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -1255,10 +1367,39 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RecordSubject<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RecordSubject<S> {
         RecordSubject {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_section_target_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_tag_target_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

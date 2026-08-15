@@ -1,0 +1,132 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.search.searchCode",
+  "defs": {
+    "chunk": {
+      "type": "object",
+      "required": [
+        "content",
+        "lineStart"
+      ],
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Source lines for this match chunk."
+        },
+        "highlights": {
+          "type": "array",
+          "description": "Byte-offset ranges within content that match the query.",
+          "items": {
+            "type": "ref",
+            "ref": "#highlight"
+          }
+        },
+        "lineStart": {
+          "type": "integer",
+          "description": "1-based line number of the first line in content."
+        }
+      }
+    },
+    "fileResult": {
+      "type": "object",
+      "required": [
+        "repoDid",
+        "path",
+        "chunks"
+      ],
+      "properties": {
+        "chunks": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#chunk"
+          }
+        },
+        "language": {
+          "type": "string",
+          "description": "Detected programming language."
+        },
+        "path": {
+          "type": "string",
+          "description": "File path relative to repository root."
+        },
+        "repoDid": {
+          "type": "string",
+          "description": "DID of the repository as minted by the knot.",
+          "format": "did"
+        }
+      }
+    },
+    "highlight": {
+      "type": "object",
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "end": {
+          "type": "integer",
+          "description": "End byte offset (exclusive) within the chunk content string."
+        },
+        "start": {
+          "type": "integer",
+          "description": "Start byte offset within the chunk content string."
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "description": "Full-text code search across indexed repositories, backed by Zoekt.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "q"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "lang": {
+            "type": "string",
+            "description": "Restrict search to a specific programming language (e.g. 'go', 'rust')."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "q": {
+            "type": "string",
+            "description": "Search query string."
+          },
+          "repoDid": {
+            "type": "string",
+            "description": "Restrict search to a specific repository, by its DID.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "results"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#fileResult"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

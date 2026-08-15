@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "stream.kralsei.score.sendBoop",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "API request to boop a character in the nose",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "character": {
+              "type": "string",
+              "description": "The character getting booped",
+              "maxLength": 32,
+              "knownValues": [
+                "kris",
+                "ralsei"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "success"
+          ],
+          "properties": {
+            "success": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

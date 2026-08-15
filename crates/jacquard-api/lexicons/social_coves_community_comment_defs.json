@@ -1,0 +1,249 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.comment.defs",
+  "defs": {
+    "blockedComment": {
+      "type": "object",
+      "description": "Comment is blocked due to viewer blocking author or moderation action",
+      "required": [
+        "uri",
+        "blocked"
+      ],
+      "properties": {
+        "blocked": {
+          "type": "boolean",
+          "description": "Always true for blocked comments",
+          "const": true
+        },
+        "blockedBy": {
+          "type": "string",
+          "description": "What caused the block: viewer blocked author, or comment was removed by moderators",
+          "maxLength": 64,
+          "knownValues": [
+            "author",
+            "moderator"
+          ]
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the blocked comment",
+          "format": "at-uri"
+        }
+      }
+    },
+    "commentRef": {
+      "type": "object",
+      "description": "Reference to a comment record",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "CID of the comment record",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the comment",
+          "format": "at-uri"
+        }
+      }
+    },
+    "commentStats": {
+      "type": "object",
+      "description": "Statistics for a comment",
+      "required": [
+        "upvotes",
+        "downvotes",
+        "score",
+        "replyCount"
+      ],
+      "properties": {
+        "downvotes": {
+          "type": "integer",
+          "description": "Number of downvotes",
+          "minimum": 0
+        },
+        "replyCount": {
+          "type": "integer",
+          "description": "Number of direct replies to this comment",
+          "minimum": 0
+        },
+        "score": {
+          "type": "integer",
+          "description": "Calculated score (upvotes - downvotes)"
+        },
+        "upvotes": {
+          "type": "integer",
+          "description": "Number of upvotes",
+          "minimum": 0
+        }
+      }
+    },
+    "commentView": {
+      "type": "object",
+      "description": "Base view for a single comment with voting, stats, and viewer state",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "post",
+        "createdAt",
+        "indexedAt",
+        "stats"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "description": "Comment author information",
+          "ref": "social.coves.community.post.defs#authorView"
+        },
+        "cid": {
+          "type": "string",
+          "description": "CID of the comment record",
+          "format": "cid"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "When the comment was created",
+          "format": "datetime"
+        },
+        "embed": {
+          "type": "union",
+          "description": "Embedded content from the comment record (images or quoted post). The AppView may transform blob references into fetchable URLs and enrich quoted posts with a resolved view.",
+          "refs": [
+            "social.coves.embed.images",
+            "social.coves.embed.post"
+          ]
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "When this comment was indexed by the AppView",
+          "format": "datetime"
+        },
+        "parent": {
+          "type": "ref",
+          "description": "Reference to parent comment if this is a nested reply",
+          "ref": "#commentRef"
+        },
+        "post": {
+          "type": "ref",
+          "description": "Reference to the parent post",
+          "ref": "#postRef"
+        },
+        "record": {
+          "type": "unknown",
+          "description": "The actual comment record verbatim"
+        },
+        "stats": {
+          "type": "ref",
+          "description": "Comment statistics (votes, replies)",
+          "ref": "#commentStats"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the comment record",
+          "format": "at-uri"
+        },
+        "viewer": {
+          "type": "ref",
+          "description": "Viewer-specific state (vote, saved, etc.)",
+          "ref": "#commentViewerState"
+        }
+      }
+    },
+    "commentViewerState": {
+      "type": "object",
+      "description": "Viewer-specific state for a comment",
+      "properties": {
+        "vote": {
+          "type": "string",
+          "description": "Viewer's vote on this comment",
+          "maxLength": 64,
+          "knownValues": [
+            "up",
+            "down"
+          ]
+        },
+        "voteUri": {
+          "type": "string",
+          "description": "AT-URI of the viewer's vote record",
+          "format": "at-uri"
+        }
+      }
+    },
+    "notFoundComment": {
+      "type": "object",
+      "description": "Comment was not found (deleted, never indexed, or invalid URI)",
+      "required": [
+        "uri",
+        "notFound"
+      ],
+      "properties": {
+        "notFound": {
+          "type": "boolean",
+          "description": "Always true for not found comments",
+          "const": true
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the missing comment",
+          "format": "at-uri"
+        }
+      }
+    },
+    "postRef": {
+      "type": "object",
+      "description": "Reference to a post record",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "description": "CID of the post record",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "description": "AT-URI of the post",
+          "format": "at-uri"
+        }
+      }
+    },
+    "threadViewComment": {
+      "type": "object",
+      "description": "Wrapper for threaded comment structure, similar to Bluesky's threadViewPost pattern",
+      "required": [
+        "comment"
+      ],
+      "properties": {
+        "comment": {
+          "type": "ref",
+          "description": "The comment itself",
+          "ref": "#commentView"
+        },
+        "hasMore": {
+          "type": "boolean",
+          "description": "True if more replies exist but are not included in this response"
+        },
+        "replies": {
+          "type": "array",
+          "description": "Nested replies to this comment",
+          "items": {
+            "type": "union",
+            "refs": [
+              "#threadViewComment",
+              "#notFoundComment",
+              "#blockedComment"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

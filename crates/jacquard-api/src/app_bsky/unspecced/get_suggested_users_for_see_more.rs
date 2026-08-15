@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::actor::ProfileView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedUsersForSeeMore<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -31,11 +28,9 @@ pub struct GetSuggestedUsersForSeeMore<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSuggestedUsersForSeeMoreOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileView<S>>,
     ///Snowflake for this recommendation, use when submitting recommendation events.
@@ -79,7 +74,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_suggested_users_for_see_more_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -108,22 +103,28 @@ pub struct GetSuggestedUsersForSeeMoreBuilder<
 
 impl GetSuggestedUsersForSeeMore<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> GetSuggestedUsersForSeeMoreBuilder<get_suggested_users_for_see_more_state::Empty, DefaultStr>
-    {
+    pub fn new() -> GetSuggestedUsersForSeeMoreBuilder<
+        get_suggested_users_for_see_more_state::Empty,
+        DefaultStr,
+    > {
         GetSuggestedUsersForSeeMoreBuilder::new()
     }
 }
 
 impl<S: BosStr> GetSuggestedUsersForSeeMore<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> GetSuggestedUsersForSeeMoreBuilder<get_suggested_users_for_see_more_state::Empty, S> {
+    pub fn builder() -> GetSuggestedUsersForSeeMoreBuilder<
+        get_suggested_users_for_see_more_state::Empty,
+        S,
+    > {
         GetSuggestedUsersForSeeMoreBuilder::builder()
     }
 }
 
-impl GetSuggestedUsersForSeeMoreBuilder<get_suggested_users_for_see_more_state::Empty, DefaultStr> {
+impl GetSuggestedUsersForSeeMoreBuilder<
+    get_suggested_users_for_see_more_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         GetSuggestedUsersForSeeMoreBuilder {
@@ -134,9 +135,9 @@ impl GetSuggestedUsersForSeeMoreBuilder<get_suggested_users_for_see_more_state::
     }
 }
 
-impl<S: BosStr>
-    GetSuggestedUsersForSeeMoreBuilder<get_suggested_users_for_see_more_state::Empty, S>
-{
+impl<
+    S: BosStr,
+> GetSuggestedUsersForSeeMoreBuilder<get_suggested_users_for_see_more_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         GetSuggestedUsersForSeeMoreBuilder {
@@ -147,9 +148,10 @@ impl<S: BosStr>
     }
 }
 
-impl<St: get_suggested_users_for_see_more_state::State, S: BosStr>
-    GetSuggestedUsersForSeeMoreBuilder<St, S>
-{
+impl<
+    St: get_suggested_users_for_see_more_state::State,
+    S: BosStr,
+> GetSuggestedUsersForSeeMoreBuilder<St, S> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -162,9 +164,10 @@ impl<St: get_suggested_users_for_see_more_state::State, S: BosStr>
     }
 }
 
-impl<St: get_suggested_users_for_see_more_state::State, S: BosStr>
-    GetSuggestedUsersForSeeMoreBuilder<St, S>
-{
+impl<
+    St: get_suggested_users_for_see_more_state::State,
+    S: BosStr,
+> GetSuggestedUsersForSeeMoreBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();

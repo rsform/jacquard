@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -52,7 +52,12 @@ pub struct Fact<S: BosStr = DefaultStr> {
     pub supersedes: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_fact_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -147,9 +152,28 @@ impl<S: BosStr> LexiconSchema for Fact<S> {
     }
 }
 
+fn deserialize_fact_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod fact_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -263,7 +287,10 @@ where
     St::Args: fact_state::IsUnset,
 {
     /// Set the `args` field (required)
-    pub fn args(mut self, value: impl Into<Vec<S>>) -> FactBuilder<fact_state::SetArgs<St>, S> {
+    pub fn args(
+        mut self,
+        value: impl Into<Vec<S>>,
+    ) -> FactBuilder<fact_state::SetArgs<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FactBuilder {
             _state: PhantomData,
@@ -414,10 +441,10 @@ where
 }
 
 fn lexicon_doc_diy_razorgirl_winter_fact() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("diy.razorgirl.winter.fact"),
@@ -428,11 +455,13 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("predicate"),
-                            SmolStr::new_static("args"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("predicate"),
+                                SmolStr::new_static("args"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -449,9 +478,9 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("confidence"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "0.0-1.0 as string (Soufflé compat)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("0.0-1.0 as string (Soufflé compat)"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -479,14 +508,18 @@ fn lexicon_doc_diy_razorgirl_winter_fact() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("source"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("CID of source record")),
+                                    description: Some(
+                                        CowStr::new_static("CID of source record"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("supersedes"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("CID of superseded fact")),
+                                    description: Some(
+                                        CowStr::new_static("CID of superseded fact"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

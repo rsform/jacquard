@@ -1,0 +1,102 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.ci.pipeline",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "A CI pipeline. Record-like, but owned by the spindle rather than a PDS.",
+      "required": [
+        "id",
+        "trigger",
+        "commit",
+        "workflows"
+      ],
+      "properties": {
+        "commit": {
+          "type": "string",
+          "description": "Commit Id this pipeline is running on"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "id": {
+          "type": "string",
+          "description": "Spindle-local pipeline id"
+        },
+        "repo": {
+          "type": "string",
+          "description": "Repository DID",
+          "format": "did"
+        },
+        "sourceRepo": {
+          "type": "string",
+          "description": "Repository DID that the commit was checked out from, if different from repo (e.g. a fork for a fork-based pull request)",
+          "format": "did"
+        },
+        "trigger": {
+          "type": "union",
+          "description": "Trigger event metadata",
+          "refs": [
+            "sh.tangled.ci.trigger#push",
+            "sh.tangled.ci.trigger#pullRequest",
+            "sh.tangled.ci.trigger#manual"
+          ]
+        },
+        "workflows": {
+          "type": "array",
+          "description": "Triggered workflows",
+          "items": {
+            "type": "ref",
+            "ref": "#workflow"
+          },
+          "minLength": 1,
+          "maxLength": 50
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "status"
+      ],
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "finishedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "id": {
+          "type": "string",
+          "description": "Spindle-local workflow id. Unique per pipeline, usually same as name."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the workflow",
+          "minGraphemes": 1,
+          "maxGraphemes": 40
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "status": {
+          "type": "string",
+          "description": "Workflow status",
+          "enum": [
+            "pending",
+            "running",
+            "failed",
+            "timeout",
+            "cancelled",
+            "success"
+          ]
+        }
+      }
+    }
+  }
+}

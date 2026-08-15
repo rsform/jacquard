@@ -10,21 +10,19 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
 use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateSeen<S: BosStr = DefaultStr> {
-    ///ID of the notification to update.
-    pub id: i64,
     pub read: bool,
+    ///at-uri of the notification to update.
+    pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -38,12 +36,25 @@ impl jacquard_common::xrpc::XrpcResp for UpdateSeenResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateSeen<S> {
     const NSID: &'static str = "org.tangled.temp.notification.updateSeen";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateSeenResponse;
 }
 
@@ -53,15 +64,16 @@ Path: `/xrpc/org.tangled.temp.notification.updateSeen`. The request payload type
 pub struct UpdateSeenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateSeenRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.notification.updateSeen";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateSeen<S>;
     type Response = UpdateSeenResponse;
 }
 
 pub mod update_seen_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -69,44 +81,44 @@ pub mod update_seen_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Read;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Read = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Read = St::Read;
+        type Uri = Unset;
     }
     ///State transition - sets the `read` field to Set
     pub struct SetRead<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRead<St> {}
     impl<St: State> State for SetRead<St> {
-        type Id = St::Id;
         type Read = Set<members::read>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Read = St::Read;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `read` field
         pub struct read(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
 /// Builder for constructing an instance of this type.
 pub struct UpdateSeenBuilder<St: update_seen_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<bool>),
+    _fields: (Option<bool>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -149,13 +161,13 @@ impl<S: BosStr> UpdateSeenBuilder<update_seen_state::Empty, S> {
 impl<St, S: BosStr> UpdateSeenBuilder<St, S>
 where
     St: update_seen_state::State,
-    St::Id: update_seen_state::IsUnset,
+    St::Read: update_seen_state::IsUnset,
 {
-    /// Set the `id` field (required)
-    pub fn id(
+    /// Set the `read` field (required)
+    pub fn read(
         mut self,
-        value: impl Into<i64>,
-    ) -> UpdateSeenBuilder<update_seen_state::SetId<St>, S> {
+        value: impl Into<bool>,
+    ) -> UpdateSeenBuilder<update_seen_state::SetRead<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UpdateSeenBuilder {
             _state: PhantomData,
@@ -168,13 +180,13 @@ where
 impl<St, S: BosStr> UpdateSeenBuilder<St, S>
 where
     St: update_seen_state::State,
-    St::Read: update_seen_state::IsUnset,
+    St::Uri: update_seen_state::IsUnset,
 {
-    /// Set the `read` field (required)
-    pub fn read(
+    /// Set the `uri` field (required)
+    pub fn uri(
         mut self,
-        value: impl Into<bool>,
-    ) -> UpdateSeenBuilder<update_seen_state::SetRead<St>, S> {
+        value: impl Into<AtUri<S>>,
+    ) -> UpdateSeenBuilder<update_seen_state::SetUri<St>, S> {
         self._fields.1 = Option::Some(value.into());
         UpdateSeenBuilder {
             _state: PhantomData,
@@ -187,22 +199,25 @@ where
 impl<St, S: BosStr> UpdateSeenBuilder<St, S>
 where
     St: update_seen_state::State,
-    St::Id: update_seen_state::IsSet,
     St::Read: update_seen_state::IsSet,
+    St::Uri: update_seen_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> UpdateSeen<S> {
         UpdateSeen {
-            id: self._fields.0.unwrap(),
-            read: self._fields.1.unwrap(),
+            read: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateSeen<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateSeen<S> {
         UpdateSeen {
-            id: self._fields.0.unwrap(),
-            read: self._fields.1.unwrap(),
+            read: self._fields.0.unwrap(),
+            uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }

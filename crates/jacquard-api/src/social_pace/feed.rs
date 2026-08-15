@@ -8,12 +8,13 @@
 //! Generated bindings for the `social.pace.feed` Lexicon namespace/module.
 pub mod activity;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// The type of activity being recorded. List taken from Apple Health Activities mostly
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -242,10 +243,7 @@ where
 /// A split within an activity, like a mile split or kilometer split.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Split<S: BosStr = DefaultStr> {
     ///The distance covered in this split. Follows the units defined in the parent.
     pub distance: S,
@@ -253,7 +251,12 @@ pub struct Split<S: BosStr = DefaultStr> {
     pub duration: i64,
     ///The order of the split within the activity, starting at 1.
     pub order: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_split_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -272,9 +275,22 @@ impl<S: BosStr> LexiconSchema for Split<S> {
     }
 }
 
+fn deserialize_split_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod split_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -417,7 +433,10 @@ where
     St::Order: split_state::IsUnset,
 {
     /// Set the `order` field (required)
-    pub fn order(mut self, value: impl Into<i64>) -> SplitBuilder<split_state::SetOrder<St>, S> {
+    pub fn order(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SplitBuilder<split_state::SetOrder<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SplitBuilder {
             _state: PhantomData,
@@ -455,10 +474,10 @@ where
 }
 
 fn lexicon_doc_social_pace_feed_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.pace.feed.defs"),

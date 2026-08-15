@@ -1,0 +1,49 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.getApiKey",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get information about the authenticated aggregator's API key. Note: The actual key value is NEVER returned - only metadata about the key.",
+      "parameters": {
+        "type": "params",
+        "description": "No parameters required. Returns key info for the authenticated aggregator.",
+        "properties": {}
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "hasKey"
+          ],
+          "properties": {
+            "hasKey": {
+              "type": "boolean",
+              "description": "Whether the aggregator has an API key (active or revoked)"
+            },
+            "keyInfo": {
+              "type": "ref",
+              "description": "API key metadata. Only present if hasKey is true.",
+              "ref": "social.coves.aggregator.defs#apiKeyView"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Authentication is required to get API key info",
+          "name": "AuthenticationRequired"
+        },
+        {
+          "description": "Only registered aggregators can get API key info",
+          "name": "AggregatorRequired"
+        },
+        {
+          "description": "Aggregator not found",
+          "name": "AggregatorNotFound"
+        }
+      ]
+    }
+  }
+}

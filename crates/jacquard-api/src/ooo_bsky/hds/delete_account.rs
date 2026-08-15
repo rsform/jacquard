@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DeleteAccount<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -37,12 +34,25 @@ impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteAccount<S> {
     const NSID: &'static str = "ooo.bsky.hds.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteAccountResponse;
 }
 
@@ -52,15 +62,16 @@ Path: `/xrpc/ooo.bsky.hds.deleteAccount`. The request payload type is `DeleteAcc
 pub struct DeleteAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.deleteAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = DeleteAccount<S>;
     type Response = DeleteAccountResponse;
 }
 
 pub mod delete_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -91,7 +102,10 @@ pub mod delete_account_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DeleteAccountBuilder<St: delete_account_state::State, S: BosStr = DefaultStr> {
+pub struct DeleteAccountBuilder<
+    St: delete_account_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -165,7 +179,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DeleteAccount<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteAccount<S> {
         DeleteAccount {
             repo: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

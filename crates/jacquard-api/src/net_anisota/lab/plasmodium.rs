@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A Physarum (slime-mould) organism grown in the Anisota Lab's Plasmodium workbench and saved to the owner's collection. Stored as its recipe rather than its pixels: a 'seed', the simulation 'gridSize', a 'genome' of behavioural parameters (all continuous 0..1 tunables scaled to integers 0..1000, since atproto lexicons have no float type), and the ordered 'foods' and 'inoculations' the grower placed. Because the GPU agent simulation is deterministic given the same seed, genome and placements, replaying the recipe regrows the organism. A small PNG thumbnail is kept for display.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -71,17 +71,19 @@ pub struct Plasmodium<S: BosStr = DefaultStr> {
     ///How many simulation steps the organism had grown when saved
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_plasmodium_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Behavioural parameters. Global tunables plus one species entry (two when multiSpecies). Continuous values are scaled to integers 0..1000; enumerated traits (spawn, interMode, renderMode) are small raw integer indices.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlasmodiumGenome<S: BosStr = DefaultStr> {
     ///Diffusion (3x3 blur) strength, 0..1000
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -100,7 +102,12 @@ pub struct PlasmodiumGenome<S: BosStr = DefaultStr> {
     pub spawn: Option<i64>,
     ///One entry per agent population
     pub species: Vec<Data<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_plasmodium_genome_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -227,6 +234,25 @@ impl<S: BosStr> LexiconSchema for Plasmodium<S> {
     }
 }
 
+fn deserialize_plasmodium_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 impl<S: BosStr> LexiconSchema for PlasmodiumGenome<S> {
     fn nsid() -> &'static str {
         "net.anisota.lab.plasmodium"
@@ -242,9 +268,22 @@ impl<S: BosStr> LexiconSchema for PlasmodiumGenome<S> {
     }
 }
 
+fn deserialize_plasmodium_genome_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod plasmodium_genome_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -275,7 +314,10 @@ pub mod plasmodium_genome_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PlasmodiumGenomeBuilder<St: plasmodium_genome_state::State, S: BosStr = DefaultStr> {
+pub struct PlasmodiumGenomeBuilder<
+    St: plasmodium_genome_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -426,7 +468,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlasmodiumGenome<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlasmodiumGenome<S> {
         PlasmodiumGenome {
             blur: self._fields.0,
             food_weight: self._fields.1,
@@ -440,10 +485,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_lab_plasmodium() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.lab.plasmodium"),
@@ -807,7 +852,7 @@ fn lexicon_doc_net_anisota_lab_plasmodium() -> LexiconDoc<'static> {
 
 pub mod plasmodium_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -938,7 +983,19 @@ impl PlasmodiumBuilder<plasmodium_state::Empty, DefaultStr> {
         PlasmodiumBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -951,7 +1008,19 @@ impl<S: BosStr> PlasmodiumBuilder<plasmodium_state::Empty, S> {
         PlasmodiumBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1186,7 +1255,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Plasmodium<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Plasmodium<S> {
         Plasmodium {
             agent_tier: self._fields.0,
             created_at: self._fields.1.unwrap(),

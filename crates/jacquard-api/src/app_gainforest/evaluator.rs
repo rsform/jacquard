@@ -10,12 +10,13 @@ pub mod evaluation;
 pub mod service;
 pub mod subscription;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,17 +27,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_gainforest::evaluator;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_gainforest::evaluator;
 /// A candidate taxon identification with confidence score and rank.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CandidateTaxon<S: BosStr = DefaultStr> {
     ///Confidence score (0-1000, where 1000 = 100.0%).
     pub confidence: i64,
@@ -56,17 +54,19 @@ pub struct CandidateTaxon<S: BosStr = DefaultStr> {
     pub rank: i64,
     ///Full scientific name of the candidate taxon.
     pub scientific_name: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_candidate_taxon_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Generic categorical classification result (e.g., conservation priority, habitat type).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ClassificationResult<S: BosStr = DefaultStr> {
     ///The classification category (e.g., 'conservation-priority', 'habitat-type').
     pub category: S,
@@ -75,17 +75,19 @@ pub struct ClassificationResult<S: BosStr = DefaultStr> {
     pub remarks: Option<S>,
     ///The assigned classification value (e.g., 'critical', 'tropical-rainforest').
     pub value: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_classification_result_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Data quality assessment result with per-field quality flags.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DataQualityResult<S: BosStr = DefaultStr> {
     ///Overall completeness score (0-1000, where 1000 = 100.0%).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -95,17 +97,19 @@ pub struct DataQualityResult<S: BosStr = DefaultStr> {
     ///Additional notes about the quality assessment.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remarks: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_data_quality_result_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single measurement derived by an evaluator from source data.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DerivedMeasurement<S: BosStr = DefaultStr> {
     ///Description of the method used to obtain the measurement.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -117,34 +121,38 @@ pub struct DerivedMeasurement<S: BosStr = DefaultStr> {
     pub measurement_unit: Option<S>,
     ///The value of the measurement.
     pub measurement_value: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_derived_measurement_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Derived measurements produced by an evaluator from source data (e.g., remote sensing metrics).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MeasurementResult<S: BosStr = DefaultStr> {
     ///List of derived measurements.
     pub measurements: Vec<evaluator::DerivedMeasurement<S>>,
     ///Additional notes about the measurements.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remarks: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_measurement_result_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Provenance metadata describing the method used to produce an evaluation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MethodInfo<S: BosStr = DefaultStr> {
     ///Identifier for the specific model checkpoint used (e.g., date or hash).
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -157,17 +165,19 @@ pub struct MethodInfo<S: BosStr = DefaultStr> {
     ///Version string of the method or model (e.g., '2.1.0').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_method_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single data quality flag indicating an issue with a specific field.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QualityFlag<S: BosStr = DefaultStr> {
     ///The field name that has the quality issue.
     pub field: S,
@@ -176,7 +186,12 @@ pub struct QualityFlag<S: BosStr = DefaultStr> {
     ///Severity level of the quality issue.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub severity: Option<QualityFlagSeverity<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_quality_flag_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -266,10 +281,7 @@ where
 /// AI or human species recognition result with ranked candidate identifications.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpeciesIdResult<S: BosStr = DefaultStr> {
     ///Ranked list of candidate species identifications.
     pub candidates: Vec<evaluator::CandidateTaxon<S>>,
@@ -279,34 +291,38 @@ pub struct SpeciesIdResult<S: BosStr = DefaultStr> {
     ///Additional notes about the species identification.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remarks: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_species_id_result_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Reference to a target record that is being evaluated.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubjectRef<S: BosStr = DefaultStr> {
     ///CID pinning the exact version of the target record.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     ///AT-URI of the target record.
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_subject_ref_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Expert verification result for a previous identification or evaluation.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VerificationResult<S: BosStr = DefaultStr> {
     ///Notes about the verification decision.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -322,7 +338,12 @@ pub struct VerificationResult<S: BosStr = DefaultStr> {
     ///Persistent identifier (e.g., ORCID) of the verifier.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub verified_by_id: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_verification_result_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -377,7 +398,8 @@ impl<S: BosStr> Serialize for VerificationResultStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VerificationResultStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for VerificationResultStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -404,7 +426,9 @@ where
             VerificationResultStatus::Confirmed => VerificationResultStatus::Confirmed,
             VerificationResultStatus::Rejected => VerificationResultStatus::Rejected,
             VerificationResultStatus::Uncertain => VerificationResultStatus::Uncertain,
-            VerificationResultStatus::Other(v) => VerificationResultStatus::Other(v.into_static()),
+            VerificationResultStatus::Other(v) => {
+                VerificationResultStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -983,9 +1007,22 @@ impl<S: BosStr> LexiconSchema for VerificationResult<S> {
     }
 }
 
+fn deserialize_candidate_taxon_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod candidate_taxon_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1042,7 +1079,10 @@ pub mod candidate_taxon_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CandidateTaxonBuilder<St: candidate_taxon_state::State, S: BosStr = DefaultStr> {
+pub struct CandidateTaxonBuilder<
+    St: candidate_taxon_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -1222,7 +1262,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CandidateTaxon<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CandidateTaxon<S> {
         CandidateTaxon {
             confidence: self._fields.0.unwrap(),
             family: self._fields.1,
@@ -1237,10 +1280,10 @@ where
 }
 
 fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.gainforest.evaluator.defs"),
@@ -1249,14 +1292,18 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("candidateTaxon"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A candidate taxon identification with confidence score and rank.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("scientificName"),
-                        SmolStr::new_static("confidence"),
-                        SmolStr::new_static("rank"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A candidate taxon identification with confidence score and rank.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("scientificName"),
+                            SmolStr::new_static("confidence"),
+                            SmolStr::new_static("rank")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1271,9 +1318,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("family"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Family of the candidate taxon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Family of the candidate taxon."),
+                                ),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1281,9 +1328,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("gbifTaxonKey"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "GBIF backbone taxonomy key for the candidate.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "GBIF backbone taxonomy key for the candidate.",
+                                    ),
+                                ),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
                             }),
@@ -1291,9 +1340,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("genus"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Genus of the candidate taxon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Genus of the candidate taxon."),
+                                ),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1301,9 +1350,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("kingdom"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Kingdom of the candidate taxon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Kingdom of the candidate taxon."),
+                                ),
                                 max_graphemes: Some(128usize),
                                 ..Default::default()
                             }),
@@ -1318,9 +1367,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("scientificName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Full scientific name of the candidate taxon.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Full scientific name of the candidate taxon.",
+                                    ),
+                                ),
                                 max_graphemes: Some(512usize),
                                 ..Default::default()
                             }),
@@ -1390,9 +1441,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dataQualityResult"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Data quality assessment result with per-field quality flags.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Data quality assessment result with per-field quality flags.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("flags")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1408,9 +1461,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("flags"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of quality issues found in the record.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "List of quality issues found in the record.",
+                                    ),
+                                ),
                                 items: LexArrayItem::Ref(LexRef {
                                     r#ref: CowStr::new_static("#qualityFlag"),
                                     ..Default::default()
@@ -1422,9 +1477,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("remarks"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Additional notes about the quality assessment.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Additional notes about the quality assessment.",
+                                    ),
+                                ),
                                 max_graphemes: Some(2048usize),
                                 ..Default::default()
                             }),
@@ -1617,22 +1674,25 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("qualityFlag"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single data quality flag indicating an issue with a specific field.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("field"),
-                        SmolStr::new_static("issue"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A single data quality flag indicating an issue with a specific field.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("field"), SmolStr::new_static("issue")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("field"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The field name that has the quality issue.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The field name that has the quality issue.",
+                                    ),
+                                ),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
                             }),
@@ -1640,9 +1700,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("issue"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Description of the quality issue.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Description of the quality issue."),
+                                ),
                                 max_graphemes: Some(256usize),
                                 ..Default::default()
                             }),
@@ -1650,9 +1710,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("severity"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Severity level of the quality issue.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Severity level of the quality issue."),
+                                ),
                                 max_graphemes: Some(64usize),
                                 ..Default::default()
                             }),
@@ -1722,9 +1782,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("subjectRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Reference to a target record that is being evaluated.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Reference to a target record that is being evaluated.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1732,9 +1794,11 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "CID pinning the exact version of the target record.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "CID pinning the exact version of the target record.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -1742,9 +1806,9 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the target record.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the target record."),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -1835,9 +1899,35 @@ fn lexicon_doc_app_gainforest_evaluator_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_classification_result_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_data_quality_result_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod data_quality_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1868,19 +1958,21 @@ pub mod data_quality_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DataQualityResultBuilder<St: data_quality_result_state::State, S: BosStr = DefaultStr> {
+pub struct DataQualityResultBuilder<
+    St: data_quality_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<i64>,
-        Option<Vec<evaluator::QualityFlag<S>>>,
-        Option<S>,
-    ),
+    _fields: (Option<i64>, Option<Vec<evaluator::QualityFlag<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl DataQualityResult<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> DataQualityResultBuilder<data_quality_result_state::Empty, DefaultStr> {
+    pub fn new() -> DataQualityResultBuilder<
+        data_quality_result_state::Empty,
+        DefaultStr,
+    > {
         DataQualityResultBuilder::new()
     }
 }
@@ -1974,7 +2066,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DataQualityResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DataQualityResult<S> {
         DataQualityResult {
             completeness_score: self._fields.0,
             flags: self._fields.1.unwrap(),
@@ -1984,9 +2079,35 @@ where
     }
 }
 
+fn deserialize_derived_measurement_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_measurement_result_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod measurement_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2017,7 +2138,10 @@ pub mod measurement_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct MeasurementResultBuilder<St: measurement_result_state::State, S: BosStr = DefaultStr> {
+pub struct MeasurementResultBuilder<
+    St: measurement_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<evaluator::DerivedMeasurement<S>>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -2025,7 +2149,10 @@ pub struct MeasurementResultBuilder<St: measurement_result_state::State, S: BosS
 
 impl MeasurementResult<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> MeasurementResultBuilder<measurement_result_state::Empty, DefaultStr> {
+    pub fn new() -> MeasurementResultBuilder<
+        measurement_result_state::Empty,
+        DefaultStr,
+    > {
         MeasurementResultBuilder::new()
     }
 }
@@ -2105,7 +2232,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MeasurementResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MeasurementResult<S> {
         MeasurementResult {
             measurements: self._fields.0.unwrap(),
             remarks: self._fields.1,
@@ -2114,9 +2244,48 @@ where
     }
 }
 
+fn deserialize_method_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_quality_flag_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_species_id_result_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod species_id_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2147,13 +2316,12 @@ pub mod species_id_result_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SpeciesIdResultBuilder<St: species_id_result_state::State, S: BosStr = DefaultStr> {
+pub struct SpeciesIdResultBuilder<
+    St: species_id_result_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Vec<evaluator::CandidateTaxon<S>>>,
-        Option<S>,
-        Option<S>,
-    ),
+    _fields: (Option<Vec<evaluator::CandidateTaxon<S>>>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -2253,7 +2421,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SpeciesIdResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SpeciesIdResult<S> {
         SpeciesIdResult {
             candidates: self._fields.0.unwrap(),
             input_feature: self._fields.1,
@@ -2263,9 +2434,22 @@ where
     }
 }
 
+fn deserialize_subject_ref_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod subject_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2384,11 +2568,27 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubjectRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SubjectRef<S> {
         SubjectRef {
             cid: self._fields.0,
             uri: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_verification_result_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Stack<S: BosStr = DefaultStr> {
     ///Cross-axis alignment of children.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -310,11 +307,9 @@ where
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StackOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -335,8 +330,9 @@ impl jacquard_common::xrpc::XrpcResp for StackResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Stack<S> {
     const NSID: &'static str = "org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = StackResponse;
 }
 
@@ -346,15 +342,16 @@ Path: `/xrpc/org.atsui.Stack`. The request payload type is `Stack<S>`; send that
 pub struct StackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     const PATH: &'static str = "/xrpc/org.atsui.Stack";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Stack<S>;
     type Response = StackResponse;
 }
 
 pub mod stack_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

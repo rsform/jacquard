@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::Facet;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::org_hypercerts::SmallImage;
 use crate::org_hypercerts::Uri;
-use crate::org_hypercerts::claim::activity;
 use crate::org_hypercerts::workscope::cel::Cel;
 use crate::pub_leaflet::pages::linear_document::LinearDocument;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::org_hypercerts::claim::activity;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Contributor<S: BosStr = DefaultStr> {
     ///Inline contribution role object with a role string via org.hypercerts.claim.activity#contributorRole, or a strong reference to a contribution details record. The record referenced must conform with the lexicon org.hypercerts.claim.contribution.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,9 +46,15 @@ pub struct Contributor<S: BosStr = DefaultStr> {
     pub contribution_weight: Option<S>,
     ///Inline contributor identity object with an identity string (DID or identifier) via org.hypercerts.claim.activity#contributorIdentity, or a strong reference to a contributor information record. The record referenced must conform with the lexicon org.hypercerts.claim.contributorInformation.
     pub contributor_identity: ContributorContributorIdentity<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_contributor_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,6 +65,7 @@ pub enum ContributorContributionDetails<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<StrongRef<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -76,28 +80,32 @@ pub enum ContributorContributorIdentity<S: BosStr = DefaultStr> {
 /// Contributor information as a string (DID or identifier).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContributorIdentity<S: BosStr = DefaultStr> {
     ///The contributor identity string (DID or identifier).
     pub identity: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_contributor_identity_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Contribution details as a string.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContributorRole<S: BosStr = DefaultStr> {
     ///The contribution role or details.
     pub role: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_contributor_role_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -144,9 +152,15 @@ pub struct Activity<S: BosStr = DefaultStr> {
     ///Work scope definition. A CEL expression for structured, machine-evaluable scopes or a free-form string for simple and legacy scopes.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub work_scope: Option<ActivityWorkScope<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_activity_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -157,6 +171,7 @@ pub enum ActivityImage<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#smallImage")]
     SmallImage(Box<SmallImage<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -182,14 +197,16 @@ pub struct ActivityGetRecordOutput<S: BosStr = DefaultStr> {
 /// A free-form string describing the work scope for simple or legacy scopes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WorkScopeString<S: BosStr = DefaultStr> {
     ///The work scope description string.
     pub scope: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_work_scope_string_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -438,9 +455,22 @@ impl<S: BosStr> LexiconSchema for WorkScopeString<S> {
     }
 }
 
+fn deserialize_contributor_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod contributor_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -583,7 +613,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Contributor<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contributor<S> {
         Contributor {
             contribution_details: self._fields.0,
             contribution_weight: self._fields.1,
@@ -594,10 +627,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_claim_activity() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.claim.activity"),
@@ -660,9 +693,11 @@ fn lexicon_doc_org_hypercerts_claim_activity() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("contributorIdentity"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Contributor information as a string (DID or identifier).",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Contributor information as a string (DID or identifier).",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("identity")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -670,9 +705,11 @@ fn lexicon_doc_org_hypercerts_claim_activity() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("identity"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The contributor identity string (DID or identifier).",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The contributor identity string (DID or identifier).",
+                                    ),
+                                ),
                                 max_length: Some(1000usize),
                                 max_graphemes: Some(100usize),
                                 ..Default::default()
@@ -686,7 +723,9 @@ fn lexicon_doc_org_hypercerts_claim_activity() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("contributorRole"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Contribution details as a string.")),
+                    description: Some(
+                        CowStr::new_static("Contribution details as a string."),
+                    ),
                     required: Some(vec![SmolStr::new_static("role")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -694,9 +733,9 @@ fn lexicon_doc_org_hypercerts_claim_activity() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("role"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The contribution role or details.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The contribution role or details."),
+                                ),
                                 max_length: Some(1000usize),
                                 max_graphemes: Some(100usize),
                                 ..Default::default()
@@ -885,9 +924,11 @@ fn lexicon_doc_org_hypercerts_claim_activity() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("workScopeString"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A free-form string describing the work scope for simple or legacy scopes.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A free-form string describing the work scope for simple or legacy scopes.",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("scope")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -895,9 +936,9 @@ fn lexicon_doc_org_hypercerts_claim_activity() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("scope"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The work scope description string.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The work scope description string."),
+                                ),
                                 max_length: Some(1000usize),
                                 max_graphemes: Some(100usize),
                                 ..Default::default()
@@ -914,9 +955,54 @@ fn lexicon_doc_org_hypercerts_claim_activity() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_contributor_identity_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_contributor_role_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_activity_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod activity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1012,7 +1098,18 @@ impl ActivityBuilder<activity_state::Empty, DefaultStr> {
         ActivityBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1025,7 +1122,18 @@ impl<S: BosStr> ActivityBuilder<activity_state::Empty, S> {
         ActivityBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1034,12 +1142,18 @@ impl<S: BosStr> ActivityBuilder<activity_state::Empty, S> {
 
 impl<St: activity_state::State, S: BosStr> ActivityBuilder<St, S> {
     /// Set the `contributors` field (optional)
-    pub fn contributors(mut self, value: impl Into<Option<Vec<activity::Contributor<S>>>>) -> Self {
+    pub fn contributors(
+        mut self,
+        value: impl Into<Option<Vec<activity::Contributor<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `contributors` field to an Option value (optional)
-    pub fn maybe_contributors(mut self, value: Option<Vec<activity::Contributor<S>>>) -> Self {
+    pub fn maybe_contributors(
+        mut self,
+        value: Option<Vec<activity::Contributor<S>>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1150,12 +1264,18 @@ where
 
 impl<St: activity_state::State, S: BosStr> ActivityBuilder<St, S> {
     /// Set the `shortDescriptionFacets` field (optional)
-    pub fn short_description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn short_description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `shortDescriptionFacets` field to an Option value (optional)
-    pub fn maybe_short_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
+    pub fn maybe_short_description_facets(
+        mut self,
+        value: Option<Vec<Facet<S>>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1249,4 +1369,17 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_work_scope_string_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

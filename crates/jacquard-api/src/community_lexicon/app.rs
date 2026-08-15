@@ -10,12 +10,13 @@ pub mod entry;
 pub mod profile;
 pub mod profile_localization;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,38 +28,42 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::community_lexicon::app;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::community_lexicon::app;
 /// A record whose presence in an account can indicate that the account probably uses this app.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AccountIndicator<S: BosStr = DefaultStr> {
     ///Record collection to look for in an account repository.
     pub collection: Nsid<S>,
     ///Optional record key to look for within the collection.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rkey: Option<RecordKey<Rkey<S>>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_account_indicator_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// width:height represents an aspect ratio. It may be approximate.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_aspect_ratio_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -75,10 +80,7 @@ impl core::fmt::Display for Discontinued {
 /// An image associated with an app, including accessibility and display metadata. Exactly one of `image` (ATProto blob) or `uri` (remote URL) MUST be present. Consumers SHOULD ignore image items that have neither or both.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     pub alt: S,
@@ -93,7 +95,12 @@ pub struct Image<S: BosStr = DefaultStr> {
     ///Remote image URI.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<UriValue<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_image_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -203,10 +210,7 @@ where
 /// Self-declared AT Protocol lexicon interoperability signals.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LexiconInterop<S: BosStr = DefaultStr> {
     ///Lexicon collections this app reads, displays, imports, or otherwise consumes.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -214,17 +218,19 @@ pub struct LexiconInterop<S: BosStr = DefaultStr> {
     ///Lexicon collections this app creates or publishes records for.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub produces: Option<Vec<Nsid<S>>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_lexicon_interop_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A labeled URI associated with an app.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Link<S: BosStr = DefaultStr> {
     ///Human-readable label for the URI.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -234,7 +240,12 @@ pub struct Link<S: BosStr = DefaultStr> {
     pub role: Option<app::LinkRole<S>>,
     ///Destination URI.
     pub uri: UriValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_link_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -278,7 +289,9 @@ impl<S: BosStr> LinkRole<S> {
             Self::CommunityLexiconAppDefsLinkRoleSourceCode => {
                 "community.lexicon.app.defs#linkRoleSourceCode"
             }
-            Self::CommunityLexiconAppDefsLinkRoleDocs => "community.lexicon.app.defs#linkRoleDocs",
+            Self::CommunityLexiconAppDefsLinkRoleDocs => {
+                "community.lexicon.app.defs#linkRoleDocs"
+            }
             Self::CommunityLexiconAppDefsLinkRoleChangelog => {
                 "community.lexicon.app.defs#linkRoleChangelog"
             }
@@ -318,7 +331,9 @@ impl<S: BosStr> LinkRole<S> {
             "community.lexicon.app.defs#linkRoleSourceCode" => {
                 Self::CommunityLexiconAppDefsLinkRoleSourceCode
             }
-            "community.lexicon.app.defs#linkRoleDocs" => Self::CommunityLexiconAppDefsLinkRoleDocs,
+            "community.lexicon.app.defs#linkRoleDocs" => {
+                Self::CommunityLexiconAppDefsLinkRoleDocs
+            }
             "community.lexicon.app.defs#linkRoleChangelog" => {
                 Self::CommunityLexiconAppDefsLinkRoleChangelog
             }
@@ -556,8 +571,12 @@ pub enum Platform<S: BosStr = DefaultStr> {
 impl<S: BosStr> Platform<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CommunityLexiconAppDefsPlatformWeb => "community.lexicon.app.defs#platformWeb",
-            Self::CommunityLexiconAppDefsPlatformIos => "community.lexicon.app.defs#platformIOS",
+            Self::CommunityLexiconAppDefsPlatformWeb => {
+                "community.lexicon.app.defs#platformWeb"
+            }
+            Self::CommunityLexiconAppDefsPlatformIos => {
+                "community.lexicon.app.defs#platformIOS"
+            }
             Self::CommunityLexiconAppDefsPlatformAndroid => {
                 "community.lexicon.app.defs#platformAndroid"
             }
@@ -570,15 +589,21 @@ impl<S: BosStr> Platform<S> {
             Self::CommunityLexiconAppDefsPlatformLinux => {
                 "community.lexicon.app.defs#platformLinux"
             }
-            Self::CommunityLexiconAppDefsPlatformCli => "community.lexicon.app.defs#platformCLI",
+            Self::CommunityLexiconAppDefsPlatformCli => {
+                "community.lexicon.app.defs#platformCLI"
+            }
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "community.lexicon.app.defs#platformWeb" => Self::CommunityLexiconAppDefsPlatformWeb,
-            "community.lexicon.app.defs#platformIOS" => Self::CommunityLexiconAppDefsPlatformIos,
+            "community.lexicon.app.defs#platformWeb" => {
+                Self::CommunityLexiconAppDefsPlatformWeb
+            }
+            "community.lexicon.app.defs#platformIOS" => {
+                Self::CommunityLexiconAppDefsPlatformIos
+            }
             "community.lexicon.app.defs#platformAndroid" => {
                 Self::CommunityLexiconAppDefsPlatformAndroid
             }
@@ -591,7 +616,9 @@ impl<S: BosStr> Platform<S> {
             "community.lexicon.app.defs#platformLinux" => {
                 Self::CommunityLexiconAppDefsPlatformLinux
             }
-            "community.lexicon.app.defs#platformCLI" => Self::CommunityLexiconAppDefsPlatformCli,
+            "community.lexicon.app.defs#platformCLI" => {
+                Self::CommunityLexiconAppDefsPlatformCli
+            }
             _ => Self::Other(s),
         }
     }
@@ -847,22 +874,38 @@ pub enum Status<S: BosStr = DefaultStr> {
 impl<S: BosStr> Status<S> {
     pub fn as_str(&self) -> &str {
         match self {
-            Self::CommunityLexiconAppDefsUnreleased => "community.lexicon.app.defs#unreleased",
+            Self::CommunityLexiconAppDefsUnreleased => {
+                "community.lexicon.app.defs#unreleased"
+            }
             Self::CommunityLexiconAppDefsPreview => "community.lexicon.app.defs#preview",
-            Self::CommunityLexiconAppDefsReleased => "community.lexicon.app.defs#released",
-            Self::CommunityLexiconAppDefsUnmaintained => "community.lexicon.app.defs#unmaintained",
-            Self::CommunityLexiconAppDefsDiscontinued => "community.lexicon.app.defs#discontinued",
+            Self::CommunityLexiconAppDefsReleased => {
+                "community.lexicon.app.defs#released"
+            }
+            Self::CommunityLexiconAppDefsUnmaintained => {
+                "community.lexicon.app.defs#unmaintained"
+            }
+            Self::CommunityLexiconAppDefsDiscontinued => {
+                "community.lexicon.app.defs#discontinued"
+            }
             Self::Other(s) => s.as_ref(),
         }
     }
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
-            "community.lexicon.app.defs#unreleased" => Self::CommunityLexiconAppDefsUnreleased,
+            "community.lexicon.app.defs#unreleased" => {
+                Self::CommunityLexiconAppDefsUnreleased
+            }
             "community.lexicon.app.defs#preview" => Self::CommunityLexiconAppDefsPreview,
-            "community.lexicon.app.defs#released" => Self::CommunityLexiconAppDefsReleased,
-            "community.lexicon.app.defs#unmaintained" => Self::CommunityLexiconAppDefsUnmaintained,
-            "community.lexicon.app.defs#discontinued" => Self::CommunityLexiconAppDefsDiscontinued,
+            "community.lexicon.app.defs#released" => {
+                Self::CommunityLexiconAppDefsReleased
+            }
+            "community.lexicon.app.defs#unmaintained" => {
+                Self::CommunityLexiconAppDefsUnmaintained
+            }
+            "community.lexicon.app.defs#discontinued" => {
+                Self::CommunityLexiconAppDefsDiscontinued
+            }
             _ => Self::Other(s),
         }
     }
@@ -907,9 +950,15 @@ where
     type Output = Status<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            Status::CommunityLexiconAppDefsUnreleased => Status::CommunityLexiconAppDefsUnreleased,
-            Status::CommunityLexiconAppDefsPreview => Status::CommunityLexiconAppDefsPreview,
-            Status::CommunityLexiconAppDefsReleased => Status::CommunityLexiconAppDefsReleased,
+            Status::CommunityLexiconAppDefsUnreleased => {
+                Status::CommunityLexiconAppDefsUnreleased
+            }
+            Status::CommunityLexiconAppDefsPreview => {
+                Status::CommunityLexiconAppDefsPreview
+            }
+            Status::CommunityLexiconAppDefsReleased => {
+                Status::CommunityLexiconAppDefsReleased
+            }
             Status::CommunityLexiconAppDefsUnmaintained => {
                 Status::CommunityLexiconAppDefsUnmaintained
             }
@@ -1042,16 +1091,19 @@ impl<S: BosStr> LexiconSchema for Image<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -1117,9 +1169,22 @@ impl<S: BosStr> LexiconSchema for Link<S> {
     }
 }
 
+fn deserialize_account_indicator_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod account_indicator_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1150,7 +1215,10 @@ pub mod account_indicator_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct AccountIndicatorBuilder<St: account_indicator_state::State, S: BosStr = DefaultStr> {
+pub struct AccountIndicatorBuilder<
+    St: account_indicator_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<RecordKey<Rkey<S>>>),
     _type: PhantomData<fn() -> S>,
@@ -1238,7 +1306,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AccountIndicator<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AccountIndicator<S> {
         AccountIndicator {
             collection: self._fields.0.unwrap(),
             rkey: self._fields.1,
@@ -1248,10 +1319,10 @@ where
 }
 
 fn lexicon_doc_community_lexicon_app_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("community.lexicon.app.defs"),
@@ -1301,13 +1372,14 @@ fn lexicon_doc_community_lexicon_app_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("aspectRatio"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "width:height represents an aspect ratio. It may be approximate.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("width"),
-                        SmolStr::new_static("height"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "width:height represents an aspect ratio. It may be approximate.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1332,9 +1404,7 @@ fn lexicon_doc_community_lexicon_app_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("discontinued"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("image"),
@@ -1445,7 +1515,9 @@ fn lexicon_doc_community_lexicon_app_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("link"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("A labeled URI associated with an app.")),
+                    description: Some(
+                        CowStr::new_static("A labeled URI associated with an app."),
+                    ),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1453,9 +1525,9 @@ fn lexicon_doc_community_lexicon_app_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("label"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Human-readable label for the URI.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Human-readable label for the URI."),
+                                ),
                                 max_length: Some(100usize),
                                 max_graphemes: Some(50usize),
                                 ..Default::default()
@@ -1484,213 +1556,157 @@ fn lexicon_doc_community_lexicon_app_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("linkRole"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static(
-                        "Known role of a link associated with an app.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Known role of a link associated with an app.",
+                        ),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleAppStore"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleChangelog"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleDocs"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleFDroid"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRolePlayStore"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRolePrivacyPolicy"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleSourceCode"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleStatus"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleSupport"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleTermsOfService"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleWebManifest"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("linkRoleWebsite"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("platform"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static("Platform where an app is available.")),
+                    description: Some(
+                        CowStr::new_static("Platform where an app is available."),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("platformAndroid"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("platformCLI"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("platformIOS"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("platformLinux"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("platformMacOS"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("platformWeb"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("platformWindows"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("preview"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("purposeAd"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("purposeAppStore"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("purposeBanner"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("purposeHero"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("purposeIcon"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("purposeLogo"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("purposeScreenshot"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("purposeSocialCard"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("released"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("status"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static(
-                        "Current release or maintenance status of an app.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Current release or maintenance status of an app.",
+                        ),
+                    ),
                     ..Default::default()
                 }),
             );
             map.insert(
                 SmolStr::new_static("unmaintained"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("unreleased"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },
@@ -1698,9 +1714,22 @@ fn lexicon_doc_community_lexicon_app_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_aspect_ratio_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod aspect_ratio_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1838,7 +1867,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> AspectRatio<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -1847,9 +1879,48 @@ where
     }
 }
 
+fn deserialize_image_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_lexicon_interop_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_link_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1954,7 +2025,10 @@ where
     St::Uri: link_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> LinkBuilder<link_state::SetUri<St>, S> {
+    pub fn uri(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> LinkBuilder<link_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,

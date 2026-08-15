@@ -1,0 +1,136 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.post",
+  "defs": {
+    "bridgedStats": {
+      "type": "object",
+      "description": "Aggregate vote counts asserted by the bridge for content federated from an origin platform (e.g. Lemmy). These supplement, and are kept separate from, native atproto votes.",
+      "required": [
+        "upvotes",
+        "downvotes",
+        "asOf"
+      ],
+      "properties": {
+        "asOf": {
+          "type": "string",
+          "description": "Timestamp the origin-platform counts were sampled; used to discard stale updates",
+          "format": "datetime"
+        },
+        "downvotes": {
+          "type": "integer",
+          "description": "Number of downvotes on the origin platform as of asOf",
+          "minimum": 0
+        },
+        "upvotes": {
+          "type": "integer",
+          "description": "Number of upvotes on the origin platform as of asOf",
+          "minimum": 0
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A post in a Coves community. Posts live in community repositories and persist independently of the author.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "community",
+          "author",
+          "createdAt"
+        ],
+        "properties": {
+          "author": {
+            "type": "string",
+            "description": "DID of the user who created this post",
+            "format": "did"
+          },
+          "bridgedStats": {
+            "type": "ref",
+            "description": "Bridge-asserted aggregate of origin-platform votes for federated/bridged content. Set by the bridge that materialized this record; absent for natively-authored posts.",
+            "ref": "#bridgedStats"
+          },
+          "community": {
+            "type": "string",
+            "description": "DID of the community this was posted to",
+            "format": "did"
+          },
+          "content": {
+            "type": "string",
+            "description": "Post content - supports rich text via facets",
+            "maxLength": 100000,
+            "maxGraphemes": 10000
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of post creation",
+            "format": "datetime"
+          },
+          "crosspostChain": {
+            "type": "array",
+            "description": "Full chain of crossposts with version pinning. First element is original, last is immediate parent.",
+            "items": {
+              "type": "ref",
+              "ref": "com.atproto.repo.strongRef"
+            },
+            "maxLength": 25
+          },
+          "crosspostOf": {
+            "type": "ref",
+            "description": "If this is a crosspost, strong reference to the immediate parent post",
+            "ref": "com.atproto.repo.strongRef"
+          },
+          "embed": {
+            "type": "union",
+            "description": "Embedded media, external links, or quoted posts",
+            "refs": [
+              "social.coves.embed.images",
+              "social.coves.embed.video",
+              "social.coves.embed.external",
+              "social.coves.embed.post"
+            ]
+          },
+          "facets": {
+            "type": "array",
+            "description": "Annotations for rich text (mentions, links, formatting, block structure)",
+            "items": {
+              "type": "ref",
+              "ref": "social.coves.richtext.facet"
+            },
+            "maxLength": 200
+          },
+          "labels": {
+            "type": "ref",
+            "description": "Self-applied content labels (NSFW, spoilers, etc.)",
+            "ref": "com.atproto.label.defs#selfLabels"
+          },
+          "langs": {
+            "type": "array",
+            "description": "Languages used in the post content (ISO 639-1)",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3
+          },
+          "tags": {
+            "type": "array",
+            "description": "User-applied topic tags",
+            "items": {
+              "type": "string",
+              "maxLength": 640,
+              "maxGraphemes": 64
+            },
+            "maxLength": 8
+          },
+          "title": {
+            "type": "string",
+            "description": "Post title (optional for media-only posts)",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          }
+        }
+      }
+    }
+  }
+}

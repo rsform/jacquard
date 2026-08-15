@@ -66,6 +66,9 @@
             "ref",
             "languages"
           ],
+          "nullable": [
+            "languages"
+          ],
           "properties": {
             "languages": {
               "type": "array",

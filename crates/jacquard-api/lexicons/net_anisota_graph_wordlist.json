@@ -1,0 +1,185 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.graph.wordlist",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A named, shareable list of muted words/phrases — Anisota's managed layer on top of Bluesky's flat muted-words preference. Each list is a complete, self-contained record so it can be shared by URL and saved (copied) into another user's PDS, mirroring the net.anisota.spell.custom architecture. Muting is applied client-side by the moderation pipeline: multiple enabled lists combine, a list can be scoped to specific feeds, restricted to a time-of-day/day-of-week window, and softened with a strength percentage (mute only that share of matching posts, deterministically per post). A list can optionally be projected into Bluesky's native mutedWordsPref for parity with other clients.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "words",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this list was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description of what this list covers",
+            "maxLength": 300
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this list is currently active. Scheduling and spell effects further gate an enabled list.",
+            "default": false
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for this word list",
+            "maxLength": 64
+          },
+          "schedule": {
+            "type": "ref",
+            "description": "Optional active window. Absent means the list applies at all times while enabled.",
+            "ref": "#schedule"
+          },
+          "source": {
+            "type": "ref",
+            "ref": "#source"
+          },
+          "strength": {
+            "type": "integer",
+            "description": "Mute strength percentage: the share of matching posts this list mutes. Which posts fill that share is decided by match confidence — how many of the list's words hit, whether they landed in the post's own text, a hashtag, or only a quoted post, and how much of the post they account for — so a softened list keeps the squarest matches muted and lets the marginal ones through. Deterministic per post, so a post never flickers. Absent means 100 (mute everything it matches).",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "syncToBluesky": {
+            "type": "boolean",
+            "description": "Whether this list's words are also projected into Bluesky's native mutedWordsPref (managed entries, removed when the list is disabled or deleted).",
+            "default": false
+          },
+          "targetFeeds": {
+            "type": "array",
+            "description": "Feeds where this list applies: feed generator / list at-uris, or the literal sentinel 'following' for the home timeline. Empty or absent applies everywhere.",
+            "items": {
+              "type": "string",
+              "maxLength": 512
+            },
+            "maxLength": 50
+          },
+          "treatment": {
+            "type": "string",
+            "description": "What this list does to a post it mutes, overriding the app-wide muted-words handling: 'hide' removes it from feeds, 'warn' collapses it behind a notice, 'show' leaves it visible and only counts it toward impact. Absent inherits the global setting.",
+            "knownValues": [
+              "hide",
+              "warn",
+              "show"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When this list was last modified",
+            "format": "datetime"
+          },
+          "words": {
+            "type": "array",
+            "description": "The muted words/phrases in this list",
+            "items": {
+              "type": "ref",
+              "ref": "#word"
+            },
+            "maxLength": 500
+          }
+        }
+      }
+    },
+    "schedule": {
+      "type": "object",
+      "description": "A recurring active window. Days and time window combine: the list applies only on the listed days (absent/empty = every day) and only inside the time window (absent = all day). A window whose end is at or before its start wraps past midnight.",
+      "properties": {
+        "days": {
+          "type": "array",
+          "description": "Days of week the list is active (0 = Sunday … 6 = Saturday)",
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 6
+          },
+          "maxLength": 7
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Window end as 'HH:MM' local time",
+          "maxLength": 5
+        },
+        "startTime": {
+          "type": "string",
+          "description": "Window start as 'HH:MM' local time",
+          "maxLength": 5
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "description": "Provenance. An 'original' list was created here; a 'learned' list was saved from another user, carrying a backlink to its immediate parent (originalUri/originalDid) and to the top of its lineage (rootUri/rootDid), modelled on net.anisota.spell.custom so save counts can aggregate across re-shares.",
+      "properties": {
+        "originalDid": {
+          "type": "string",
+          "description": "DID of the user this list was saved from.",
+          "format": "did"
+        },
+        "originalUri": {
+          "type": "string",
+          "description": "AT URI of the list this copy was saved from (its immediate parent).",
+          "format": "at-uri"
+        },
+        "rootDid": {
+          "type": "string",
+          "description": "DID of the original author at the top of the lineage.",
+          "format": "did"
+        },
+        "rootUri": {
+          "type": "string",
+          "description": "AT URI of the first author's list — the top of the lineage — propagated to every descendant.",
+          "format": "at-uri"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "original",
+            "learned"
+          ]
+        }
+      }
+    },
+    "word": {
+      "type": "object",
+      "description": "One muted word or phrase, matching the shape of Bluesky's mutedWord items so a list can be projected into the native preference losslessly.",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "actorTarget": {
+          "type": "string",
+          "description": "Whose posts to apply this word to. Absent means 'all'.",
+          "knownValues": [
+            "all",
+            "exclude-following"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "description": "What to match against: post text ('content') and/or hashtags ('tag'). Absent means both.",
+          "items": {
+            "type": "string",
+            "knownValues": [
+              "content",
+              "tag"
+            ]
+          }
+        },
+        "value": {
+          "type": "string",
+          "description": "The word or phrase to mute",
+          "maxLength": 100
+        }
+      }
+    }
+  }
+}

@@ -10,12 +10,12 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -32,20 +32,38 @@ impl jacquard_common::xrpc::XrpcResp for ImportAccountResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl jacquard_common::xrpc::XrpcRequest for ImportAccount {
     const NSID: &'static str = "ooo.bsky.hds.importAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/vnd.ipld.car");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/vnd.ipld.car",
+    );
     type Response = ImportAccountResponse;
-    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
+    fn encode_body(
+        &self,
+        buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,
     {
         Ok(buffer.extend_from_slice(self.body.as_ref()))
     }
-    fn decode_body<'de>(body: &'de [u8]) -> Result<Self, jacquard_common::error::DecodeError>
+    fn decode_body<'de>(
+        body: &'de [u8],
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
@@ -61,8 +79,9 @@ Path: `/xrpc/ooo.bsky.hds.importAccount`. The request payload type is `ImportAcc
 pub struct ImportAccountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ImportAccountRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.hds.importAccount";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/vnd.ipld.car");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/vnd.ipld.car",
+    );
     type Request<S: BosStr> = ImportAccount;
     type Response = ImportAccountResponse;
 }

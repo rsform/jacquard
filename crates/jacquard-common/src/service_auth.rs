@@ -196,7 +196,7 @@ impl<S: BosStr> ServiceAuthClaims<S> {
         if self.aud.audience().as_str() != expected_aud.as_str() {
             return Err(ServiceAuthError::AudienceMismatch {
                 expected: expected_aud.borrow().into_static(),
-                actual: DidService::new_owned(self.aud.as_str()).unwrap(),
+                actual: self.aud.borrow().into_static(),
             });
         }
 
@@ -243,34 +243,38 @@ impl<S: BosStr> ServiceAuthClaims<S> {
     pub fn require_method(&self, nsid: &Nsid<CowStr<'_>>) -> Result<(), ServiceAuthError> {
         if !self.check_method(nsid) {
             return Err(ServiceAuthError::MethodMismatch {
-                // TODO: remove this call once migration complete
-                expected: unsafe { Nsid::unchecked(nsid.as_str()).into_static() },
-                actual: self
-                    .lxm
-                    .as_ref()
-                    .map(|l| Nsid::new_owned(l.as_str()).unwrap()),
+                expected: nsid.borrow().into_static(),
+                actual: self.lxm.as_ref().map(|lxm| lxm.borrow().into_static()),
             });
         }
         Ok(())
     }
 }
 
-/// Parsed JWT components.
+/// Parsed JWT components with service-auth claims.
 ///
-/// This struct owns decoded and parsed JWT data. `signing_input` stores the
-/// original `header.payload` bytes used for signature verification.
-pub struct ParsedJwt<S: BosStr = DefaultStr> {
+/// A convenience alias over [`ParsedJwtWithClaims`]; this struct owns decoded
+/// and parsed JWT data. `signing_input` stores the original `header.payload`
+/// bytes used for signature verification.
+pub type ParsedJwt<S = DefaultStr> = ParsedJwtWithClaims<ServiceAuthClaims<S>>;
+
+/// A parsed JWT with a caller-defined claims shape, for token families whose
+/// claims do not fit [`ServiceAuthClaims`] (space credentials, delegation
+/// tokens, client attestations). Signature verification goes through
+/// [`verify_signature`], which only needs the header, signing input, and
+/// signature — all retained here.
+pub struct ParsedJwtWithClaims<C> {
     /// Parsed JWT header.
     header: JwtHeader,
-    /// Parsed service-auth claims.
-    claims: ServiceAuthClaims<S>,
+    /// Parsed caller-defined claims.
+    claims: C,
     /// Original `header.payload` signing input.
     signing_input: String,
     /// Decoded signature bytes.
     signature: Vec<u8>,
 }
 
-impl<S: BosStr> ParsedJwt<S> {
+impl<C> ParsedJwtWithClaims<C> {
     /// Get the signing input (header.payload) for signature verification.
     pub fn signing_input(&self) -> &[u8] {
         self.signing_input.as_bytes()
@@ -281,23 +285,18 @@ impl<S: BosStr> ParsedJwt<S> {
         &self.header
     }
 
-    /// Get a reference to the claims.
-    pub fn claims(&self) -> &ServiceAuthClaims<S> {
+    /// Get a reference to the custom claims.
+    pub fn claims(&self) -> &C {
         &self.claims
     }
 
-    /// Get a reference to the signature.
+    /// Get the decoded signature bytes.
     pub fn signature(&self) -> &[u8] {
         &self.signature
     }
 
-    /// Get owned header with 'static lifetime.
-    pub fn into_header(self) -> JwtHeader {
-        self.header
-    }
-
-    /// Get owned claims.
-    pub fn into_claims(self) -> ServiceAuthClaims<S> {
+    /// Consume the parsed token, returning the custom claims.
+    pub fn into_claims(self) -> C {
         self.claims
     }
 }
@@ -307,6 +306,18 @@ impl<S: BosStr> ParsedJwt<S> {
 /// This extracts and decodes all JWT components. The header and claims are parsed
 /// into their default owned backing types.
 pub fn parse_jwt(token: &str) -> Result<ParsedJwt, ServiceAuthError> {
+    parse_jwt_with_claims::<ServiceAuthClaims>(token)
+}
+
+/// Parse a JWT token with a custom claims shape, without verifying the signature.
+///
+/// Space credentials, delegation tokens, and client attestations share the JWT
+/// envelope but carry claim sets that do not fit [`ServiceAuthClaims`]; callers
+/// verify the signature with [`verify_signature`] against their own parsed form.
+pub fn parse_jwt_with_claims<C>(token: &str) -> Result<ParsedJwtWithClaims<C>, ServiceAuthError>
+where
+    C: serde::de::DeserializeOwned,
+{
     let parts: Vec<&str> = token.split('.').collect();
     if parts.len() != 3 {
         return Err(ServiceAuthError::MalformedToken(CowStr::new_static(
@@ -322,10 +333,10 @@ pub fn parse_jwt(token: &str) -> Result<ParsedJwt, ServiceAuthError> {
     let payload_buf = URL_SAFE_NO_PAD.decode(payload_b64)?;
     let signature = URL_SAFE_NO_PAD.decode(signature_b64)?;
     let header: JwtHeader = serde_json::from_slice(&header_buf)?;
-    let claims: ServiceAuthClaims = serde_json::from_slice(&payload_buf)?;
+    let claims: C = serde_json::from_slice(&payload_buf)?;
     let signing_input = format!("{}.{}", header_b64, payload_b64);
 
-    Ok(ParsedJwt {
+    Ok(ParsedJwtWithClaims {
         header,
         claims,
         signing_input,
@@ -368,8 +379,8 @@ impl PublicKey {
 /// Verify a JWT signature using the provided public key.
 ///
 /// The algorithm is determined by the JWT header and must match the public key type.
-pub fn verify_signature(
-    parsed: &ParsedJwt,
+pub fn verify_signature<C>(
+    parsed: &ParsedJwtWithClaims<C>,
     public_key: &PublicKey,
 ) -> Result<(), ServiceAuthError> {
     let alg = parsed.header().alg.as_str();

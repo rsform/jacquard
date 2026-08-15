@@ -785,7 +785,35 @@ pub(crate) fn generate_jti() -> SmolStr {
     URL_SAFE_NO_PAD.encode(bytes).into()
 }
 
-/// Build a compact JWS (ES256) for DPoP with embedded public JWK.
+/// Compute the RFC 7638 JWK thumbprint (`jkt`) of a P-256 JWK.
+///
+/// This is the value a space credential's `cnf.jkt` binds to, and the value a
+/// server derives from the proof's embedded JWK. Derived from the exact JWK
+/// serialization `build_dpop_proof` embeds, so the two can never disagree.
+pub fn jkt(key: &Key) -> Result<SmolStr> {
+    use base64::Engine as _;
+    use p256::elliptic_curve::sec1::ToEncodedPoint;
+    use sha2::Digest as _;
+
+    let public = match crypto::Key::try_from(key).map_err(DpopError::crypto)? {
+        crypto::Key::P256(crypto::Kind::Secret(sk)) => sk.public_key(),
+        crypto::Key::P256(crypto::Kind::Public(pk)) => pk,
+        _ => return Err(DpopError::unsupported_key()),
+    };
+    let point = public.to_encoded_point(false);
+    let (x, y) = (point.x(), point.y());
+    // RFC 7638: lexicographic order of the required members.
+    let thumbprint_input = format!(
+        "{{\"crv\":\"P-256\",\"kty\":\"EC\",\"x\":\"{}\",\"y\":\"{}\"}}",
+        x.map(|b| URL_SAFE_NO_PAD.encode(b)).unwrap_or_default(),
+        y.map(|b| URL_SAFE_NO_PAD.encode(b)).unwrap_or_default(),
+    );
+    Ok(SmolStr::from(
+        URL_SAFE_NO_PAD.encode(sha2::Sha256::digest(thumbprint_input.as_bytes())),
+    ))
+}
+
+/// Build a compact ES256 DPoP proof with an embedded public JWK.
 #[inline]
 pub fn build_dpop_proof(
     key: &Key,

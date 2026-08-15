@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct File<S: BosStr = DefaultStr> {
     ///The blessed CID of the file's bytes (CIDv1, raw multicodec, sha-256 multihash) — the canonical identity. This is what dev.atfs.repo.uploadFile (and its com.atproto.repo.uploadBlob alias) returns, what equality/dedup use, what atfs's own HTTP surfaces serve at any size, and the only DASL-compatible form. Never a DAG root.
     pub cid: CidLink<S>,
@@ -38,12 +35,20 @@ pub struct File<S: BosStr = DefaultStr> {
     pub ipfs_root: CidLink<S>,
     ///The IANA media type of the file's bytes, exactly as recorded at upload time (see dev.atfs.repo.uploadFile). Defaults to application/octet-stream when the uploader supplied no Content-Type.
     pub mime_type: S,
-    ///Advisory HTTPS origins (not full URLs — each is expected to answer both /ipfs/<cid> and a dev.atfs.repo.getFile-style XRPC, with the rest supplied by the author's DID), ordered by preference with the uploader's own instance first. Never required for correctness: a full IPFS client can always fall back to DHT routing.
+    ///Advisory HTTPS origins (not full URLs — each is expected to answer both /ipfs/<cid> and a dev.atfs.repo.getFile-style XRPC, with the rest supplied by the author's DID), ordered by preference with the uploader's own instance first. Never required for correctness: a full IPFS client can always fall back to DHT routing. HTTPS is meant literally — an atfs instance asked to pin this file skips any origin naming another scheme, and any origin resolving to an address that isn't routable on the public internet, since a providers list is a stranger's instruction about where to make connections.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub providers: Option<Vec<UriValue<S>>>,
     ///Size of the file, in bytes.
     pub size: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    ///Free-form labels attached to this content, deduplicated and sorted. Advisory and instance-local, in the same register as `providers`: never part of the file's identity (two identical uploads to two different instances, or under two different accounts, can carry entirely different tags for the same cid), never required for correctness, and not something a `dev.atfs.file` reference's recipient should trust as a global fact about the content — only as a note from whoever produced this reference. In dev.atfs.repo.listFiles output this is a union: every tag borne by ANY of that file's claims here — account-class and mirrored-server claims alike — with no indication of which claimant applied which; listFiles never discloses who pinned or tagged anything (pass listFiles' `did` parameter to scope this to one claimant's own tags instead). dev.atfs.repo.pinFile reads this field on input and adopts it verbatim under the calling instance's own claim (see dev.atfs.repo.pinFile).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<S>>,
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_file_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -60,6 +65,16 @@ impl<S: BosStr> LexiconSchema for File<S> {
     fn validate(&self) -> Result<(), ConstraintError> {
         if let Some(ref value) = self.providers {
             #[allow(unused_comparisons)]
+            if value.len() > 16usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("providers"),
+                    max: 16usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.providers {
+            #[allow(unused_comparisons)]
             if value.len() < 1usize {
                 return Err(ConstraintError::MinLength {
                     path: ValidationPath::from_field("providers"),
@@ -68,13 +83,85 @@ impl<S: BosStr> LexiconSchema for File<S> {
                 });
             }
         }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() > 16usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tags"),
+                    max: 16usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.tags {
+            #[allow(unused_comparisons)]
+            if value.len() < 1usize {
+                return Err(ConstraintError::MinLength {
+                    path: ValidationPath::from_field("tags"),
+                    min: 1usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 128usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 128usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) < 1usize {
+                    return Err(ConstraintError::MinLength {
+                        path: ValidationPath::from_field("tags"),
+                        min: 1usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                {
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
+                        .count();
+                    if count > 128usize {
+                        return Err(ConstraintError::MaxGraphemes {
+                            path: ValidationPath::from_field("tags"),
+                            max: 128usize,
+                            actual: count,
+                        });
+                    }
+                }
+            }
+        }
         Ok(())
     }
 }
 
+fn deserialize_file_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod file_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -155,6 +242,7 @@ pub struct FileBuilder<St: file_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<Vec<UriValue<S>>>,
         Option<i64>,
+        Option<Vec<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -178,7 +266,7 @@ impl FileBuilder<file_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         FileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -189,7 +277,7 @@ impl<S: BosStr> FileBuilder<file_state::Empty, S> {
     pub fn builder() -> Self {
         FileBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None),
+            _fields: (None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -201,7 +289,10 @@ where
     St::Cid: file_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(mut self, value: impl Into<CidLink<S>>) -> FileBuilder<file_state::SetCid<St>, S> {
+    pub fn cid(
+        mut self,
+        value: impl Into<CidLink<S>>,
+    ) -> FileBuilder<file_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -236,7 +327,10 @@ where
     St::MimeType: file_state::IsUnset,
 {
     /// Set the `mimeType` field (required)
-    pub fn mime_type(mut self, value: impl Into<S>) -> FileBuilder<file_state::SetMimeType<St>, S> {
+    pub fn mime_type(
+        mut self,
+        value: impl Into<S>,
+    ) -> FileBuilder<file_state::SetMimeType<St>, S> {
         self._fields.2 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -265,13 +359,29 @@ where
     St::Size: file_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(mut self, value: impl Into<i64>) -> FileBuilder<file_state::SetSize<St>, S> {
+    pub fn size(
+        mut self,
+        value: impl Into<i64>,
+    ) -> FileBuilder<file_state::SetSize<St>, S> {
         self._fields.4 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
             _fields: self._fields,
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: file_state::State, S: BosStr> FileBuilder<St, S> {
+    /// Set the `tags` field (optional)
+    pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.5 = value.into();
+        self
+    }
+    /// Set the `tags` field to an Option value (optional)
+    pub fn maybe_tags(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.5 = value;
+        self
     }
 }
 
@@ -291,6 +401,7 @@ where
             mime_type: self._fields.2.unwrap(),
             providers: self._fields.3,
             size: self._fields.4.unwrap(),
+            tags: self._fields.5,
             extra_data: Default::default(),
         }
     }
@@ -302,16 +413,17 @@ where
             mime_type: self._fields.2.unwrap(),
             providers: self._fields.3,
             size: self._fields.4.unwrap(),
+            tags: self._fields.5,
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_dev_atfs_file() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.atfs.file"),
@@ -357,7 +469,7 @@ fn lexicon_doc_dev_atfs_file() -> LexiconDoc<'static> {
                             LexObjectProperty::Array(LexArray {
                                 description: Some(
                                     CowStr::new_static(
-                                        "Advisory HTTPS origins (not full URLs — each is expected to answer both /ipfs/<cid> and a dev.atfs.repo.getFile-style XRPC, with the rest supplied by the author's DID), ordered by preference with the uploader's own instance first. Never required for correctness: a full IPFS client can always fall back to DHT routing.",
+                                        "Advisory HTTPS origins (not full URLs — each is expected to answer both /ipfs/<cid> and a dev.atfs.repo.getFile-style XRPC, with the rest supplied by the author's DID), ordered by preference with the uploader's own instance first. Never required for correctness: a full IPFS client can always fall back to DHT routing. HTTPS is meant literally — an atfs instance asked to pin this file skips any origin naming another scheme, and any origin resolving to an address that isn't routable on the public internet, since a providers list is a stranger's instruction about where to make connections.",
                                     ),
                                 ),
                                 items: LexArrayItem::String(LexString {
@@ -365,12 +477,37 @@ fn lexicon_doc_dev_atfs_file() -> LexiconDoc<'static> {
                                     ..Default::default()
                                 }),
                                 min_length: Some(1usize),
+                                max_length: Some(16usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("size"),
                             LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("tags"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Free-form labels attached to this content, deduplicated and sorted. Advisory and instance-local, in the same register as `providers`: never part of the file's identity (two identical uploads to two different instances, or under two different accounts, can carry entirely different tags for the same cid), never required for correctness, and not something a `dev.atfs.file` reference's recipient should trust as a global fact about the content — only as a note from whoever produced this reference. In dev.atfs.repo.listFiles output this is a union: every tag borne by ANY of that file's claims here — account-class and mirrored-server claims alike — with no indication of which claimant applied which; listFiles never discloses who pinned or tagged anything (pass listFiles' `did` parameter to scope this to one claimant's own tags instead). dev.atfs.repo.pinFile reads this field on input and adopts it verbatim under the calling instance's own claim (see dev.atfs.repo.pinFile).",
+                                    ),
+                                ),
+                                items: LexArrayItem::String(LexString {
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "A single free-form tag: 1-128 bytes, no control characters. maxGraphemes is the same 128 rather than a smaller, byte-aware figure, because the bound atfs actually enforces is bytes, not graphemes — a tighter maxGraphemes here would advertise a stricter limit than the server applies.",
+                                        ),
+                                    ),
+                                    min_length: Some(1usize),
+                                    max_length: Some(128usize),
+                                    max_graphemes: Some(128usize),
+                                    ..Default::default()
+                                }),
+                                min_length: Some(1usize),
+                                max_length: Some(16usize),
                                 ..Default::default()
                             }),
                         );

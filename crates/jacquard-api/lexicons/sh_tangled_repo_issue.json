@@ -13,6 +13,16 @@
           "createdAt"
         ],
         "properties": {
+          "blobs": {
+            "type": "array",
+            "items": {
+              "type": "blob",
+              "accept": [
+                "image/*"
+              ],
+              "maxSize": 1000000
+            }
+          },
           "body": {
             "type": "string"
           },

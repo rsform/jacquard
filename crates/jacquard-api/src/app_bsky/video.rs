@@ -6,16 +6,22 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `app.bsky.video` Lexicon namespace/module.
+pub mod abort_upload;
+pub mod finish_upload;
 pub mod get_job_status;
 pub mod get_upload_limits;
+pub mod get_upload_status;
+pub mod start_upload;
+pub mod upload_part;
 pub mod upload_video;
+
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,19 +35,19 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct JobStatus<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<BlobRef<S>>,
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<S>,
+    ///A machine-readable code for why the video processing job failed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failure_code: Option<JobStatusFailureCode<S>>,
     pub job_id: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
@@ -50,14 +56,127 @@ pub struct JobStatus<S: BosStr = DefaultStr> {
     pub progress: Option<i64>,
     ///The state of the video processing job. All values not listed as a known value indicate that the job is in process.
     pub state: JobStatusState<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_job_status_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// A machine-readable code for why the video processing job failed.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum JobStatusFailureCode<S: BosStr = DefaultStr> {
+    ValidationFailure,
+    EncodingFailure,
+    PdsUploadFailure,
+    PdsUploadUnsupportedBlobSize,
+    GenericFailure,
+    Other(S),
+}
+
+impl<S: BosStr> JobStatusFailureCode<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ValidationFailure => "validation_failure",
+            Self::EncodingFailure => "encoding_failure",
+            Self::PdsUploadFailure => "pds_upload_failure",
+            Self::PdsUploadUnsupportedBlobSize => "pds_upload_unsupported_blob_size",
+            Self::GenericFailure => "generic_failure",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "validation_failure" => Self::ValidationFailure,
+            "encoding_failure" => Self::EncodingFailure,
+            "pds_upload_failure" => Self::PdsUploadFailure,
+            "pds_upload_unsupported_blob_size" => Self::PdsUploadUnsupportedBlobSize,
+            "generic_failure" => Self::GenericFailure,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for JobStatusFailureCode<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for JobStatusFailureCode<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for JobStatusFailureCode<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for JobStatusFailureCode<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for JobStatusFailureCode<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for JobStatusFailureCode<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = JobStatusFailureCode<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            JobStatusFailureCode::ValidationFailure => {
+                JobStatusFailureCode::ValidationFailure
+            }
+            JobStatusFailureCode::EncodingFailure => {
+                JobStatusFailureCode::EncodingFailure
+            }
+            JobStatusFailureCode::PdsUploadFailure => {
+                JobStatusFailureCode::PdsUploadFailure
+            }
+            JobStatusFailureCode::PdsUploadUnsupportedBlobSize => {
+                JobStatusFailureCode::PdsUploadUnsupportedBlobSize
+            }
+            JobStatusFailureCode::GenericFailure => JobStatusFailureCode::GenericFailure,
+            JobStatusFailureCode::Other(v) => {
+                JobStatusFailureCode::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// The state of the video processing job. All values not listed as a known value indicate that the job is in process.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum JobStatusState<S: BosStr = DefaultStr> {
+    JobStateCreated,
+    JobStateEncoding,
+    JobStateEncoded,
+    JobStateScanning,
+    JobStateScanned,
+    JobStateUploading,
+    JobStateUploaded,
     JobStateCompleted,
     JobStateFailed,
     Other(S),
@@ -66,6 +185,13 @@ pub enum JobStatusState<S: BosStr = DefaultStr> {
 impl<S: BosStr> JobStatusState<S> {
     pub fn as_str(&self) -> &str {
         match self {
+            Self::JobStateCreated => "JOB_STATE_CREATED",
+            Self::JobStateEncoding => "JOB_STATE_ENCODING",
+            Self::JobStateEncoded => "JOB_STATE_ENCODED",
+            Self::JobStateScanning => "JOB_STATE_SCANNING",
+            Self::JobStateScanned => "JOB_STATE_SCANNED",
+            Self::JobStateUploading => "JOB_STATE_UPLOADING",
+            Self::JobStateUploaded => "JOB_STATE_UPLOADED",
             Self::JobStateCompleted => "JOB_STATE_COMPLETED",
             Self::JobStateFailed => "JOB_STATE_FAILED",
             Self::Other(s) => s.as_ref(),
@@ -74,6 +200,13 @@ impl<S: BosStr> JobStatusState<S> {
     /// Construct from a string-like value, matching known values.
     pub fn from_value(s: S) -> Self {
         match s.as_ref() {
+            "JOB_STATE_CREATED" => Self::JobStateCreated,
+            "JOB_STATE_ENCODING" => Self::JobStateEncoding,
+            "JOB_STATE_ENCODED" => Self::JobStateEncoded,
+            "JOB_STATE_SCANNING" => Self::JobStateScanning,
+            "JOB_STATE_SCANNED" => Self::JobStateScanned,
+            "JOB_STATE_UPLOADING" => Self::JobStateUploading,
+            "JOB_STATE_UPLOADED" => Self::JobStateUploaded,
             "JOB_STATE_COMPLETED" => Self::JobStateCompleted,
             "JOB_STATE_FAILED" => Self::JobStateFailed,
             _ => Self::Other(s),
@@ -126,6 +259,13 @@ where
     type Output = JobStatusState<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
+            JobStatusState::JobStateCreated => JobStatusState::JobStateCreated,
+            JobStatusState::JobStateEncoding => JobStatusState::JobStateEncoding,
+            JobStatusState::JobStateEncoded => JobStatusState::JobStateEncoded,
+            JobStatusState::JobStateScanning => JobStatusState::JobStateScanning,
+            JobStatusState::JobStateScanned => JobStatusState::JobStateScanned,
+            JobStatusState::JobStateUploading => JobStatusState::JobStateUploading,
+            JobStatusState::JobStateUploaded => JobStatusState::JobStateUploaded,
             JobStatusState::JobStateCompleted => JobStatusState::JobStateCompleted,
             JobStatusState::JobStateFailed => JobStatusState::JobStateFailed,
             JobStatusState::Other(v) => JobStatusState::Other(v.into_static()),
@@ -166,9 +306,22 @@ impl<S: BosStr> LexiconSchema for JobStatus<S> {
     }
 }
 
+fn deserialize_job_status_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod job_status_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -231,6 +384,7 @@ pub struct JobStatusBuilder<St: job_status_state::State, S: BosStr = DefaultStr>
         Option<BlobRef<S>>,
         Option<Did<S>>,
         Option<S>,
+        Option<JobStatusFailureCode<S>>,
         Option<S>,
         Option<S>,
         Option<i64>,
@@ -258,7 +412,7 @@ impl JobStatusBuilder<job_status_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         JobStatusBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -269,7 +423,7 @@ impl<S: BosStr> JobStatusBuilder<job_status_state::Empty, S> {
     pub fn builder() -> Self {
         JobStatusBuilder {
             _state: PhantomData,
-            _fields: (None, None, None, None, None, None, None),
+            _fields: (None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -320,6 +474,22 @@ impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     }
 }
 
+impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
+    /// Set the `failureCode` field (optional)
+    pub fn failure_code(
+        mut self,
+        value: impl Into<Option<JobStatusFailureCode<S>>>,
+    ) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `failureCode` field to an Option value (optional)
+    pub fn maybe_failure_code(mut self, value: Option<JobStatusFailureCode<S>>) -> Self {
+        self._fields.3 = value;
+        self
+    }
+}
+
 impl<St, S: BosStr> JobStatusBuilder<St, S>
 where
     St: job_status_state::State,
@@ -330,7 +500,7 @@ where
         mut self,
         value: impl Into<S>,
     ) -> JobStatusBuilder<job_status_state::SetJobId<St>, S> {
-        self._fields.3 = Option::Some(value.into());
+        self._fields.4 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -342,12 +512,12 @@ where
 impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
-        self._fields.4 = value.into();
+        self._fields.5 = value.into();
         self
     }
     /// Set the `message` field to an Option value (optional)
     pub fn maybe_message(mut self, value: Option<S>) -> Self {
-        self._fields.4 = value;
+        self._fields.5 = value;
         self
     }
 }
@@ -355,12 +525,12 @@ impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
 impl<St: job_status_state::State, S: BosStr> JobStatusBuilder<St, S> {
     /// Set the `progress` field (optional)
     pub fn progress(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.5 = value.into();
+        self._fields.6 = value.into();
         self
     }
     /// Set the `progress` field to an Option value (optional)
     pub fn maybe_progress(mut self, value: Option<i64>) -> Self {
-        self._fields.5 = value;
+        self._fields.6 = value;
         self
     }
 }
@@ -375,7 +545,7 @@ where
         mut self,
         value: impl Into<JobStatusState<S>>,
     ) -> JobStatusBuilder<job_status_state::SetState<St>, S> {
-        self._fields.6 = Option::Some(value.into());
+        self._fields.7 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -397,33 +567,38 @@ where
             blob: self._fields.0,
             did: self._fields.1.unwrap(),
             error: self._fields.2,
-            job_id: self._fields.3.unwrap(),
-            message: self._fields.4,
-            progress: self._fields.5,
-            state: self._fields.6.unwrap(),
+            failure_code: self._fields.3,
+            job_id: self._fields.4.unwrap(),
+            message: self._fields.5,
+            progress: self._fields.6,
+            state: self._fields.7.unwrap(),
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> JobStatus<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JobStatus<S> {
         JobStatus {
             blob: self._fields.0,
             did: self._fields.1.unwrap(),
             error: self._fields.2,
-            job_id: self._fields.3.unwrap(),
-            message: self._fields.4,
-            progress: self._fields.5,
-            state: self._fields.6.unwrap(),
+            failure_code: self._fields.3,
+            job_id: self._fields.4.unwrap(),
+            message: self._fields.5,
+            progress: self._fields.6,
+            state: self._fields.7.unwrap(),
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_app_bsky_video_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.bsky.video.defs"),
@@ -455,6 +630,17 @@ fn lexicon_doc_app_bsky_video_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("error"),
                             LexObjectProperty::String(LexString { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("failureCode"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "A machine-readable code for why the video processing job failed.",
+                                    ),
+                                ),
+                                ..Default::default()
+                            }),
                         );
                         map.insert(
                             SmolStr::new_static("jobId"),

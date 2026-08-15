@@ -695,6 +695,11 @@ async fn logout_deletes_session_and_clears_cookie() {
             .is_none()
     );
     server.get("/protected").await.assert_status_unauthorized();
+    server
+        .get("/protected")
+        .add_header("x-jacquard-session", encode_session_key(&key).unwrap())
+        .await
+        .assert_status_unauthorized();
 }
 
 #[tokio::test]

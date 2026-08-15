@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A comment on a deck, card, or note.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -45,7 +45,12 @@ pub struct Comment<S: BosStr = DefaultStr> {
     pub reply_to: Option<AtUri<S>>,
     ///The root subject being commented on.
     pub subject_ref: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_comment_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -119,9 +124,28 @@ impl<S: BosStr> LexiconSchema for Comment<S> {
     }
 }
 
+fn deserialize_comment_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,12 +204,7 @@ pub mod comment_state {
 /// Builder for constructing an instance of this type.
 pub struct CommentBuilder<St: comment_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Datetime>,
-        Option<AtUri<S>>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<S>, Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -231,7 +250,10 @@ where
     St::Body: comment_state::IsUnset,
 {
     /// Set the `body` field (required)
-    pub fn body(mut self, value: impl Into<S>) -> CommentBuilder<comment_state::SetBody<St>, S> {
+    pub fn body(
+        mut self,
+        value: impl Into<S>,
+    ) -> CommentBuilder<comment_state::SetBody<St>, S> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -322,10 +344,10 @@ where
 }
 
 fn lexicon_doc_org_stormlightlabs_malfestio_thread_comment() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.stormlightlabs.malfestio.thread.comment"),
@@ -334,14 +356,18 @@ fn lexicon_doc_org_stormlightlabs_malfestio_thread_comment() -> LexiconDoc<'stat
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A comment on a deck, card, or note.")),
+                    description: Some(
+                        CowStr::new_static("A comment on a deck, card, or note."),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("subjectRef"),
-                            SmolStr::new_static("body"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("subjectRef"),
+                                SmolStr::new_static("body"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -363,9 +389,9 @@ fn lexicon_doc_org_stormlightlabs_malfestio_thread_comment() -> LexiconDoc<'stat
                             map.insert(
                                 SmolStr::new_static("replyTo"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The parent comment if this is a reply.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The parent comment if this is a reply."),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),
@@ -373,9 +399,9 @@ fn lexicon_doc_org_stormlightlabs_malfestio_thread_comment() -> LexiconDoc<'stat
                             map.insert(
                                 SmolStr::new_static("subjectRef"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The root subject being commented on.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The root subject being commented on."),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Datetime};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Event<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -33,11 +30,9 @@ pub struct Event<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventOutput<S: BosStr = DefaultStr> {
     ///AT URI of the created event record.
     pub uri: AtUri<S>,
@@ -58,8 +53,9 @@ impl jacquard_common::xrpc::XrpcResp for EventResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Event<S> {
     const NSID: &'static str = "st.lifepo.event";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = EventResponse;
 }
 
@@ -69,15 +65,16 @@ Path: `/xrpc/st.lifepo.event`. The request payload type is `Event<S>`; send that
 pub struct EventRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for EventRequest {
     const PATH: &'static str = "/xrpc/st.lifepo.event";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Event<S>;
     type Response = EventResponse;
 }
 
 pub mod event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -213,7 +210,10 @@ where
     St::Title: event_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> EventBuilder<event_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> EventBuilder<event_state::SetTitle<St>, S> {
         self._fields.3 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,

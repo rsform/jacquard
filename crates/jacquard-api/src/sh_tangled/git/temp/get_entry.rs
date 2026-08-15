@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::sh_tangled::git::temp::Commit;
-use crate::sh_tangled::git::temp::Submodule;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp::Commit;
+use crate::sh_tangled::git::temp::Submodule;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntry<S: BosStr = DefaultStr> {
     pub path: S,
     /// Defaults to `"HEAD"`.
@@ -33,11 +30,9 @@ pub struct GetEntry<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEntryOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_commit: Option<Commit<S>>,
@@ -54,9 +49,18 @@ pub struct GetEntryOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetEntryError {
     /// Repository not found or access denied
@@ -73,10 +77,7 @@ pub enum GetEntryError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEntryError {
@@ -155,7 +156,7 @@ fn _default_ref<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -246,7 +247,10 @@ where
     St::Path: get_entry_state::IsUnset,
 {
     /// Set the `path` field (required)
-    pub fn path(mut self, value: impl Into<S>) -> GetEntryBuilder<get_entry_state::SetPath<St>, S> {
+    pub fn path(
+        mut self,
+        value: impl Into<S>,
+    ) -> GetEntryBuilder<get_entry_state::SetPath<St>, S> {
         self._fields.0 = Option::Some(value.into());
         GetEntryBuilder {
             _state: PhantomData,

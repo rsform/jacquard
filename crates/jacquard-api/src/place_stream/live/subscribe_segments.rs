@@ -5,22 +5,20 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use crate::place_stream::live::subscribe_segments;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_stream::live::subscribe_segments;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscribeSegments<S: BosStr = DefaultStr> {
     pub streamer: S,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -38,15 +36,21 @@ impl<S: BosStr> SubscribeSegmentsMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#segment" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Segment(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
@@ -57,31 +61,28 @@ pub type Segment = Bytes;
 pub struct SubscribeSegmentsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeSegmentsStream {
     const NSID: &'static str = "place.stream.live.subscribeSegments";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeSegmentsMessage<S>;
     type Error = jacquard_common::xrpc::GenericError;
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcSubscription for SubscribeSegments<S> {
     const NSID: &'static str = "place.stream.live.subscribeSegments";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeSegmentsStream;
 }
 
 pub struct SubscribeSegmentsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeSegmentsEndpoint {
     const PATH: &'static str = "/xrpc/place.stream.live.subscribeSegments";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribeSegments<S>;
     type Stream = SubscribeSegmentsStream;
 }
 
 pub mod subscribe_segments_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -112,7 +113,10 @@ pub mod subscribe_segments_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SubscribeSegmentsBuilder<St: subscribe_segments_state::State, S: BosStr = DefaultStr> {
+pub struct SubscribeSegmentsBuilder<
+    St: subscribe_segments_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
     _type: PhantomData<fn() -> S>,
@@ -120,7 +124,10 @@ pub struct SubscribeSegmentsBuilder<St: subscribe_segments_state::State, S: BosS
 
 impl SubscribeSegments<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SubscribeSegmentsBuilder<subscribe_segments_state::Empty, DefaultStr> {
+    pub fn new() -> SubscribeSegmentsBuilder<
+        subscribe_segments_state::Empty,
+        DefaultStr,
+    > {
         SubscribeSegmentsBuilder::new()
     }
 }

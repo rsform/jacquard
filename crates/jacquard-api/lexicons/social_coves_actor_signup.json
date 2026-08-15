@@ -1,0 +1,99 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.actor.signup",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Register a new account on the Coves instance. Creates account on PDS and indexes in AppView.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "handle",
+            "email",
+            "password"
+          ],
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Email address for account recovery and notifications",
+              "maxLength": 320
+            },
+            "handle": {
+              "type": "string",
+              "description": "Requested handle for the account (e.g., alice.coves.dev)",
+              "format": "handle"
+            },
+            "inviteCode": {
+              "type": "string",
+              "description": "Invite code (required if instance has invite-only registration)",
+              "maxLength": 128
+            },
+            "password": {
+              "type": "string",
+              "description": "Account password (must meet strength requirements)",
+              "maxLength": 512
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "handle",
+            "accessJwt",
+            "refreshJwt"
+          ],
+          "properties": {
+            "accessJwt": {
+              "type": "string",
+              "description": "Access token for authenticated requests",
+              "maxLength": 8192
+            },
+            "did": {
+              "type": "string",
+              "description": "The DID of the newly created account",
+              "format": "did"
+            },
+            "handle": {
+              "type": "string",
+              "description": "The handle of the newly created account",
+              "format": "handle"
+            },
+            "refreshJwt": {
+              "type": "string",
+              "description": "Refresh token for obtaining new access tokens",
+              "maxLength": 8192
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Handle does not meet format requirements",
+          "name": "InvalidHandle"
+        },
+        {
+          "description": "The requested handle is already taken",
+          "name": "HandleNotAvailable"
+        },
+        {
+          "description": "The provided invite code is invalid or expired",
+          "name": "InvalidInviteCode"
+        },
+        {
+          "description": "The email address is invalid",
+          "name": "InvalidEmail"
+        },
+        {
+          "description": "Password does not meet strength requirements",
+          "name": "WeakPassword"
+        }
+      ]
+    }
+  }
+}

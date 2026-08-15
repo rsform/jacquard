@@ -1,0 +1,36 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.repo.deleteWebhook",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a webhook from a repository.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "repoDid",
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "integer",
+              "description": "Webhook ID to delete."
+            },
+            "repoDid": {
+              "type": "string",
+              "description": "DID of the repository as minted by the knot.",
+              "format": "did"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "WebhookNotFound"
+        }
+      ]
+    }
+  }
+}

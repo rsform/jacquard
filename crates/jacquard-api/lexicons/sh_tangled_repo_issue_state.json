@@ -9,9 +9,14 @@
         "type": "object",
         "required": [
           "issue",
-          "state"
+          "state",
+          "createdAt"
         ],
         "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
           "issue": {
             "type": "string",
             "format": "at-uri"

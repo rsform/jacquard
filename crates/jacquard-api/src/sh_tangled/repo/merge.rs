@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Merge<S: BosStr = DefaultStr> {
     ///Author email for the merge commit
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,12 +57,25 @@ impl jacquard_common::xrpc::XrpcResp for MergeResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Merge<S> {
     const NSID: &'static str = "sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MergeResponse;
 }
 
@@ -75,15 +85,16 @@ Path: `/xrpc/sh.tangled.repo.merge`. The request payload type is `Merge<S>`; sen
 pub struct MergeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.merge";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Merge<S>;
     type Response = MergeResponse;
 }
 
 pub mod merge_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -224,7 +235,10 @@ where
     St::Branch: merge_state::IsUnset,
 {
     /// Set the `branch` field (required)
-    pub fn branch(mut self, value: impl Into<S>) -> MergeBuilder<merge_state::SetBranch<St>, S> {
+    pub fn branch(
+        mut self,
+        value: impl Into<S>,
+    ) -> MergeBuilder<merge_state::SetBranch<St>, S> {
         self._fields.2 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -292,7 +306,10 @@ where
     St::Patch: merge_state::IsUnset,
 {
     /// Set the `patch` field (required)
-    pub fn patch(mut self, value: impl Into<S>) -> MergeBuilder<merge_state::SetPatch<St>, S> {
+    pub fn patch(
+        mut self,
+        value: impl Into<S>,
+    ) -> MergeBuilder<merge_state::SetPatch<St>, S> {
         self._fields.7 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,
@@ -308,7 +325,10 @@ where
     St::Repo: merge_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<Did<S>>) -> MergeBuilder<merge_state::SetRepo<St>, S> {
+    pub fn repo(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> MergeBuilder<merge_state::SetRepo<St>, S> {
         self._fields.8 = Option::Some(value.into());
         MergeBuilder {
             _state: PhantomData,

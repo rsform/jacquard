@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::at_inlay::Element;
-use crate::at_inlay::Response;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::at_inlay::Element;
+use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Loading<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     pub fallback: Element<S>,
@@ -30,11 +27,9 @@ pub struct Loading<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LoadingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Response<S>,
@@ -55,8 +50,9 @@ impl jacquard_common::xrpc::XrpcResp for LoadingResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Loading<S> {
     const NSID: &'static str = "at.inlay.Loading";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = LoadingResponse;
 }
 
@@ -66,15 +62,16 @@ Path: `/xrpc/at.inlay.Loading`. The request payload type is `Loading<S>`; send t
 pub struct LoadingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LoadingRequest {
     const PATH: &'static str = "/xrpc/at.inlay.Loading";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Loading<S>;
     type Response = LoadingResponse;
 }
 
 pub mod loading_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

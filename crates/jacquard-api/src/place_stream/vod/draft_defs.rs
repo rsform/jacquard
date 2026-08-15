@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,14 +22,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A draft VOD with its ats:// URI and CID, for list/get responses.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DraftView<S: BosStr = DefaultStr> {
     ///CID (sha256 of CBOR record bytes, base32) of the draft record.
     pub cid: S,
@@ -37,7 +34,12 @@ pub struct DraftView<S: BosStr = DefaultStr> {
     pub record: Data<S>,
     ///The ats:// URI of the draft record.
     pub uri: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_draft_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -56,9 +58,22 @@ impl<S: BosStr> LexiconSchema for DraftView<S> {
     }
 }
 
+fn deserialize_draft_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod draft_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -163,7 +178,10 @@ where
     St::Cid: draft_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(mut self, value: impl Into<S>) -> DraftViewBuilder<draft_view_state::SetCid<St>, S> {
+    pub fn cid(
+        mut self,
+        value: impl Into<S>,
+    ) -> DraftViewBuilder<draft_view_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -198,7 +216,10 @@ where
     St::Uri: draft_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<S>) -> DraftViewBuilder<draft_view_state::SetUri<St>, S> {
+    pub fn uri(
+        mut self,
+        value: impl Into<S>,
+    ) -> DraftViewBuilder<draft_view_state::SetUri<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
@@ -225,7 +246,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DraftView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DraftView<S> {
         DraftView {
             cid: self._fields.0.unwrap(),
             record: self._fields.1.unwrap(),
@@ -236,10 +260,10 @@ where
 }
 
 fn lexicon_doc_place_stream_vod_draftDefs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.vod.draftDefs"),

@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnregisterPush<S: BosStr = DefaultStr> {
     pub app_id: S,
     pub platform: UnregisterPushPlatform<S>,
@@ -30,6 +27,7 @@ pub struct UnregisterPush<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UnregisterPushPlatform<S: BosStr = DefaultStr> {
@@ -107,7 +105,9 @@ where
             UnregisterPushPlatform::Ios => UnregisterPushPlatform::Ios,
             UnregisterPushPlatform::Android => UnregisterPushPlatform::Android,
             UnregisterPushPlatform::Web => UnregisterPushPlatform::Web,
-            UnregisterPushPlatform::Other(v) => UnregisterPushPlatform::Other(v.into_static()),
+            UnregisterPushPlatform::Other(v) => {
+                UnregisterPushPlatform::Other(v.into_static())
+            }
         }
     }
 }
@@ -121,12 +121,25 @@ impl jacquard_common::xrpc::XrpcResp for UnregisterPushResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UnregisterPush<S> {
     const NSID: &'static str = "app.bsky.notification.unregisterPush";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UnregisterPushResponse;
 }
 
@@ -136,15 +149,16 @@ Path: `/xrpc/app.bsky.notification.unregisterPush`. The request payload type is 
 pub struct UnregisterPushRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnregisterPushRequest {
     const PATH: &'static str = "/xrpc/app.bsky.notification.unregisterPush";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UnregisterPush<S>;
     type Response = UnregisterPushResponse;
 }
 
 pub mod unregister_push_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -217,14 +231,12 @@ pub mod unregister_push_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UnregisterPushBuilder<St: unregister_push_state::State, S: BosStr = DefaultStr> {
+pub struct UnregisterPushBuilder<
+    St: unregister_push_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<UnregisterPushPlatform<S>>,
-        Option<Did<S>>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<UnregisterPushPlatform<S>>, Option<Did<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -359,7 +371,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnregisterPush<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnregisterPush<S> {
         UnregisterPush {
             app_id: self._fields.0.unwrap(),
             platform: self._fields.1.unwrap(),

@@ -66,10 +66,10 @@
           },
           "targetFeeds": {
             "type": "array",
-            "description": "Specific feeds where this mute should apply. If empty, applies to all feeds",
+            "description": "Specific feeds where this mute should apply: feed generator / list at-uris, or the literal sentinel 'following' for the home timeline (which has no at-uri). Empty or absent applies everywhere. Matches net.anisota.graph.wordlist#targetFeeds.",
             "items": {
               "type": "string",
-              "format": "at-uri"
+              "maxLength": 512
             },
             "maxLength": 50
           }

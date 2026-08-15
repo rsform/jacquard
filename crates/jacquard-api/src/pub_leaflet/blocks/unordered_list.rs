@@ -20,20 +20,17 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::pub_leaflet::blocks::header::Header;
 use crate::pub_leaflet::blocks::image::Image;
 use crate::pub_leaflet::blocks::ordered_list::OrderedList;
 use crate::pub_leaflet::blocks::text::Text;
 use crate::pub_leaflet::blocks::unordered_list;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListItem<S: BosStr = DefaultStr> {
     ///If present, this item is a checklist item. true = checked, false = unchecked. If absent, this is a normal list item.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,9 +42,15 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     ///Nested ordered list items. Mutually exclusive with children; if both are present, children takes precedence.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ordered_list_children: Option<OrderedList<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_list_item_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -61,14 +64,17 @@ pub enum ListItemContent<S: BosStr = DefaultStr> {
     Image(Box<Image<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnorderedList<S: BosStr = DefaultStr> {
     pub children: Vec<unordered_list::ListItem<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_unordered_list_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -102,9 +108,22 @@ impl<S: BosStr> LexiconSchema for UnorderedList<S> {
     }
 }
 
+fn deserialize_list_item_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -197,12 +216,18 @@ impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
 
 impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
     /// Set the `children` field (optional)
-    pub fn children(mut self, value: impl Into<Option<Vec<unordered_list::ListItem<S>>>>) -> Self {
+    pub fn children(
+        mut self,
+        value: impl Into<Option<Vec<unordered_list::ListItem<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `children` field to an Option value (optional)
-    pub fn maybe_children(mut self, value: Option<Vec<unordered_list::ListItem<S>>>) -> Self {
+    pub fn maybe_children(
+        mut self,
+        value: Option<Vec<unordered_list::ListItem<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -229,7 +254,10 @@ where
 
 impl<St: list_item_state::State, S: BosStr> ListItemBuilder<St, S> {
     /// Set the `orderedListChildren` field (optional)
-    pub fn ordered_list_children(mut self, value: impl Into<Option<OrderedList<S>>>) -> Self {
+    pub fn ordered_list_children(
+        mut self,
+        value: impl Into<Option<OrderedList<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -268,10 +296,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.unorderedList"),
@@ -356,9 +384,22 @@ fn lexicon_doc_pub_leaflet_blocks_unorderedList() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_unordered_list_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod unordered_list_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -389,7 +430,10 @@ pub mod unordered_list_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UnorderedListBuilder<St: unordered_list_state::State, S: BosStr = DefaultStr> {
+pub struct UnorderedListBuilder<
+    St: unordered_list_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<unordered_list::ListItem<S>>>,),
     _type: PhantomData<fn() -> S>,
@@ -463,7 +507,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnorderedList<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnorderedList<S> {
         UnorderedList {
             children: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

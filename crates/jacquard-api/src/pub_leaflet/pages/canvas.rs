@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,6 +20,9 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::pub_leaflet::blocks::blockquote::Blockquote;
 use crate::pub_leaflet::blocks::bsky_post::BskyPost;
 use crate::pub_leaflet::blocks::button::Button;
@@ -43,15 +46,9 @@ use crate::pub_leaflet::blocks::text::Text;
 use crate::pub_leaflet::blocks::unordered_list::UnorderedList;
 use crate::pub_leaflet::blocks::website::Website;
 use crate::pub_leaflet::pages::canvas;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Block<S: BosStr = DefaultStr> {
     pub block: BlockBlock<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,9 +59,15 @@ pub struct Block<S: BosStr = DefaultStr> {
     pub width: i64,
     pub x: i64,
     pub y: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_block_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -116,42 +119,52 @@ pub enum BlockBlock<S: BosStr = DefaultStr> {
     MembersOnlyDelimiter(Box<MembersOnlyDelimiter<S>>),
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Canvas<S: BosStr = DefaultStr> {
     pub blocks: Vec<canvas::Block<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_canvas_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Position<S: BosStr = DefaultStr> {
     pub block: Vec<i64>,
     pub offset: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_position_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Quote<S: BosStr = DefaultStr> {
     pub end: canvas::Position<S>,
     pub start: canvas::Position<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_quote_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct TextAlignCenter;
@@ -161,6 +174,7 @@ impl core::fmt::Display for TextAlignCenter {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct TextAlignLeft;
 impl core::fmt::Display for TextAlignLeft {
@@ -168,6 +182,7 @@ impl core::fmt::Display for TextAlignLeft {
         write!(f, "textAlignLeft")
     }
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
 pub struct TextAlignRight;
@@ -237,9 +252,22 @@ impl<S: BosStr> LexiconSchema for Quote<S> {
     }
 }
 
+fn deserialize_block_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod block_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -412,7 +440,10 @@ where
     St::Width: block_state::IsUnset,
 {
     /// Set the `width` field (required)
-    pub fn width(mut self, value: impl Into<i64>) -> BlockBuilder<block_state::SetWidth<St>, S> {
+    pub fn width(
+        mut self,
+        value: impl Into<i64>,
+    ) -> BlockBuilder<block_state::SetWidth<St>, S> {
         self._fields.3 = Option::Some(value.into());
         BlockBuilder {
             _state: PhantomData,
@@ -489,10 +520,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.pages.canvas"),
@@ -501,12 +532,12 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("block"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("block"),
-                        SmolStr::new_static("x"),
-                        SmolStr::new_static("y"),
-                        SmolStr::new_static("width"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("block"), SmolStr::new_static("x"),
+                            SmolStr::new_static("y"), SmolStr::new_static("width")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -529,15 +560,13 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
                                     CowStr::new_static("pub.leaflet.blocks.horizontalRule"),
                                     CowStr::new_static("pub.leaflet.blocks.bskyPost"),
                                     CowStr::new_static("pub.leaflet.blocks.standardSitePost"),
-                                    CowStr::new_static(
-                                        "pub.leaflet.blocks.standardSitePublication",
-                                    ),
+                                    CowStr::new_static("pub.leaflet.blocks.standardSitePublication"),
                                     CowStr::new_static("pub.leaflet.blocks.page"),
                                     CowStr::new_static("pub.leaflet.blocks.poll"),
                                     CowStr::new_static("pub.leaflet.blocks.button"),
                                     CowStr::new_static("pub.leaflet.blocks.postsList"),
                                     CowStr::new_static("pub.leaflet.blocks.signup"),
-                                    CowStr::new_static("pub.leaflet.blocks.membersOnlyDelimiter"),
+                                    CowStr::new_static("pub.leaflet.blocks.membersOnlyDelimiter")
                                 ],
                                 ..Default::default()
                             }),
@@ -596,9 +625,7 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("id"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -608,10 +635,9 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("position"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("block"),
-                        SmolStr::new_static("offset"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("block"), SmolStr::new_static("offset")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -638,10 +664,9 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("quote"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("start"),
-                        SmolStr::new_static("end"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("start"), SmolStr::new_static("end")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -666,21 +691,15 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("textAlignCenter"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("textAlignLeft"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("textAlignRight"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },
@@ -688,9 +707,22 @@ fn lexicon_doc_pub_leaflet_pages_canvas() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_canvas_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod canvas_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -818,9 +850,22 @@ where
     }
 }
 
+fn deserialize_position_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod position_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -967,9 +1012,22 @@ where
     }
 }
 
+fn deserialize_quote_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod quote_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

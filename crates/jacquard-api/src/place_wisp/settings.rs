@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::place_wisp::settings;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::place_wisp::settings;
 /// Custom HTTP header configuration
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CustomHeader<S: BosStr = DefaultStr> {
     ///HTTP header name (e.g., 'Cache-Control', 'X-Frame-Options')
     pub name: S,
@@ -43,7 +40,12 @@ pub struct CustomHeader<S: BosStr = DefaultStr> {
     pub path: Option<S>,
     ///HTTP header value
     pub value: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_custom_header_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -77,7 +79,12 @@ pub struct Settings<S: BosStr = DefaultStr> {
     ///File to serve for all routes (e.g., 'index.html'). When set, enables SPA mode where all non-file requests are routed to this file. Incompatible with directoryListing and custom404.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub spa_mode: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_settings_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -239,11 +246,24 @@ impl<S: BosStr> LexiconSchema for Settings<S> {
     }
 }
 
+fn deserialize_custom_header_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_place_wisp_settings() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.wisp.settings"),
@@ -392,6 +412,25 @@ fn lexicon_doc_place_wisp_settings() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_settings_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 fn _default_settings_clean_urls() -> Option<bool> {
     Some(false)
 }
@@ -416,7 +455,7 @@ impl Default for Settings {
 
 pub mod settings_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -524,12 +563,18 @@ impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
 
 impl<St: settings_state::State, S: BosStr> SettingsBuilder<St, S> {
     /// Set the `headers` field (optional)
-    pub fn headers(mut self, value: impl Into<Option<Vec<settings::CustomHeader<S>>>>) -> Self {
+    pub fn headers(
+        mut self,
+        value: impl Into<Option<Vec<settings::CustomHeader<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `headers` field to an Option value (optional)
-    pub fn maybe_headers(mut self, value: Option<Vec<settings::CustomHeader<S>>>) -> Self {
+    pub fn maybe_headers(
+        mut self,
+        value: Option<Vec<settings::CustomHeader<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }

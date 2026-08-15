@@ -314,7 +314,7 @@ fn extract_integer_validations(
 ) -> Vec<ValidationCheck> {
     let mut checks = Vec::new();
 
-    if let Some(max) = integer.maximum {
+    if let Some(max) = integer.maximum.filter(|max| *max != i64::MAX) {
         checks.push(ValidationCheck {
             field_name: field_name.to_string(),
             schema_name: schema_name.to_string(),
@@ -326,7 +326,7 @@ fn extract_integer_validations(
         });
     }
 
-    if let Some(min) = integer.minimum {
+    if let Some(min) = integer.minimum.filter(|min| *min != i64::MIN) {
         checks.push(ValidationCheck {
             field_name: field_name.to_string(),
             schema_name: schema_name.to_string(),
@@ -354,6 +354,32 @@ fn field_name_from_schema(schema_name: &str) -> String {
 mod tests {
     use super::*;
     use std::fs;
+
+    #[test]
+    fn omits_extremal_integer_bounds_but_keeps_meaningful_bounds() {
+        let extremal = LexInteger {
+            minimum: Some(i64::MIN),
+            maximum: Some(i64::MAX),
+            ..Default::default()
+        };
+        assert!(extract_integer_validations("value", "value", &extremal, true, false).is_empty());
+
+        let bounded = LexInteger {
+            minimum: Some(i64::MIN + 1),
+            maximum: Some(i64::MAX - 1),
+            ..Default::default()
+        };
+        let checks = extract_integer_validations("value", "value", &bounded, true, false);
+        assert_eq!(checks.len(), 2);
+        assert!(matches!(
+            checks[0].check,
+            ConstraintCheck::Maximum { max } if max == i64::MAX - 1
+        ));
+        assert!(matches!(
+            checks[1].check,
+            ConstraintCheck::Minimum { min } if min == i64::MIN + 1
+        ));
+    }
 
     #[test]
     fn follows_reused_cross_namespace_scalar_refs_and_array_items() {

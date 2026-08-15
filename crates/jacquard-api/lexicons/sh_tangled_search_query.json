@@ -1,0 +1,110 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.search.query",
+  "defs": {
+    "hit": {
+      "type": "object",
+      "required": [
+        "uri",
+        "nsid",
+        "score",
+        "value"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "nsid": {
+          "type": "string",
+          "description": "Collection of the matched record.",
+          "format": "nsid"
+        },
+        "score": {
+          "type": "unknown",
+          "description": "Relevance score of the hit, a floating-point number where higher ranks first."
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "value": {
+          "type": "unknown",
+          "description": "Embedded matched record."
+        }
+      }
+    },
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "q"
+        ],
+        "properties": {
+          "author": {
+            "type": "string",
+            "description": "Restrict to records authored by this DID.",
+            "format": "did"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 1000
+          },
+          "nsid": {
+            "type": "string",
+            "description": "Restrict to records of this collection.",
+            "format": "nsid"
+          },
+          "q": {
+            "type": "string",
+            "description": "Full-text search query.",
+            "minLength": 1
+          },
+          "repo": {
+            "type": "string",
+            "description": "Restrict to records under this repo DID.",
+            "format": "did"
+          },
+          "since": {
+            "type": "string",
+            "description": "Restrict to records created at or after this time.",
+            "format": "datetime"
+          },
+          "until": {
+            "type": "string",
+            "description": "Restrict to records created at or before this time.",
+            "format": "datetime"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "hits"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "hits": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#hit"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

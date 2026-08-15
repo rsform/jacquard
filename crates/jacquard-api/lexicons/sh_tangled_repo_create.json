@@ -29,7 +29,8 @@
             },
             "rkey": {
               "type": "string",
-              "description": "Rkey of the repository record"
+              "description": "Rkey of the repository record",
+              "format": "record-key"
             },
             "source": {
               "type": "string",
@@ -43,6 +44,10 @@
         "schema": {
           "type": "object",
           "properties": {
+            "key": {
+              "type": "string",
+              "description": "Multibase-encoded public signing key the knot holds for this repository"
+            },
             "repoDid": {
               "type": "string",
               "format": "did"

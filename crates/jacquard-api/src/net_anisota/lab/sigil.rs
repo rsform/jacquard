@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A sigil crafted in the Anisota Lab's Sigil studio and saved to the owner's library. Each record stores the finished figure as a standalone SVG (for display and re-export) and its normalised 'core path' as integer coordinates (x and y interleaved, scaled 0..1000) — the single line a sigil is, and the shape a future gesture-passcode could be matched against. 'method' records which bench made it (intent, square, wheel or draw).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -52,7 +52,12 @@ pub struct Sigil<S: BosStr = DefaultStr> {
     ///A standalone SVG document of the finished figure
     #[serde(skip_serializing_if = "Option::is_none")]
     pub svg: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_sigil_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -159,9 +164,28 @@ impl<S: BosStr> LexiconSchema for Sigil<S> {
     }
 }
 
+fn deserialize_sigil_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod sigil_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -305,7 +329,10 @@ where
     St::Method: sigil_state::IsUnset,
 {
     /// Set the `method` field (required)
-    pub fn method(mut self, value: impl Into<S>) -> SigilBuilder<sigil_state::SetMethod<St>, S> {
+    pub fn method(
+        mut self,
+        value: impl Into<S>,
+    ) -> SigilBuilder<sigil_state::SetMethod<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SigilBuilder {
             _state: PhantomData,
@@ -321,7 +348,10 @@ where
     St::Name: sigil_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SigilBuilder<sigil_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> SigilBuilder<sigil_state::SetName<St>, S> {
         self._fields.3 = Option::Some(value.into());
         SigilBuilder {
             _state: PhantomData,
@@ -391,10 +421,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_lab_sigil() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.lab.sigil"),

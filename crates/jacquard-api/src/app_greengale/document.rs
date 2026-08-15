@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,23 +24,25 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_greengale::blog::BlobMetadata;
 use crate::app_greengale::blog::Ogp;
 use crate::app_greengale::blog::Theme;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Reference to external content via AT-URI. Used in site.standard.document content union.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContentRef<S: BosStr = DefaultStr> {
     ///AT-URI pointing to the full document content
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_content_ref_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -83,7 +85,12 @@ pub struct Document<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_document_visibility")]
     pub visibility: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_document_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -199,6 +206,33 @@ impl<S: BosStr> LexiconSchema for Document<S> {
                 });
             }
         }
+        if let Some(values) = &self.tags {
+            for value in values {
+                #[allow(unused_comparisons)]
+                if <str>::len(value.as_ref()) > 100usize {
+                    return Err(ConstraintError::MaxLength {
+                        path: ValidationPath::from_field("tags"),
+                        max: 100usize,
+                        actual: <str>::len(value.as_ref()),
+                    });
+                }
+            }
+        }
+        if let Some(values) = &self.tags {
+            for value in values {
+                {
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
+                        .count();
+                    if count > 50usize {
+                        return Err(ConstraintError::MaxGraphemes {
+                            path: ValidationPath::from_field("tags"),
+                            max: 50usize,
+                            actual: count,
+                        });
+                    }
+                }
+            }
+        }
         {
             let value = &self.title;
             #[allow(unused_comparisons)]
@@ -235,9 +269,22 @@ impl<S: BosStr> LexiconSchema for Document<S> {
     }
 }
 
+fn deserialize_content_ref_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod content_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -342,7 +389,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContentRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContentRef<S> {
         ContentRef {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -351,10 +401,10 @@ where
 }
 
 fn lexicon_doc_app_greengale_document() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.greengale.document"),
@@ -541,6 +591,25 @@ fn lexicon_doc_app_greengale_document() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_document_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 fn _default_document_latex() -> Option<bool> {
     Some(false)
 }
@@ -551,7 +620,7 @@ fn _default_document_visibility<S: FromStaticStr>() -> ::core::option::Option<S>
 
 pub mod document_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -681,7 +750,18 @@ impl DocumentBuilder<document_state::Empty, DefaultStr> {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -694,7 +774,18 @@ impl<S: BosStr> DocumentBuilder<document_state::Empty, S> {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -765,7 +856,10 @@ where
     St::Path: document_state::IsUnset,
 {
     /// Set the `path` field (required)
-    pub fn path(mut self, value: impl Into<S>) -> DocumentBuilder<document_state::SetPath<St>, S> {
+    pub fn path(
+        mut self,
+        value: impl Into<S>,
+    ) -> DocumentBuilder<document_state::SetPath<St>, S> {
         self._fields.4 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,

@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A cryptographic grant allowing a streaming service to decrypt the artist's music catalog. This record contains the master content key encrypted with the service's public key.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -53,7 +53,12 @@ pub struct Grant<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_grant_wrapping_algorithm")]
     pub wrapping_algorithm: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_grant_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -158,13 +163,32 @@ impl<S: BosStr> LexiconSchema for Grant<S> {
     }
 }
 
+fn deserialize_grant_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 fn _default_grant_wrapping_algorithm<S: FromStaticStr>() -> ::core::option::Option<S> {
     Some(S::from_static("RSA-OAEP"))
 }
 
 pub mod grant_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -381,7 +405,10 @@ where
             service_did: self._fields.2.unwrap(),
             wrapped_master_key: self._fields.3.unwrap(),
             wrapped_master_key_iv: self._fields.4,
-            wrapping_algorithm: self._fields.5.or_else(|| Some(S::from_static("RSA-OAEP"))),
+            wrapping_algorithm: self
+                ._fields
+                .5
+                .or_else(|| Some(S::from_static("RSA-OAEP"))),
             extra_data: Default::default(),
         }
     }
@@ -393,17 +420,20 @@ where
             service_did: self._fields.2.unwrap(),
             wrapped_master_key: self._fields.3.unwrap(),
             wrapped_master_key_iv: self._fields.4,
-            wrapping_algorithm: self._fields.5.or_else(|| Some(S::from_static("RSA-OAEP"))),
+            wrapping_algorithm: self
+                ._fields
+                .5
+                .or_else(|| Some(S::from_static("RSA-OAEP"))),
             extra_data: Some(extra_data),
         }
     }
 }
 
 fn lexicon_doc_ch_indiemusi_alpha_grant() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ch.indiemusi.alpha.grant"),

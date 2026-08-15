@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::beta::game::collection;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::collection;
 /// Beta version: Record representing a collected specimen in a player's collection
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -83,7 +83,12 @@ pub struct Collection<S: BosStr = DefaultStr> {
     ///Collection status of this specimen
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_collection_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -101,10 +106,7 @@ pub struct CollectionGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional details about how the specimen was acquired
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SourceDetails<S: BosStr = DefaultStr> {
     ///Number of attempts before successful capture
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -118,17 +120,19 @@ pub struct SourceDetails<S: BosStr = DefaultStr> {
     ///Location where specimen was found or observed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub location: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_source_details_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Complete specimen information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SpecimenData<S: BosStr = DefaultStr> {
     ///Scientific authorship of the species
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -136,7 +140,12 @@ pub struct SpecimenData<S: BosStr = DefaultStr> {
     ///Detailed description of the specimen
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_specimen_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -289,9 +298,28 @@ impl<S: BosStr> LexiconSchema for SpecimenData<S> {
     }
 }
 
+fn deserialize_collection_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod collection_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -408,8 +436,23 @@ impl CollectionBuilder<collection_state::Empty, DefaultStr> {
         CollectionBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -422,8 +465,23 @@ impl<S: BosStr> CollectionBuilder<collection_state::Empty, S> {
         CollectionBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -614,7 +672,10 @@ impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
         self
     }
     /// Set the `sourceDetails` field to an Option value (optional)
-    pub fn maybe_source_details(mut self, value: Option<collection::SourceDetails<S>>) -> Self {
+    pub fn maybe_source_details(
+        mut self,
+        value: Option<collection::SourceDetails<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
@@ -635,12 +696,18 @@ impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
 
 impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `specimenData` field (optional)
-    pub fn specimen_data(mut self, value: impl Into<Option<collection::SpecimenData<S>>>) -> Self {
+    pub fn specimen_data(
+        mut self,
+        value: impl Into<Option<collection::SpecimenData<S>>>,
+    ) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `specimenData` field to an Option value (optional)
-    pub fn maybe_specimen_data(mut self, value: Option<collection::SpecimenData<S>>) -> Self {
+    pub fn maybe_specimen_data(
+        mut self,
+        value: Option<collection::SpecimenData<S>>,
+    ) -> Self {
         self._fields.14 = value;
         self
     }
@@ -710,7 +777,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Collection<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Collection<S> {
         Collection {
             acquired_at: self._fields.0.unwrap(),
             common_name: self._fields.1,
@@ -735,10 +805,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_beta_game_collection() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.collection"),
@@ -983,25 +1053,27 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("specimenData"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Complete specimen information")),
+                    description: Some(
+                        CowStr::new_static("Complete specimen information"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("authorship"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Scientific authorship of the species",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Scientific authorship of the species"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Detailed description of the specimen",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Detailed description of the specimen"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1014,4 +1086,30 @@ fn lexicon_doc_net_anisota_beta_game_collection() -> LexiconDoc<'static> {
         },
         ..Default::default()
     }
+}
+
+fn deserialize_source_details_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_specimen_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

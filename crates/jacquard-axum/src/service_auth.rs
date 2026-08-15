@@ -8,7 +8,8 @@
 //!
 //! Global service-id allow-lists constrain present `aud` fragments but do not
 //! require a fragment. Use [`require_service_id`] as a route layer for endpoints
-//! that require a specific `did:web:example.com#service_id` audience fragment.
+//! whose present `did:web:example.com#service_id` audience fragment must match
+//! the configured service id; bare service-DID audiences remain valid.
 //!
 //! [`ExtractOptionalServiceAuth`] treats only an absent Authorization header as
 //! anonymous. Present malformed, invalid, or replayed credentials are rejected.
@@ -375,25 +376,28 @@ impl<R: IdentityResolver> ServiceAuth for ServiceAuthConfig<R> {
 /// Route-scoped service auth policy.
 #[derive(Debug, Clone, Default)]
 pub struct ServiceAuthRoutePolicy {
-    /// Required service-id fragment for this route.
+    /// Configured service-id fragment to check when present in the audience.
     required_service_id: Option<SmolStr>,
 }
 
 impl ServiceAuthRoutePolicy {
-    /// Require a specific service-id fragment for this route.
+    /// Check a present service-id fragment against this route.
     pub fn require_service_id(service_id: impl Into<SmolStr>) -> Self {
         Self {
             required_service_id: Some(service_id.into()),
         }
     }
 
-    /// Get the required service-id fragment.
+    /// Get the configured service-id fragment to check when present.
     pub fn required_service_id(&self) -> Option<&str> {
         self.required_service_id.as_deref()
     }
 }
 
-/// Create an axum route layer that requires a specific service-id fragment.
+/// Create an Axum route layer that checks a present service-id fragment.
+///
+/// Bare service-DID audiences remain valid; when the token includes a fragment,
+/// it must match this route's service id.
 pub fn require_service_id(service_id: impl Into<SmolStr>) -> Extension<ServiceAuthRoutePolicy> {
     Extension(ServiceAuthRoutePolicy::require_service_id(service_id))
 }
@@ -573,6 +577,15 @@ pub enum ServiceAuthError {
     #[error("lxm (method binding) is required but missing from token")]
     MethodBindingRequired,
 
+    /// Method binding does not match the generated endpoint.
+    #[error("lxm method binding mismatch: expected {expected}, got {actual}")]
+    MethodBindingMismatch {
+        /// Generated endpoint NSID.
+        expected: Nsid,
+        /// Token's method binding.
+        actual: Nsid,
+    },
+
     /// Invalid key format
     #[error("invalid key format: {0}")]
     InvalidKey(String),
@@ -626,7 +639,8 @@ impl IntoResponse for ServiceAuthError {
                 "AuthenticationRequired",
                 self.to_string(),
             ),
-            ServiceAuthError::MethodBindingRequired => (
+            ServiceAuthError::MethodBindingRequired
+            | ServiceAuthError::MethodBindingMismatch { .. } => (
                 StatusCode::UNAUTHORIZED,
                 "AuthenticationRequired",
                 self.to_string(),
@@ -719,22 +733,31 @@ where
     if state.require_lxm() && claims.lxm.is_none() {
         return Err(ServiceAuthError::MethodBindingRequired);
     }
+    if let Some(lxm) = claims.lxm.as_ref() {
+        let method = parts
+            .uri
+            .path()
+            .strip_prefix("/xrpc/")
+            .and_then(|path| Nsid::new_owned(path).ok());
+        if let Some(method) = method {
+            if lxm.as_str() != method.as_str() {
+                return Err(ServiceAuthError::MethodBindingMismatch {
+                    expected: method,
+                    actual: lxm.clone().into_static(),
+                });
+            }
+        }
+    }
 
     if let Some(policy) = parts.extensions.get::<ServiceAuthRoutePolicy>() {
         if let Some(required) = policy.required_service_id() {
-            match claims.aud.service() {
-                Some(actual) if actual == required => {}
-                Some(actual) => {
-                    return Err(ServiceAuthError::RouteServiceIdMismatch {
-                        required: SmolStr::new(required),
-                        actual: SmolStr::new(actual),
-                    });
-                }
-                None => {
-                    return Err(ServiceAuthError::ServiceIdRequired {
-                        required: SmolStr::new(required),
-                    });
-                }
+            if let Some(actual) = claims.aud.service()
+                && actual != required
+            {
+                return Err(ServiceAuthError::RouteServiceIdMismatch {
+                    required: SmolStr::new(required),
+                    actual: SmolStr::new(actual),
+                });
             }
         }
     }

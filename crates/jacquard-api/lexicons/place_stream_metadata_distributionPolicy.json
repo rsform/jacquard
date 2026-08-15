@@ -6,6 +6,10 @@
       "type": "object",
       "description": "Distribution and rebroadcast policy.",
       "properties": {
+        "allowGenAiTraining": {
+          "type": "boolean",
+          "description": "Whether this content may be used as training data for generative AI models. Absent means undeclared; Streamplace treats undeclared as false and stamps an explicit value into every minted segment. Covers generative AI only — non-generative machine learning (e.g. moderation, accessibility, speech models) is not governed by this flag."
+        },
         "allowedBroadcasters": {
           "type": "array",
           "description": "List of did:webs of the broadcasters you want to allow to distribute your content. \"*\" allows anyone. Starting a line with a \"!\" bans that broadcaster.",

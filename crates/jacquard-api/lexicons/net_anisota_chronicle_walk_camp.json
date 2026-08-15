@@ -1,0 +1,179 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.walk.camp",
+  "defs": {
+    "campConditions": {
+      "type": "object",
+      "description": "Environmental conditions when camp was made",
+      "properties": {
+        "lightLevel": {
+          "type": "string",
+          "description": "Time-of-day light condition when camp was made",
+          "enum": [
+            "dawn",
+            "morning",
+            "midday",
+            "afternoon",
+            "dusk",
+            "night",
+            "deepnight"
+          ]
+        },
+        "weather": {
+          "type": "string",
+          "description": "Weather condition when camp was made",
+          "enum": [
+            "clear",
+            "overcast",
+            "rainy",
+            "stormy",
+            "foggy"
+          ]
+        }
+      }
+    },
+    "campLight": {
+      "type": "object",
+      "description": "Light levels at camp start/end",
+      "properties": {
+        "atBreak": {
+          "type": "integer",
+          "description": "Light level when camp was broken (in minutes)",
+          "minimum": 0
+        },
+        "atCamp": {
+          "type": "integer",
+          "description": "Light level when camp was made (in minutes)",
+          "minimum": 0
+        },
+        "regenerated": {
+          "type": "integer",
+          "description": "Light regenerated during camp",
+          "minimum": 0
+        }
+      }
+    },
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Camp record. Created when a user makes camp during a walk. Updated when camp is broken. References the parent walk record via AT URI.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "walkRef",
+          "status",
+          "campedAt",
+          "reason",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "brokeAt": {
+            "type": "string",
+            "description": "When camp was broken (only set when status is 'completed')",
+            "format": "datetime"
+          },
+          "campNumber": {
+            "type": "integer",
+            "description": "Sequential camp number within the parent walk (1, 2, 3...)",
+            "minimum": 1
+          },
+          "campedAt": {
+            "type": "string",
+            "description": "When camp was set up",
+            "format": "datetime"
+          },
+          "conditions": {
+            "type": "ref",
+            "ref": "#campConditions"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the record was created",
+            "format": "datetime"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Total camp duration in minutes (only set when status is 'completed'). Minutes throughout the walk system, unlike the legacy expedition camp lexicon's milliseconds.",
+            "minimum": 0
+          },
+          "light": {
+            "type": "ref",
+            "ref": "#campLight"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why camp was made",
+            "enum": [
+              "user_initiated",
+              "light_low",
+              "stamina_low",
+              "conditions_harsh"
+            ]
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "status": {
+            "type": "string",
+            "description": "Whether the camp is currently active or has been broken",
+            "enum": [
+              "active",
+              "completed"
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the record was last updated (set on break camp)",
+            "format": "datetime"
+          },
+          "walkRef": {
+            "type": "string",
+            "description": "AT URI of the parent walk record (net.anisota.chronicle.walk)",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

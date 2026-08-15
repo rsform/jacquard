@@ -8,38 +8,40 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::dev_atfs::file::File;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::dev_atfs::file::File;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListFiles<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
+    /// (min length: 1)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub did: Option<Did<S>>,
     /// Defaults to `500`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tag: Option<Vec<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListFilesOutput<S: BosStr = DefaultStr> {
     ///Present only when this page filled up to the requested limit, meaning more files may follow. Its absence marks the final page.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
+    ///Each entry's tags field (see dev.atfs.file) is a flat union: every tag borne by ANY of that file's claims, account-class and mirrored-server alike, with no indication of which claimant applied which — listFiles never discloses who pinned or tagged anything. Pass the `did` parameter above to scope both this listing and each entry's tags to one claimant's own claims instead.
     pub files: Vec<File<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -79,7 +81,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod list_files_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,7 +101,7 @@ pub mod list_files_state {
 /// Builder for constructing an instance of this type.
 pub struct ListFilesBuilder<St: list_files_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>),
+    _fields: (Option<S>, Option<Did<S>>, Option<i64>, Option<Vec<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -122,7 +124,7 @@ impl ListFilesBuilder<list_files_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ListFilesBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -133,7 +135,7 @@ impl<S: BosStr> ListFilesBuilder<list_files_state::Empty, S> {
     pub fn builder() -> Self {
         ListFilesBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -153,14 +155,40 @@ impl<St: list_files_state::State, S: BosStr> ListFilesBuilder<St, S> {
 }
 
 impl<St: list_files_state::State, S: BosStr> ListFilesBuilder<St, S> {
+    /// Set the `did` field (optional)
+    pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `did` field to an Option value (optional)
+    pub fn maybe_did(mut self, value: Option<Did<S>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: list_files_state::State, S: BosStr> ListFilesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `limit` field to an Option value (optional)
     pub fn maybe_limit(mut self, value: Option<i64>) -> Self {
-        self._fields.1 = value;
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St: list_files_state::State, S: BosStr> ListFilesBuilder<St, S> {
+    /// Set the `tag` field (optional)
+    pub fn tag(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+        self._fields.3 = value.into();
+        self
+    }
+    /// Set the `tag` field to an Option value (optional)
+    pub fn maybe_tag(mut self, value: Option<Vec<S>>) -> Self {
+        self._fields.3 = value;
         self
     }
 }
@@ -173,7 +201,9 @@ where
     pub fn build(self) -> ListFiles<S> {
         ListFiles {
             cursor: self._fields.0,
-            limit: self._fields.1,
+            did: self._fields.1,
+            limit: self._fields.2,
+            tag: self._fields.3,
         }
     }
 }

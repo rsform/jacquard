@@ -1,0 +1,67 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.ci.describeWorkflowDefinition",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Resolve the workflow definition a pipeline would use at a given commit and return a fingerprint of it.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repo",
+          "sha"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "Target repository DID the workflow definition belongs to.",
+            "format": "did"
+          },
+          "sha": {
+            "type": "string",
+            "description": "Commit SHA to resolve the workflow definition at",
+            "minLength": 40,
+            "maxLength": 40
+          },
+          "sourceRepo": {
+            "type": "string",
+            "description": "Repository DID to resolve workflow definitions from, if different from the target repo",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "derived"
+          ],
+          "properties": {
+            "derived": {
+              "type": "boolean",
+              "description": "Whether the workflow definition is derived from this repository at all. When false, no commit-to-commit comparison is meaningful (e.g. definitions managed externally), and callers should not surface change warnings."
+            },
+            "hash": {
+              "type": "string",
+              "description": "Fingerprint of the workflow definition as resolved by the spindle. Absent when derived is false."
+            },
+            "workflows": {
+              "type": "array",
+              "description": "Names or paths of the effective workflow files that produced the hash.",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

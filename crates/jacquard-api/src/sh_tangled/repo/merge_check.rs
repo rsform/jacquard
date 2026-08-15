@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,30 +21,30 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::repo::merge_check;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::repo::merge_check;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ConflictInfo<S: BosStr = DefaultStr> {
     ///Name of the conflicted file
     pub filename: S,
     ///Reason for the conflict
     pub reason: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_conflict_info_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MergeCheck<S: BosStr = DefaultStr> {
     ///Target branch to merge into
     pub branch: S,
@@ -62,11 +62,9 @@ pub struct MergeCheck<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MergeCheckOutput<S: BosStr = DefaultStr> {
     ///List of files with merge conflicts
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -111,8 +109,9 @@ impl jacquard_common::xrpc::XrpcResp for MergeCheckResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for MergeCheck<S> {
     const NSID: &'static str = "sh.tangled.repo.mergeCheck";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = MergeCheckResponse;
 }
 
@@ -122,17 +121,31 @@ Path: `/xrpc/sh.tangled.repo.mergeCheck`. The request payload type is `MergeChec
 pub struct MergeCheckRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MergeCheckRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.mergeCheck";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = MergeCheck<S>;
     type Response = MergeCheckResponse;
 }
 
+fn deserialize_conflict_info_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_sh_tangled_repo_mergeCheck() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.mergeCheck"),
@@ -141,26 +154,30 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("conflictInfo"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("filename"),
-                        SmolStr::new_static("reason"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("filename"),
+                            SmolStr::new_static("reason")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("filename"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Name of the conflicted file",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Name of the conflicted file"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("reason"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Reason for the conflict")),
+                                description: Some(
+                                    CowStr::new_static("Reason for the conflict"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -256,7 +273,7 @@ fn lexicon_doc_sh_tangled_repo_mergeCheck() -> LexiconDoc<'static> {
 
 pub mod merge_check_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -315,13 +332,7 @@ pub mod merge_check_state {
 /// Builder for constructing an instance of this type.
 pub struct MergeCheckBuilder<St: merge_check_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Did<S>>,
-        Option<S>,
-        Option<S>,
-        Option<Did<S>>,
-    ),
+    _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -463,7 +474,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> MergeCheck<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MergeCheck<S> {
         MergeCheck {
             branch: self._fields.0.unwrap(),
             did: self._fields.1,

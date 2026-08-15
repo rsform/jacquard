@@ -13,12 +13,13 @@ pub mod get_values;
 pub mod query_sets;
 pub mod upsert_set;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,26 +32,26 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Set<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
     pub name: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_set_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SetView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,7 +59,12 @@ pub struct SetView<S: BosStr = DefaultStr> {
     pub name: S,
     pub set_size: i64,
     pub updated_at: Datetime,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_set_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -180,11 +186,24 @@ impl<S: BosStr> LexiconSchema for SetView<S> {
     }
 }
 
+fn deserialize_set_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_tools_ozone_set_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.set.defs"),
@@ -221,12 +240,13 @@ fn lexicon_doc_tools_ozone_set_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("setView"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("setSize"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("updatedAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("setSize"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("updatedAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -277,9 +297,22 @@ fn lexicon_doc_tools_ozone_set_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_set_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod set_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -354,13 +387,7 @@ pub mod set_view_state {
 /// Builder for constructing an instance of this type.
 pub struct SetViewBuilder<St: set_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<S>,
-        Option<i64>,
-        Option<Datetime>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<i64>, Option<Datetime>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -438,7 +465,10 @@ where
     St::Name: set_view_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SetViewBuilder<set_view_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> SetViewBuilder<set_view_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SetViewBuilder {
             _state: PhantomData,

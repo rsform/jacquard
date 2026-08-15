@@ -6,7 +6,9 @@ use crate::{
     scopes::{Scope, Scopes},
 };
 use jacquard_common::deps::fluent_uri::Uri;
-use jacquard_common::{BosStr, IntoStatic};
+use jacquard_common::types::aturi::AtSpaceUri;
+use jacquard_common::xrpc::{XrpcMethod, XrpcRequest, XrpcResp};
+use jacquard_common::{BosStr, DefaultStr, IntoStatic};
 use serde::{Deserialize, Serialize};
 use smol_str::{SmolStr, ToSmolStr};
 use thiserror::Error;
@@ -180,7 +182,7 @@ where
             client_name: self.client_name.into_static(),
             logo_uri: self.logo_uri,
             tos_uri: self.tos_uri,
-            privacy_policy_uri: None,
+            privacy_policy_uri: self.privacy_policy_uri,
         }
     }
 }
@@ -514,6 +516,22 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
     }
 
     #[test]
+    fn test_into_static_preserves_privacy_policy_uri() {
+        let metadata = AtprotoClientMetadata::new_localhost(None, None).with_prod_info(
+            SmolStr::new_static("jacquard"),
+            None,
+            None,
+            Some(Uri::parse("https://example.com/privacy".to_string()).unwrap()),
+        );
+
+        let metadata = metadata.into_static();
+        assert_eq!(
+            metadata.privacy_policy_uri.as_ref().map(Uri::as_str),
+            Some("https://example.com/privacy")
+        );
+    }
+
+    #[test]
     fn test_localhost_client_metadata_invalid() {
         // Invalid inputs are coerced to http://localhost rather than failing
         {
@@ -684,4 +702,93 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             );
         }
     }
+}
+
+/// Request for `com.atproto.space.getDelegationToken`: mint a single-use
+/// delegation token for a permissioned space, proving the client acts on
+/// the user's behalf. Served by the user's PDS; requires OAuth auth.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct GetDelegationToken<S: BosStr = DefaultStr> {
+    /// Reference to the space.
+    pub space: AtSpaceUri<S>,
+}
+
+impl<S: BosStr> XrpcRequest for GetDelegationToken<S> {
+    const NSID: &'static str = "com.atproto.space.getDelegationToken";
+    const METHOD: XrpcMethod = XrpcMethod::Query;
+    type Response = GetDelegationTokenResponse;
+}
+
+/// Generic XRPC error body for the space endpoints: `{"error": ..., "message": ...}`.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct SpaceXrpcError<S: BosStr = DefaultStr> {
+    /// The protocol error code.
+    pub error: S,
+    /// An optional human-readable error message.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<S>,
+}
+
+impl<S: BosStr + AsRef<str>> core::fmt::Display for SpaceXrpcError<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.error.as_ref())?;
+        if let Some(message) = &self.message {
+            write!(f, ": {}", message.as_ref())?;
+        }
+        Ok(())
+    }
+}
+
+impl<S: BosStr + AsRef<str> + std::fmt::Debug> std::error::Error for SpaceXrpcError<S> {}
+
+/// Response marker for `com.atproto.space.getDelegationToken`.
+pub struct GetDelegationTokenResponse;
+
+impl XrpcResp for GetDelegationTokenResponse {
+    const NSID: &'static str = "com.atproto.space.getDelegationToken";
+    const ENCODING: &'static str = "application/json";
+    type Output<S: BosStr> = GetDelegationTokenOutput<S>;
+    type Err = SpaceXrpcError;
+}
+
+/// Successful body of `com.atproto.space.getDelegationToken`.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GetDelegationTokenOutput<S: BosStr = DefaultStr> {
+    /// A signed JWT delegation token.
+    pub token: S,
+}
+
+/// Request for `com.atproto.space.getSpaceCredential`: exchange a delegation
+/// token (Authorization: Bearer) plus a DPoP proof (DPoP header) for a
+/// space credential bound to the proof key's `jkt`. Served by the space
+/// authority, usually reached via `atproto-proxy`.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct GetSpaceCredential<S: BosStr = DefaultStr> {
+    /// Optional client attestation JWT establishing the app's identity.
+    pub client_attestation: Option<S>,
+    /// Reference to the space.
+    pub space: AtSpaceUri<S>,
+}
+
+impl<S: BosStr> XrpcRequest for GetSpaceCredential<S> {
+    const NSID: &'static str = "com.atproto.space.getSpaceCredential";
+    const METHOD: XrpcMethod = XrpcMethod::Procedure("application/json");
+    type Response = GetSpaceCredentialResponse;
+}
+
+/// Response marker for `com.atproto.space.getSpaceCredential`.
+pub struct GetSpaceCredentialResponse;
+
+impl XrpcResp for GetSpaceCredentialResponse {
+    const NSID: &'static str = "com.atproto.space.getSpaceCredential";
+    const ENCODING: &'static str = "application/json";
+    type Output<S: BosStr> = GetSpaceCredentialOutput<S>;
+    type Err = SpaceXrpcError;
+}
+
+/// Successful body of `com.atproto.space.getSpaceCredential`.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct GetSpaceCredentialOutput<S: BosStr = DefaultStr> {
+    /// A signed JWT space credential bound to the requesting proof key.
+    pub credential: S,
 }

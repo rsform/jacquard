@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,23 +26,25 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_altq::aqfile;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_altq::aqfile;
 /// Cryptographic checksum for integrity verification.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Checksum<S: BosStr = DefaultStr> {
     ///Hash algorithm name.
     pub algo: ChecksumAlgo<S>,
     ///Hex or base64 encoded digest produced by the algorithm.
     pub hash: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_checksum_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -132,10 +134,7 @@ where
 /// File metadata describing the uploaded blob.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct File<S: BosStr = DefaultStr> {
     ///MIME type, e.g. 'video/mp4'.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -147,7 +146,12 @@ pub struct File<S: BosStr = DefaultStr> {
     pub name: S,
     ///File size in bytes.
     pub size: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_file_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -173,7 +177,12 @@ pub struct Aqfile<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Metadata about the file.
     pub file: aqfile::File<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_aqfile_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -343,16 +352,19 @@ impl<S: BosStr> LexiconSchema for Aqfile<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -366,11 +378,24 @@ impl<S: BosStr> LexiconSchema for Aqfile<S> {
     }
 }
 
+fn deserialize_checksum_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.altq.aqfile"),
@@ -379,20 +404,23 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("checksum"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Cryptographic checksum for integrity verification.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("algo"),
-                        SmolStr::new_static("hash"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Cryptographic checksum for integrity verification.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("algo"), SmolStr::new_static("hash")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("algo"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Hash algorithm name.")),
+                                description: Some(
+                                    CowStr::new_static("Hash algorithm name."),
+                                ),
                                 max_length: Some(32usize),
                                 ..Default::default()
                             }),
@@ -400,9 +428,11 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("hash"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Hex or base64 encoded digest produced by the algorithm.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Hex or base64 encoded digest produced by the algorithm.",
+                                    ),
+                                ),
                                 max_length: Some(128usize),
                                 ..Default::default()
                             }),
@@ -415,22 +445,21 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("file"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "File metadata describing the uploaded blob.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("size"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("File metadata describing the uploaded blob."),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("size")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("mimeType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "MIME type, e.g. 'video/mp4'.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("MIME type, e.g. 'video/mp4'."),
+                                ),
                                 max_length: Some(255usize),
                                 ..Default::default()
                             }),
@@ -438,9 +467,9 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("modifiedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Client-side last-modified timestamp.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Client-side last-modified timestamp."),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -448,7 +477,9 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("User-visible filename.")),
+                                description: Some(
+                                    CowStr::new_static("User-visible filename."),
+                                ),
                                 max_length: Some(512usize),
                                 ..Default::default()
                             }),
@@ -469,34 +500,38 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A record representing an uploaded file blob with metadata.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A record representing an uploaded file blob with metadata.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("any")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("blob"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("file"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("blob"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("file")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("attribution"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Handle or DID of the account to attribute this upload to.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Handle or DID of the account to attribute this upload to.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::AtIdentifier),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("blob"),
-                                LexObjectProperty::Blob(LexBlob {
-                                    ..Default::default()
-                                }),
+                                LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                             );
                             map.insert(
                                 SmolStr::new_static("checksum"),
@@ -508,9 +543,11 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when this record was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Timestamp when this record was created.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -535,9 +572,22 @@ fn lexicon_doc_net_altq_aqfile() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_file_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod file_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -654,7 +704,10 @@ where
     St::Name: file_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> FileBuilder<file_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> FileBuilder<file_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -670,7 +723,10 @@ where
     St::Size: file_state::IsUnset,
 {
     /// Set the `size` field (required)
-    pub fn size(mut self, value: impl Into<i64>) -> FileBuilder<file_state::SetSize<St>, S> {
+    pub fn size(
+        mut self,
+        value: impl Into<i64>,
+    ) -> FileBuilder<file_state::SetSize<St>, S> {
         self._fields.3 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
@@ -708,9 +764,28 @@ where
     }
 }
 
+fn deserialize_aqfile_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod aqfile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

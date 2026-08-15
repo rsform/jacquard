@@ -1,0 +1,125 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.post.create",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a new post in a community",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "community"
+          ],
+          "properties": {
+            "community": {
+              "type": "string",
+              "description": "DID or handle of the community to post in",
+              "format": "at-identifier"
+            },
+            "content": {
+              "type": "string",
+              "description": "Post content - supports rich text via facets",
+              "maxLength": 100000,
+              "maxGraphemes": 10000
+            },
+            "embed": {
+              "type": "union",
+              "description": "Embedded media, external links, or quoted posts",
+              "refs": [
+                "social.coves.embed.images",
+                "social.coves.embed.video",
+                "social.coves.embed.external",
+                "social.coves.embed.post"
+              ]
+            },
+            "facets": {
+              "type": "array",
+              "description": "Annotations for rich text (mentions, links, formatting, block structure)",
+              "items": {
+                "type": "ref",
+                "ref": "social.coves.richtext.facet"
+              },
+              "maxLength": 200
+            },
+            "labels": {
+              "type": "ref",
+              "description": "Self-applied content labels (NSFW, spoilers, etc.)",
+              "ref": "com.atproto.label.defs#selfLabels"
+            },
+            "langs": {
+              "type": "array",
+              "description": "Languages used in the post content (ISO 639-1)",
+              "items": {
+                "type": "string",
+                "format": "language"
+              },
+              "maxLength": 3
+            },
+            "tags": {
+              "type": "array",
+              "description": "User-applied topic tags",
+              "items": {
+                "type": "string",
+                "maxLength": 640,
+                "maxGraphemes": 64
+              },
+              "maxLength": 8
+            },
+            "title": {
+              "type": "string",
+              "description": "Post title (optional for media-only posts)",
+              "maxLength": 3000,
+              "maxGraphemes": 300
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the created post",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the created post",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Community not found",
+          "name": "CommunityNotFound"
+        },
+        {
+          "description": "User is not authorized to post in this community",
+          "name": "NotAuthorized"
+        },
+        {
+          "description": "User is banned from this community",
+          "name": "Banned"
+        },
+        {
+          "description": "Post content violates community rules",
+          "name": "InvalidContent"
+        },
+        {
+          "description": "Post violates community content rules (e.g., embeds not allowed, text too short)",
+          "name": "ContentRuleViolation"
+        }
+      ]
+    }
+  }
+}

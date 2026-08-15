@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A cryptographic proof that a did-git object was signed by a specific DID. This provides key-rotation-independent verification by anchoring the proof to a PDS or signing event.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -52,7 +52,12 @@ pub struct SignatureProof<S: BosStr = DefaultStr> {
     pub signed_at: i64,
     ///The DID of the signer.
     pub signer: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_signature_proof_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -110,7 +115,8 @@ impl<S: BosStr> Serialize for SignatureProofObjectType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SignatureProofObjectType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for SignatureProofObjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -138,7 +144,9 @@ where
             SignatureProofObjectType::Tree => SignatureProofObjectType::Tree,
             SignatureProofObjectType::Commit => SignatureProofObjectType::Commit,
             SignatureProofObjectType::Tag => SignatureProofObjectType::Tag,
-            SignatureProofObjectType::Other(v) => SignatureProofObjectType::Other(v.into_static()),
+            SignatureProofObjectType::Other(v) => {
+                SignatureProofObjectType::Other(v.into_static())
+            }
         }
     }
 }
@@ -267,9 +275,28 @@ impl<S: BosStr> LexiconSchema for SignatureProof<S> {
     }
 }
 
+fn deserialize_signature_proof_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod signature_proof_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -380,7 +407,10 @@ pub mod signature_proof_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SignatureProofBuilder<St: signature_proof_state::State, S: BosStr = DefaultStr> {
+pub struct SignatureProofBuilder<
+    St: signature_proof_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -581,7 +611,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SignatureProof<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SignatureProof<S> {
         SignatureProof {
             object_id: self._fields.0.unwrap(),
             object_type: self._fields.1.unwrap(),
@@ -596,10 +629,10 @@ where
 }
 
 fn lexicon_doc_tech_lenooby09_didgit_signatureProof() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tech.lenooby09.didgit.signatureProof"),

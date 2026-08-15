@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -20,14 +20,11 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Attribution for a creative work
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Credit<S: BosStr = DefaultStr> {
     ///Name of the credited person
     pub name: S,
@@ -36,7 +33,12 @@ pub struct Credit<S: BosStr = DefaultStr> {
     ///URL to credited person's profile or website
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<UriValue<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_credit_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -206,11 +208,24 @@ impl<S: BosStr> LexiconSchema for Credit<S> {
     }
 }
 
+fn deserialize_credit_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_io_sound_credit() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.sound.credit"),
@@ -219,20 +234,21 @@ fn lexicon_doc_io_sound_credit() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Attribution for a creative work")),
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("role"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Attribution for a creative work"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("role")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Name of the credited person",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Name of the credited person"),
+                                ),
                                 max_length: Some(640usize),
                                 max_graphemes: Some(320usize),
                                 ..Default::default()
@@ -241,9 +257,11 @@ fn lexicon_doc_io_sound_credit() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("role"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Role: composer, lyricist, arranger, etc",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Role: composer, lyricist, arranger, etc",
+                                    ),
+                                ),
                                 max_length: Some(64usize),
                                 max_graphemes: Some(32usize),
                                 ..Default::default()
@@ -252,9 +270,11 @@ fn lexicon_doc_io_sound_credit() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URL to credited person's profile or website",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "URL to credited person's profile or website",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),

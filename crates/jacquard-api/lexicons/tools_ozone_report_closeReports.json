@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "tools.ozone.report.closeReports",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Close all reports on a subject matching the given criteria. Reports whose current status does not permit a transition to closed are skipped silently. Intended for automated flows that resolve reports without taking action on the subject.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "subject"
+          ],
+          "properties": {
+            "internalNote": {
+              "type": "string",
+              "description": "Optional moderator-only note recorded on each close activity. Not visible to reporters."
+            },
+            "isAutomated": {
+              "type": "boolean",
+              "description": "Set true when this action is triggered by an automated process. Defaults to false.",
+              "default": false
+            },
+            "reportTypes": {
+              "type": "array",
+              "description": "If specified, only reports of the given report types (fully qualified reason NSIDs) are closed. When omitted, all non-closed reports on the subject are targeted.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "subject": {
+              "type": "string",
+              "description": "Subject DID (account-level reports) or AT-URI (record-level reports) whose reports should be closed.",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "closedCount",
+            "reportIds"
+          ],
+          "properties": {
+            "closedCount": {
+              "type": "integer",
+              "description": "Number of reports that were transitioned to closed."
+            },
+            "reportIds": {
+              "type": "array",
+              "description": "IDs of the reports that were closed.",
+              "items": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

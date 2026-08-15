@@ -1,0 +1,114 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.notification.listNotifications",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List notifications for the authenticated user, split by category.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Filter by category: 'all', 'social', or 'work'."
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Max notifications per category to return.",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "read": {
+            "type": "string",
+            "description": "Filter by read state: 'all' or 'unread'."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "notifications",
+            "workUnreadCount",
+            "socialUnreadCount"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "notifications": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#notification"
+              }
+            },
+            "socialUnreadCount": {
+              "type": "integer"
+            },
+            "workUnreadCount": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "notification": {
+      "type": "object",
+      "required": [
+        "uri",
+        "type",
+        "category",
+        "actorDid",
+        "read",
+        "createdAt"
+      ],
+      "properties": {
+        "actorDid": {
+          "type": "string",
+          "description": "DID of the user who triggered this notification.",
+          "format": "did"
+        },
+        "category": {
+          "type": "string",
+          "description": "Broad category: 'social' or 'work'."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "issueAt": {
+          "type": "string",
+          "description": "AT-URI of the related org.tangled.issue.issue record, if applicable.",
+          "format": "at-uri"
+        },
+        "pullAt": {
+          "type": "string",
+          "description": "AT-URI of the related org.tangled.pulls.pull record, if applicable.",
+          "format": "at-uri"
+        },
+        "read": {
+          "type": "boolean"
+        },
+        "repoDid": {
+          "type": "string",
+          "description": "DID of the related repository, if applicable.",
+          "format": "did"
+        },
+        "type": {
+          "type": "string",
+          "description": "Notification type: repo_starred, issue_created, issue_commented, issue_closed, issue_reopen, issue_assigned, issue_unassigned, pull_created, pull_commented, pull_merged, pull_closed, pull_reopen, pull_assigned, pull_unassigned, followed, user_mentioned."
+        },
+        "uri": {
+          "type": "string",
+          "description": "at-uri of this notification; the stable key for read/unread state.",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

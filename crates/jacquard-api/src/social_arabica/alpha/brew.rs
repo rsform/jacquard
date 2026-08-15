@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_arabica::alpha::brew;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_arabica::alpha::brew;
 /// Parameters specific to espresso brewing
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EspressoParams<S: BosStr = DefaultStr> {
     ///Pre-infusion time in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,7 +42,12 @@ pub struct EspressoParams<S: BosStr = DefaultStr> {
     ///Espresso yield/output weight in tenths of a gram (e.g., 360 = 36.0g)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub yield_weight: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_espresso_params_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -105,7 +107,12 @@ pub struct Brew<S: BosStr = DefaultStr> {
     ///Amount of water used in grams or milliliters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub water_amount: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_brew_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -123,26 +130,25 @@ pub struct BrewGetRecordOutput<S: BosStr = DefaultStr> {
 /// Information about a single pour in a multi-pour brewing method
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Pour<S: BosStr = DefaultStr> {
     ///Time of this pour relative to brew start (seconds)
     pub time_seconds: i64,
     ///Amount of water in this pour (grams or ml)
     pub water_amount: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_pour_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Parameters specific to pour-over brewing
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PouroverParams<S: BosStr = DefaultStr> {
     ///Bloom wait time in seconds
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -159,7 +165,12 @@ pub struct PouroverParams<S: BosStr = DefaultStr> {
     ///Type of filter used (e.g. paper, metal, cloth)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub filter: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_pourover_params_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -442,11 +453,24 @@ impl<S: BosStr> LexiconSchema for PouroverParams<S> {
     }
 }
 
+fn deserialize_espresso_params_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_social_arabica_alpha_brew() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.arabica.alpha.brew"),
@@ -455,9 +479,9 @@ fn lexicon_doc_social_arabica_alpha_brew() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("espressoParams"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Parameters specific to espresso brewing",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Parameters specific to espresso brewing"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -674,13 +698,17 @@ fn lexicon_doc_social_arabica_alpha_brew() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pour"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Information about a single pour in a multi-pour brewing method",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("waterAmount"),
-                        SmolStr::new_static("timeSeconds"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Information about a single pour in a multi-pour brewing method",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("waterAmount"),
+                            SmolStr::new_static("timeSeconds")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -706,9 +734,9 @@ fn lexicon_doc_social_arabica_alpha_brew() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pouroverParams"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Parameters specific to pour-over brewing",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Parameters specific to pour-over brewing"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -743,9 +771,11 @@ fn lexicon_doc_social_arabica_alpha_brew() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("filter"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Type of filter used (e.g. paper, metal, cloth)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Type of filter used (e.g. paper, metal, cloth)",
+                                    ),
+                                ),
                                 max_length: Some(100usize),
                                 ..Default::default()
                             }),
@@ -761,9 +791,28 @@ fn lexicon_doc_social_arabica_alpha_brew() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_brew_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod brew_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -849,8 +898,22 @@ impl BrewBuilder<brew_state::Empty, DefaultStr> {
         BrewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -863,8 +926,22 @@ impl<S: BosStr> BrewBuilder<brew_state::Empty, S> {
         BrewBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -937,12 +1014,18 @@ where
 
 impl<St: brew_state::State, S: BosStr> BrewBuilder<St, S> {
     /// Set the `espressoParams` field (optional)
-    pub fn espresso_params(mut self, value: impl Into<Option<brew::EspressoParams<S>>>) -> Self {
+    pub fn espresso_params(
+        mut self,
+        value: impl Into<Option<brew::EspressoParams<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `espressoParams` field to an Option value (optional)
-    pub fn maybe_espresso_params(mut self, value: Option<brew::EspressoParams<S>>) -> Self {
+    pub fn maybe_espresso_params(
+        mut self,
+        value: Option<brew::EspressoParams<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -989,12 +1072,18 @@ impl<St: brew_state::State, S: BosStr> BrewBuilder<St, S> {
 
 impl<St: brew_state::State, S: BosStr> BrewBuilder<St, S> {
     /// Set the `pouroverParams` field (optional)
-    pub fn pourover_params(mut self, value: impl Into<Option<brew::PouroverParams<S>>>) -> Self {
+    pub fn pourover_params(
+        mut self,
+        value: impl Into<Option<brew::PouroverParams<S>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `pouroverParams` field to an Option value (optional)
-    pub fn maybe_pourover_params(mut self, value: Option<brew::PouroverParams<S>>) -> Self {
+    pub fn maybe_pourover_params(
+        mut self,
+        value: Option<brew::PouroverParams<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1143,9 +1232,22 @@ where
     }
 }
 
+fn deserialize_pour_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod pour_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1290,4 +1392,17 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_pourover_params_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

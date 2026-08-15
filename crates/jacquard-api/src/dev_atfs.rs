@@ -4,6 +4,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `dev.atfs` Lexicon namespace/module.
+pub mod describe_server;
 pub mod file;
 pub mod repo;
 pub mod server;

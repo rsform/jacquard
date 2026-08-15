@@ -46,6 +46,11 @@
             "description": "Count of medium severity vulnerabilities",
             "minimum": 0
           },
+          "reason": {
+            "type": "string",
+            "description": "Optional human-readable explanation for non-ok status (e.g. 'unscannable artifact type application/vnd.cncf.helm.config.v1+json').",
+            "maxLength": 256
+          },
           "repository": {
             "type": "string",
             "description": "Repository name (e.g., myapp)",
@@ -67,6 +72,16 @@
             "type": "string",
             "description": "Version of the scanner that produced this result (e.g., atcr-scanner-v1.0.0)",
             "maxLength": 64
+          },
+          "status": {
+            "type": "string",
+            "description": "Outcome of the scan attempt. 'ok' (or omitted, for back-compat) means the scanner produced an SBOM. 'failed' means the scanner ran but errored. 'skipped' means the scanner intentionally bypassed this artifact type (e.g. helm charts).",
+            "maxLength": 32,
+            "knownValues": [
+              "ok",
+              "failed",
+              "skipped"
+            ]
           },
           "total": {
             "type": "integer",

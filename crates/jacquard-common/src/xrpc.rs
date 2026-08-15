@@ -692,7 +692,7 @@ where
 
     if let Some(token) = &opts.auth {
         let hv = match token {
-            AuthorizationToken::Bearer(t) => {
+            AuthorizationToken::Bearer(t) | AuthorizationToken::Delegation(t) => {
                 HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
             }
             AuthorizationToken::Dpop(t) => HeaderValue::from_str(&format!("DPoP {}", t.as_str())),
@@ -1099,6 +1099,9 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
                     HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
                 }
                 AuthorizationToken::Dpop(t) => {
+                    HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
+                }
+                AuthorizationToken::Delegation(t) => {
                     HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
                 }
             }

@@ -41,6 +41,37 @@
         }
       }
     },
+    "inAppCounts": {
+      "type": "object",
+      "description": "Per-category counts of activity performed inside anisota, summed across the period and across devices.",
+      "properties": {
+        "likes": {
+          "type": "integer",
+          "description": "Likes created in anisota",
+          "minimum": 0
+        },
+        "posts": {
+          "type": "integer",
+          "description": "Top-level posts created in anisota",
+          "minimum": 0
+        },
+        "quotes": {
+          "type": "integer",
+          "description": "Quote posts created in anisota",
+          "minimum": 0
+        },
+        "replies": {
+          "type": "integer",
+          "description": "Replies created in anisota",
+          "minimum": 0
+        },
+        "reposts": {
+          "type": "integer",
+          "description": "Reposts created in anisota",
+          "minimum": 0
+        }
+      }
+    },
     "main": {
       "type": "record",
       "description": "Yearly aggregation of monthly records. rkey is YYYY. Updated once per month, finalized when year ends.",
@@ -68,6 +99,11 @@
             "type": "string",
             "description": "When the yearly record was finalized (end of year)",
             "format": "datetime"
+          },
+          "inApp": {
+            "type": "ref",
+            "description": "Rolled-up in-anisota activity for the year (summed daily inApp across devices, per field). Optional and additive; the read side may instead compute this from the year's daily logs.",
+            "ref": "#inAppCounts"
           },
           "lowerLogRefs": {
             "type": "array",

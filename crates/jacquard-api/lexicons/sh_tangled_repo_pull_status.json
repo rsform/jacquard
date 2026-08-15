@@ -9,9 +9,14 @@
         "type": "object",
         "required": [
           "pull",
-          "status"
+          "status",
+          "createdAt"
         ],
         "properties": {
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
           "pull": {
             "type": "string",
             "format": "at-uri"

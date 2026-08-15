@@ -20,25 +20,28 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::richtext::facet::ByteSlice;
 use crate::app_bsky::richtext::facet::Link;
 use crate::app_bsky::richtext::facet::Mention;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// Annotation of a sub-string within rich text in a livestream chat message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Facet<S: BosStr = DefaultStr> {
     pub features: Vec<FacetFeaturesItem<S>>,
     pub index: ByteSlice<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_facet_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -65,9 +68,22 @@ impl<S: BosStr> LexiconSchema for Facet<S> {
     }
 }
 
+fn deserialize_facet_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod facet_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -215,10 +231,10 @@ where
 }
 
 fn lexicon_doc_place_stream_richtext_facet() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.richtext.facet"),
@@ -227,13 +243,16 @@ fn lexicon_doc_place_stream_richtext_facet() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Annotation of a sub-string within rich text in a livestream chat message.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("index"),
-                        SmolStr::new_static("features"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Annotation of a sub-string within rich text in a livestream chat message.",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("index"), SmolStr::new_static("features")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -243,7 +262,7 @@ fn lexicon_doc_place_stream_richtext_facet() -> LexiconDoc<'static> {
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("app.bsky.richtext.facet#mention"),
-                                        CowStr::new_static("app.bsky.richtext.facet#link"),
+                                        CowStr::new_static("app.bsky.richtext.facet#link")
                                     ],
                                     ..Default::default()
                                 }),
@@ -253,7 +272,9 @@ fn lexicon_doc_place_stream_richtext_facet() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("index"),
                             LexObjectProperty::Ref(LexRef {
-                                r#ref: CowStr::new_static("app.bsky.richtext.facet#byteSlice"),
+                                r#ref: CowStr::new_static(
+                                    "app.bsky.richtext.facet#byteSlice",
+                                ),
                                 ..Default::default()
                             }),
                         );

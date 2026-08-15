@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An at-circle group definition
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -48,7 +48,12 @@ pub struct Ring<S: BosStr = DefaultStr> {
     pub status: RingStatus<S>,
     ///Name of the circle
     pub title: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_ring_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -126,7 +131,9 @@ where
         match self {
             RingAcceptancePolicy::Automatic => RingAcceptancePolicy::Automatic,
             RingAcceptancePolicy::Manual => RingAcceptancePolicy::Manual,
-            RingAcceptancePolicy::Other(v) => RingAcceptancePolicy::Other(v.into_static()),
+            RingAcceptancePolicy::Other(v) => {
+                RingAcceptancePolicy::Other(v.into_static())
+            }
         }
     }
 }
@@ -336,9 +343,28 @@ impl<S: BosStr> LexiconSchema for Ring<S> {
     }
 }
 
+fn deserialize_ring_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod ring_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -445,12 +471,18 @@ impl<S: BosStr> RingBuilder<ring_state::Empty, S> {
 
 impl<St: ring_state::State, S: BosStr> RingBuilder<St, S> {
     /// Set the `acceptancePolicy` field (optional)
-    pub fn acceptance_policy(mut self, value: impl Into<Option<RingAcceptancePolicy<S>>>) -> Self {
+    pub fn acceptance_policy(
+        mut self,
+        value: impl Into<Option<RingAcceptancePolicy<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `acceptancePolicy` field to an Option value (optional)
-    pub fn maybe_acceptance_policy(mut self, value: Option<RingAcceptancePolicy<S>>) -> Self {
+    pub fn maybe_acceptance_policy(
+        mut self,
+        value: Option<RingAcceptancePolicy<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -513,7 +545,10 @@ where
     St::Title: ring_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> RingBuilder<ring_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> RingBuilder<ring_state::SetTitle<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
@@ -555,10 +590,10 @@ where
 }
 
 fn lexicon_doc_net_asadaame5121_at_circle_ring() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.asadaame5121.at-circle.ring"),
@@ -567,23 +602,27 @@ fn lexicon_doc_net_asadaame5121_at_circle_ring() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("An at-circle group definition")),
+                    description: Some(
+                        CowStr::new_static("An at-circle group definition"),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("status"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("status")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("acceptancePolicy"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "How new members are accepted",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("How new members are accepted"),
+                                    ),
                                     max_length: Some(64usize),
                                     ..Default::default()
                                 }),
@@ -598,9 +637,9 @@ fn lexicon_doc_net_asadaame5121_at_circle_ring() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("description"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Description of the circle",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Description of the circle"),
+                                    ),
                                     max_length: Some(10000usize),
                                     max_graphemes: Some(1000usize),
                                     ..Default::default()

@@ -10,8 +10,7 @@
         "schema": {
           "type": "object",
           "required": [
-            "did",
-            "name",
+            "repo",
             "patch",
             "branch"
           ],
@@ -38,16 +37,21 @@
             },
             "did": {
               "type": "string",
-              "description": "DID of the repository owner",
+              "description": "DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.",
               "format": "did"
             },
             "name": {
               "type": "string",
-              "description": "Name of the repository"
+              "description": "Name of the repository. A knot without the repo-did-input capability reads this and DID in place of repo."
             },
             "patch": {
               "type": "string",
               "description": "Patch content to merge"
+            },
+            "repo": {
+              "type": "string",
+              "description": "DID of the repository",
+              "format": "did"
             }
           }
         }

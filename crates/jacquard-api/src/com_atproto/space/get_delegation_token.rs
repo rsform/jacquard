@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetDelegationToken<S: BosStr = DefaultStr> {
     pub space: AtSpaceUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetDelegationTokenOutput<S: BosStr = DefaultStr> {
     ///A signed JWT delegation token.
     pub token: S,
@@ -68,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetDelegationTokenRequest {
 
 pub mod get_delegation_token_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,8 +94,10 @@ pub mod get_delegation_token_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetDelegationTokenBuilder<St: get_delegation_token_state::State, S: BosStr = DefaultStr>
-{
+pub struct GetDelegationTokenBuilder<
+    St: get_delegation_token_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtSpaceUri<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -108,7 +105,10 @@ pub struct GetDelegationTokenBuilder<St: get_delegation_token_state::State, S: B
 
 impl GetDelegationToken<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetDelegationTokenBuilder<get_delegation_token_state::Empty, DefaultStr> {
+    pub fn new() -> GetDelegationTokenBuilder<
+        get_delegation_token_state::Empty,
+        DefaultStr,
+    > {
         GetDelegationTokenBuilder::new()
     }
 }

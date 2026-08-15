@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateActorAccess<S: BosStr = DefaultStr> {
     pub actor: Did<S>,
     pub allow_access: bool,
@@ -40,12 +37,25 @@ impl jacquard_common::xrpc::XrpcResp for UpdateActorAccessResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<S> {
     const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateActorAccessResponse;
 }
 
@@ -55,15 +65,16 @@ Path: `/xrpc/chat.bsky.moderation.updateActorAccess`. The request payload type i
 pub struct UpdateActorAccessRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.updateActorAccess";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateActorAccess<S>;
     type Response = UpdateActorAccessResponse;
 }
 
 pub mod update_actor_access_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -106,7 +117,10 @@ pub mod update_actor_access_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UpdateActorAccessBuilder<St: update_actor_access_state::State, S: BosStr = DefaultStr> {
+pub struct UpdateActorAccessBuilder<
+    St: update_actor_access_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<bool>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -114,7 +128,10 @@ pub struct UpdateActorAccessBuilder<St: update_actor_access_state::State, S: Bos
 
 impl UpdateActorAccess<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UpdateActorAccessBuilder<update_actor_access_state::Empty, DefaultStr> {
+    pub fn new() -> UpdateActorAccessBuilder<
+        update_actor_access_state::Empty,
+        DefaultStr,
+    > {
         UpdateActorAccessBuilder::new()
     }
 }
@@ -215,7 +232,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateActorAccess<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateActorAccess<S> {
         UpdateActorAccess {
             actor: self._fields.0.unwrap(),
             allow_access: self._fields.1.unwrap(),

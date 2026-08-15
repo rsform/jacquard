@@ -584,13 +584,15 @@ where
         self.store.upsert_session(value).await?;
         Ok(())
     }
-    /// Delete a session from the backing store.
+    /// Delete a session from the backing store and in-memory restore cache.
     pub async fn del<D: BosStr + Send + Sync>(
         &self,
         did: &Did<D>,
         session_id: &str,
     ) -> Result<(), Error> {
         self.store.delete_session(did, session_id).await?;
+        let key = SessionKey::new(did.borrow().into_static(), session_id);
+        self.cache().invalidate(&key);
         Ok(())
     }
 }

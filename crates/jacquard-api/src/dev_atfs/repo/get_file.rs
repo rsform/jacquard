@@ -10,24 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Cid, Did};
+use jacquard_common::types::string::{Did, Cid};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFile<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -35,20 +33,29 @@ pub struct GetFileOutput {
     pub body: Bytes,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetFileError {
-    /// No file is stored under this cid, or — when did is supplied — that account holds no claim on it; the two are reported identically, matching com.atproto.sync.getBlob's own behavior.
+    /// No file is stored under this cid, or — when did is supplied — that account holds no claim on it; the two are reported identically, matching com.atproto.sync.getBlob's own behavior. Also reported, indistinguishably, when this instance once tried to fetch this cid and gave up: a failed fetch stays impossible to tell apart from a cid that was never asked for.
     #[serde(rename = "BlobNotFound")]
     BlobNotFound(Option<SmolStr>),
+    /// This instance doesn't have the file yet but is actively trying to fetch it (see dev.atfs.repo.pinFile). Served over HTTP 503 with a Retry-After header naming how long to wait before asking again; retrying is the status check.
+    #[serde(rename = "ContentPending")]
+    ContentPending(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetFileError {
@@ -56,6 +63,13 @@ impl core::fmt::Display for GetFileError {
         match self {
             Self::BlobNotFound(msg) => {
                 write!(f, "BlobNotFound")?;
+                if let Some(msg) = msg {
+                    write!(f, ": {}", msg)?;
+                }
+                Ok(())
+            }
+            Self::ContentPending(msg) => {
+                write!(f, "ContentPending")?;
                 if let Some(msg) = msg {
                     write!(f, ": {}", msg)?;
                 }
@@ -121,7 +135,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetFileRequest {
 
 pub mod get_file_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

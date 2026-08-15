@@ -1,0 +1,40 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.feed.vote",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Record declaring a vote (upvote or downvote) on a post or comment. Requires authentication.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "subject",
+          "direction",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp when the vote was created",
+            "format": "datetime"
+          },
+          "direction": {
+            "type": "string",
+            "description": "Vote direction: up for upvote, down for downvote",
+            "maxLength": 64,
+            "knownValues": [
+              "up",
+              "down"
+            ]
+          },
+          "subject": {
+            "type": "ref",
+            "description": "Strong reference to the post or comment being voted on",
+            "ref": "com.atproto.repo.strongRef"
+          }
+        }
+      }
+    }
+  }
+}

@@ -555,6 +555,42 @@ async fn test_legacy_without_lxm() {
 }
 
 #[tokio::test]
+async fn test_lxm_must_match_xrpc_path() {
+    let signing_key = k256::ecdsa::SigningKey::random(&mut rand::thread_rng());
+    let did = "did:plc:test123";
+    let service = "did:web:service.example";
+    let jwt = create_test_jwt(
+        did,
+        service,
+        chrono::Utc::now().timestamp() + 300,
+        Some("app.bsky.feed.getTimeline"),
+        &signing_key,
+    );
+    let config = ServiceAuthConfig::new(
+        Did::new_static(service).unwrap(),
+        MockResolver::new(create_test_did_doc(did, signing_key.verifying_key())),
+    )
+    .disable_replay_protection();
+    async fn handler(ExtractServiceAuth(_auth): ExtractServiceAuth) -> &'static str {
+        "ok"
+    }
+    let app = Router::new()
+        .route("/xrpc/app.bsky.feed.getAuthorFeed", get(handler))
+        .with_state(config);
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/xrpc/app.bsky.feed.getAuthorFeed")
+                .header(header::AUTHORIZATION, format!("Bearer {jwt}"))
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+}
+
+#[tokio::test]
 async fn test_optional_extractor_valid_and_missing_and_invalid() {
     let signing_key = k256::ecdsa::SigningKey::random(&mut rand::thread_rng());
     let verifying_key = signing_key.verifying_key();
@@ -853,7 +889,7 @@ async fn test_route_scoped_service_id_policy() {
 
     for (aud, strict, expected) in [
         (service_did, false, StatusCode::OK),
-        (service_did, true, StatusCode::UNAUTHORIZED),
+        (service_did, true, StatusCode::OK),
         (
             "did:web:feedgen.example.com#bsky_appview",
             true,

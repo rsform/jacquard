@@ -1,0 +1,286 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.post.defs",
+  "defs": {
+    "authorView": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 1280,
+          "maxGraphemes": 128
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle"
+        },
+        "reputation": {
+          "type": "integer",
+          "description": "Author's reputation in the community"
+        }
+      }
+    },
+    "blockedAuthor": {
+      "type": "object",
+      "description": "Minimal author info for blocked posts",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        }
+      }
+    },
+    "blockedCommunity": {
+      "type": "object",
+      "description": "Minimal community info for blocked posts",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 63
+        }
+      }
+    },
+    "blockedPost": {
+      "type": "object",
+      "description": "Post is blocked due to viewer blocking author/community, or community moderation",
+      "required": [
+        "uri",
+        "blocked"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "#blockedAuthor"
+        },
+        "blocked": {
+          "type": "boolean",
+          "const": true
+        },
+        "blockedBy": {
+          "type": "string",
+          "description": "What caused the block: viewer blocked author, viewer blocked community, or post was removed by moderators",
+          "maxLength": 64,
+          "knownValues": [
+            "author",
+            "community",
+            "moderator"
+          ]
+        },
+        "community": {
+          "type": "ref",
+          "ref": "#blockedCommunity"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "communityRef": {
+      "type": "object",
+      "required": [
+        "did",
+        "name"
+      ],
+      "properties": {
+        "avatar": {
+          "type": "string",
+          "format": "uri"
+        },
+        "did": {
+          "type": "string",
+          "format": "did"
+        },
+        "handle": {
+          "type": "string",
+          "description": "Current handle resolved from DID",
+          "format": "handle"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 63
+        }
+      }
+    },
+    "notFoundPost": {
+      "type": "object",
+      "description": "Post was not found (deleted, never indexed, or invalid URI)",
+      "required": [
+        "uri",
+        "notFound"
+      ],
+      "properties": {
+        "notFound": {
+          "type": "boolean",
+          "const": true
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "postStats": {
+      "type": "object",
+      "required": [
+        "upvotes",
+        "downvotes",
+        "score",
+        "commentCount"
+      ],
+      "properties": {
+        "commentCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "downvotes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "score": {
+          "type": "integer",
+          "description": "Calculated score (upvotes - downvotes)"
+        },
+        "shareCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tagCounts": {
+          "type": "unknown",
+          "description": "Map of tag name to the number of community members who applied it (e.g., {\"insightful\": 12})"
+        },
+        "upvotes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "postView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "cid",
+        "author",
+        "record",
+        "community",
+        "createdAt",
+        "indexedAt"
+      ],
+      "properties": {
+        "author": {
+          "type": "ref",
+          "ref": "#authorView"
+        },
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "community": {
+          "type": "ref",
+          "ref": "#communityRef"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "editedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "embed": {
+          "type": "union",
+          "description": "Embedded content from the post record. Untransformed embeds keep their record types; when the AppView rewrites blob references to URLs or resolves quoted posts, it serves the corresponding #view type.",
+          "refs": [
+            "social.coves.embed.images",
+            "social.coves.embed.video",
+            "social.coves.embed.external",
+            "social.coves.embed.external#view",
+            "social.coves.embed.post",
+            "social.coves.embed.post#view"
+          ]
+        },
+        "indexedAt": {
+          "type": "string",
+          "description": "When this post was indexed by the AppView",
+          "format": "datetime"
+        },
+        "language": {
+          "type": "string",
+          "format": "language"
+        },
+        "record": {
+          "type": "unknown",
+          "description": "The actual post record (text, image, video, etc.)"
+        },
+        "stats": {
+          "type": "ref",
+          "ref": "#postStats"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "viewer": {
+          "type": "ref",
+          "ref": "#viewerState"
+        }
+      }
+    },
+    "viewerState": {
+      "type": "object",
+      "properties": {
+        "saved": {
+          "type": "boolean"
+        },
+        "savedUri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags applied by the viewer to this post",
+          "items": {
+            "type": "string",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        },
+        "vote": {
+          "type": "string",
+          "description": "Viewer's vote on this post",
+          "maxLength": 64,
+          "knownValues": [
+            "up",
+            "down"
+          ]
+        },
+        "voteUri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    }
+  }
+}

@@ -105,9 +105,9 @@
           },
           "temperature": {
             "type": "integer",
-            "description": "Water temperature in tenths of a degree Celsius (e.g., 935 = 93.5°C)",
+            "description": "Water temperature in tenths of a degree Celsius or Fahrenheit (e.g., 935 = 93.5°C)",
             "minimum": 0,
-            "maximum": 1000
+            "maximum": 2120
           },
           "timeSeconds": {
             "type": "integer",

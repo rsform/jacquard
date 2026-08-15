@@ -28,13 +28,21 @@
           "type": "unknown",
           "description": "Patterns visualization configuration captured with this layout"
         },
+        "rows": {
+          "type": "array",
+          "description": "Row-based layout. Each row sits on a shared six-column track; tile spans are derived from the row's tile count and balance and always sum to 6. Rows are the authority for geometry; tileOrder is the flattened reading order of the same tiles, kept in sync so clients that predate the row model still render the layout. When rows is absent, or disagrees with tileOrder, a client re-derives rows from tileOrder. No maxLength: every row holds at least one tile, so rows.length can never exceed tileOrder.length, which is itself uncapped — a cap here and not there would make a legal tileOrder unrepresentable.",
+          "items": {
+            "type": "ref",
+            "ref": "#row"
+          }
+        },
         "shuffleLayout": {
           "type": "boolean",
-          "description": "Whether tiles shuffle within divider-bounded groups each session"
+          "description": "Whether tiles shuffle within divider-bounded groups each session. Retained for compatibility with clients that still shuffle; a client using the row model preserves the stored value on write but does not act on it, because rows describe a stable layout."
         },
         "tileOrder": {
           "type": "array",
-          "description": "Unified rendering order. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array.",
+          "description": "The flattened projection of rows: rows in order, tiles in order within each row. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array. rows is the geometry authority and this field is the compatibility flattening kept for clients that predate the row model — a reader that understands rows uses it only to reconcile (dropping tokens no row claims, appending tokens no row carries).",
           "items": {
             "type": "string",
             "maxLength": 64
@@ -44,7 +52,7 @@
     },
     "main": {
       "type": "record",
-      "description": "A saved Observatory grid layout. Each record is a complete, self-contained snapshot of a layout — built-in button configuration, unified tile order, and embedded element snapshots — so it can be shared by URL and saved ('learned') into another user's PDS without depending on the original author's element records, mirroring the spell architecture. tileOrder entries are 'builtin:<key>' for built-in tiles or 'element:<index>' pointing into the embedded elements array. An optional schedule makes the layout activate automatically during a daily time window.",
+      "description": "A saved Observatory grid layout. Each record is a complete, self-contained snapshot of a layout — built-in button configuration, the row geometry, the flattened tile order, and embedded element snapshots — so it can be shared by URL and saved ('learned') into another user's PDS without depending on the original author's element records, mirroring the spell architecture. Tile references are 'builtin:<key>' for built-in tiles or 'element:<index>' pointing into the embedded elements array. layout.rows is the authority for geometry; layout.tileOrder is the flattened reading order of the same tiles, kept in sync so clients that predate the row model still render the layout. An optional schedule makes the layout activate automatically during a daily time window.",
       "key": "any",
       "record": {
         "type": "object",
@@ -100,6 +108,53 @@
         }
       }
     },
+    "row": {
+      "type": "object",
+      "description": "One row of the Observatory grid. 'tiles' rows hold 1-3 tiles across the six-column track. 'ledger' rows render their tiles as hairline lines (label left, meta right) and absorb the long tail. 'structure' rows hold exactly one divider, heading or empty-space element and act as a boundary between rows. Entries in the tiles array use the same token vocabulary as tileOrder: 'builtin:<key>' or 'element:<index>'. kind, band and balance use knownValues and are therefore open: a reader that does not recognise a value clamps it for that session only and must not rewrite the stored value.",
+      "required": [
+        "tiles"
+      ],
+      "properties": {
+        "balance": {
+          "type": "string",
+          "description": "How a two-tile row divides the track: even 3:3, left 4:2, right 2:4. Meaningless (and canonically 'even') for any other tile count.",
+          "maxLength": 32,
+          "knownValues": [
+            "even",
+            "left",
+            "right"
+          ]
+        },
+        "band": {
+          "type": "string",
+          "description": "The one height every tile in this row takes. Ignored by ledger rows, and by structure rows whose tile is a divider or heading.",
+          "maxLength": 32,
+          "knownValues": [
+            "compact",
+            "standard",
+            "tall",
+            "panel"
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "maxLength": 32,
+          "knownValues": [
+            "tiles",
+            "ledger",
+            "structure"
+          ]
+        },
+        "tiles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "maxLength": 12
+        }
+      }
+    },
     "schedule": {
       "type": "object",
       "description": "Optional daily activation window. When enabled, the layout takes over the Observatory between startTime and endTime (wrapping past midnight when startTime > endTime), optionally restricted to certain days of the week.",
@@ -132,7 +187,7 @@
     },
     "source": {
       "type": "object",
-      "description": "Provenance backlink for layouts learned from another user.",
+      "description": "Provenance for this layout. 'original' was crafted here, 'learned' was saved from another user's shared layout (see originalUri/originalDid), 'migrated' marks the layout the one-time unify migration captured from the user's live grid, and 'starter' marks the layout a published generation of the starter grid wrote when it moved an account onto that generation. The last two are those passes' idempotency sentinels and must be preserved when a record is re-saved, or the pass will run again and duplicate the layout.",
       "properties": {
         "originalDid": {
           "type": "string",
@@ -148,7 +203,9 @@
           "type": "string",
           "knownValues": [
             "original",
-            "learned"
+            "learned",
+            "migrated",
+            "starter"
           ]
         }
       }

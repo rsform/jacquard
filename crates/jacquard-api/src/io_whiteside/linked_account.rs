@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A linked account record containing external account information
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -46,7 +46,12 @@ pub struct LinkedAccount<S: BosStr = DefaultStr> {
     ///Sort order for displaying linked accounts (lower numbers appear first). Defaults to 999 if not specified.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_linked_account_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -109,9 +114,28 @@ impl<S: BosStr> LexiconSchema for LinkedAccount<S> {
     }
 }
 
+fn deserialize_linked_account_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod linked_account_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -168,7 +192,10 @@ pub mod linked_account_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct LinkedAccountBuilder<St: linked_account_state::State, S: BosStr = DefaultStr> {
+pub struct LinkedAccountBuilder<
+    St: linked_account_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -298,7 +325,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LinkedAccount<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LinkedAccount<S> {
         LinkedAccount {
             icon: self._fields.0.unwrap(),
             link: self._fields.1.unwrap(),
@@ -310,10 +340,10 @@ where
 }
 
 fn lexicon_doc_io_whiteside_linkedAccount() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.whiteside.linkedAccount"),
@@ -322,33 +352,38 @@ fn lexicon_doc_io_whiteside_linkedAccount() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A linked account record containing external account information",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A linked account record containing external account information",
+                        ),
+                    ),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("icon"),
-                            SmolStr::new_static("name"),
-                            SmolStr::new_static("link"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("icon"), SmolStr::new_static("name"),
+                                SmolStr::new_static("link")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("icon"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Icon identifier or URL for the linked account",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Icon identifier or URL for the linked account",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("link"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL to the linked account",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("URL to the linked account"),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),
@@ -356,9 +391,9 @@ fn lexicon_doc_io_whiteside_linkedAccount() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Display name of the linked account",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Display name of the linked account"),
+                                    ),
                                     ..Default::default()
                                 }),
                             );

@@ -21,38 +21,42 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::science_alt::dataset::entry::ShardChecksum;
-use crate::science_alt::dataset::storage_http;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::science_alt::dataset::entry::ShardChecksum;
+use crate::science_alt::dataset::storage_http;
 /// HTTP/HTTPS storage for WebDataset tar archives. Each shard is listed individually with a checksum for integrity verification. Consumers build brace-expansion patterns on the fly when needed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StorageHttp<S: BosStr = DefaultStr> {
     ///Array of shard entries with URL and integrity checksum
     pub shards: Vec<storage_http::ShardEntry<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_storage_http_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A single HTTP-accessible shard with integrity checksum
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ShardEntry<S: BosStr = DefaultStr> {
     ///Content hash for integrity verification
     pub checksum: ShardChecksum<S>,
     ///HTTP/HTTPS URL for this WebDataset tar shard
     pub url: UriValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_shard_entry_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -108,9 +112,22 @@ impl<S: BosStr> LexiconSchema for ShardEntry<S> {
     }
 }
 
+fn deserialize_storage_http_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod storage_http_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -215,7 +232,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StorageHttp<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StorageHttp<S> {
         StorageHttp {
             shards: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -224,10 +244,10 @@ where
 }
 
 fn lexicon_doc_science_alt_dataset_storageHttp() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("science.alt.dataset.storageHttp"),
@@ -269,13 +289,14 @@ fn lexicon_doc_science_alt_dataset_storageHttp() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("shardEntry"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A single HTTP-accessible shard with integrity checksum",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("url"),
-                        SmolStr::new_static("checksum"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A single HTTP-accessible shard with integrity checksum",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("url"), SmolStr::new_static("checksum")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -291,9 +312,11 @@ fn lexicon_doc_science_alt_dataset_storageHttp() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "HTTP/HTTPS URL for this WebDataset tar shard",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "HTTP/HTTPS URL for this WebDataset tar shard",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 max_length: Some(2000usize),
                                 ..Default::default()
@@ -310,9 +333,22 @@ fn lexicon_doc_science_alt_dataset_storageHttp() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_shard_entry_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod shard_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -450,7 +486,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ShardEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ShardEntry<S> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),

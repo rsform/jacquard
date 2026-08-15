@@ -8,23 +8,20 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::IntoStatic;
+use serde::{Serialize, Deserialize};
 use crate::app_bsky::notification::ChatPreference;
 use crate::app_bsky::notification::FilterablePreference;
 use crate::app_bsky::notification::Preference;
 use crate::app_bsky::notification::Preferences;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
-use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutPreferencesV2<S: BosStr = DefaultStr> {
     ///Deprecated: use chat.bsky.notification preferences instead. Setting this won't stick and the default values will be returned.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,11 +54,9 @@ pub struct PutPreferencesV2<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PutPreferencesV2Output<S: BosStr = DefaultStr> {
     pub preferences: Preferences<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -81,8 +76,9 @@ impl jacquard_common::xrpc::XrpcResp for PutPreferencesV2Response {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutPreferencesV2<S> {
     const NSID: &'static str = "app.bsky.notification.putPreferencesV2";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = PutPreferencesV2Response;
 }
 
@@ -92,8 +88,9 @@ Path: `/xrpc/app.bsky.notification.putPreferencesV2`. The request payload type i
 pub struct PutPreferencesV2Request;
 impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesV2Request {
     const PATH: &'static str = "/xrpc/app.bsky.notification.putPreferencesV2";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = PutPreferencesV2<S>;
     type Response = PutPreferencesV2Response;
 }

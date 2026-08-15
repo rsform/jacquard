@@ -19,3 +19,4 @@ pub mod list_stars;
 pub mod list_stars_by;
 pub mod reaction;
 pub mod star;
+pub mod subscription;

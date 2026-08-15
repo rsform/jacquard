@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.notification.getPreferences",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get notification preferences for the authenticated user.",
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "ref",
+          "ref": "#preferences"
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "required": [
+        "repoStarred",
+        "issueCreated",
+        "issueCommented",
+        "issueClosed",
+        "pullCreated",
+        "pullCommented",
+        "pullMerged",
+        "followed",
+        "userMentioned",
+        "emailNotifications"
+      ],
+      "properties": {
+        "emailNotifications": {
+          "type": "boolean"
+        },
+        "followed": {
+          "type": "boolean"
+        },
+        "issueClosed": {
+          "type": "boolean"
+        },
+        "issueCommented": {
+          "type": "boolean"
+        },
+        "issueCreated": {
+          "type": "boolean"
+        },
+        "pullCommented": {
+          "type": "boolean"
+        },
+        "pullCreated": {
+          "type": "boolean"
+        },
+        "pullMerged": {
+          "type": "boolean"
+        },
+        "repoStarred": {
+          "type": "boolean"
+        },
+        "userMentioned": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

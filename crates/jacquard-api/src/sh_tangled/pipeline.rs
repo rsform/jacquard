@@ -17,18 +17,19 @@ pub mod list_statuses;
 pub mod list_statuses_by;
 pub mod status;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -36,24 +37,27 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::pipeline;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::pipeline;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CloneOpts<S: BosStr = DefaultStr> {
     pub depth: i64,
     pub skip: bool,
     pub submodules: bool,
     pub tags: bool,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_clone_opts_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -65,7 +69,12 @@ pub struct CloneOpts<S: BosStr = DefaultStr> {
 pub struct Pipeline<S: BosStr = DefaultStr> {
     pub trigger_metadata: pipeline::TriggerMetadata<S>,
     pub workflows: Vec<pipeline::Workflow<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_pipeline_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -80,11 +89,9 @@ pub struct PipelineGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Pipeline<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ManualTriggerData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inputs: Option<Vec<pipeline::Pair<S>>>,
@@ -93,27 +100,33 @@ pub struct ManualTriggerData<S: BosStr = DefaultStr> {
     pub r#ref: Option<S>,
     ///commit SHA the manual run targets
     pub sha: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_manual_trigger_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Pair<S: BosStr = DefaultStr> {
     pub key: S,
     pub value: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_pair_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PullRequestTriggerData<S: BosStr = DefaultStr> {
     ///the pull request lifecycle action that produced this trigger
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -124,28 +137,34 @@ pub struct PullRequestTriggerData<S: BosStr = DefaultStr> {
     pub source_branch: S,
     pub source_sha: S,
     pub target_branch: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_pull_request_trigger_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PushTriggerData<S: BosStr = DefaultStr> {
     pub new_sha: S,
     pub old_sha: S,
     pub r#ref: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_push_trigger_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TriggerMetadata<S: BosStr = DefaultStr> {
     pub kind: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -158,15 +177,18 @@ pub struct TriggerMetadata<S: BosStr = DefaultStr> {
     ///Repository DID that code and workflow definitions are checked out from, when different from repo (e.g. a fork's commit for a fork-based manual trigger). If absent, source uses repo itself.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_repo: Option<Did<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_trigger_metadata_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TriggerRepo<S: BosStr = DefaultStr> {
     pub default_branch: S,
     pub did: Did<S>,
@@ -176,15 +198,18 @@ pub struct TriggerRepo<S: BosStr = DefaultStr> {
     ///DID of the repo itself
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo_did: Option<Did<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_trigger_repo_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Workflow<S: BosStr = DefaultStr> {
     pub clone: pipeline::CloneOpts<S>,
     pub engine: S,
@@ -192,7 +217,12 @@ pub struct Workflow<S: BosStr = DefaultStr> {
     pub raw: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub runs_on: Option<Vec<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_workflow_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -452,9 +482,22 @@ impl<S: BosStr> LexiconSchema for Workflow<S> {
     }
 }
 
+fn deserialize_clone_opts_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod clone_opts_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -664,7 +707,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CloneOpts<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CloneOpts<S> {
         CloneOpts {
             depth: self._fields.0.unwrap(),
             skip: self._fields.1.unwrap(),
@@ -676,10 +722,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.pipeline"),
@@ -688,12 +734,13 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("cloneOpts"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("skip"),
-                        SmolStr::new_static("depth"),
-                        SmolStr::new_static("submodules"),
-                        SmolStr::new_static("tags"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("skip"), SmolStr::new_static("depth"),
+                            SmolStr::new_static("submodules"),
+                            SmolStr::new_static("tags")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -731,13 +778,17 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        description: Some(CowStr::new_static(
-                            "DEPRECATED: use sh.tangled.ci.pipeline instead",
-                        )),
-                        required: Some(vec![
-                            SmolStr::new_static("triggerMetadata"),
-                            SmolStr::new_static("workflows"),
-                        ]),
+                        description: Some(
+                            CowStr::new_static(
+                                "DEPRECATED: use sh.tangled.ci.pipeline instead",
+                            ),
+                        ),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("triggerMetadata"),
+                                SmolStr::new_static("workflows")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -812,24 +863,19 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pair"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("key"),
-                        SmolStr::new_static("value"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("key"), SmolStr::new_static("value")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("key"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("value"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -839,38 +885,42 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pullRequestTriggerData"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("sourceBranch"),
-                        SmolStr::new_static("targetBranch"),
-                        SmolStr::new_static("sourceSha"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("sourceBranch"),
+                            SmolStr::new_static("targetBranch"),
+                            SmolStr::new_static("sourceSha")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("action"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "the pull request lifecycle action that produced this trigger",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "the pull request lifecycle action that produced this trigger",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("pull"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the sh.tangled.repo.pull record this run belongs to",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "AT-URI of the sh.tangled.repo.pull record this run belongs to",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sourceBranch"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("sourceSha"),
@@ -882,9 +932,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("targetBranch"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -894,11 +942,12 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pushTriggerData"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("ref"),
-                        SmolStr::new_static("newSha"),
-                        SmolStr::new_static("oldSha"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("ref"), SmolStr::new_static("newSha"),
+                            SmolStr::new_static("oldSha")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -920,9 +969,7 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("ref"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -990,19 +1037,18 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("triggerRepo"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("knot"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("defaultBranch"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("knot"), SmolStr::new_static("did"),
+                            SmolStr::new_static("defaultBranch")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("defaultBranch"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("did"),
@@ -1013,20 +1059,18 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("knot"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("repo"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("repoDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("DID of the repo itself")),
+                                description: Some(
+                                    CowStr::new_static("DID of the repo itself"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -1039,12 +1083,12 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("workflow"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("engine"),
-                        SmolStr::new_static("clone"),
-                        SmolStr::new_static("raw"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("engine"),
+                            SmolStr::new_static("clone"), SmolStr::new_static("raw")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1057,21 +1101,15 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("engine"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("raw"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("runsOn"),
@@ -1093,9 +1131,28 @@ fn lexicon_doc_sh_tangled_pipeline() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_pipeline_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod pipeline_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1140,10 +1197,7 @@ pub mod pipeline_state {
 /// Builder for constructing an instance of this type.
 pub struct PipelineBuilder<St: pipeline_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<pipeline::TriggerMetadata<S>>,
-        Option<Vec<pipeline::Workflow<S>>>,
-    ),
+    _fields: (Option<pipeline::TriggerMetadata<S>>, Option<Vec<pipeline::Workflow<S>>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1245,9 +1299,74 @@ where
     }
 }
 
+fn deserialize_manual_trigger_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_pair_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_pull_request_trigger_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_push_trigger_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_trigger_metadata_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod trigger_metadata_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1290,7 +1409,10 @@ pub mod trigger_metadata_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TriggerMetadataBuilder<St: trigger_metadata_state::State, S: BosStr = DefaultStr> {
+pub struct TriggerMetadataBuilder<
+    St: trigger_metadata_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -1360,12 +1482,18 @@ where
 
 impl<St: trigger_metadata_state::State, S: BosStr> TriggerMetadataBuilder<St, S> {
     /// Set the `manual` field (optional)
-    pub fn manual(mut self, value: impl Into<Option<pipeline::ManualTriggerData<S>>>) -> Self {
+    pub fn manual(
+        mut self,
+        value: impl Into<Option<pipeline::ManualTriggerData<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `manual` field to an Option value (optional)
-    pub fn maybe_manual(mut self, value: Option<pipeline::ManualTriggerData<S>>) -> Self {
+    pub fn maybe_manual(
+        mut self,
+        value: Option<pipeline::ManualTriggerData<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1392,7 +1520,10 @@ impl<St: trigger_metadata_state::State, S: BosStr> TriggerMetadataBuilder<St, S>
 
 impl<St: trigger_metadata_state::State, S: BosStr> TriggerMetadataBuilder<St, S> {
     /// Set the `push` field (optional)
-    pub fn push(mut self, value: impl Into<Option<pipeline::PushTriggerData<S>>>) -> Self {
+    pub fn push(
+        mut self,
+        value: impl Into<Option<pipeline::PushTriggerData<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -1454,7 +1585,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TriggerMetadata<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TriggerMetadata<S> {
         TriggerMetadata {
             kind: self._fields.0.unwrap(),
             manual: self._fields.1,
@@ -1467,9 +1601,22 @@ where
     }
 }
 
+fn deserialize_trigger_repo_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod trigger_repo_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1528,13 +1675,7 @@ pub mod trigger_repo_state {
 /// Builder for constructing an instance of this type.
 pub struct TriggerRepoBuilder<St: trigger_repo_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<Did<S>>,
-        Option<S>,
-        Option<S>,
-        Option<Did<S>>,
-    ),
+    _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1676,7 +1817,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TriggerRepo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TriggerRepo<S> {
         TriggerRepo {
             default_branch: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -1688,9 +1832,22 @@ where
     }
 }
 
+fn deserialize_workflow_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod workflow_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1855,7 +2012,10 @@ where
     St::Name: workflow_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> WorkflowBuilder<workflow_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> WorkflowBuilder<workflow_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         WorkflowBuilder {
             _state: PhantomData,
@@ -1871,7 +2031,10 @@ where
     St::Raw: workflow_state::IsUnset,
 {
     /// Set the `raw` field (required)
-    pub fn raw(mut self, value: impl Into<S>) -> WorkflowBuilder<workflow_state::SetRaw<St>, S> {
+    pub fn raw(
+        mut self,
+        value: impl Into<S>,
+    ) -> WorkflowBuilder<workflow_state::SetRaw<St>, S> {
         self._fields.3 = Option::Some(value.into());
         WorkflowBuilder {
             _state: PhantomData,

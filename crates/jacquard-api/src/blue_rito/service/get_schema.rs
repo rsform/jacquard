@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,31 +21,31 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::blue_rito::service::get_schema;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::blue_rito::service::get_schema;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Langs<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
     pub lang: S,
     pub moderation: Vec<S>,
     pub title: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_langs_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSchema<S: BosStr = DefaultStr> {
     pub nsid: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -55,10 +55,7 @@ pub struct GetSchema<S: BosStr = DefaultStr> {
 /// Returns the Bookmark data for the given NSID.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetSchemaOutput<S: BosStr = DefaultStr> {
     ///Comments with titles, content, and moderation in multiple languages.
     pub comments: Vec<get_schema::Langs<S>>,
@@ -114,8 +111,9 @@ impl jacquard_common::xrpc::XrpcResp for GetSchemaResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSchema<S> {
     const NSID: &'static str = "blue.rito.service.getSchema";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = GetSchemaResponse;
 }
 
@@ -125,15 +123,29 @@ Path: `/xrpc/blue.rito.service.getSchema`. The request payload type is `GetSchem
 pub struct GetSchemaRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSchemaRequest {
     const PATH: &'static str = "/xrpc/blue.rito.service.getSchema";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = GetSchema<S>;
     type Response = GetSchemaResponse;
 }
 
+fn deserialize_langs_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod langs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -251,7 +263,10 @@ where
     St::Lang: langs_state::IsUnset,
 {
     /// Set the `lang` field (required)
-    pub fn lang(mut self, value: impl Into<S>) -> LangsBuilder<langs_state::SetLang<St>, S> {
+    pub fn lang(
+        mut self,
+        value: impl Into<S>,
+    ) -> LangsBuilder<langs_state::SetLang<St>, S> {
         self._fields.1 = Option::Some(value.into());
         LangsBuilder {
             _state: PhantomData,
@@ -286,7 +301,10 @@ where
     St::Title: langs_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> LangsBuilder<langs_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> LangsBuilder<langs_state::SetTitle<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LangsBuilder {
             _state: PhantomData,
@@ -326,10 +344,10 @@ where
 }
 
 fn lexicon_doc_blue_rito_service_getSchema() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("blue.rito.service.getSchema"),
@@ -338,25 +356,22 @@ fn lexicon_doc_blue_rito_service_getSchema() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("langs"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("lang"),
-                        SmolStr::new_static("title"),
-                        SmolStr::new_static("moderation"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("lang"), SmolStr::new_static("title"),
+                            SmolStr::new_static("moderation")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("comment"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("lang"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("moderation"),
@@ -369,9 +384,7 @@ fn lexicon_doc_blue_rito_service_getSchema() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("title"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -383,21 +396,23 @@ fn lexicon_doc_blue_rito_service_getSchema() -> LexiconDoc<'static> {
                 LexUserType::XrpcProcedure(LexXrpcProcedure {
                     input: Some(LexXrpcBody {
                         encoding: CowStr::new_static("application/json"),
-                        schema: Some(LexXrpcBodySchema::Object(LexObject {
-                            required: Some(vec![SmolStr::new_static("nsid")]),
-                            properties: {
-                                #[allow(unused_mut)]
-                                let mut map = BTreeMap::new();
-                                map.insert(
-                                    SmolStr::new_static("nsid"),
-                                    LexObjectProperty::String(LexString {
-                                        ..Default::default()
-                                    }),
-                                );
-                                map
-                            },
-                            ..Default::default()
-                        })),
+                        schema: Some(
+                            LexXrpcBodySchema::Object(LexObject {
+                                required: Some(vec![SmolStr::new_static("nsid")]),
+                                properties: {
+                                    #[allow(unused_mut)]
+                                    let mut map = BTreeMap::new();
+                                    map.insert(
+                                        SmolStr::new_static("nsid"),
+                                        LexObjectProperty::String(LexString {
+                                            ..Default::default()
+                                        }),
+                                    );
+                                    map
+                                },
+                                ..Default::default()
+                            }),
+                        ),
                         ..Default::default()
                     }),
                     ..Default::default()

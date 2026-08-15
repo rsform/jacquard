@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -58,7 +58,12 @@ pub struct Tape<S: BosStr = DefaultStr> {
     ///Direct URL to download the original ZIP file with frames and audio
     #[serde(skip_serializing_if = "Option::is_none")]
     pub zip_url: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_tape_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -133,20 +138,25 @@ impl<S: BosStr> LexiconSchema for Tape<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/jpeg", "image/png"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumbnail"),
-                        accepted: vec!["image/jpeg".to_string(), "image/png".to_string()],
+                        accepted: vec![
+                            "image/jpeg".to_string(), "image/png".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -168,16 +178,19 @@ impl<S: BosStr> LexiconSchema for Tape<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["video/mp4"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("video"),
@@ -191,9 +204,28 @@ impl<S: BosStr> LexiconSchema for Tape<S> {
     }
 }
 
+fn deserialize_tape_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod tape_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -320,7 +352,10 @@ where
     St::Code: tape_state::IsUnset,
 {
     /// Set the `code` field (required)
-    pub fn code(mut self, value: impl Into<S>) -> TapeBuilder<tape_state::SetCode<St>, S> {
+    pub fn code(
+        mut self,
+        value: impl Into<S>,
+    ) -> TapeBuilder<tape_state::SetCode<St>, S> {
         self._fields.1 = Option::Some(value.into());
         TapeBuilder {
             _state: PhantomData,
@@ -349,7 +384,10 @@ where
     St::Slug: tape_state::IsUnset,
 {
     /// Set the `slug` field (required)
-    pub fn slug(mut self, value: impl Into<S>) -> TapeBuilder<tape_state::SetSlug<St>, S> {
+    pub fn slug(
+        mut self,
+        value: impl Into<S>,
+    ) -> TapeBuilder<tape_state::SetSlug<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TapeBuilder {
             _state: PhantomData,
@@ -391,7 +429,10 @@ where
     St::When: tape_state::IsUnset,
 {
     /// Set the `when` field (required)
-    pub fn when(mut self, value: impl Into<Datetime>) -> TapeBuilder<tape_state::SetWhen<St>, S> {
+    pub fn when(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> TapeBuilder<tape_state::SetWhen<St>, S> {
         self._fields.6 = Option::Some(value.into());
         TapeBuilder {
             _state: PhantomData,
@@ -452,10 +493,10 @@ where
 }
 
 fn lexicon_doc_computer_aesthetic_tape() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("computer.aesthetic.tape"),

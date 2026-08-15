@@ -10,8 +10,8 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -22,10 +22,10 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::io_atcr::hold::subscribe_scan_jobs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::hold::subscribe_scan_jobs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase")]
@@ -33,6 +33,7 @@ pub struct SubscribeScanJobs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<i64>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -52,26 +53,43 @@ impl<S: BosStr> SubscribeScanJobsMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#scanJob" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::ScanJob(Box::new(variant)))
             }
             "#scanResult" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::ScanResult(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SubscribeScanJobsError {
     /// Scanner shared secret is invalid
@@ -79,10 +97,7 @@ pub enum SubscribeScanJobsError {
     InvalidSecret(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SubscribeScanJobsError {
@@ -109,10 +124,7 @@ impl core::fmt::Display for SubscribeScanJobsError {
 /// A scan job dispatched from hold to scanner. Sent as a JSON WebSocket message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScanJob<S: BosStr = DefaultStr> {
     ///Manifest digest (e.g., sha256:abc123...)
     pub digest: S,
@@ -134,17 +146,19 @@ pub struct ScanJob<S: BosStr = DefaultStr> {
     pub r#type: S,
     ///DID of the image owner
     pub user_did: Did<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_scan_job_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A scan result sent from scanner back to hold. Sent as a JSON WebSocket message.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScanResult<S: BosStr = DefaultStr> {
     ///Manifest digest that was scanned
     pub digest: S,
@@ -166,15 +180,18 @@ pub struct ScanResult<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default, with = "jacquard_common::opt_serde_bytes_helper")]
     pub vuln_report: Option<Bytes>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_scan_result_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VulnSummary<S: BosStr = DefaultStr> {
     ///Count of critical severity vulnerabilities
     pub critical: i64,
@@ -186,7 +203,12 @@ pub struct VulnSummary<S: BosStr = DefaultStr> {
     pub medium: i64,
     ///Total vulnerability count
     pub total: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_vuln_summary_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -195,24 +217,21 @@ pub struct VulnSummary<S: BosStr = DefaultStr> {
 pub struct SubscribeScanJobsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribeScanJobsStream {
     const NSID: &'static str = "io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribeScanJobsMessage<S>;
     type Error = SubscribeScanJobsError;
 }
 
 impl jacquard_common::xrpc::XrpcSubscription for SubscribeScanJobs {
     const NSID: &'static str = "io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribeScanJobsStream;
 }
 
 pub struct SubscribeScanJobsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribeScanJobsEndpoint {
     const PATH: &'static str = "/xrpc/io.atcr.hold.subscribeScanJobs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribeScanJobs;
     type Stream = SubscribeScanJobsStream;
 }
@@ -399,7 +418,7 @@ impl<S: BosStr> LexiconSchema for VulnSummary<S> {
 
 pub mod subscribe_scan_jobs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -474,9 +493,22 @@ where
     }
 }
 
+fn deserialize_scan_job_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod scan_job_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -756,7 +788,10 @@ where
     St::Seq: scan_job_state::IsUnset,
 {
     /// Set the `seq` field (required)
-    pub fn seq(mut self, value: impl Into<i64>) -> ScanJobBuilder<scan_job_state::SetSeq<St>, S> {
+    pub fn seq(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ScanJobBuilder<scan_job_state::SetSeq<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -785,7 +820,10 @@ where
     St::Type: scan_job_state::IsUnset,
 {
     /// Set the `type` field (required)
-    pub fn r#type(mut self, value: impl Into<S>) -> ScanJobBuilder<scan_job_state::SetType<St>, S> {
+    pub fn r#type(
+        mut self,
+        value: impl Into<S>,
+    ) -> ScanJobBuilder<scan_job_state::SetType<St>, S> {
         self._fields.7 = Option::Some(value.into());
         ScanJobBuilder {
             _state: PhantomData,
@@ -858,10 +896,10 @@ where
 }
 
 fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("io.atcr.hold.subscribeScanJobs"),
@@ -870,20 +908,22 @@ fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcSubscription(LexXrpcSubscription {
-                    parameters: Some(LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -1087,13 +1127,13 @@ fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("vulnSummary"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("critical"),
-                        SmolStr::new_static("high"),
-                        SmolStr::new_static("medium"),
-                        SmolStr::new_static("low"),
-                        SmolStr::new_static("total"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("critical"), SmolStr::new_static("high"),
+                            SmolStr::new_static("medium"), SmolStr::new_static("low"),
+                            SmolStr::new_static("total")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1143,9 +1183,22 @@ fn lexicon_doc_io_atcr_hold_subscribeScanJobs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_scan_result_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod scan_result_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1382,7 +1435,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ScanResult<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ScanResult<S> {
         ScanResult {
             digest: self._fields.0.unwrap(),
             error: self._fields.1,
@@ -1396,9 +1452,22 @@ where
     }
 }
 
+fn deserialize_vuln_summary_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod vuln_summary_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1491,13 +1560,7 @@ pub mod vuln_summary_state {
 /// Builder for constructing an instance of this type.
 pub struct VulnSummaryBuilder<St: vuln_summary_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-        Option<i64>,
-    ),
+    _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1653,7 +1716,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> VulnSummary<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> VulnSummary<S> {
         VulnSummary {
             critical: self._fields.0.unwrap(),
             high: self._fields.1.unwrap(),

@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "place.stream.vod.listDrafts",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List the authenticated user's draft VODs, newest first.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor from a previous response."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of drafts to return.",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "drafts"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "description": "Pagination cursor for the next page, if more results exist."
+            },
+            "drafts": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "place.stream.vod.draftDefs#draftView"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

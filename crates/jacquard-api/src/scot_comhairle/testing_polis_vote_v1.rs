@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::scot_comhairle::testing_polis_vote_v1;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::scot_comhairle::testing_polis_vote_v1;
 /// A vote on a statement in the Polis-style deliberation system
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -46,7 +46,12 @@ pub struct TestingPolisVoteV1<S: BosStr = DefaultStr> {
     pub subject: testing_polis_vote_v1::StatementRef<S>,
     ///The vote value
     pub value: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_testing_polis_vote_v1_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -64,32 +69,36 @@ pub struct TestingPolisVoteV1GetRecordOutput<S: BosStr = DefaultStr> {
 /// Reference to a poll record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PollRef<S: BosStr = DefaultStr> {
     ///Content identifier of the poll record
     pub cid: Cid<S>,
     ///AT-URI of the poll record
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_poll_ref_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Reference to a statement record
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StatementRef<S: BosStr = DefaultStr> {
     ///Content identifier of the statement record
     pub cid: Cid<S>,
     ///AT-URI of the statement record
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_statement_ref_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -171,9 +180,28 @@ impl<S: BosStr> LexiconSchema for StatementRef<S> {
     }
 }
 
+fn deserialize_testing_polis_vote_v1_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod testing_polis_vote_v1_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -246,8 +274,10 @@ pub mod testing_polis_vote_v1_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct TestingPolisVoteV1Builder<St: testing_polis_vote_v1_state::State, S: BosStr = DefaultStr>
-{
+pub struct TestingPolisVoteV1Builder<
+    St: testing_polis_vote_v1_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -260,14 +290,20 @@ pub struct TestingPolisVoteV1Builder<St: testing_polis_vote_v1_state::State, S: 
 
 impl TestingPolisVoteV1<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> TestingPolisVoteV1Builder<testing_polis_vote_v1_state::Empty, DefaultStr> {
+    pub fn new() -> TestingPolisVoteV1Builder<
+        testing_polis_vote_v1_state::Empty,
+        DefaultStr,
+    > {
         TestingPolisVoteV1Builder::new()
     }
 }
 
 impl<S: BosStr> TestingPolisVoteV1<S> {
     /// Create a new builder for this type
-    pub fn builder() -> TestingPolisVoteV1Builder<testing_polis_vote_v1_state::Empty, S> {
+    pub fn builder() -> TestingPolisVoteV1Builder<
+        testing_polis_vote_v1_state::Empty,
+        S,
+    > {
         TestingPolisVoteV1Builder::builder()
     }
 }
@@ -389,7 +425,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TestingPolisVoteV1<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TestingPolisVoteV1<S> {
         TestingPolisVoteV1 {
             created_at: self._fields.0.unwrap(),
             poll: self._fields.1.unwrap(),
@@ -401,10 +440,10 @@ where
 }
 
 fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("scot.comhairle.testingPolisVoteV1"),
@@ -413,26 +452,29 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A vote on a statement in the Polis-style deliberation system",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A vote on a statement in the Polis-style deliberation system",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("value"),
-                            SmolStr::new_static("subject"),
-                            SmolStr::new_static("poll"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("value"),
+                                SmolStr::new_static("subject"), SmolStr::new_static("poll"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when the vote was created",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when the vote was created"),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -469,16 +511,18 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
                 SmolStr::new_static("pollRef"),
                 LexUserType::Object(LexObject {
                     description: Some(CowStr::new_static("Reference to a poll record")),
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content identifier of the poll record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Content identifier of the poll record"),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -486,7 +530,9 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("AT-URI of the poll record")),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the poll record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -499,17 +545,23 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("statementRef"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Reference to a statement record")),
-                    required: Some(vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")]),
+                    description: Some(
+                        CowStr::new_static("Reference to a statement record"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("uri"), SmolStr::new_static("cid")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Content identifier of the statement record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Content identifier of the statement record",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -517,9 +569,9 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "AT-URI of the statement record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("AT-URI of the statement record"),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -535,9 +587,22 @@ fn lexicon_doc_scot_comhairle_testingPolisVoteV1() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_poll_ref_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod poll_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -684,9 +749,22 @@ where
     }
 }
 
+fn deserialize_statement_ref_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod statement_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -824,7 +902,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> StatementRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StatementRef<S> {
         StatementRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

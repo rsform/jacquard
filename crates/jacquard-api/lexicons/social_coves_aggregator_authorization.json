@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.authorization",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Authorization for an aggregator to post to a community with specific configuration. Published in the community's repository by moderators. The record key MUST be the authorized aggregator's DID, guaranteeing at most one authorization per (community, aggregator) pair. Similar to social.coves.actor.subscription.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "aggregatorDid",
+          "communityDid",
+          "enabled",
+          "createdAt",
+          "createdBy"
+        ],
+        "properties": {
+          "aggregatorDid": {
+            "type": "string",
+            "description": "DID of the authorized aggregator",
+            "format": "did"
+          },
+          "communityDid": {
+            "type": "string",
+            "description": "DID of the community granting access (must match repo DID)",
+            "format": "did"
+          },
+          "config": {
+            "type": "unknown",
+            "description": "Aggregator-specific configuration. Must conform to the aggregator's configSchema."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "DID of moderator who authorized this aggregator",
+            "format": "did"
+          },
+          "disabledAt": {
+            "type": "string",
+            "description": "When this authorization was disabled (if enabled=false)",
+            "format": "datetime"
+          },
+          "disabledBy": {
+            "type": "string",
+            "description": "DID of moderator who disabled this aggregator",
+            "format": "did"
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Whether this aggregator is currently active. Can be toggled without deleting the record."
+          }
+        }
+      }
+    }
+  }
+}

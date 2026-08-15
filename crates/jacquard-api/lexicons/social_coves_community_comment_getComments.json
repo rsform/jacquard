@@ -1,0 +1,115 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.comment.getComments",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get comments for a post with threading and sorting support. Supports hot/top/new sorting, configurable nesting depth, and pagination.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "post"
+        ],
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Pagination cursor from previous response",
+            "maxLength": 500
+          },
+          "depth": {
+            "type": "integer",
+            "description": "Maximum reply nesting depth to return. 0 returns only top-level comments.",
+            "default": 10,
+            "minimum": 0,
+            "maximum": 100
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of top-level comments to return per page",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "parentRkey": {
+            "type": "string",
+            "description": "Record key of a comment within the post. When provided, the response contains only the subtree rooted at that comment: the comment itself as the sole top-level entry, with its descendants nested beneath it. depth is relative to this comment (0 returns only the comment itself), and limit/cursor paginate its direct replies.",
+            "format": "record-key"
+          },
+          "post": {
+            "type": "string",
+            "description": "AT-URI of the post to get comments for",
+            "format": "at-uri"
+          },
+          "sort": {
+            "type": "string",
+            "description": "Sort order: hot (trending), top (highest score), new (most recent)",
+            "default": "hot",
+            "maxLength": 64,
+            "knownValues": [
+              "hot",
+              "top",
+              "new"
+            ]
+          },
+          "timeframe": {
+            "type": "string",
+            "description": "Timeframe for 'top' sort. Ignored for other sort types.",
+            "maxLength": 64,
+            "knownValues": [
+              "hour",
+              "day",
+              "week",
+              "month",
+              "year",
+              "all"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "comments",
+            "post"
+          ],
+          "properties": {
+            "comments": {
+              "type": "array",
+              "description": "Top-level comments with nested replies up to requested depth",
+              "items": {
+                "type": "ref",
+                "ref": "social.coves.community.comment.defs#threadViewComment"
+              }
+            },
+            "cursor": {
+              "type": "string",
+              "description": "Pagination cursor for fetching next page of top-level comments",
+              "maxLength": 500
+            },
+            "post": {
+              "type": "ref",
+              "description": "The post these comments belong to",
+              "ref": "social.coves.community.post.defs#postView"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Post not found",
+          "name": "NotFound"
+        },
+        {
+          "description": "No comment with the given parentRkey exists within the post",
+          "name": "ParentNotFound"
+        },
+        {
+          "description": "Invalid parameters (malformed URI, invalid sort/timeframe combination, etc.)",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

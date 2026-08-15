@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -19,31 +19,33 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// The strategy used to authenticate fetch requests for private records in a hidden repository.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Strategy<S: BosStr = DefaultStr> {
     /**The name that identifies the strategy. The following strategies are supported:
-    1. `nobody` - Only the author
-    2. `author-follows` - Accounts the author follows
-    3. `following-author` - Accounts following the author
-    4. `mutuals` - Accounts that both the author follows and are following the author
-    5. `mentioned` - The author, along with any accounts "mentioned", including in-text or via reply/embed/etc. links
-    6. `threadgate` - Uses the public post's existing `app.bsky.feed.threadgate` record to determine visibility
-    7. `circle` - Implementation-defined, generally a configurable per-author list of accounts
-    8. `inherit` - Implementation-defined, generally used for replies, allows the set of accounts that the parent record allows, plus the author of the reply record
+1. `nobody` - Only the author
+2. `author-follows` - Accounts the author follows
+3. `following-author` - Accounts following the author
+4. `mutuals` - Accounts that both the author follows and are following the author
+5. `mentioned` - The author, along with any accounts "mentioned", including in-text or via reply/embed/etc. links
+6. `threadgate` - Uses the public post's existing `app.bsky.feed.threadgate` record to determine visibility
+7. `circle` - Implementation-defined, generally a configurable per-author list of accounts
+8. `inherit` - Implementation-defined, generally used for replies, allows the set of accounts that the parent record allows, plus the author of the reply record
 
-    When fetching a private record from the hidden repository, the server will check the record's strategy, and if the requesting account is not allowed, the server will act as if the record does not exist.
+When fetching a private record from the hidden repository, the server will check the record's strategy, and if the requesting account is not allowed, the server will act as if the record does not exist.
 
-    Of course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.
-    */
+Of course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.
+*/
     pub name: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_strategy_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,11 +64,24 @@ impl<S: BosStr> LexiconSchema for Strategy<S> {
     }
 }
 
+fn deserialize_strategy_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_ooo_bsky_authfetch_strategy() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("ooo.bsky.authfetch.strategy"),

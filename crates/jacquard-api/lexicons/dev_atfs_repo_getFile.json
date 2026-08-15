@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "dev.atfs.repo.getFile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Fetch a file previously uploaded to this atfs instance. Compatible with com.atproto.sync.getBlob — also mounted, unmodified, under that name, for callers that have no reason to know atfs has its own name for it — with one deliberate difference: did is optional here. Requiring a did the way a PDS does is a repo-scoping artifact (a PDS's blobs live inside a specific account's repo); atfs content is content-addressed by cid alone, and the /ipfs/<cid> gateway path already serves it that way, so a did-less getFile exposes nothing a full IPFS client couldn't already reach. When did is supplied, the file is served only if that account holds a claim on it — pin-set membership (see dev.atfs.repo.deleteFile), which any claimant satisfies whether or not it was the one that originally uploaded the file — a mismatch is reported identically to a missing file — matching com.atproto.sync.getBlob's own scoping exactly; the com.atproto.sync.getBlob alias always requires it, to stay PDS-compatible. Does not require auth, on either name.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "cid"
+        ],
+        "properties": {
+          "cid": {
+            "type": "string",
+            "description": "The blessed CID (see dev.atfs.file) of the file to fetch.",
+            "format": "cid"
+          },
+          "did": {
+            "type": "string",
+            "description": "Restrict the fetch to a file this account holds a claim on (pin-set membership — not necessarily the account that uploaded it). Optional here — unlike on the com.atproto.sync.getBlob alias, where it's required to stay PDS-compatible — since atfs content is addressed by cid alone, so omitting did simply serves any file with that cid.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "*/*"
+      },
+      "errors": [
+        {
+          "description": "No file is stored under this cid, or — when did is supplied — that account holds no claim on it; the two are reported identically, matching com.atproto.sync.getBlob's own behavior. Also reported, indistinguishably, when this instance once tried to fetch this cid and gave up: a failed fetch stays impossible to tell apart from a cid that was never asked for.",
+          "name": "BlobNotFound"
+        },
+        {
+          "description": "This instance doesn't have the file yet but is actively trying to fetch it (see dev.atfs.repo.pinFile). Served over HTTP 503 with a Retry-After header naming how long to wait before asking again; retrying is the status check.",
+          "name": "ContentPending"
+        }
+      ]
+    }
+  }
+}

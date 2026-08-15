@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A review of a community contribution by a moderator.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -44,9 +44,15 @@ pub struct ContributionReview<S: BosStr = DefaultStr> {
     pub reason: Option<S>,
     pub reviewed_by: Did<S>,
     pub status: ContributionReviewStatus<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_contribution_review_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ContributionReviewStatus<S: BosStr = DefaultStr> {
@@ -97,7 +103,8 @@ impl<S: BosStr> Serialize for ContributionReviewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContributionReviewStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ContributionReviewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -123,8 +130,12 @@ where
         match self {
             ContributionReviewStatus::Approved => ContributionReviewStatus::Approved,
             ContributionReviewStatus::Denied => ContributionReviewStatus::Denied,
-            ContributionReviewStatus::NeedsRevision => ContributionReviewStatus::NeedsRevision,
-            ContributionReviewStatus::Other(v) => ContributionReviewStatus::Other(v.into_static()),
+            ContributionReviewStatus::NeedsRevision => {
+                ContributionReviewStatus::NeedsRevision
+            }
+            ContributionReviewStatus::Other(v) => {
+                ContributionReviewStatus::Other(v.into_static())
+            }
         }
     }
 }
@@ -200,9 +211,28 @@ impl<S: BosStr> LexiconSchema for ContributionReview<S> {
     }
 }
 
+fn deserialize_contribution_review_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod contribution_review_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -275,7 +305,10 @@ pub mod contribution_review_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributionReviewBuilder<St: contribution_review_state::State, S: BosStr = DefaultStr> {
+pub struct ContributionReviewBuilder<
+    St: contribution_review_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
@@ -289,7 +322,10 @@ pub struct ContributionReviewBuilder<St: contribution_review_state::State, S: Bo
 
 impl ContributionReview<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ContributionReviewBuilder<contribution_review_state::Empty, DefaultStr> {
+    pub fn new() -> ContributionReviewBuilder<
+        contribution_review_state::Empty,
+        DefaultStr,
+    > {
         ContributionReviewBuilder::new()
     }
 }
@@ -432,7 +468,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContributionReview<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContributionReview<S> {
         ContributionReview {
             contribution: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -445,10 +484,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_contributionReview() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.contributionReview"),
@@ -457,17 +496,21 @@ fn lexicon_doc_games_gamesgamesgamesgames_contributionReview() -> LexiconDoc<'st
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A review of a community contribution by a moderator.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A review of a community contribution by a moderator.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("contribution"),
-                            SmolStr::new_static("status"),
-                            SmolStr::new_static("reviewedBy"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("contribution"),
+                                SmolStr::new_static("status"),
+                                SmolStr::new_static("reviewedBy"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();

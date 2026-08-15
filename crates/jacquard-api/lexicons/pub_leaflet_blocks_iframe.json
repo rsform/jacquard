@@ -19,9 +19,6 @@
     },
     "main": {
       "type": "object",
-      "required": [
-        "url"
-      ],
       "properties": {
         "aspectRatio": {
           "type": "ref",
@@ -31,6 +28,10 @@
           "type": "integer",
           "minimum": 16,
           "maximum": 1600
+        },
+        "html": {
+          "type": "string",
+          "description": "DEPRECATED — use pub.leaflet.blocks.html instead. Inline HTML rendered via the iframe's srcdoc attribute. Takes precedence over url."
         },
         "url": {
           "type": "string",

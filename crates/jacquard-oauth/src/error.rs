@@ -65,6 +65,16 @@ pub enum OAuthError {
     #[diagnostic(code(jacquard_oauth::invalid_request))]
     InvalidRequest(String),
 
+    /// An XRPC request made as part of an OAuth flow failed.
+    #[error(transparent)]
+    #[diagnostic(code(jacquard_oauth::xrpc))]
+    Xrpc(#[from] jacquard_common::error::ClientError),
+
+    /// The space authority rejected a credential-mint request.
+    #[error("space credential request failed: {0}")]
+    #[diagnostic(code(jacquard_oauth::space_mint))]
+    SpaceMint(String),
+
     /// An error validating an authorization callback.
     #[error(transparent)]
     #[diagnostic(code(jacquard_oauth::callback))]

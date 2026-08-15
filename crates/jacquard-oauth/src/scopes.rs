@@ -78,6 +78,7 @@ use jacquard_common::deps::fluent_uri::pct_enc::{
     encoder::{Query, Query as EncQuery},
 };
 use jacquard_common::types::collection::Collection;
+use jacquard_common::types::did::validate_did;
 use jacquard_common::types::did_service::validate_did_service;
 use jacquard_common::types::nsid::Nsid;
 use jacquard_common::types::string::{AtStrError, DidService};
@@ -101,6 +102,8 @@ pub enum Scope<S: BosStr = DefaultStr> {
     Repo(RepoScope<S>),
     /// RPC scope for method access
     Rpc(RpcScope<S>),
+    /// Space scope for permissioned-space access
+    Space(SpaceScope<S>),
     /// AT Protocol scope - required to indicate that other AT Protocol scopes will be used
     Atproto,
     /// Transition scope for migration operations
@@ -170,6 +173,7 @@ where
             Scope::Blob(scope) => Scope::Blob(scope.into_static()),
             Scope::Repo(scope) => Scope::Repo(scope.into_static()),
             Scope::Rpc(scope) => Scope::Rpc(scope.into_static()),
+            Scope::Space(scope) => Scope::Space(scope.into_static()),
             Scope::Atproto => Scope::Atproto,
             Scope::Transition(scope) => Scope::Transition(scope),
             Scope::Include(scope) => Scope::Include(scope.into_static()),
@@ -591,6 +595,96 @@ pub enum MimePattern<S: BosStr = DefaultStr> {
     Exact(S),
 }
 
+/// Whether space scope `a` grants every permission space scope `b` requires,
+/// mirroring the reference implementation's `SpacePermission::matches`:
+/// `read` implies `read_self`, wildcards in type/authority/skey/collection
+/// cover concrete values, `self` authority never matches a concrete one, and
+/// collection constraints only bind write actions.
+fn space_scope_grants<T: BosStr, U: BosStr>(a: &SpaceScope<T>, b: &SpaceScope<U>) -> bool {
+    let type_match = match (&a.space_type, &b.space_type) {
+        (SpaceType::All, _) => true,
+        (SpaceType::Nsid(a_nsid), SpaceType::Nsid(b_nsid)) => a_nsid.as_ref() == b_nsid.as_ref(),
+        _ => false,
+    };
+    if !type_match {
+        return false;
+    }
+
+    let authority_match = match (&a.authority, &b.authority) {
+        (SpaceAuthority::All, _) => true,
+        (SpaceAuthority::Self_, SpaceAuthority::Self_) => true,
+        (SpaceAuthority::Did(a_did), SpaceAuthority::Did(b_did)) => {
+            a_did.as_ref() == b_did.as_ref()
+        }
+        _ => false,
+    };
+    if !authority_match {
+        return false;
+    }
+
+    let skey_match = match (&a.skey, &b.skey) {
+        (SpaceSkey::All, _) => true,
+        (SpaceSkey::Key(a_key), SpaceSkey::Key(b_key)) => a_key.as_ref() == b_key.as_ref(),
+        _ => false,
+    };
+    if !skey_match {
+        return false;
+    }
+
+    for action in &b.actions {
+        let granted = match action {
+            SpaceAction::ReadSelf => {
+                a.actions.contains(&SpaceAction::Read)
+                    || a.actions.contains(&SpaceAction::ReadSelf)
+            }
+            SpaceAction::Read => a.actions.contains(&SpaceAction::Read),
+            SpaceAction::Create | SpaceAction::Update | SpaceAction::Delete => {
+                a.actions.contains(action)
+            }
+        };
+        if !granted {
+            return false;
+        }
+    }
+
+    // Collection constraints bind only write actions: if `b` grants writes,
+    // `a` must allow every collection `b` names.
+    let b_has_writes = b.actions.iter().any(|act| {
+        matches!(
+            act,
+            SpaceAction::Create | SpaceAction::Update | SpaceAction::Delete
+        )
+    });
+    if b_has_writes {
+        let a_allows_all = a.collections.is_empty()
+            || a
+                .collections
+                .iter()
+                .any(|c| matches!(c, SpaceCollection::All));
+        let within = if b.collections.is_empty() {
+            // `b` grants writes on every collection; only a wildcard (or
+            // absent) constraint in `a` can cover that.
+            a_allows_all
+        } else {
+            b.collections.iter().all(|bc| match bc {
+                SpaceCollection::All => a_allows_all,
+                SpaceCollection::Nsid(b_nsid) => {
+                    a_allows_all
+                        || a.collections.iter().any(|ac| match ac {
+                            SpaceCollection::All => true,
+                            SpaceCollection::Nsid(a_nsid) => a_nsid.as_ref() == b_nsid.as_ref(),
+                        })
+                }
+            })
+        };
+        if !within {
+            return false;
+        }
+    }
+
+    b.manage.is_subset(&a.manage)
+}
+
 impl<S: BosStr> MimePattern<S> {
     /// Convert to a `MimePattern` with a different backing type.
     pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> MimePattern<B> {
@@ -695,6 +789,233 @@ where
         match self {
             RepoCollection::All => RepoCollection::All,
             RepoCollection::Nsid(nsid) => RepoCollection::Nsid(nsid.into_static()),
+        }
+    }
+}
+
+/// Space scope: permission over a permissioned-space type with optional
+/// authority, skey, collection, action, and manage constraints.
+///
+/// Wire form: `space:<type>` with query parameters `authority` (default
+/// `self`), `skey` (default `*`), `collection`, `action`, and `manage`,
+/// matching the reference implementation's scope grammar.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SpaceScope<S: BosStr = DefaultStr> {
+    /// Space type NSID or wildcard.
+    pub space_type: SpaceType<S>,
+    /// Space authority: any, the requesting user's own spaces, or a DID.
+    pub authority: SpaceAuthority<S>,
+    /// Space key: any or a specific record key.
+    pub skey: SpaceSkey<S>,
+    /// Collections the grant covers; empty means all.
+    pub collections: BTreeSet<SpaceCollection<S>>,
+    /// Actions the grant covers.
+    pub actions: BTreeSet<SpaceAction>,
+    /// Space-management operations the grant covers.
+    pub manage: BTreeSet<SpaceManageOp>,
+}
+
+/// Space type selector.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SpaceType<S: BosStr = DefaultStr> {
+    /// Any space type (`*`).
+    All,
+    /// A specific space-type NSID.
+    Nsid(Nsid<S>),
+}
+
+impl<S: BosStr> SpaceType<S> {
+    /// Convert to a `SpaceType` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> SpaceType<B> {
+        match self {
+            SpaceType::All => SpaceType::All,
+            SpaceType::Nsid(nsid) => SpaceType::Nsid(nsid.convert()),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for SpaceType<S>
+where
+    S::Output: BosStr,
+{
+    type Output = SpaceType<S::Output>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            SpaceType::All => SpaceType::All,
+            SpaceType::Nsid(nsid) => SpaceType::Nsid(nsid.into_static()),
+        }
+    }
+}
+
+/// Space authority selector.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SpaceAuthority<S: BosStr = DefaultStr> {
+    /// Any authority (`*`).
+    All,
+    /// The requesting user's own spaces (the default; not a grant over
+    /// anyone else's spaces).
+    Self_,
+    /// A specific authority DID.
+    Did(jacquard_common::types::did::Did<S>),
+}
+
+impl<S: BosStr> SpaceAuthority<S> {
+    /// Convert to a `SpaceAuthority` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(
+        self,
+    ) -> SpaceAuthority<B> {
+        match self {
+            SpaceAuthority::All => SpaceAuthority::All,
+            SpaceAuthority::Self_ => SpaceAuthority::Self_,
+            SpaceAuthority::Did(did) => SpaceAuthority::Did(did.convert()),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for SpaceAuthority<S>
+where
+    S::Output: BosStr,
+{
+    type Output = SpaceAuthority<S::Output>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            SpaceAuthority::All => SpaceAuthority::All,
+            SpaceAuthority::Self_ => SpaceAuthority::Self_,
+            SpaceAuthority::Did(did) => SpaceAuthority::Did(did.into_static()),
+        }
+    }
+}
+
+/// Space key selector.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SpaceSkey<S: BosStr = DefaultStr> {
+    /// Any skey (`*`, the default).
+    All,
+    /// A specific space key (record-key syntax).
+    Key(S),
+}
+
+impl<S: BosStr> SpaceSkey<S> {
+    /// Convert to a `SpaceSkey` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> SpaceSkey<B> {
+        match self {
+            SpaceSkey::All => SpaceSkey::All,
+            SpaceSkey::Key(key) => SpaceSkey::Key(B::from(key)),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for SpaceSkey<S>
+where
+    S::Output: BosStr,
+{
+    type Output = SpaceSkey<S::Output>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            SpaceSkey::All => SpaceSkey::All,
+            SpaceSkey::Key(key) => SpaceSkey::Key(key.into_static()),
+        }
+    }
+}
+
+/// Space collection selector.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum SpaceCollection<S: BosStr = DefaultStr> {
+    /// Any collection (`*`).
+    All,
+    /// A specific collection NSID.
+    Nsid(Nsid<S>),
+}
+
+impl<S: BosStr> SpaceCollection<S> {
+    /// Convert to a `SpaceCollection` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(
+        self,
+    ) -> SpaceCollection<B> {
+        match self {
+            SpaceCollection::All => SpaceCollection::All,
+            SpaceCollection::Nsid(nsid) => SpaceCollection::Nsid(nsid.convert()),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for SpaceCollection<S>
+where
+    S::Output: BosStr,
+{
+    type Output = SpaceCollection<S::Output>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            SpaceCollection::All => SpaceCollection::All,
+            SpaceCollection::Nsid(nsid) => SpaceCollection::Nsid(nsid.into_static()),
+        }
+    }
+}
+
+/// Actions permitted on a space. `Read` implies `ReadSelf`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum SpaceAction {
+    /// Read the holder's own repo within the space.
+    ReadSelf,
+    /// Read any repo within the space (implies `ReadSelf`).
+    Read,
+    /// Create records in the space.
+    Create,
+    /// Update records in the space.
+    Update,
+    /// Delete records in the space.
+    Delete,
+}
+
+/// Space-management operations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum SpaceManageOp {
+    /// Create spaces.
+    Create,
+    /// Update spaces.
+    Update,
+    /// Delete spaces.
+    Delete,
+}
+
+impl<S: BosStr + Ord> SpaceScope<S> {
+    /// Convert to a `SpaceScope` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr + Ord>(
+        self,
+    ) -> SpaceScope<B> {
+        SpaceScope {
+            space_type: self.space_type.convert(),
+            authority: self.authority.convert(),
+            skey: self.skey.convert(),
+            collections: self.collections.into_iter().map(|c| c.convert()).collect(),
+            actions: self.actions,
+            manage: self.manage,
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic + Ord> IntoStatic for SpaceScope<S>
+where
+    S::Output: BosStr + Ord,
+{
+    type Output = SpaceScope<S::Output>;
+
+    fn into_static(self) -> Self::Output {
+        SpaceScope {
+            space_type: self.space_type.into_static(),
+            authority: self.authority.into_static(),
+            skey: self.skey.into_static(),
+            collections: self
+                .collections
+                .into_iter()
+                .map(|c| c.into_static())
+                .collect(),
+            actions: self.actions,
+            manage: self.manage,
         }
     }
 }
@@ -827,6 +1148,14 @@ pub(crate) enum ScopeInnerIndices {
     Rpc {
         lxm: SmallVec<[(u16, u16); 2]>,
         aud: SmallVec<[(u16, u16); 2]>,
+    },
+    Space {
+        space_type: Option<(u16, u16)>,
+        authority: SmallVec<[(u16, u16); 2]>,
+        skey: SmallVec<[(u16, u16); 2]>,
+        collections: SmallVec<[(u16, u16); 2]>,
+        actions: SmallVec<[(u16, u16); 2]>,
+        manage: SmallVec<[(u16, u16); 2]>,
     },
     Include {
         nsid: (u16, u16),
@@ -1338,6 +1667,7 @@ fn parse_scope_indices(token: &str, base: u16) -> Result<ScopeInnerIndices, Pars
         "blob",
         "repo",
         "rpc",
+        "space",
         "atproto",
         "transition",
         "include",
@@ -1375,6 +1705,7 @@ fn parse_scope_indices(token: &str, base: u16) -> Result<ScopeInnerIndices, Pars
         "blob" => parse_blob_indices(token, suffix, base),
         "repo" => parse_repo_indices(token, suffix, base),
         "rpc" => parse_rpc_indices(token, suffix, base),
+        "space" => parse_space_indices(token, suffix, base),
         "atproto" => parse_atproto_indices(suffix),
         "transition" => parse_transition_indices(suffix),
         "include" => parse_include_indices(token, suffix, base),
@@ -1694,6 +2025,118 @@ fn parse_rpc_indices(
     Ok(ScopeInnerIndices::Rpc { lxm, aud })
 }
 
+/// Parse space scope indices, validating the type NSID and query parameters.
+fn parse_space_indices(
+    token: &str,
+    suffix: Option<&str>,
+    base: u16,
+) -> Result<ScopeInnerIndices, ParseError> {
+    let (type_str, params) = match suffix {
+        Some(s) => {
+            if let Some(pos) = s.find('?') {
+                (&s[..pos], Some(&s[pos + 1..]))
+            } else {
+                (s, None)
+            }
+        }
+        None => return Err(ParseError::MissingResource),
+    };
+
+    let mut space_type = None;
+    if type_str != "*" {
+        jacquard_common::types::nsid::validate_nsid(type_str)?;
+        if let Some(pos) = token.find(type_str) {
+            let start = base + pos as u16;
+            space_type = Some((start, start + type_str.len() as u16));
+        }
+    }
+
+    // Index-bearing query parameters. Empty smallvecs signal defaults on
+    // reconstruction (`self` authority, `*` skey, default action set).
+    let mut authority = SmallVec::new();
+    let mut skey = SmallVec::new();
+    let mut collections = SmallVec::new();
+    let mut actions = SmallVec::new();
+    let mut manage = SmallVec::new();
+
+    let record_index = |value: &str, out: &mut SmallVec<[(u16, u16); 2]>| {
+        if let Some(pos) = token.find(value) {
+            let start = base + pos as u16;
+            out.push((start, start + value.len() as u16));
+        }
+    };
+
+    if let Some(params) = params {
+        let parsed = parse_query_string(params);
+
+        if let Some(values) = parsed.get("authority") {
+            for value in values {
+                match *value {
+                    // Defaults contribute no index: an empty smallvec
+                    // reconstructs as the `self` default, `*` as any.
+                    "self" => {}
+                    "*" => record_index(value, &mut authority),
+                    other => {
+                        validate_did(other)?;
+                        record_index(other, &mut authority);
+                    }
+                }
+            }
+        }
+
+        if let Some(values) = parsed.get("skey") {
+            for value in values {
+                if value.is_empty() {
+                    return Err(ParseError::InvalidResource(SmolStr::new_static("skey")));
+                }
+                // The default `*` contributes no index.
+                if *value != "*" {
+                    record_index(value, &mut skey);
+                }
+            }
+        }
+
+        if let Some(values) = parsed.get("collection") {
+            for value in values {
+                if *value != "*" {
+                    jacquard_common::types::nsid::validate_nsid(value)?;
+                }
+                record_index(value, &mut collections);
+            }
+        }
+
+        if let Some(values) = parsed.get("action") {
+            for value in values {
+                if !matches!(
+                    *value,
+                    "read" | "read_self" | "create" | "update" | "delete"
+                ) {
+                    return Err(ParseError::InvalidAction(value.to_smolstr()));
+                }
+                record_index(value, &mut actions);
+            }
+        }
+
+        if let Some(values) = parsed.get("manage") {
+            for value in values {
+                if !matches!(*value, "create" | "update" | "delete") {
+                    return Err(ParseError::InvalidAction(value.to_smolstr()));
+                }
+                record_index(value, &mut manage);
+            }
+        }
+    }
+
+    Ok(ScopeInnerIndices::Space {
+        space_type,
+        authority,
+        skey,
+        collections,
+        actions,
+        manage,
+    })
+}
+
 /// Parse include scope indices, validating NSID and optional audience.
 fn parse_include_indices(
     token: &str,
@@ -1788,6 +2231,7 @@ fn reduce_indices(
     let mut unit_or_account_or_identity_or_transition: Vec<_> = Vec::new();
     let mut repo_indices: Vec<_> = Vec::new();
     let mut rpc_indices: Vec<_> = Vec::new();
+    let mut space_indices: Vec<_> = Vec::new();
     let mut blob_indices: Vec<_> = Vec::new();
     let mut include_indices: Vec<_> = Vec::new();
 
@@ -1801,6 +2245,7 @@ fn reduce_indices(
             }
             ScopeInnerIndices::Repo { .. } => repo_indices.push(indices),
             ScopeInnerIndices::Rpc { .. } => rpc_indices.push(indices),
+            ScopeInnerIndices::Space { .. } => space_indices.push(indices),
             ScopeInnerIndices::Blob { .. } => blob_indices.push(indices),
             ScopeInnerIndices::Include { .. } => include_indices.push(indices),
         }
@@ -1823,6 +2268,7 @@ fn reduce_indices(
     let mut result = unit_or_account_or_identity_or_transition;
     result.extend(repo_indices);
     result.extend(rpc_indices);
+    result.extend(space_indices);
     result.extend(blob_indices);
     result.extend(include_indices);
 
@@ -1976,6 +2422,90 @@ unsafe fn reconstruct_scope<'a>(buffer: &'a str, indices: &ScopeIndices) -> Scop
             })
         }
 
+        ScopeInnerIndices::Space {
+            space_type,
+            authority,
+            skey,
+            collections,
+            actions,
+            manage,
+        } => {
+            let space_type = match space_type {
+                None => SpaceType::All,
+                Some((start, end)) => {
+                    SpaceType::Nsid(unsafe {
+                        Nsid::unchecked(&buffer[*start as usize..*end as usize])
+                    })
+                }
+            };
+
+            // Empty authority signals the `self` default; `*` any.
+            let authority = match authority.first() {
+                None => SpaceAuthority::Self_,
+                Some(&(start, end)) => match &buffer[start as usize..end as usize] {
+                    "*" => SpaceAuthority::All,
+                    s => SpaceAuthority::Did(unsafe {
+                        jacquard_common::types::did::Did::unchecked(s)
+                    }),
+                },
+            };
+
+            let skey = match skey.first() {
+                None => SpaceSkey::All,
+                Some(&(start, end)) => SpaceSkey::Key(&buffer[start as usize..end as usize]),
+            };
+
+            let mut collection_set = BTreeSet::new();
+            for &(start, end) in collections.iter() {
+                let s = &buffer[start as usize..end as usize];
+                if s == "*" {
+                    collection_set.insert(SpaceCollection::All);
+                } else {
+                    collection_set.insert(SpaceCollection::Nsid(unsafe { Nsid::unchecked(s) }));
+                }
+            }
+
+            let parse_action = |s: &str| match s {
+                "read" => SpaceAction::Read,
+                "read_self" => SpaceAction::ReadSelf,
+                "create" => SpaceAction::Create,
+                "update" => SpaceAction::Update,
+                _ => SpaceAction::Delete,
+            };
+            let parse_manage = |s: &str| match s {
+                "create" => SpaceManageOp::Create,
+                "update" => SpaceManageOp::Update,
+                _ => SpaceManageOp::Delete,
+            };
+
+            let mut action_set = BTreeSet::new();
+            for &(start, end) in actions.iter() {
+                action_set.insert(parse_action(&buffer[start as usize..end as usize]));
+            }
+            let mut manage_set = BTreeSet::new();
+            for &(start, end) in manage.iter() {
+                manage_set.insert(parse_manage(&buffer[start as usize..end as usize]));
+            }
+
+            // The reference grammar defaults an action-less grant to the
+            // standard action set (read implied by the write actions).
+            if action_set.is_empty() && manage_set.is_empty() {
+                action_set.insert(SpaceAction::Read);
+                action_set.insert(SpaceAction::Create);
+                action_set.insert(SpaceAction::Update);
+                action_set.insert(SpaceAction::Delete);
+            }
+
+            Scope::Space(SpaceScope {
+                space_type,
+                authority,
+                skey,
+                collections: collection_set,
+                actions: action_set,
+                manage: manage_set,
+            })
+        }
+
         ScopeInnerIndices::Include { nsid, audience } => {
             let (ns, ne) = *nsid;
             let nsid_str = &buffer[ns as usize..ne as usize];
@@ -2005,6 +2535,7 @@ impl<S: BosStr + Ord> Scope<S> {
             Scope::Blob(scope) => Scope::Blob(scope.convert()),
             Scope::Repo(scope) => Scope::Repo(scope.convert()),
             Scope::Rpc(scope) => Scope::Rpc(scope.convert()),
+            Scope::Space(scope) => Scope::Space(scope.convert()),
             Scope::Atproto => Scope::Atproto,
             Scope::Transition(scope) => Scope::Transition(scope),
             Scope::Include(scope) => Scope::Include(scope.convert()),
@@ -2027,6 +2558,7 @@ impl<S: BosStr + Ord> Scope<S> {
             "blob",
             "repo",
             "rpc",
+            "space",
             "atproto",
             "transition",
             "include",
@@ -2067,6 +2599,7 @@ impl<S: BosStr + Ord> Scope<S> {
             "blob" => Self::parse_blob(suffix),
             "repo" => Self::parse_repo(suffix),
             "rpc" => Self::parse_rpc(suffix),
+            "space" => Self::parse_space(suffix),
             "atproto" => Self::parse_atproto(suffix),
             "transition" => Self::parse_transition(suffix),
             "include" => Self::parse_include(suffix),
@@ -2075,6 +2608,120 @@ impl<S: BosStr + Ord> Scope<S> {
             "email" => Self::parse_email(suffix),
             _ => Err(ParseError::UnknownPrefix(prefix.to_smolstr())),
         }
+    }
+
+    fn parse_space<'a>(suffix: Option<&'a str>) -> Result<Self, ParseError>
+    where
+        S: FromStr,
+    {
+        let (type_str, params) = match suffix {
+            Some(s) => {
+                if let Some(pos) = s.find('?') {
+                    (&s[..pos], Some(&s[pos + 1..]))
+                } else {
+                    (s, None)
+                }
+            }
+            None => return Err(ParseError::MissingResource),
+        };
+
+        let space_type = match type_str {
+            "*" => SpaceType::All,
+            nsid => SpaceType::Nsid(Nsid::from_str(nsid)?),
+        };
+
+        let mut authority = SpaceAuthority::Self_;
+        let mut skey = SpaceSkey::All;
+        let mut collections = BTreeSet::new();
+        let mut actions = BTreeSet::new();
+        let mut manage = BTreeSet::new();
+
+        if let Some(params) = params {
+            let parsed = parse_query_string(params);
+
+            if let Some(values) = parsed.get("authority") {
+                for value in values {
+                    authority = match *value {
+                        "*" => SpaceAuthority::All,
+                        "self" => SpaceAuthority::Self_,
+                        did => SpaceAuthority::Did(
+                            jacquard_common::types::did::Did::from_str(did)?,
+                        ),
+                    };
+                }
+            }
+
+            if let Some(values) = parsed.get("skey") {
+                for value in values {
+                    if value.is_empty() {
+                        return Err(ParseError::InvalidResource(SmolStr::new_static("skey")));
+                    }
+                    skey = match *value {
+                        "*" => SpaceSkey::All,
+                        key => SpaceSkey::Key(S::from_str(key).map_err(|_| {
+                            ParseError::InvalidResource(key.to_smolstr())
+                        })?),
+                    };
+                }
+            }
+
+            if let Some(values) = parsed.get("collection") {
+                for value in values {
+                    if *value == "*" {
+                        collections.insert(SpaceCollection::All);
+                    } else {
+                        collections
+                            .insert(SpaceCollection::Nsid(Nsid::from_str(*value)?));
+                    }
+                }
+            }
+
+            if let Some(values) = parsed.get("action") {
+                for value in values {
+                    let action = match *value {
+                        "read" => SpaceAction::Read,
+                        "read_self" => SpaceAction::ReadSelf,
+                        "create" => SpaceAction::Create,
+                        "update" => SpaceAction::Update,
+                        "delete" => SpaceAction::Delete,
+                        other => {
+                            return Err(ParseError::InvalidAction(other.to_smolstr()))
+                        }
+                    };
+                    actions.insert(action);
+                }
+            }
+
+            if let Some(values) = parsed.get("manage") {
+                for value in values {
+                    let op = match *value {
+                        "create" => SpaceManageOp::Create,
+                        "update" => SpaceManageOp::Update,
+                        "delete" => SpaceManageOp::Delete,
+                        other => {
+                            return Err(ParseError::InvalidAction(other.to_smolstr()))
+                        }
+                    };
+                    manage.insert(op);
+                }
+            }
+        }
+
+        if actions.is_empty() && manage.is_empty() {
+            actions.insert(SpaceAction::Read);
+            actions.insert(SpaceAction::Create);
+            actions.insert(SpaceAction::Update);
+            actions.insert(SpaceAction::Delete);
+        }
+
+        Ok(Scope::Space(SpaceScope {
+            space_type,
+            authority,
+            skey,
+            collections,
+            actions,
+            manage,
+        }))
     }
 
     fn parse_account(suffix: Option<&str>) -> Result<Self, ParseError> {
@@ -2440,6 +3087,55 @@ impl<S: BosStr + Ord> Scope<S> {
                     format_smolstr!("repo:{}?{}", collection, params.join("&"))
                 }
             }
+            Scope::Space(scope) => {
+                let space_type = match &scope.space_type {
+                    SpaceType::All => "*",
+                    SpaceType::Nsid(nsid) => nsid,
+                };
+                let mut params = Vec::new();
+                match &scope.authority {
+                    SpaceAuthority::All => params.push("authority=*".to_smolstr()),
+                    SpaceAuthority::Self_ => {}
+                    SpaceAuthority::Did(did) => {
+                        params.push(format_smolstr!("authority={}", did))
+                    }
+                }
+                if let SpaceSkey::Key(key) = &scope.skey {
+                    params.push(format_smolstr!("skey={}", key.as_ref()));
+                }
+                for collection in &scope.collections {
+                    match collection {
+                        SpaceCollection::All => params.push("collection=*".to_smolstr()),
+                        SpaceCollection::Nsid(nsid) => {
+                            params.push(format_smolstr!("collection={}", nsid))
+                        }
+                    }
+                }
+                for action in &scope.actions {
+                    let name = match action {
+                        SpaceAction::ReadSelf => "read_self",
+                        SpaceAction::Read => "read",
+                        SpaceAction::Create => "create",
+                        SpaceAction::Update => "update",
+                        SpaceAction::Delete => "delete",
+                    };
+                    params.push(format_smolstr!("action={}", name));
+                }
+                for op in &scope.manage {
+                    let name = match op {
+                        SpaceManageOp::Create => "create",
+                        SpaceManageOp::Update => "update",
+                        SpaceManageOp::Delete => "delete",
+                    };
+                    params.push(format_smolstr!("manage={}", name));
+                }
+                if params.is_empty() {
+                    format_smolstr!("space:{}", space_type)
+                } else {
+                    params.sort();
+                    format_smolstr!("space:{}?{}", space_type, params.join("&"))
+                }
+            }
             Scope::Rpc(scope) => {
                 if scope.lxm.len() == 1
                     && scope.lxm.contains(&RpcLexicon::All)
@@ -2570,6 +3266,7 @@ impl<S: BosStr + Ord> Scope<S> {
                 }
                 true
             }
+            (Scope::Space(a), Scope::Space(b)) => space_scope_grants(a, b),
             (Scope::Repo(a), Scope::Repo(b)) => {
                 let collection_match = match (&a.collection, &b.collection) {
                     (RepoCollection::All, _) => true,
@@ -3164,6 +3861,125 @@ mod tests {
             DidService::new_owned("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
         ));
         assert_eq!(scope, Scope::Rpc(RpcScope { lxm, aud }));
+    }
+
+    #[test]
+    fn test_space_scope_parsing_and_round_trip() {
+        // Bare type: defaults to self authority, wildcard skey, and the
+        // default action set.
+        let scope: Scope = Scope::parse("space:dev.jacquard.e2e.space").unwrap();
+        match &scope {
+            Scope::Space(s) => {
+                assert_eq!(
+                    s.space_type,
+                    SpaceType::Nsid(Nsid::new_owned("dev.jacquard.e2e.space").unwrap())
+                );
+                assert_eq!(s.authority, SpaceAuthority::Self_);
+                assert_eq!(s.skey, SpaceSkey::All);
+                assert!(s.actions.contains(&SpaceAction::Read));
+                assert!(s.actions.contains(&SpaceAction::Create));
+                assert!(s.collections.is_empty());
+            }
+            other => panic!("expected space scope, got {other:?}"),
+        }
+
+        // Fully constrained form round-trips through normalization.
+        let input = "space:dev.jacquard.e2e.space?action=read&authority=*";
+        let scope: Scope = Scope::parse(input).unwrap();
+        assert_eq!(scope.to_string_normalized(), input);
+
+        // Wildcard type and explicit authority/skey.
+        let scope: Scope = Scope::parse(
+            "space:*?authority=did:web:example.test&skey=main&collection=com.example.post&manage=create&manage=delete",
+        )
+        .unwrap();
+        match &scope {
+            Scope::Space(s) => {
+                assert_eq!(s.space_type, SpaceType::All);
+                assert_eq!(
+                    s.authority,
+                    SpaceAuthority::Did(
+                        jacquard_common::types::did::Did::new_owned("did:web:example.test")
+                            .unwrap()
+                    )
+                );
+                assert_eq!(
+                    s.skey,
+                    SpaceSkey::Key(SmolStr::new("main"))
+                );
+                assert!(s.collections.contains(&SpaceCollection::Nsid(
+                    Nsid::new_owned("com.example.post").unwrap()
+                )));
+                assert!(s.manage.contains(&SpaceManageOp::Create));
+                assert!(s.manage.contains(&SpaceManageOp::Delete));
+            }
+            other => panic!("expected space scope, got {other:?}"),
+        }
+
+        // Default authority and skey are omitted from the normalized form.
+        let scope: Scope =
+            Scope::parse("space:dev.jacquard.e2e.space?authority=self&skey=*&action=read")
+                .unwrap();
+        assert_eq!(
+            scope.to_string_normalized(),
+            "space:dev.jacquard.e2e.space?action=read"
+        );
+
+        // Invalid action and invalid authority DID are rejected.
+        assert!(Scope::<SmolStr>::parse("space:dev.jacquard.e2e.space?action=manage").is_err());
+        assert!(Scope::<SmolStr>::parse("space:dev.jacquard.e2e.space?authority=not-a-did").is_err());
+        assert!(Scope::<SmolStr>::parse("space:not an nsid").is_err());
+        assert!(Scope::<SmolStr>::parse("space").is_err());
+    }
+
+    #[test]
+    fn test_space_scope_grants() {
+        let parse = |s: &str| -> Scope { Scope::parse(s).unwrap() };
+
+        // Read implies read_self.
+        let read = parse("space:dev.t.example?authority=*&action=read");
+        let read_self = parse("space:dev.t.example?authority=*&action=read_self");
+        assert!(read.grants(&read_self));
+        assert!(!read_self.grants(&read));
+
+        // Wildcard type and authority cover concrete values.
+        let wildcard = parse("space:*?authority=*&action=read");
+        let concrete = parse(
+            "space:dev.t.example?authority=did:web:example.test&action=read",
+        );
+        assert!(wildcard.grants(&concrete));
+        assert!(!concrete.grants(&wildcard));
+
+        // A different concrete authority never grants.
+        let other = parse("space:dev.t.example?authority=did:web:other.test&action=read");
+        assert!(!concrete.grants(&other));
+
+        // `self` never grants a concrete authority.
+        let self_auth = parse("space:dev.t.example?action=read");
+        assert!(!self_auth.grants(&concrete));
+
+        // skey narrowing.
+        let skey = parse("space:dev.t.example?authority=*&skey=main&action=read");
+        let any_skey = parse("space:dev.t.example?authority=*&action=read");
+        assert!(any_skey.grants(&skey));
+        assert!(!skey.grants(&any_skey));
+
+        // Collection constraints bind write actions.
+        let write_post = parse(
+            "space:dev.t.example?authority=*&action=create&collection=com.example.post",
+        );
+        let write_any = parse("space:dev.t.example?authority=*&action=create");
+        assert!(write_any.grants(&write_post));
+        assert!(!write_post.grants(&write_any));
+
+        // Manage operations.
+        let manage = parse("space:dev.t.example?authority=*&manage=create&manage=delete");
+        let manage_create = parse("space:dev.t.example?authority=*&manage=create");
+        assert!(manage.grants(&manage_create));
+        assert!(!manage_create.grants(&manage));
+
+        // Non-space scopes never grant space scopes.
+        assert!(!parse("atproto").grants(&concrete));
     }
 
     #[test]

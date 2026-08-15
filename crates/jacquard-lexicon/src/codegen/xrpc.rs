@@ -1250,7 +1250,22 @@ impl<'c> CodeGenerator<'c> {
         let encode_error_path =
             resolved.external_type_tokens(&super::prettify::ExternalImport::EncodeError);
 
-        let decode_output_method = if output_encoding == "application/json" {
+        let decode_output_method = if !has_output && output_encoding == "application/json" {
+            // Unit output: success bodies must be empty. A non-empty body on
+            // a 2xx is a protocol violation, not something to ignore.
+            quote! {
+                fn decode_output<'de, S>(body: &'de [u8]) -> Result<Self::Output<S>, #decode_error_path>
+                where
+                    S: #bosstr_path + #de_path<'de>,
+                {
+                    if body.is_empty() {
+                        Ok(())
+                    } else {
+                        Err(#decode_error_path::UnexpectedBody)
+                    }
+                }
+            }
+        } else if output_encoding == "application/json" {
             quote! {}
         } else {
             let output_ident = syn::Ident::new(
@@ -1416,6 +1431,13 @@ impl<'c> CodeGenerator<'c> {
                     const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 
                     type Response = #response_ident;
+
+                    // No input schema: send no body at all. The default
+                    // `encode_body` would serialize the unit struct (e.g.
+                    // `null`), which servers reject for body-less procedures.
+                    fn encode_body(&self, _buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError> {
+                        Ok(())
+                    }
                 }
 
                 #[doc = #endpoint_doc]

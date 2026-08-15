@@ -20,23 +20,26 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_offprint::block::heading::Heading;
-use crate::app_offprint::block::text::Text;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_offprint::block::heading::Heading;
+use crate::app_offprint::block::text::Text;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Blockquote<S: BosStr = DefaultStr> {
     ///Nested content blocks within the blockquote
     pub content: Vec<BlockquoteContentItem<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_blockquote_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -63,9 +66,22 @@ impl<S: BosStr> LexiconSchema for Blockquote<S> {
     }
 }
 
+fn deserialize_blockquote_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod blockquote_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -170,7 +186,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Blockquote<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Blockquote<S> {
         Blockquote {
             content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -179,10 +198,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_blockquote() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.blockquote"),
@@ -198,13 +217,15 @@ fn lexicon_doc_app_offprint_block_blockquote() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("content"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "Nested content blocks within the blockquote",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Nested content blocks within the blockquote",
+                                    ),
+                                ),
                                 items: LexArrayItem::Union(LexRefUnion {
                                     refs: vec![
                                         CowStr::new_static("app.offprint.block.text"),
-                                        CowStr::new_static("app.offprint.block.heading"),
+                                        CowStr::new_static("app.offprint.block.heading")
                                     ],
                                     ..Default::default()
                                 }),

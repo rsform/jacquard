@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.fieldwork.state",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Quest system state for cross-device sync (dismissals, nudge timing, visited routes). Singleton record (rkey: self), overwritten via putRecord. Client-written (no backend signing). Distinct from net.anisota.chronicle.fieldwork (immutable, backend-signed completion records).",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "updatedAt"
+        ],
+        "properties": {
+          "counters": {
+            "type": "unknown",
+            "description": "Reserved for future quest progress counters. Object mapping counter ids to values."
+          },
+          "dismissed": {
+            "type": "unknown",
+            "description": "Object mapping dismissed quest ids to the ISO datetime they were dismissed. Dismissed quests are excluded from recommendations and nudges until undismissed."
+          },
+          "lastNudgeAt": {
+            "type": "string",
+            "description": "When a quest nudge was last shown (nudges are spaced at least a day apart)",
+            "format": "datetime"
+          },
+          "lastNudgeQuestId": {
+            "type": "string",
+            "description": "Which quest the most recent nudge was about"
+          },
+          "pinnedQuestId": {
+            "type": "string",
+            "description": "Quest the player has pinned to keep in view"
+          },
+          "retroSweepAt": {
+            "type": "string",
+            "description": "When the retroactive completion sweep last ran (throttles the sweep to once per day)",
+            "format": "datetime"
+          },
+          "retroSweepVersion": {
+            "type": "integer",
+            "description": "Version of the retroactive sweep that armed retroSweepAt. When it doesn't match the client's current sweep version the throttle is treated as stale and the sweep runs once more, so a throttle armed by an earlier (buggy) sweep can't lock out backfill."
+          },
+          "snoozedUntil": {
+            "type": "string",
+            "description": "Suppress quest nudges until this time",
+            "format": "datetime"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When this state snapshot was taken",
+            "format": "datetime"
+          },
+          "visitedRoutes": {
+            "type": "unknown",
+            "description": "Object mapping visited app routes (e.g. '/chronicle') to the ISO datetime of the first tracked visit. Drives route-based quest detection."
+          }
+        }
+      }
+    }
+  }
+}

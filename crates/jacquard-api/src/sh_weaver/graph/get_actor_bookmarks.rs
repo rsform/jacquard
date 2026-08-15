@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorBookmarks<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -32,11 +29,9 @@ pub struct GetActorBookmarks<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetActorBookmarksOutput<S: BosStr = DefaultStr> {
     pub bookmarks: Vec<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -79,7 +74,7 @@ fn _default_limit() -> Option<i64> {
 
 pub mod get_actor_bookmarks_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -110,7 +105,10 @@ pub mod get_actor_bookmarks_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetActorBookmarksBuilder<St: get_actor_bookmarks_state::State, S: BosStr = DefaultStr> {
+pub struct GetActorBookmarksBuilder<
+    St: get_actor_bookmarks_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
@@ -118,7 +116,10 @@ pub struct GetActorBookmarksBuilder<St: get_actor_bookmarks_state::State, S: Bos
 
 impl GetActorBookmarks<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetActorBookmarksBuilder<get_actor_bookmarks_state::Empty, DefaultStr> {
+    pub fn new() -> GetActorBookmarksBuilder<
+        get_actor_bookmarks_state::Empty,
+        DefaultStr,
+    > {
         GetActorBookmarksBuilder::new()
     }
 }

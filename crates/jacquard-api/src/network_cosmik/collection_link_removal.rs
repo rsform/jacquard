@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A record representing the removal of a collection link by a collection owner when they cannot delete the original link (which exists in another user's repository). The creator of this record (determined from the AT-URI) is the user who performed the removal.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -44,7 +44,12 @@ pub struct CollectionLinkRemoval<S: BosStr = DefaultStr> {
     pub removed_at: Datetime,
     ///Strong reference to the collectionLink record that is being removed.
     pub removed_link: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_collection_link_removal_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -76,7 +81,8 @@ impl XrpcResp for CollectionLinkRemovalRecord {
     type Err = RecordError;
 }
 
-impl<S: BosStr> From<CollectionLinkRemovalGetRecordOutput<S>> for CollectionLinkRemoval<S> {
+impl<S: BosStr> From<CollectionLinkRemovalGetRecordOutput<S>>
+for CollectionLinkRemoval<S> {
     fn from(output: CollectionLinkRemovalGetRecordOutput<S>) -> Self {
         output.value
     }
@@ -107,9 +113,28 @@ impl<S: BosStr> LexiconSchema for CollectionLinkRemoval<S> {
     }
 }
 
+fn deserialize_collection_link_removal_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod collection_link_removal_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -177,14 +202,20 @@ pub struct CollectionLinkRemovalBuilder<
 
 impl CollectionLinkRemoval<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CollectionLinkRemovalBuilder<collection_link_removal_state::Empty, DefaultStr> {
+    pub fn new() -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::Empty,
+        DefaultStr,
+    > {
         CollectionLinkRemovalBuilder::new()
     }
 }
 
 impl<S: BosStr> CollectionLinkRemoval<S> {
     /// Create a new builder for this type
-    pub fn builder() -> CollectionLinkRemovalBuilder<collection_link_removal_state::Empty, S> {
+    pub fn builder() -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::Empty,
+        S,
+    > {
         CollectionLinkRemovalBuilder::builder()
     }
 }
@@ -220,7 +251,10 @@ where
     pub fn collection(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionLinkRemovalBuilder<collection_link_removal_state::SetCollection<St>, S> {
+    ) -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::SetCollection<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -239,7 +273,10 @@ where
     pub fn removed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionLinkRemovalBuilder<collection_link_removal_state::SetRemovedAt<St>, S> {
+    ) -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::SetRemovedAt<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -258,7 +295,10 @@ where
     pub fn removed_link(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionLinkRemovalBuilder<collection_link_removal_state::SetRemovedLink<St>, S> {
+    ) -> CollectionLinkRemovalBuilder<
+        collection_link_removal_state::SetRemovedLink<St>,
+        S,
+    > {
         self._fields.2 = Option::Some(value.into());
         CollectionLinkRemovalBuilder {
             _state: PhantomData,
@@ -299,10 +339,10 @@ where
 }
 
 fn lexicon_doc_network_cosmik_collectionLinkRemoval() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.cosmik.collectionLinkRemoval"),

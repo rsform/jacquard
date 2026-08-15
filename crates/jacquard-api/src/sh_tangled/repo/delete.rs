@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, RecordKey, Rkey};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Delete<S: BosStr = DefaultStr> {
     ///DID of the repository owner. A knot without the repo-did-input capability reads this and name in place of repo.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,12 +47,25 @@ impl jacquard_common::xrpc::XrpcResp for DeleteResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Delete<S> {
     const NSID: &'static str = "sh.tangled.repo.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = DeleteResponse;
 }
 
@@ -65,15 +75,16 @@ Path: `/xrpc/sh.tangled.repo.delete`. The request payload type is `Delete<S>`; s
 pub struct DeleteRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DeleteRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.delete";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = Delete<S>;
     type Response = DeleteResponse;
 }
 
 pub mod delete_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -197,7 +208,10 @@ where
     St::Repo: delete_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<Did<S>>) -> DeleteBuilder<delete_state::SetRepo<St>, S> {
+    pub fn repo(
+        mut self,
+        value: impl Into<Did<S>>,
+    ) -> DeleteBuilder<delete_state::SetRepo<St>, S> {
         self._fields.3 = Option::Some(value.into());
         DeleteBuilder {
             _state: PhantomData,

@@ -10,17 +10,18 @@ pub mod list_options;
 pub mod remove_options;
 pub mod upsert_option;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, Nsid};
+use jacquard_common::types::string::{Did, Nsid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
@@ -28,13 +29,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DefsOption<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -50,9 +48,15 @@ pub struct DefsOption<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
     pub value: Data<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_defs_option_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DefsOptionManagerRole<S: BosStr = DefaultStr> {
@@ -134,10 +138,13 @@ where
             DefsOptionManagerRole::RoleTriage => DefsOptionManagerRole::RoleTriage,
             DefsOptionManagerRole::RoleAdmin => DefsOptionManagerRole::RoleAdmin,
             DefsOptionManagerRole::RoleVerifier => DefsOptionManagerRole::RoleVerifier,
-            DefsOptionManagerRole::Other(v) => DefsOptionManagerRole::Other(v.into_static()),
+            DefsOptionManagerRole::Other(v) => {
+                DefsOptionManagerRole::Other(v.into_static())
+            }
         }
     }
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum DefsOptionScope<S: BosStr = DefaultStr> {
@@ -253,9 +260,22 @@ impl<S: BosStr> LexiconSchema for DefsOption<S> {
     }
 }
 
+fn deserialize_defs_option_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod defs_option_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -523,12 +543,18 @@ where
 
 impl<St: defs_option_state::State, S: BosStr> DefsOptionBuilder<St, S> {
     /// Set the `managerRole` field (optional)
-    pub fn manager_role(mut self, value: impl Into<Option<DefsOptionManagerRole<S>>>) -> Self {
+    pub fn manager_role(
+        mut self,
+        value: impl Into<Option<DefsOptionManagerRole<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `managerRole` field to an Option value (optional)
-    pub fn maybe_manager_role(mut self, value: Option<DefsOptionManagerRole<S>>) -> Self {
+    pub fn maybe_manager_role(
+        mut self,
+        value: Option<DefsOptionManagerRole<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
@@ -612,7 +638,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DefsOption<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DefsOption<S> {
         DefsOption {
             created_at: self._fields.0,
             created_by: self._fields.1.unwrap(),
@@ -630,10 +659,10 @@ where
 }
 
 fn lexicon_doc_tools_ozone_setting_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("tools.ozone.setting.defs"),
@@ -642,14 +671,14 @@ fn lexicon_doc_tools_ozone_setting_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("option"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("key"),
-                        SmolStr::new_static("value"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("scope"),
-                        SmolStr::new_static("createdBy"),
-                        SmolStr::new_static("lastUpdatedBy"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("key"), SmolStr::new_static("value"),
+                            SmolStr::new_static("did"), SmolStr::new_static("scope"),
+                            SmolStr::new_static("createdBy"),
+                            SmolStr::new_static("lastUpdatedBy")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -698,15 +727,11 @@ fn lexicon_doc_tools_ozone_setting_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("managerRole"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("scope"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("updatedAt"),

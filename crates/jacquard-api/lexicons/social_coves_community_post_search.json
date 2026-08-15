@@ -1,0 +1,109 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.post.search",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Search for posts",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "q"
+        ],
+        "properties": {
+          "author": {
+            "type": "string",
+            "description": "Filter by author",
+            "format": "at-identifier"
+          },
+          "community": {
+            "type": "string",
+            "description": "Filter by specific community",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "q": {
+            "type": "string",
+            "description": "Search query",
+            "maxLength": 500
+          },
+          "sort": {
+            "type": "string",
+            "default": "relevance",
+            "maxLength": 64,
+            "knownValues": [
+              "relevance",
+              "new",
+              "top"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "description": "Filter by tags",
+            "items": {
+              "type": "string",
+              "maxLength": 640,
+              "maxGraphemes": 64
+            }
+          },
+          "timeframe": {
+            "type": "string",
+            "default": "all",
+            "maxLength": 64,
+            "knownValues": [
+              "hour",
+              "day",
+              "week",
+              "month",
+              "year",
+              "all"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "description": "Filter by post type",
+            "maxLength": 64,
+            "knownValues": [
+              "text",
+              "image",
+              "video",
+              "article",
+              "microblog"
+            ]
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "posts"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "posts": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.coves.feed.defs#feedViewPost"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

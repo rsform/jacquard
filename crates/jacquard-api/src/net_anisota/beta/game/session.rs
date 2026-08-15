@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::beta::game::session;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::session;
 /// Summary of activity during this session
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ActivitySummary<S: BosStr = DefaultStr> {
     ///Player's current level at the time of this session update
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,17 +50,19 @@ pub struct ActivitySummary<S: BosStr = DefaultStr> {
     ///Total XP gained during this specific session
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained_this_session: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_activity_summary_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Game-specific actions performed
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GameActions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub daily_rewards_claimed: Option<i64>,
@@ -77,7 +76,12 @@ pub struct GameActions<S: BosStr = DefaultStr> {
     pub posts_viewed: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specimens_collected: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_game_actions_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -135,7 +139,12 @@ pub struct Session<S: BosStr = DefaultStr> {
     ///When the session record was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_session_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -153,10 +162,7 @@ pub struct SessionGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional session metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Metadata<S: BosStr = DefaultStr> {
     ///List of features used during the session
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -166,17 +172,19 @@ pub struct Metadata<S: BosStr = DefaultStr> {
     pub network_condition: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub performance_metrics: Option<session::PerformanceMetrics<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_metadata_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Performance-related data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PerformanceMetrics<S: BosStr = DefaultStr> {
     ///Average API response time in milliseconds (rounded to nearest integer)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -184,17 +192,19 @@ pub struct PerformanceMetrics<S: BosStr = DefaultStr> {
     ///Number of errors encountered
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_count: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_performance_metrics_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Context about how the session started
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SessionContext<S: BosStr = DefaultStr> {
     ///How the user was authenticated
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -208,7 +218,12 @@ pub struct SessionContext<S: BosStr = DefaultStr> {
     ///Referrer URL if applicable
     #[serde(skip_serializing_if = "Option::is_none")]
     pub referrer: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_session_context_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -452,11 +467,24 @@ impl<S: BosStr> LexiconSchema for SessionContext<S> {
     }
 }
 
+fn deserialize_activity_summary_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.session"),
@@ -465,9 +493,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activitySummary"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Summary of activity during this session",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Summary of activity during this session"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -495,9 +523,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("pagesVisited"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of unique pages/routes visited",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("List of unique pages/routes visited"),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -526,7 +554,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameActions"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Game-specific actions performed")),
+                    description: Some(
+                        CowStr::new_static("Game-specific actions performed"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -786,9 +816,11 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("features"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "List of features used during the session",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "List of features used during the session",
+                                    ),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -798,9 +830,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("networkCondition"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Network condition during session",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Network condition during session"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -845,25 +877,27 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("sessionContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Context about how the session started")),
+                    description: Some(
+                        CowStr::new_static("Context about how the session started"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("authenticationMethod"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "How the user was authenticated",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("How the user was authenticated"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("entryPoint"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "How the user entered the app",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("How the user entered the app"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -876,7 +910,9 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("referrer"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Referrer URL if applicable")),
+                                description: Some(
+                                    CowStr::new_static("Referrer URL if applicable"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -891,9 +927,41 @@ fn lexicon_doc_net_anisota_beta_game_session() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_game_actions_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_session_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod session_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1010,8 +1078,23 @@ impl SessionBuilder<session_state::Empty, DefaultStr> {
         SessionBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1024,8 +1107,23 @@ impl<S: BosStr> SessionBuilder<session_state::Empty, S> {
         SessionBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1042,7 +1140,10 @@ impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
         self
     }
     /// Set the `activitySummary` field to an Option value (optional)
-    pub fn maybe_activity_summary(mut self, value: Option<session::ActivitySummary<S>>) -> Self {
+    pub fn maybe_activity_summary(
+        mut self,
+        value: Option<session::ActivitySummary<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -1218,12 +1319,18 @@ impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
 
 impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `sessionContext` field (optional)
-    pub fn session_context(mut self, value: impl Into<Option<session::SessionContext<S>>>) -> Self {
+    pub fn session_context(
+        mut self,
+        value: impl Into<Option<session::SessionContext<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `sessionContext` field to an Option value (optional)
-    pub fn maybe_session_context(mut self, value: Option<session::SessionContext<S>>) -> Self {
+    pub fn maybe_session_context(
+        mut self,
+        value: Option<session::SessionContext<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
@@ -1334,4 +1441,43 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_metadata_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_performance_metrics_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_session_context_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -19,6 +19,7 @@ streaming = ["jacquard-common/streaming"]
 cache = ["dep:mini-moka"]
 
 [dependencies]
+percent-encoding = "2"
 trait-variant.workspace = true
 bon.workspace = true
 bytes.workspace = true

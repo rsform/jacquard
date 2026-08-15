@@ -43,6 +43,10 @@
             "type": "string",
             "description": "Record last updated timestamp",
             "format": "datetime"
+          },
+          "userEdited": {
+            "type": "boolean",
+            "description": "Whether the description was manually edited by the user. When true, auto-population from manifest annotations is skipped on push."
           }
         }
       }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::games_gamesgamesgamesgames::Signature;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::games_gamesgamesgamesgames::Signature;
 /// A community contribution proposing changes to a game or submitting a new game.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -52,9 +52,15 @@ pub struct Contribution<S: BosStr = DefaultStr> {
     ///The entity being modified. Required for corrections and additions, absent for new game submissions.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_contribution_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ContributionContributionType<S: BosStr = DefaultStr> {
@@ -105,7 +111,8 @@ impl<S: BosStr> Serialize for ContributionContributionType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContributionContributionType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ContributionContributionType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -129,15 +136,22 @@ where
     type Output = ContributionContributionType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
-            ContributionContributionType::Correction => ContributionContributionType::Correction,
-            ContributionContributionType::Addition => ContributionContributionType::Addition,
-            ContributionContributionType::NewGame => ContributionContributionType::NewGame,
+            ContributionContributionType::Correction => {
+                ContributionContributionType::Correction
+            }
+            ContributionContributionType::Addition => {
+                ContributionContributionType::Addition
+            }
+            ContributionContributionType::NewGame => {
+                ContributionContributionType::NewGame
+            }
             ContributionContributionType::Other(v) => {
                 ContributionContributionType::Other(v.into_static())
             }
         }
     }
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -220,9 +234,28 @@ impl<S: BosStr> LexiconSchema for Contribution<S> {
     }
 }
 
+fn deserialize_contribution_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod contribution_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -408,7 +441,10 @@ impl<St: contribution_state::State, S: BosStr> ContributionBuilder<St, S> {
         self
     }
     /// Set the `signatures` field to an Option value (optional)
-    pub fn maybe_signatures(mut self, value: Option<Vec<ContributionSignaturesItem<S>>>) -> Self {
+    pub fn maybe_signatures(
+        mut self,
+        value: Option<Vec<ContributionSignaturesItem<S>>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -447,7 +483,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Contribution<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contribution<S> {
         Contribution {
             changes: self._fields.0.unwrap(),
             contribution_type: self._fields.1.unwrap(),
@@ -461,10 +500,10 @@ where
 }
 
 fn lexicon_doc_games_gamesgamesgamesgames_contribution() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("games.gamesgamesgamesgames.contribution"),

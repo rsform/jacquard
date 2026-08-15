@@ -59,7 +59,7 @@
     },
     "main": {
       "type": "record",
-      "description": "An update to a git repository, emitted by knots.",
+      "description": "An event record representing git-push operation to git repository, emitted by knots.",
       "key": "tid",
       "record": {
         "type": "object",
@@ -72,6 +72,13 @@
           "meta"
         ],
         "properties": {
+          "changedFiles": {
+            "type": "array",
+            "description": "files changed between commits",
+            "items": {
+              "type": "string"
+            }
+          },
           "committerDid": {
             "type": "string",
             "description": "did of the user that pushed this ref",
@@ -97,6 +104,21 @@
             "type": "string",
             "description": "did of the owner of the repo",
             "format": "did"
+          },
+          "pushOptions": {
+            "type": "array",
+            "description": "push options passed on git-push",
+            "items": {
+              "type": "string",
+              "maxLength": 1024,
+              "knownValues": [
+                "ci-skip",
+                "ci-verbose",
+                "skip-ci",
+                "verbose-ci"
+              ]
+            },
+            "maxLength": 50
           },
           "ref": {
             "type": "string",

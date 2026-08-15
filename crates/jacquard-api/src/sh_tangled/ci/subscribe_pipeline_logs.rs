@@ -10,26 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Tid};
+use jacquard_common::types::string::{Tid, Datetime};
 use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::ci::subscribe_pipeline_logs;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::ci::subscribe_pipeline_logs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Control<S: BosStr = DefaultStr> {
     ///Step command
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,15 +43,18 @@ pub struct Control<S: BosStr = DefaultStr> {
     pub time: Datetime,
     ///workflow name
     pub workflow: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_control_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, jacquard_common::types::value::Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Data<S: BosStr = DefaultStr> {
     pub content: S,
     ///Step ID
@@ -63,20 +63,24 @@ pub struct Data<S: BosStr = DefaultStr> {
     pub time: Datetime,
     ///workflow name
     pub workflow: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, jacquard_common::types::value::Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubscribePipelineLogs<S: BosStr = DefaultStr> {
     pub pipeline: Tid,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflows: Option<Vec<S>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -96,26 +100,43 @@ impl<S: BosStr> SubscribePipelineLogsMessage<S> {
     where
         S: serde::Deserialize<'de>,
     {
-        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(bytes)?;
+        let (header, body) = jacquard_common::xrpc::subscription::parse_event_header(
+            bytes,
+        )?;
         match header.t.as_str() {
             "#control" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Control(Box::new(variant)))
             }
             "#data" => {
-                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(body)?;
+                let variant = jacquard_common::deps::codegen::serde_ipld_dagcbor::from_slice(
+                    body,
+                )?;
                 Ok(Self::Data(Box::new(variant)))
             }
-            unknown => Err(jacquard_common::error::DecodeError::UnknownEventType(
-                unknown.into(),
-            )),
+            unknown => {
+                Err(
+                    jacquard_common::error::DecodeError::UnknownEventType(unknown.into()),
+                )
+            }
         }
     }
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum SubscribePipelineLogsError {
     /// Workflow not found
@@ -126,10 +147,7 @@ pub enum SubscribePipelineLogsError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for SubscribePipelineLogsError {
@@ -195,31 +213,41 @@ impl<S: BosStr> LexiconSchema for Data<S> {
 pub struct SubscribePipelineLogsStream;
 impl jacquard_common::xrpc::SubscriptionResp for SubscribePipelineLogsStream {
     const NSID: &'static str = "sh.tangled.ci.subscribePipelineLogs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Message<S: BosStr> = SubscribePipelineLogsMessage<S>;
     type Error = SubscribePipelineLogsError;
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcSubscription for SubscribePipelineLogs<S> {
     const NSID: &'static str = "sh.tangled.ci.subscribePipelineLogs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Stream = SubscribePipelineLogsStream;
 }
 
 pub struct SubscribePipelineLogsEndpoint;
 impl jacquard_common::xrpc::SubscriptionEndpoint for SubscribePipelineLogsEndpoint {
     const PATH: &'static str = "/xrpc/sh.tangled.ci.subscribePipelineLogs";
-    const ENCODING: jacquard_common::xrpc::MessageEncoding =
-        jacquard_common::xrpc::MessageEncoding::Json;
+    const ENCODING: jacquard_common::xrpc::MessageEncoding = jacquard_common::xrpc::MessageEncoding::Json;
     type Params<S: BosStr> = SubscribePipelineLogs<S>;
     type Stream = SubscribePipelineLogsStream;
 }
 
+fn deserialize_control_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, jacquard_common::types::value::Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, jacquard_common::types::value::Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod control_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -406,7 +434,10 @@ where
     St::Step: control_state::IsUnset,
 {
     /// Set the `step` field (required)
-    pub fn step(mut self, value: impl Into<i64>) -> ControlBuilder<control_state::SetStep<St>, S> {
+    pub fn step(
+        mut self,
+        value: impl Into<i64>,
+    ) -> ControlBuilder<control_state::SetStep<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ControlBuilder {
             _state: PhantomData,
@@ -494,10 +525,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_ci_subscribePipelineLogs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.ci.subscribePipelineLogs"),
@@ -506,12 +537,12 @@ fn lexicon_doc_sh_tangled_ci_subscribePipelineLogs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("control"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("time"),
-                        SmolStr::new_static("workflow"),
-                        SmolStr::new_static("step"),
-                        SmolStr::new_static("content"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("time"), SmolStr::new_static("workflow"),
+                            SmolStr::new_static("step"), SmolStr::new_static("content")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -524,9 +555,7 @@ fn lexicon_doc_sh_tangled_ci_subscribePipelineLogs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("content"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("kind"),
@@ -570,21 +599,19 @@ fn lexicon_doc_sh_tangled_ci_subscribePipelineLogs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("data"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("time"),
-                        SmolStr::new_static("workflow"),
-                        SmolStr::new_static("step"),
-                        SmolStr::new_static("content"),
-                        SmolStr::new_static("stream"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("time"), SmolStr::new_static("workflow"),
+                            SmolStr::new_static("step"), SmolStr::new_static("content"),
+                            SmolStr::new_static("stream")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("content"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("step"),
@@ -594,9 +621,7 @@ fn lexicon_doc_sh_tangled_ci_subscribePipelineLogs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("stream"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("time"),
@@ -620,33 +645,35 @@ fn lexicon_doc_sh_tangled_ci_subscribePipelineLogs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcSubscription(LexXrpcSubscription {
-                    parameters: Some(LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("pipeline")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("pipeline"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Pipeline ID")),
-                                    format: Some(LexStringFormat::Tid),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("workflows"),
-                                LexXrpcParametersProperty::Array(LexPrimitiveArray {
-                                    items: LexPrimitiveArrayItem::String(LexString {
-                                        description: Some(CowStr::new_static("Workflow name")),
+                    parameters: Some(
+                        LexXrpcSubscriptionParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("pipeline")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("pipeline"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(CowStr::new_static("Pipeline ID")),
+                                        format: Some(LexStringFormat::Tid),
                                         ..Default::default()
                                     }),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("workflows"),
+                                    LexXrpcParametersProperty::Array(LexPrimitiveArray {
+                                        items: LexPrimitiveArrayItem::String(LexString {
+                                            description: Some(CowStr::new_static("Workflow name")),
+                                            ..Default::default()
+                                        }),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -656,9 +683,22 @@ fn lexicon_doc_sh_tangled_ci_subscribePipelineLogs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, jacquard_common::types::value::Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, jacquard_common::types::value::Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod data_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -751,13 +791,7 @@ pub mod data_state {
 /// Builder for constructing an instance of this type.
 pub struct DataBuilder<St: data_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<i64>,
-        Option<S>,
-        Option<Datetime>,
-        Option<S>,
-    ),
+    _fields: (Option<S>, Option<i64>, Option<S>, Option<Datetime>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -803,7 +837,10 @@ where
     St::Content: data_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(mut self, value: impl Into<S>) -> DataBuilder<data_state::SetContent<St>, S> {
+    pub fn content(
+        mut self,
+        value: impl Into<S>,
+    ) -> DataBuilder<data_state::SetContent<St>, S> {
         self._fields.0 = Option::Some(value.into());
         DataBuilder {
             _state: PhantomData,
@@ -819,7 +856,10 @@ where
     St::Step: data_state::IsUnset,
 {
     /// Set the `step` field (required)
-    pub fn step(mut self, value: impl Into<i64>) -> DataBuilder<data_state::SetStep<St>, S> {
+    pub fn step(
+        mut self,
+        value: impl Into<i64>,
+    ) -> DataBuilder<data_state::SetStep<St>, S> {
         self._fields.1 = Option::Some(value.into());
         DataBuilder {
             _state: PhantomData,
@@ -835,7 +875,10 @@ where
     St::Stream: data_state::IsUnset,
 {
     /// Set the `stream` field (required)
-    pub fn stream(mut self, value: impl Into<S>) -> DataBuilder<data_state::SetStream<St>, S> {
+    pub fn stream(
+        mut self,
+        value: impl Into<S>,
+    ) -> DataBuilder<data_state::SetStream<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DataBuilder {
             _state: PhantomData,
@@ -851,7 +894,10 @@ where
     St::Time: data_state::IsUnset,
 {
     /// Set the `time` field (required)
-    pub fn time(mut self, value: impl Into<Datetime>) -> DataBuilder<data_state::SetTime<St>, S> {
+    pub fn time(
+        mut self,
+        value: impl Into<Datetime>,
+    ) -> DataBuilder<data_state::SetTime<St>, S> {
         self._fields.3 = Option::Some(value.into());
         DataBuilder {
             _state: PhantomData,
@@ -867,7 +913,10 @@ where
     St::Workflow: data_state::IsUnset,
 {
     /// Set the `workflow` field (required)
-    pub fn workflow(mut self, value: impl Into<S>) -> DataBuilder<data_state::SetWorkflow<St>, S> {
+    pub fn workflow(
+        mut self,
+        value: impl Into<S>,
+    ) -> DataBuilder<data_state::SetWorkflow<St>, S> {
         self._fields.4 = Option::Some(value.into());
         DataBuilder {
             _state: PhantomData,
@@ -915,7 +964,7 @@ where
 
 pub mod subscribe_pipeline_logs_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -957,14 +1006,20 @@ pub struct SubscribePipelineLogsBuilder<
 
 impl SubscribePipelineLogs<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> SubscribePipelineLogsBuilder<subscribe_pipeline_logs_state::Empty, DefaultStr> {
+    pub fn new() -> SubscribePipelineLogsBuilder<
+        subscribe_pipeline_logs_state::Empty,
+        DefaultStr,
+    > {
         SubscribePipelineLogsBuilder::new()
     }
 }
 
 impl<S: BosStr> SubscribePipelineLogs<S> {
     /// Create a new builder for this type
-    pub fn builder() -> SubscribePipelineLogsBuilder<subscribe_pipeline_logs_state::Empty, S> {
+    pub fn builder() -> SubscribePipelineLogsBuilder<
+        subscribe_pipeline_logs_state::Empty,
+        S,
+    > {
         SubscribePipelineLogsBuilder::builder()
     }
 }
@@ -1000,7 +1055,10 @@ where
     pub fn pipeline(
         mut self,
         value: impl Into<Tid>,
-    ) -> SubscribePipelineLogsBuilder<subscribe_pipeline_logs_state::SetPipeline<St>, S> {
+    ) -> SubscribePipelineLogsBuilder<
+        subscribe_pipeline_logs_state::SetPipeline<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         SubscribePipelineLogsBuilder {
             _state: PhantomData,
@@ -1010,7 +1068,10 @@ where
     }
 }
 
-impl<St: subscribe_pipeline_logs_state::State, S: BosStr> SubscribePipelineLogsBuilder<St, S> {
+impl<
+    St: subscribe_pipeline_logs_state::State,
+    S: BosStr,
+> SubscribePipelineLogsBuilder<St, S> {
     /// Set the `workflows` field (optional)
     pub fn workflows(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();

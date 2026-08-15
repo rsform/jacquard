@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::repo::list_collaborators;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::repo::list_collaborators;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListItem<S: BosStr = DefaultStr> {
     ///DID that added this collaborator
     pub added_by: Did<S>,
@@ -44,15 +41,18 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     ///Optional record AT-URI for record-backed indexers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_list_item_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListCollaborators<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -67,11 +67,9 @@ pub struct ListCollaborators<S: BosStr = DefaultStr> {
     pub subject: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListCollaboratorsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -123,9 +121,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListCollaboratorsRequest {
     type Response = ListCollaboratorsResponse;
 }
 
+fn deserialize_list_item_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod list_item_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -345,10 +356,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_repo_listCollaborators() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.repo.listCollaborators"),
@@ -357,20 +368,22 @@ fn lexicon_doc_sh_tangled_repo_listCollaborators() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("listItem"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("subject"),
-                        SmolStr::new_static("addedBy"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("subject"),
+                            SmolStr::new_static("addedBy"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("addedBy"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "DID that added this collaborator",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("DID that added this collaborator"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -378,9 +391,11 @@ fn lexicon_doc_sh_tangled_repo_listCollaborators() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Optional record CID for record-backed indexers",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Optional record CID for record-backed indexers",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Cid),
                                 ..Default::default()
                             }),
@@ -388,9 +403,9 @@ fn lexicon_doc_sh_tangled_repo_listCollaborators() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the collaborator was added",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the collaborator was added"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -398,7 +413,9 @@ fn lexicon_doc_sh_tangled_repo_listCollaborators() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("subject"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("DID of the collaborator")),
+                                description: Some(
+                                    CowStr::new_static("DID of the collaborator"),
+                                ),
                                 format: Some(LexStringFormat::Did),
                                 ..Default::default()
                             }),
@@ -406,9 +423,11 @@ fn lexicon_doc_sh_tangled_repo_listCollaborators() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Optional record AT-URI for record-backed indexers",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Optional record AT-URI for record-backed indexers",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::AtUri),
                                 ..Default::default()
                             }),
@@ -421,47 +440,51 @@ fn lexicon_doc_sh_tangled_repo_listCollaborators() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![SmolStr::new_static("subject")]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("cursor"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static("Pagination cursor")),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("order"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Sort direction by createdAt.",
-                                    )),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("subject"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Repo DID whose collaborator records to list.",
-                                    )),
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(vec![SmolStr::new_static("subject")]),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("cursor"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(CowStr::new_static("Pagination cursor")),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("order"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("Sort direction by createdAt."),
+                                        ),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("subject"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "Repo DID whose collaborator records to list.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -481,7 +504,7 @@ fn _default_order<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod list_collaborators_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -512,7 +535,10 @@ pub mod list_collaborators_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ListCollaboratorsBuilder<St: list_collaborators_state::State, S: BosStr = DefaultStr> {
+pub struct ListCollaboratorsBuilder<
+    St: list_collaborators_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -520,7 +546,10 @@ pub struct ListCollaboratorsBuilder<St: list_collaborators_state::State, S: BosS
 
 impl ListCollaborators<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListCollaboratorsBuilder<list_collaborators_state::Empty, DefaultStr> {
+    pub fn new() -> ListCollaboratorsBuilder<
+        list_collaborators_state::Empty,
+        DefaultStr,
+    > {
         ListCollaboratorsBuilder::new()
     }
 }

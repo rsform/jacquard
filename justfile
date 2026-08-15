@@ -111,3 +111,21 @@ example NAME *ARGS:
             sed 's/^/  - /'
         exit 1
     fi
+
+# Run the full-stack e2e harness against all stable providers (opt-in; never
+# part of ordinary `cargo nextest run`). Requires Docker with rootful bridge
+# networking. Tranquil needs `docker login atcr.io` first.
+e2e:
+    #!/usr/bin/env bash
+    set -e
+    ./scripts/e2e.sh tranquil
+    ./scripts/e2e.sh reference
+
+# Run the e2e harness against one provider: tranquil or reference
+e2e-provider PROVIDER *ARGS:
+    ./scripts/e2e.sh {{ PROVIDER }} {{ ARGS }}
+
+# Show the retained diagnostics bundle for an e2e run
+e2e-logs RUN_ID:
+    @ls -la target/e2e/{{ RUN_ID }}/ && echo "--- ps.txt ---" && sed -n 1,40p target/e2e/{{ RUN_ID }}/ps.txt 2>/dev/null; \
+    for f in target/e2e/{{ RUN_ID }}/*.log; do [ -f "$f" ] && echo "--- $f (tail) ---" && tail -30 "$f"; done

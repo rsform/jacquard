@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "test.blobby.record",
+  "description": "Curated record with required and optional blob fields for generated wire-contract tests.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "any",
+      "description": "Record carrying constrained blob fields.",
+      "record": {
+        "type": "object",
+        "required": ["primary"],
+        "properties": {
+          "primary": {
+            "type": "blob",
+            "accept": ["image/png", "image/jpeg"],
+            "maxSize": 1000,
+            "description": "Required blob with exact MIME and size constraints."
+          },
+          "secondary": {
+            "type": "blob",
+            "accept": ["*/*"],
+            "maxSize": 4000,
+            "description": "Optional blob accepting any MIME type."
+          },
+          "note": {
+            "type": "string",
+            "maxGraphemes": 100,
+            "description": "Free-form annotation."
+          }
+        }
+      }
+    }
+  }
+}

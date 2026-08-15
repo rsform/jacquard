@@ -10,27 +10,22 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CountReactionsBy<S: BosStr = DefaultStr> {
     pub subject: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CountReactionsByOutput<S: BosStr = DefaultStr> {
     ///Total number of matching records.
     pub count: i64,
@@ -70,7 +65,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CountReactionsByRequest {
 
 pub mod count_reactions_by_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -101,7 +96,10 @@ pub mod count_reactions_by_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct CountReactionsByBuilder<St: count_reactions_by_state::State, S: BosStr = DefaultStr> {
+pub struct CountReactionsByBuilder<
+    St: count_reactions_by_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
     _type: PhantomData<fn() -> S>,
@@ -109,7 +107,10 @@ pub struct CountReactionsByBuilder<St: count_reactions_by_state::State, S: BosSt
 
 impl CountReactionsBy<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> CountReactionsByBuilder<count_reactions_by_state::Empty, DefaultStr> {
+    pub fn new() -> CountReactionsByBuilder<
+        count_reactions_by_state::Empty,
+        DefaultStr,
+    > {
         CountReactionsByBuilder::new()
     }
 }

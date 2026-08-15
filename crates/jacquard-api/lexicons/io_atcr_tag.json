@@ -23,6 +23,11 @@
             "description": "DEPRECATED: Digest of the manifest (e.g., 'sha256:...'). Kept for backward compatibility with old records. New records should use 'manifest' field instead.",
             "maxLength": 128
           },
+          "mediaType": {
+            "type": "string",
+            "description": "OCI media type of the manifest (e.g., 'application/vnd.oci.image.manifest.v1+json' or 'application/vnd.oci.image.index.v1+json')",
+            "maxLength": 255
+          },
           "repository": {
             "type": "string",
             "description": "Repository name (e.g., 'myapp'). Scoped to user's DID.",

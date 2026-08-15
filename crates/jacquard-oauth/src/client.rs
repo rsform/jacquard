@@ -67,6 +67,38 @@ where
     NeedsInput,
 }
 
+/// Controls validation of the issuer parameter on OAuth authorization responses.
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub enum CallbackValidationPolicy {
+    /// Enforce the authorization server's advertised RFC 9207 issuer-parameter support.
+    #[default]
+    Strict,
+    /// Permit an omitted `iss` parameter while retaining state, token-endpoint, and token-subject
+    /// issuer binding. A present but mismatched `iss` is always rejected.
+    AllowMissingIssuer,
+}
+
+fn validate_callback_issuer(
+    policy: CallbackValidationPolicy,
+    issuer_parameter_supported: Option<bool>,
+    response_issuer: Option<&str>,
+    expected_issuer: &str,
+) -> core::result::Result<(), CallbackError> {
+    match response_issuer {
+        Some(issuer) if issuer != expected_issuer => Err(CallbackError::IssuerMismatch {
+            expected: expected_issuer.to_string(),
+            got: issuer.to_string(),
+        }),
+        Some(_) => Ok(()),
+        None if issuer_parameter_supported == Some(true)
+            && policy == CallbackValidationPolicy::Strict =>
+        {
+            Err(CallbackError::MissingIssuer)
+        }
+        None => Ok(()),
+    }
+}
+
 /// The top-level OAuth client responsible for driving the authorization flow.
 pub struct OAuthClient<T, S>
 where
@@ -81,6 +113,7 @@ where
     pub endpoint: RwLock<Option<Uri<String>>>,
     /// Underlying HTTP/identity/OAuth resolver used for all network operations.
     pub client: Arc<T>,
+    callback_validation: CallbackValidationPolicy,
 }
 
 impl<S: ClientAuthStore, C: HttpClient + Sync> OAuthClient<JacquardResolver<C>, S> {
@@ -153,6 +186,7 @@ where
             client,
             options: RwLock::new(CallOptions::default()),
             endpoint: RwLock::new(None),
+            callback_validation: CallbackValidationPolicy::Strict,
         }
     }
 
@@ -172,7 +206,18 @@ where
             client,
             options: RwLock::new(CallOptions::default()),
             endpoint: RwLock::new(None),
+            callback_validation: CallbackValidationPolicy::Strict,
         }
+    }
+
+    /// Set authorization callback validation policy.
+    ///
+    /// The default is [`CallbackValidationPolicy::Strict`]. Use
+    /// [`CallbackValidationPolicy::AllowMissingIssuer`] only for a known authorization server
+    /// that advertises RFC 9207 support but omits `iss` from its response.
+    pub fn with_callback_validation(mut self, policy: CallbackValidationPolicy) -> Self {
+        self.callback_validation = policy;
+        self
     }
 }
 
@@ -310,17 +355,12 @@ where
             .get_authorization_server_metadata(auth_req_info.authserver_url.as_str())
             .await?;
 
-        if let Some(iss) = params.iss {
-            if iss != metadata.issuer {
-                return Err(CallbackError::IssuerMismatch {
-                    expected: metadata.issuer.to_string(),
-                    got: iss.to_string(),
-                }
-                .into());
-            }
-        } else if metadata.authorization_response_iss_parameter_supported == Some(true) {
-            return Err(CallbackError::MissingIssuer.into());
-        }
+        validate_callback_issuer(
+            self.callback_validation,
+            metadata.authorization_response_iss_parameter_supported,
+            params.iss.as_ref().map(AsRef::as_ref),
+            metadata.issuer.as_ref(),
+        )?;
         let metadata = OAuthMetadata {
             server_metadata: metadata,
             client_metadata: atproto_client_metadata(
@@ -373,10 +413,11 @@ where
 
     async fn create_session(&self, data: ClientSessionData) -> Result<OAuthSession<T, S>> {
         self.registry.set(data.clone()).await?;
-        Ok(OAuthSession::new(
+        Ok(OAuthSession::new_with_callback_validation(
             self.registry.clone(),
             self.client.clone(),
             data.into_static(),
+            self.callback_validation,
         ))
     }
 
@@ -695,6 +736,7 @@ where
     pub data: Arc<RwLock<ClientSessionData>>,
     /// Default call options applied to every outgoing XRPC request from this session.
     pub options: Arc<RwLock<CallOptions>>,
+    callback_validation: CallbackValidationPolicy,
 }
 
 impl<T, S, W: Clone> Clone for OAuthSession<T, S, W>
@@ -709,6 +751,7 @@ where
             ws_client: self.ws_client.clone(),
             data: self.data.clone(),
             options: self.options.clone(),
+            callback_validation: self.callback_validation,
         }
     }
 }
@@ -727,12 +770,22 @@ where
         client: Arc<T>,
         data: ClientSessionData,
     ) -> Self {
+        Self::new_with_callback_validation(registry, client, data, CallbackValidationPolicy::Strict)
+    }
+
+    fn new_with_callback_validation(
+        registry: Arc<SessionRegistry<T, S, SmolStr>>,
+        client: Arc<T>,
+        data: ClientSessionData,
+        callback_validation: CallbackValidationPolicy,
+    ) -> Self {
         Self {
             registry,
             client,
             ws_client: (),
             data: Arc::new(RwLock::new(data)),
             options: Arc::new(RwLock::new(CallOptions::default())),
+            callback_validation,
         }
     }
 }
@@ -759,6 +812,7 @@ where
             ws_client,
             data: Arc::new(RwLock::new(data)),
             options: Arc::new(RwLock::new(CallOptions::default())),
+            callback_validation: CallbackValidationPolicy::Strict,
         }
     }
 
@@ -773,6 +827,7 @@ where
             ws_client: self.ws_client,
             data: self.data,
             options: Arc::new(RwLock::new(options.into_static())),
+            callback_validation: self.callback_validation,
         }
     }
 
@@ -830,6 +885,7 @@ where
         OAuthClient::from_session(self)
     }
 }
+
 impl<T, S, W> OAuthSession<T, S, W>
 where
     S: ClientAuthStore + Send + Sync + 'static,
@@ -874,6 +930,7 @@ where
             client: session.client.clone(),
             options: RwLock::new(CallOptions::default()),
             endpoint: RwLock::new(None),
+            callback_validation: session.callback_validation,
         }
     }
 }
@@ -976,8 +1033,15 @@ where
         }
 
         let base_uri = self.base_uri().await;
+        // A caller-provided authorization (e.g. a delegation token for
+        // permissioned-space credential minting) takes precedence over the
+        // session's own access token. The DPoP wrapper derives `ath` from
+        // the Authorization scheme: `Bearer`/`Delegation` proofs omit it,
+        // `Dpop` proofs bind it to the session's token.
+        if opts.auth.is_none() {
+            opts.auth = Some(self.access_token().await);
+        }
         let original_token = self.access_token().await;
-        opts.auth = Some(original_token.clone());
         // Clone dpop_data and release read lock before the await point
         let mut dpop = self.data.read().await.dpop_data.clone();
         let http_response = self
@@ -1033,6 +1097,190 @@ where
             resp
         }
     }
+}
+
+async fn send_space_dpop_request<T, R, F>(
+    client: &T,
+    base_uri: &Uri<String>,
+    request: &R,
+    build_options: F,
+) -> crate::error::Result<Response<R::Response>>
+where
+    T: HttpClient,
+    R: XrpcRequest + Send + Sync + serde::Serialize,
+    R::Response: Send + Sync,
+    F: Fn(Option<&str>) -> crate::error::Result<CallOptions>,
+{
+    let options = build_options(None)?;
+    let initial_request = build_http_request(&base_uri.borrow(), request, &options)
+        .map_err(crate::error::OAuthError::from)?;
+    let response = client
+        .send_http(initial_request)
+        .await
+        .map_err(|error| crate::error::OAuthError::InvalidRequest(error.to_string()))?;
+    let nonce = {
+        let nonce = response
+            .headers()
+            .get("dpop-nonce")
+            .and_then(|value| value.to_str().ok());
+        (response.status() == http::StatusCode::UNAUTHORIZED
+            && (response
+                .headers()
+                .get(http::header::WWW_AUTHENTICATE)
+                .and_then(|value| value.to_str().ok())
+                .is_some_and(|value| value.contains("use_dpop_nonce"))
+                || nonce.is_some()))
+        .then(|| nonce.map(str::to_owned))
+    };
+
+    let response = match nonce {
+        Some(nonce) => {
+            let options = build_options(Some(nonce.as_deref().unwrap_or_default()))?;
+            let retry_request = build_http_request(&base_uri.borrow(), request, &options)
+                .map_err(crate::error::OAuthError::from)?;
+            client
+                .send_http(retry_request)
+                .await
+                .map_err(|error| crate::error::OAuthError::InvalidRequest(error.to_string()))?
+        }
+        None => response,
+    };
+    process_response(response).map_err(crate::error::OAuthError::from)
+}
+
+impl<T, S, W> OAuthSession<T, S, W>
+where
+    S: ClientAuthStore + Send + Sync + 'static,
+    T: OAuthResolver + DpopExt + XrpcExt + Send + Sync + 'static,
+    W: Send + Sync,
+{
+    /// Send a request using a DPoP-bound permissioned-space credential.
+    ///
+    /// `dpop_key` must be the P-256 key named by the credential's `cnf.jkt`.
+    pub async fn space_request<R>(
+        &self,
+        request: R,
+        credential: &str,
+        dpop_key: &jose_jwk::Key,
+    ) -> crate::error::Result<jacquard_common::xrpc::Response<R::Response>>
+    where
+        R: jacquard_common::xrpc::XrpcRequest + Send + Sync + serde::Serialize,
+        R::Response: Send + Sync,
+    {
+        use base64::Engine as _;
+        use jacquard_common::AuthorizationToken;
+        use jacquard_common::xrpc::CallOptions;
+        use sha2::Digest as _;
+
+        let base_uri = self.base_uri().await;
+        let method = match R::METHOD {
+            jacquard_common::xrpc::XrpcMethod::Query => "GET",
+            jacquard_common::xrpc::XrpcMethod::Procedure(_) => "POST",
+        };
+        let url = format!("{}/xrpc/{}", base_uri.as_str(), R::NSID);
+        // The proof binds to the credential: ath is the base64url SHA-256
+        // of the credential token (the DPoP scheme's token hash), signed by
+        // the key the credential's cnf.jkt names. Resource servers may
+        // require a nonce (use_dpop_nonce); the response's DPoP-Nonce
+        // header is folded into a single retry.
+        let ath = base64::engine::general_purpose::URL_SAFE_NO_PAD
+            .encode(sha2::Sha256::digest(credential.as_bytes()));
+
+        let build_opts = |nonce: Option<&str>| -> crate::error::Result<CallOptions> {
+            let proof = crate::dpop::build_dpop_proof(dpop_key, method, &url, nonce, Some(&ath))?;
+            Ok(CallOptions {
+                auth: Some(AuthorizationToken::Dpop(SmolStr::from(credential))),
+                // No atproto-proxy: the space endpoints are served by the
+                // authority's PDS directly; a proxy header would route the
+                // request into service-auth verification instead.
+                atproto_proxy: None,
+                atproto_accept_labelers: None,
+                extra_headers: vec![(
+                    http::header::HeaderName::from_static("dpop"),
+                    http::header::HeaderValue::from_str(proof.as_str())
+                        .map_err(|e| crate::error::OAuthError::InvalidRequest(e.to_string()))?,
+                )],
+            })
+        };
+
+        send_space_dpop_request(&*self.client, &base_uri, &request, build_opts).await
+    }
+
+    /// Mint a DPoP-bound credential for a permissioned space.
+    ///
+    /// The session obtains a delegation token from the user's PDS and
+    /// exchanges it at the space authority using `dpop_key`.
+    pub async fn space_credential(
+        &self,
+        space: &jacquard_common::types::aturi::AtSpaceUri<SmolStr>,
+        dpop_key: &jose_jwk::Key,
+    ) -> crate::error::Result<SpaceCredentialBundle> {
+        use crate::atproto::{GetDelegationToken, GetSpaceCredential};
+        use jacquard_common::AuthorizationToken;
+        use jacquard_common::xrpc::CallOptions;
+
+        // 1. Fresh delegation token through the session's normal DPoP path.
+        let delegation = self
+            .send(GetDelegationToken {
+                space: space.clone(),
+            })
+            .await
+            .map_err(crate::error::OAuthError::from)?
+            .into_output()
+            .map_err(|e| crate::error::OAuthError::SpaceMint(e.to_string()))?;
+
+        // 2. Mint request: Authorization is the delegation token (Bearer
+        //    scheme), so the DPoP wrapper derives an ath-less proof — exactly
+        //    what the authority requires when issuing a credential. The
+        //    request is proxied to the space authority. The proof here signs
+        //    with the *credential-bound* dpop_key, not the session's DPoP
+        //    key, so it is attached directly rather than via dpop_call.
+        let base_uri = self.base_uri().await;
+        let mint_url = format!(
+            "{}{}",
+            base_uri.as_str(),
+            "/xrpc/com.atproto.space.getSpaceCredential"
+        );
+        let request = GetSpaceCredential {
+            client_attestation: None,
+            space: space.clone(),
+        };
+        let build_opts = |nonce: Option<&str>| -> crate::error::Result<CallOptions> {
+            let proof = crate::dpop::build_dpop_proof(dpop_key, "POST", &mint_url, nonce, None)?;
+            Ok(CallOptions {
+                auth: Some(AuthorizationToken::Delegation(delegation.token.clone())),
+                atproto_proxy: Some(SmolStr::from(
+                    space.did_authority().to_string() + "#atproto_space_host",
+                )),
+                atproto_accept_labelers: None,
+                extra_headers: vec![(
+                    http::header::HeaderName::from_static("dpop"),
+                    http::header::HeaderValue::from_str(proof.as_str())
+                        .map_err(|e| crate::error::OAuthError::InvalidRequest(e.to_string()))?,
+                )],
+            })
+        };
+        let resp = send_space_dpop_request(&*self.client, &base_uri, &request, build_opts).await?;
+        let space_credential = resp
+            .into_output()
+            .map(|out| out.credential)
+            .map_err(|e| crate::error::OAuthError::SpaceMint(e.to_string()))?;
+        Ok(SpaceCredentialBundle {
+            delegation_token: delegation.token,
+            space_credential,
+        })
+    }
+}
+
+/// The tokens produced by a successful [`OAuthSession::space_credential`]
+/// flow: the single-use delegation token (consumed by the authority at
+/// mint time) and the long-lived DPoP-bound space credential.
+#[derive(Debug, Clone)]
+pub struct SpaceCredentialBundle {
+    /// The delegation token minted by the user's PDS.
+    pub delegation_token: SmolStr,
+    /// The space credential minted by the space authority.
+    pub space_credential: SmolStr,
 }
 
 #[cfg(feature = "scope-check")]
@@ -1260,7 +1508,7 @@ where
                 AuthorizationToken::Bearer(t) => {
                     http::HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
                 }
-                AuthorizationToken::Dpop(t) => {
+                AuthorizationToken::Dpop(t) | AuthorizationToken::Delegation(t) => {
                     http::HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
                 }
             }
@@ -1409,7 +1657,9 @@ where
         let token = self.access_token().await;
         let auth_value = match token {
             AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_str()),
-            AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_str()),
+            AuthorizationToken::Dpop(t) | AuthorizationToken::Delegation(t) => {
+                format!("DPoP {}", t.as_str())
+            }
         };
         opts.headers
             .push((CowStr::from("Authorization"), CowStr::from(auth_value)));
@@ -1441,6 +1691,64 @@ where
             .with_options(opts)
             .subscribe(params)
             .await
+    }
+}
+
+#[cfg(test)]
+mod callback_validation_tests {
+    use super::*;
+
+    #[test]
+    fn strict_policy_rejects_missing_advertised_issuer() {
+        assert!(matches!(
+            validate_callback_issuer(
+                CallbackValidationPolicy::Strict,
+                Some(true),
+                None,
+                "https://issuer.example",
+            ),
+            Err(CallbackError::MissingIssuer)
+        ));
+    }
+
+    #[test]
+    fn compatibility_policy_allows_only_missing_issuer() {
+        assert!(
+            validate_callback_issuer(
+                CallbackValidationPolicy::AllowMissingIssuer,
+                Some(true),
+                None,
+                "https://issuer.example",
+            )
+            .is_ok()
+        );
+        assert!(matches!(
+            validate_callback_issuer(
+                CallbackValidationPolicy::AllowMissingIssuer,
+                Some(true),
+                Some("https://attacker.example"),
+                "https://issuer.example",
+            ),
+            Err(CallbackError::IssuerMismatch { .. })
+        ));
+    }
+
+    #[test]
+    fn matching_issuer_is_accepted_by_every_policy() {
+        for policy in [
+            CallbackValidationPolicy::Strict,
+            CallbackValidationPolicy::AllowMissingIssuer,
+        ] {
+            assert!(
+                validate_callback_issuer(
+                    policy,
+                    Some(true),
+                    Some("https://issuer.example"),
+                    "https://issuer.example",
+                )
+                .is_ok()
+            );
+        }
     }
 }
 

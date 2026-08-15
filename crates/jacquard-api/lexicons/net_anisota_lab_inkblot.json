@@ -21,7 +21,7 @@
           },
           "image": {
             "type": "string",
-            "description": "A rendered PNG of the blot as a data URL, for display",
+            "description": "A rendered still of the blot as an image data URL (PNG, or WebP when a denser blot needs the more compact encoding to stay sharp within the size cap), for display",
             "maxLength": 200000
           },
           "palette": {

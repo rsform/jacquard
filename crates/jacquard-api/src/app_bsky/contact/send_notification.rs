@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SendNotification<S: BosStr = DefaultStr> {
     ///The DID of who this notification comes from.
     pub from: Did<S>,
@@ -31,11 +28,9 @@ pub struct SendNotification<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SendNotificationOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -54,8 +49,9 @@ impl jacquard_common::xrpc::XrpcResp for SendNotificationResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendNotification<S> {
     const NSID: &'static str = "app.bsky.contact.sendNotification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = SendNotificationResponse;
 }
 
@@ -65,15 +61,16 @@ Path: `/xrpc/app.bsky.contact.sendNotification`. The request payload type is `Se
 pub struct SendNotificationRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SendNotificationRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.sendNotification";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = SendNotification<S>;
     type Response = SendNotificationResponse;
 }
 
 pub mod send_notification_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -116,7 +113,10 @@ pub mod send_notification_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct SendNotificationBuilder<St: send_notification_state::State, S: BosStr = DefaultStr> {
+pub struct SendNotificationBuilder<
+    St: send_notification_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -211,7 +211,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SendNotification<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SendNotification<S> {
         SendNotification {
             from: self._fields.0.unwrap(),
             to: self._fields.1.unwrap(),

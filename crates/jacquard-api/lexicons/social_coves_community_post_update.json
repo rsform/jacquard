@@ -1,0 +1,127 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.post.update",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update an existing post",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "content": {
+              "type": "string",
+              "description": "Updated content - main text for text posts, description for media, etc.",
+              "maxLength": 100000,
+              "maxGraphemes": 10000
+            },
+            "editNote": {
+              "type": "string",
+              "description": "Optional note explaining the edit",
+              "maxLength": 3000,
+              "maxGraphemes": 300
+            },
+            "embed": {
+              "type": "union",
+              "description": "Updated embedded content (note: changing embed type may be restricted)",
+              "refs": [
+                "social.coves.embed.images",
+                "social.coves.embed.video",
+                "social.coves.embed.external",
+                "social.coves.embed.post"
+              ]
+            },
+            "facets": {
+              "type": "array",
+              "description": "Updated annotations for rich text (mentions, links, formatting, block structure)",
+              "items": {
+                "type": "ref",
+                "ref": "social.coves.richtext.facet"
+              },
+              "maxLength": 200
+            },
+            "labels": {
+              "type": "ref",
+              "description": "Updated self-applied content labels",
+              "ref": "com.atproto.label.defs#selfLabels"
+            },
+            "langs": {
+              "type": "array",
+              "description": "Updated languages (ISO 639-1)",
+              "items": {
+                "type": "string",
+                "format": "language"
+              },
+              "maxLength": 3
+            },
+            "tags": {
+              "type": "array",
+              "description": "Updated topic tags",
+              "items": {
+                "type": "string",
+                "maxLength": 640,
+                "maxGraphemes": 64
+              },
+              "maxLength": 8
+            },
+            "title": {
+              "type": "string",
+              "description": "Updated title",
+              "maxLength": 3000,
+              "maxGraphemes": 300
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the post to update",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "New CID of the updated post",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the updated post",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Post not found",
+          "name": "PostNotFound"
+        },
+        {
+          "description": "User is not authorized to edit this post",
+          "name": "NotAuthorized"
+        },
+        {
+          "description": "Edit window has expired (posts can only be edited within 24 hours)",
+          "name": "EditWindowExpired"
+        },
+        {
+          "description": "Invalid update operation (e.g., changing post type)",
+          "name": "InvalidUpdate"
+        }
+      ]
+    }
+  }
+}

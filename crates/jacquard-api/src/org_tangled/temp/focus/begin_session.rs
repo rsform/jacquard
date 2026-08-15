@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{AtUri, Did};
+use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BeginSessionOutput<S: BosStr = DefaultStr> {
     ///AT-URI of the issue to navigate to, if the item is an issue.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,9 +36,18 @@ pub struct BeginSessionOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum BeginSessionError {
     /// There are no unread work notifications to focus on.
@@ -49,10 +55,7 @@ pub enum BeginSessionError {
     NoFocusItems(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for BeginSessionError {
@@ -95,9 +98,16 @@ impl jacquard_common::xrpc::XrpcResp for BeginSessionResponse {
 
 impl jacquard_common::xrpc::XrpcRequest for BeginSession {
     const NSID: &'static str = "org.tangled.temp.focus.beginSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = BeginSessionResponse;
+    fn encode_body(
+        &self,
+        _buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+        Ok(())
+    }
 }
 
 /** Endpoint marker for the `org.tangled.temp.focus.beginSession` procedure.
@@ -106,8 +116,9 @@ Path: `/xrpc/org.tangled.temp.focus.beginSession`. The request payload type is `
 pub struct BeginSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BeginSessionRequest {
     const PATH: &'static str = "/xrpc/org.tangled.temp.focus.beginSession";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = BeginSession;
     type Response = BeginSessionResponse;
 }

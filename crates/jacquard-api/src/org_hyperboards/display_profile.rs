@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::org_hypercerts::SmallImage;
 use crate::org_hypercerts::SmallVideo;
 use crate::org_hypercerts::Uri;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// User-declared visual presentation defaults for how a contributor appears on hyperboards. Stored in the contributor's own PDS and reusable across multiple boards.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -60,9 +60,15 @@ pub struct DisplayProfile<S: BosStr = DefaultStr> {
     ///Default video for this user across boards, as a URI (embed/direct link) or uploaded video blob.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub video: Option<DisplayProfileVideo<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_display_profile_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -74,6 +80,7 @@ pub enum DisplayProfileHoverImage<S: BosStr = DefaultStr> {
     SmallImage(Box<SmallImage<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -83,6 +90,7 @@ pub enum DisplayProfileImage<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#smallImage")]
     SmallImage(Box<SmallImage<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -195,9 +203,28 @@ impl<S: BosStr> LexiconSchema for DisplayProfile<S> {
     }
 }
 
+fn deserialize_display_profile_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod display_profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -228,7 +255,10 @@ pub mod display_profile_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct DisplayProfileBuilder<St: display_profile_state::State, S: BosStr = DefaultStr> {
+pub struct DisplayProfileBuilder<
+    St: display_profile_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
@@ -325,12 +355,18 @@ impl<St: display_profile_state::State, S: BosStr> DisplayProfileBuilder<St, S> {
 
 impl<St: display_profile_state::State, S: BosStr> DisplayProfileBuilder<St, S> {
     /// Set the `hoverImage` field (optional)
-    pub fn hover_image(mut self, value: impl Into<Option<DisplayProfileHoverImage<S>>>) -> Self {
+    pub fn hover_image(
+        mut self,
+        value: impl Into<Option<DisplayProfileHoverImage<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `hoverImage` field to an Option value (optional)
-    pub fn maybe_hover_image(mut self, value: Option<DisplayProfileHoverImage<S>>) -> Self {
+    pub fn maybe_hover_image(
+        mut self,
+        value: Option<DisplayProfileHoverImage<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -394,7 +430,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DisplayProfile<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DisplayProfile<S> {
         DisplayProfile {
             created_at: self._fields.0.unwrap(),
             display_name: self._fields.1,
@@ -409,10 +448,10 @@ where
 }
 
 fn lexicon_doc_org_hyperboards_displayProfile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hyperboards.displayProfile"),

@@ -8,25 +8,22 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::aturi::AtSpaceUri;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::simplespace::AllowList;
 use crate::com_atproto::simplespace::ManagingAppPolicy;
 use crate::com_atproto::simplespace::MemberListPolicy;
 use crate::com_atproto::simplespace::Open;
 use crate::com_atproto::simplespace::PublicPolicy;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::aturi::AtSpaceUri;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UpdateSpace<S: BosStr = DefaultStr> {
     ///How the authority decides whether to authorize a requesting app. When supplied, replaces the current policy wholesale.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,6 +37,7 @@ pub struct UpdateSpace<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -49,6 +47,7 @@ pub enum UpdateSpaceAppAccess<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.simplespace.defs#allowList")]
     AllowList(Box<AllowList<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,9 +61,18 @@ pub enum UpdateSpacePolicy<S: BosStr = DefaultStr> {
     ManagingAppPolicy(Box<ManagingAppPolicy<S>>),
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum UpdateSpaceError {
     #[serde(rename = "SpaceNotFound")]
@@ -79,10 +87,7 @@ pub enum UpdateSpaceError {
     UnsupportedAppAccess(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for UpdateSpaceError {
@@ -136,12 +141,25 @@ impl jacquard_common::xrpc::XrpcResp for UpdateSpaceResponse {
     const ENCODING: &'static str = "application/json";
     type Output<S: BosStr> = ();
     type Err = UpdateSpaceError;
+    fn decode_output<'de, S>(
+        body: &'de [u8],
+    ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+    {
+        if body.is_empty() {
+            Ok(())
+        } else {
+            Err(jacquard_common::error::DecodeError::UnexpectedBody)
+        }
+    }
 }
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateSpace<S> {
     const NSID: &'static str = "com.atproto.simplespace.updateSpace";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UpdateSpaceResponse;
 }
 
@@ -151,15 +169,16 @@ Path: `/xrpc/com.atproto.simplespace.updateSpace`. The request payload type is `
 pub struct UpdateSpaceRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UpdateSpaceRequest {
     const PATH: &'static str = "/xrpc/com.atproto.simplespace.updateSpace";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UpdateSpace<S>;
     type Response = UpdateSpaceResponse;
 }
 
 pub mod update_space_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -238,7 +257,10 @@ impl<S: BosStr> UpdateSpaceBuilder<update_space_state::Empty, S> {
 
 impl<St: update_space_state::State, S: BosStr> UpdateSpaceBuilder<St, S> {
     /// Set the `appAccess` field (optional)
-    pub fn app_access(mut self, value: impl Into<Option<UpdateSpaceAppAccess<S>>>) -> Self {
+    pub fn app_access(
+        mut self,
+        value: impl Into<Option<UpdateSpaceAppAccess<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
@@ -296,7 +318,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UpdateSpace<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateSpace<S> {
         UpdateSpace {
             app_access: self._fields.0,
             policy: self._fields.1,

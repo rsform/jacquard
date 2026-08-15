@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::chat_bsky::convo::ConvoView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::chat_bsky::convo::ConvoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ApproveJoinRequest<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub member: Did<S>,
@@ -30,20 +27,27 @@ pub struct ApproveJoinRequest<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ApproveJoinRequestOutput<S: BosStr = DefaultStr> {
     pub convo: ConvoView<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum ApproveJoinRequestError {
     #[serde(rename = "InvalidConvo")]
@@ -54,10 +58,7 @@ pub enum ApproveJoinRequestError {
     MemberLimitReached(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ApproveJoinRequestError {
@@ -108,8 +109,9 @@ impl jacquard_common::xrpc::XrpcResp for ApproveJoinRequestResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ApproveJoinRequest<S> {
     const NSID: &'static str = "chat.bsky.group.approveJoinRequest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ApproveJoinRequestResponse;
 }
 
@@ -119,15 +121,16 @@ Path: `/xrpc/chat.bsky.group.approveJoinRequest`. The request payload type is `A
 pub struct ApproveJoinRequestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ApproveJoinRequestRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.group.approveJoinRequest";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ApproveJoinRequest<S>;
     type Response = ApproveJoinRequestResponse;
 }
 
 pub mod approve_join_request_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -170,8 +173,10 @@ pub mod approve_join_request_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ApproveJoinRequestBuilder<St: approve_join_request_state::State, S: BosStr = DefaultStr>
-{
+pub struct ApproveJoinRequestBuilder<
+    St: approve_join_request_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -179,7 +184,10 @@ pub struct ApproveJoinRequestBuilder<St: approve_join_request_state::State, S: B
 
 impl ApproveJoinRequest<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ApproveJoinRequestBuilder<approve_join_request_state::Empty, DefaultStr> {
+    pub fn new() -> ApproveJoinRequestBuilder<
+        approve_join_request_state::Empty,
+        DefaultStr,
+    > {
         ApproveJoinRequestBuilder::new()
     }
 }
@@ -266,7 +274,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ApproveJoinRequest<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ApproveJoinRequest<S> {
         ApproveJoinRequest {
             convo_id: self._fields.0.unwrap(),
             member: self._fields.1.unwrap(),

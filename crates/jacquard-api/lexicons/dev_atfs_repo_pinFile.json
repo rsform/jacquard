@@ -1,0 +1,109 @@
+{
+  "lexicon": 1,
+  "id": "dev.atfs.repo.pinFile",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Pin a file that already exists on the IPFS network, as if the caller had uploaded it to this instance: the bytes are fetched, verified against the reference's blessed cid, stored, served, and announced, and the caller ends up holding an ordinary claim on them (see dev.atfs.repo.deleteFile). A dev.atfs.file reference is the whole request — it already names the cid the fetched bytes must hash to (which is what makes the fetch trustless whatever the source), the ipfsRoot to fetch, the size to refuse before fetching a byte, the mimeType (underivable from IPFS bytes), and any provider origins to try over HTTP before the IPFS network. Requires auth (a caller's own inter-service auth JWT, signed by its account's signing key) and — like uploadFile, and unlike deleteFile — is restricted to the instance's configured account allowlist: pinning adds content to the instance, so it is an upload by another name. Returns immediately, always: the content is usually not here yet, and the retry lifecycle below is the node's own business, not the caller's.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "file"
+          ],
+          "properties": {
+            "file": {
+              "type": "ref",
+              "description": "The file to pin, exactly as it would be embedded in a record. Wrapped in an object rather than being the request body itself so later additions to the call have somewhere to live. Its tags field (see dev.atfs.file), if present, is adopted: the tags on the reference become the caller's own on the resulting claim, as if the caller had supplied them itself. A reference with no tags simply yields a pin with no tags — this is the only current way to seed tags on a pin, since pinFile takes no separate tag parameter of its own.",
+              "ref": "dev.atfs.file"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "description": "Where the pin stands right now. Call again with the same file to check on it: a repeat call is idempotent — it joins the existing intent (several accounts asking for the same cid share one intent and one fetch) and reports its current state rather than starting anything new. The one exception is a call naming a cid whose intent has failed, which re-triggers it: attempts start over from a clean slate and the response carries the previous run's lastError so the caller learns what had gone wrong. To stop waiting for a pin, call dev.atfs.repo.deleteFile with the same cid — an intent is a claim before the fact, so deleteFile is its inverse there too, and (exactly as for stored content) the pin is only abandoned once the last account waiting on it has released it.",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "attempts": {
+              "type": "integer",
+              "description": "How many fetch attempts this pin has cost so far. Reset to zero when a failed pin is re-triggered."
+            },
+            "ipfsRoot": {
+              "type": "cid-link",
+              "description": "Present only when state is pinned: the CID this instance now serves the file's DAG under, and deliberately the same field name as dev.atfs.repo.uploadFile's, since it means exactly the same thing. Usually this is the reference's own ipfsRoot, fetched and kept verbatim. It differs when the instance had already committed a root for these bytes — from an earlier upload, or an earlier pin naming a different DAG shape — because that root has already been handed out in responses, embedded in dev.atfs.file records and announced to the DHT: first root wins, the pin still succeeds (recording the claim is what a pin means), and this field reports what is really being served so the caller can tell its requester the file is here but reachable under a different root than their reference names."
+            },
+            "lastError": {
+              "type": "string",
+              "description": "Why the most recent attempt failed, as one of a closed set of reasons rather than an error message. Present alongside seeking (a failure being retried), failed (the one that ended it), and the first response after a failed pin is re-triggered. no-source-responded: nothing served the content — the default, and deliberately no more specific, since which origin failed and how is a fact about the instance's own network rather than an answer to the caller. content-mismatch: a source served bytes that provably aren't the reference's. transfer-incomplete: a transfer ended before the declared size. size-exceeded: the reference is over this instance's limit, or a source streamed more than it declares. not-a-unixfs-file: the ipfsRoot isn't a readable UnixFS file. invalid-reference: the reference couldn't describe a pinnable file at all. storage-unavailable: this instance couldn't store bytes it did fetch. The full error text stays in the instance's own logs.",
+              "knownValues": [
+                "no-source-responded",
+                "content-mismatch",
+                "transfer-incomplete",
+                "size-exceeded",
+                "not-a-unixfs-file",
+                "invalid-reference",
+                "storage-unavailable"
+              ]
+            },
+            "nextAttemptIn": {
+              "type": "integer",
+              "description": "Seconds until the next attempt starts. Deliberately relative rather than an absolute timestamp: an atfs appliance can boot with its clock reading 1970 and no network to correct it, so any absolute time it quoted would be a lie. Absent when nothing is scheduled — an attempt is running now, the pin has finished, or it has failed."
+            },
+            "progress": {
+              "type": "ref",
+              "description": "Present only while state is fetching.",
+              "ref": "#progress"
+            },
+            "state": {
+              "type": "string",
+              "description": "seeking: the node is looking for a source, or waiting out the backoff before looking again. fetching: bytes are actually arriving; seeking and fetching can bounce back and forth as sources come and go. pinned: the bytes are stored, served and announced, and the caller holds a claim on them — this is read from ground truth (content in the store, caller in its pin set), not from anything the pin request recorded. failed: the node has stopped trying (see lastError); the request rests until it is either re-triggered by another pinFile call or released by every account waiting on it. A failure the node could not prove — no providers found yet, an origin that wouldn't answer, a transfer cut short — is never reported as failed on the spot: provider records on the DHT routinely take hours to propagate, so those are retried on a backoff doubling from a minute to an hour, for roughly 48 hours of the instance's uptime (uptime, not wall time: a box that spends a day powered off spends none of it), and the state stays seeking throughout. Only a failure the node could prove — bytes that don't hash to the cid, a source holding more than the declared size, a root that isn't a readable UnixFS file, a size over this instance's limit — fails immediately, since no retry could change it.",
+              "knownValues": [
+                "seeking",
+                "fetching",
+                "pinned",
+                "failed"
+              ]
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "This instance is running without its IPFS node, so it has no way to fetch anything. Uploads and retrieval are unaffected.",
+          "name": "PinningUnavailable"
+        },
+        {
+          "description": "The reference's declared size exceeds this instance's maximum blob size — checked before any fetch is attempted, the same limit dev.atfs.repo.uploadFile enforces on bytes it receives directly.",
+          "name": "BlobTooLarge"
+        },
+        {
+          "description": "This instance has no room to take on another pin: its data volume has reached the free space it keeps in reserve, or it is already holding as many pin requests at once as it will. No intent was registered, and pins already registered carry on. The same named error dev.atfs.repo.uploadFile answers with, for the same reason — a pin is an upload by another name — and releasing content with dev.atfs.repo.deleteFile is what makes room again.",
+          "name": "InsufficientStorage"
+        }
+      ]
+    },
+    "progress": {
+      "type": "object",
+      "required": [
+        "bytesFetched",
+        "size"
+      ],
+      "properties": {
+        "bytesFetched": {
+          "type": "integer",
+          "description": "Bytes of the file verified into the store so far by the attempt currently running. It restarts from zero on each attempt: a fetch that was cut short leaves nothing behind, so the next one starts from the beginning."
+        },
+        "size": {
+          "type": "integer",
+          "description": "The file's total size, as the reference declares it — repeated here so a progress bar needs only this object."
+        }
+      }
+    }
+  }
+}

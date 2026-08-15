@@ -1,0 +1,51 @@
+{
+  "lexicon": 1,
+  "id": "dev.atfs.repo.deleteFile",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Release the caller's claim on a file previously uploaded to — or pinned by — this atfs instance. The semantics are pin removal, not unconditional deletion: several accounts can hold independent claims on the same cid (see dev.atfs.repo.uploadFile, which merges an idempotent re-upload's claim rather than rejecting it), and the underlying bytes — its raw block plus any UnixFS DAG artifacts built for it — are physically deleted only once the last claim on it goes. A caller's own claim is always gone on success, whether or not that triggered the physical deletion; see the output's contentDeleted field to tell the two apart. It is also the inverse of dev.atfs.repo.pinFile: a pin request the instance hasn't been able to satisfy yet is a claim before the fact, so calling this with a cid that is still being fetched withdraws the caller's interest in it, and the fetch itself is abandoned (with anything partially fetched discarded) only once the last account waiting on it has done so. Since nothing was stored on the caller's behalf, nothing is deleted: that case succeeds with contentDeleted false. Only a cid with neither stored bytes nor a pending request of the caller's is reported as an error. There is deliberately no com.atproto alias for this method, unlike uploadFile/getFile: atproto itself has no explicit blob-deletion call — a PDS garbage-collects a blob once no record in the repo references it any longer — so there is no existing wire contract to mirror. Requires auth (a caller's own inter-service auth JWT, signed by its account's signing key), but — unlike uploadFile — authorization is by pin-set membership, not the upload allowlist: an account removed from the allowlist can still release claims it holds from before it was delisted.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "cid"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "The blessed CID (see dev.atfs.file) of the file to release the caller's claim on.",
+              "format": "cid"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "contentDeleted"
+          ],
+          "properties": {
+            "contentDeleted": {
+              "type": "boolean",
+              "description": "Whether this call was the one that removed the last claim, triggering physical deletion of the stored bytes (and, for a large file, its UnixFS DAG artifacts). false means other accounts still hold claims on the cid, so it remains fully served."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "No file is stored under this cid, and no pinFile request of the caller's is waiting on it either. Existence isn't secret — the /ipfs/<cid> gateway serves any stored cid to anyone — so this is reported distinctly from NotPinned rather than folded into it.",
+          "name": "BlobNotFound"
+        },
+        {
+          "description": "The file exists, but the caller holds no claim on it — there is nothing for this call to release.",
+          "name": "NotPinned"
+        }
+      ]
+    }
+  }
+}

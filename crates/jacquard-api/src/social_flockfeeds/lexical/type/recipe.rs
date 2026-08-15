@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A recipe. For dietary restrictions covered by the recipe, a few common restrictions are enumerated via [[suitableForDiet]]. The [[keywords]] property can also be used to add more detail.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -333,9 +330,15 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub work_translation: Option<EmbeddedWorkTranslation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#yield: Option<EmbeddedYield<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_embedded_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -389,6 +392,7 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -450,6 +454,7 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -467,6 +472,7 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -513,6 +519,7 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -532,6 +539,7 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -567,6 +575,7 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -620,6 +629,7 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -681,6 +691,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -713,6 +724,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -752,6 +764,7 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -759,6 +772,7 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -810,6 +824,7 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -817,6 +832,7 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -845,6 +861,7 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -881,6 +898,7 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -890,6 +908,7 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -906,6 +925,7 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -913,6 +933,7 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -951,6 +972,7 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -997,6 +1019,7 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1009,6 +1032,7 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1030,6 +1054,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1047,6 +1072,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1086,6 +1112,7 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1120,6 +1147,7 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1466,9 +1494,15 @@ pub struct Recipe<S: BosStr = DefaultStr> {
     pub work_translation: Option<RecipeWorkTranslation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#yield: Option<RecipeYield<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_recipe_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1522,6 +1556,7 @@ pub enum RecipeAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1583,6 +1618,7 @@ pub enum RecipeAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1600,6 +1636,7 @@ pub enum RecipeCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1646,6 +1683,7 @@ pub enum RecipeContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1665,6 +1703,7 @@ pub enum RecipeCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1700,6 +1739,7 @@ pub enum RecipeCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1753,6 +1793,7 @@ pub enum RecipeEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1814,6 +1855,7 @@ pub enum RecipeFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1846,6 +1888,7 @@ pub enum RecipeImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1885,6 +1928,7 @@ pub enum RecipeIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1892,6 +1936,7 @@ pub enum RecipeIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1943,6 +1988,7 @@ pub enum RecipeMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1950,6 +1996,7 @@ pub enum RecipeMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1978,6 +2025,7 @@ pub enum RecipeOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2014,6 +2062,7 @@ pub enum RecipeProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2023,6 +2072,7 @@ pub enum RecipeProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2039,6 +2089,7 @@ pub enum RecipePublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2046,6 +2097,7 @@ pub enum RecipePublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2084,6 +2136,7 @@ pub enum RecipeRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2130,6 +2183,7 @@ pub enum RecipeSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2142,6 +2196,7 @@ pub enum RecipeSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2163,6 +2218,7 @@ pub enum RecipeSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2180,6 +2236,7 @@ pub enum RecipeSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2219,6 +2276,7 @@ pub enum RecipeThumbnail<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2253,6 +2311,7 @@ pub enum RecipeTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2372,11 +2431,24 @@ impl<S: BosStr> LexiconSchema for Recipe<S> {
     }
 }
 
+fn deserialize_embedded_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_social_flockfeeds_lexical_type_Recipe() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Recipe"),
@@ -5474,9 +5546,28 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Recipe() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_recipe_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod recipe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5667,17 +5758,152 @@ impl RecipeBuilder<recipe_state::Empty, DefaultStr> {
         RecipeBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -5690,17 +5916,152 @@ impl<S: BosStr> RecipeBuilder<recipe_state::Empty, S> {
         RecipeBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -5775,7 +6136,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
-    pub fn maybe_accessibility_api(mut self, value: Option<RecipeAccessibilityApi<S>>) -> Self {
+    pub fn maybe_accessibility_api(
+        mut self,
+        value: Option<RecipeAccessibilityApi<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -5867,7 +6231,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
-    pub fn maybe_accountable_person(mut self, value: Option<RecipeAccountablePerson<S>>) -> Self {
+    pub fn maybe_accountable_person(
+        mut self,
+        value: Option<RecipeAccountablePerson<S>>,
+    ) -> Self {
         self._fields.9 = value;
         self
     }
@@ -5894,12 +6261,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<RecipeAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<RecipeAdditionalType<S>>>,
+    ) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<RecipeAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<RecipeAdditionalType<S>>,
+    ) -> Self {
         self._fields.11 = value;
         self
     }
@@ -5907,12 +6280,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<RecipeAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<RecipeAggregateRating<S>>>,
+    ) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<RecipeAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<RecipeAggregateRating<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
@@ -5920,12 +6299,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<RecipeAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<RecipeAlternateName<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `alternateName` field to an Option value (optional)
-    pub fn maybe_alternate_name(mut self, value: Option<RecipeAlternateName<S>>) -> Self {
+    pub fn maybe_alternate_name(
+        mut self,
+        value: Option<RecipeAlternateName<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
@@ -5978,12 +6363,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `associatedMedia` field (optional)
-    pub fn associated_media(mut self, value: impl Into<Option<RecipeAssociatedMedia<S>>>) -> Self {
+    pub fn associated_media(
+        mut self,
+        value: impl Into<Option<RecipeAssociatedMedia<S>>>,
+    ) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(mut self, value: Option<RecipeAssociatedMedia<S>>) -> Self {
+    pub fn maybe_associated_media(
+        mut self,
+        value: Option<RecipeAssociatedMedia<S>>,
+    ) -> Self {
         self._fields.17 = value;
         self
     }
@@ -6095,7 +6486,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `commentCount` field (optional)
-    pub fn comment_count(mut self, value: impl Into<Option<RecipeCommentCount<S>>>) -> Self {
+    pub fn comment_count(
+        mut self,
+        value: impl Into<Option<RecipeCommentCount<S>>>,
+    ) -> Self {
         self._fields.26 = value.into();
         self
     }
@@ -6127,12 +6521,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `contentLocation` field (optional)
-    pub fn content_location(mut self, value: impl Into<Option<RecipeContentLocation<S>>>) -> Self {
+    pub fn content_location(
+        mut self,
+        value: impl Into<Option<RecipeContentLocation<S>>>,
+    ) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
-    pub fn maybe_content_location(mut self, value: Option<RecipeContentLocation<S>>) -> Self {
+    pub fn maybe_content_location(
+        mut self,
+        value: Option<RecipeContentLocation<S>>,
+    ) -> Self {
         self._fields.28 = value;
         self
     }
@@ -6140,12 +6540,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `contentRating` field (optional)
-    pub fn content_rating(mut self, value: impl Into<Option<RecipeContentRating<S>>>) -> Self {
+    pub fn content_rating(
+        mut self,
+        value: impl Into<Option<RecipeContentRating<S>>>,
+    ) -> Self {
         self._fields.29 = value.into();
         self
     }
     /// Set the `contentRating` field to an Option value (optional)
-    pub fn maybe_content_rating(mut self, value: Option<RecipeContentRating<S>>) -> Self {
+    pub fn maybe_content_rating(
+        mut self,
+        value: Option<RecipeContentRating<S>>,
+    ) -> Self {
         self._fields.29 = value;
         self
     }
@@ -6172,7 +6578,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `contributor` field (optional)
-    pub fn contributor(mut self, value: impl Into<Option<RecipeContributor<S>>>) -> Self {
+    pub fn contributor(
+        mut self,
+        value: impl Into<Option<RecipeContributor<S>>>,
+    ) -> Self {
         self._fields.31 = value.into();
         self
     }
@@ -6198,12 +6607,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `cookingMethod` field (optional)
-    pub fn cooking_method(mut self, value: impl Into<Option<RecipeCookingMethod<S>>>) -> Self {
+    pub fn cooking_method(
+        mut self,
+        value: impl Into<Option<RecipeCookingMethod<S>>>,
+    ) -> Self {
         self._fields.33 = value.into();
         self
     }
     /// Set the `cookingMethod` field to an Option value (optional)
-    pub fn maybe_cooking_method(mut self, value: Option<RecipeCookingMethod<S>>) -> Self {
+    pub fn maybe_cooking_method(
+        mut self,
+        value: Option<RecipeCookingMethod<S>>,
+    ) -> Self {
         self._fields.33 = value;
         self
     }
@@ -6211,12 +6626,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `copyrightHolder` field (optional)
-    pub fn copyright_holder(mut self, value: impl Into<Option<RecipeCopyrightHolder<S>>>) -> Self {
+    pub fn copyright_holder(
+        mut self,
+        value: impl Into<Option<RecipeCopyrightHolder<S>>>,
+    ) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
-    pub fn maybe_copyright_holder(mut self, value: Option<RecipeCopyrightHolder<S>>) -> Self {
+    pub fn maybe_copyright_holder(
+        mut self,
+        value: Option<RecipeCopyrightHolder<S>>,
+    ) -> Self {
         self._fields.34 = value;
         self
     }
@@ -6224,12 +6645,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `copyrightNotice` field (optional)
-    pub fn copyright_notice(mut self, value: impl Into<Option<RecipeCopyrightNotice<S>>>) -> Self {
+    pub fn copyright_notice(
+        mut self,
+        value: impl Into<Option<RecipeCopyrightNotice<S>>>,
+    ) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
-    pub fn maybe_copyright_notice(mut self, value: Option<RecipeCopyrightNotice<S>>) -> Self {
+    pub fn maybe_copyright_notice(
+        mut self,
+        value: Option<RecipeCopyrightNotice<S>>,
+    ) -> Self {
         self._fields.35 = value;
         self
     }
@@ -6237,12 +6664,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `copyrightYear` field (optional)
-    pub fn copyright_year(mut self, value: impl Into<Option<RecipeCopyrightYear<S>>>) -> Self {
+    pub fn copyright_year(
+        mut self,
+        value: impl Into<Option<RecipeCopyrightYear<S>>>,
+    ) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `copyrightYear` field to an Option value (optional)
-    pub fn maybe_copyright_year(mut self, value: Option<RecipeCopyrightYear<S>>) -> Self {
+    pub fn maybe_copyright_year(
+        mut self,
+        value: Option<RecipeCopyrightYear<S>>,
+    ) -> Self {
         self._fields.36 = value;
         self
     }
@@ -6263,12 +6696,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `countryOfOrigin` field (optional)
-    pub fn country_of_origin(mut self, value: impl Into<Option<RecipeCountryOfOrigin<S>>>) -> Self {
+    pub fn country_of_origin(
+        mut self,
+        value: impl Into<Option<RecipeCountryOfOrigin<S>>>,
+    ) -> Self {
         self._fields.38 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
-    pub fn maybe_country_of_origin(mut self, value: Option<RecipeCountryOfOrigin<S>>) -> Self {
+    pub fn maybe_country_of_origin(
+        mut self,
+        value: Option<RecipeCountryOfOrigin<S>>,
+    ) -> Self {
         self._fields.38 = value;
         self
     }
@@ -6321,7 +6760,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `dateCreated` field (optional)
-    pub fn date_created(mut self, value: impl Into<Option<RecipeDateCreated<S>>>) -> Self {
+    pub fn date_created(
+        mut self,
+        value: impl Into<Option<RecipeDateCreated<S>>>,
+    ) -> Self {
         self._fields.42 = value.into();
         self
     }
@@ -6334,7 +6776,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `dateModified` field (optional)
-    pub fn date_modified(mut self, value: impl Into<Option<RecipeDateModified<S>>>) -> Self {
+    pub fn date_modified(
+        mut self,
+        value: impl Into<Option<RecipeDateModified<S>>>,
+    ) -> Self {
         self._fields.43 = value.into();
         self
     }
@@ -6347,12 +6792,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `datePublished` field (optional)
-    pub fn date_published(mut self, value: impl Into<Option<RecipeDatePublished<S>>>) -> Self {
+    pub fn date_published(
+        mut self,
+        value: impl Into<Option<RecipeDatePublished<S>>>,
+    ) -> Self {
         self._fields.44 = value.into();
         self
     }
     /// Set the `datePublished` field to an Option value (optional)
-    pub fn maybe_date_published(mut self, value: Option<RecipeDatePublished<S>>) -> Self {
+    pub fn maybe_date_published(
+        mut self,
+        value: Option<RecipeDatePublished<S>>,
+    ) -> Self {
         self._fields.44 = value;
         self
     }
@@ -6360,7 +6811,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `description` field (optional)
-    pub fn description(mut self, value: impl Into<Option<RecipeDescription<S>>>) -> Self {
+    pub fn description(
+        mut self,
+        value: impl Into<Option<RecipeDescription<S>>>,
+    ) -> Self {
         self._fields.45 = value.into();
         self
     }
@@ -6381,7 +6835,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
-    pub fn maybe_digital_source_type(mut self, value: Option<RecipeDigitalSourceType<S>>) -> Self {
+    pub fn maybe_digital_source_type(
+        mut self,
+        value: Option<RecipeDigitalSourceType<S>>,
+    ) -> Self {
         self._fields.46 = value;
         self
     }
@@ -6408,12 +6865,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `discussionUrl` field (optional)
-    pub fn discussion_url(mut self, value: impl Into<Option<RecipeDiscussionUrl<S>>>) -> Self {
+    pub fn discussion_url(
+        mut self,
+        value: impl Into<Option<RecipeDiscussionUrl<S>>>,
+    ) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `discussionUrl` field to an Option value (optional)
-    pub fn maybe_discussion_url(mut self, value: Option<RecipeDiscussionUrl<S>>) -> Self {
+    pub fn maybe_discussion_url(
+        mut self,
+        value: Option<RecipeDiscussionUrl<S>>,
+    ) -> Self {
         self._fields.48 = value;
         self
     }
@@ -6474,7 +6937,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
-    pub fn maybe_educational_level(mut self, value: Option<RecipeEducationalLevel<S>>) -> Self {
+    pub fn maybe_educational_level(
+        mut self,
+        value: Option<RecipeEducationalLevel<S>>,
+    ) -> Self {
         self._fields.52 = value;
         self
     }
@@ -6482,12 +6948,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `educationalUse` field (optional)
-    pub fn educational_use(mut self, value: impl Into<Option<RecipeEducationalUse<S>>>) -> Self {
+    pub fn educational_use(
+        mut self,
+        value: impl Into<Option<RecipeEducationalUse<S>>>,
+    ) -> Self {
         self._fields.53 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
-    pub fn maybe_educational_use(mut self, value: Option<RecipeEducationalUse<S>>) -> Self {
+    pub fn maybe_educational_use(
+        mut self,
+        value: Option<RecipeEducationalUse<S>>,
+    ) -> Self {
         self._fields.53 = value;
         self
     }
@@ -6508,12 +6980,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `encodingFormat` field (optional)
-    pub fn encoding_format(mut self, value: impl Into<Option<RecipeEncodingFormat<S>>>) -> Self {
+    pub fn encoding_format(
+        mut self,
+        value: impl Into<Option<RecipeEncodingFormat<S>>>,
+    ) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
-    pub fn maybe_encoding_format(mut self, value: Option<RecipeEncodingFormat<S>>) -> Self {
+    pub fn maybe_encoding_format(
+        mut self,
+        value: Option<RecipeEncodingFormat<S>>,
+    ) -> Self {
         self._fields.55 = value;
         self
     }
@@ -6534,12 +7012,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `estimatedCost` field (optional)
-    pub fn estimated_cost(mut self, value: impl Into<Option<RecipeEstimatedCost<S>>>) -> Self {
+    pub fn estimated_cost(
+        mut self,
+        value: impl Into<Option<RecipeEstimatedCost<S>>>,
+    ) -> Self {
         self._fields.57 = value.into();
         self
     }
     /// Set the `estimatedCost` field to an Option value (optional)
-    pub fn maybe_estimated_cost(mut self, value: Option<RecipeEstimatedCost<S>>) -> Self {
+    pub fn maybe_estimated_cost(
+        mut self,
+        value: Option<RecipeEstimatedCost<S>>,
+    ) -> Self {
         self._fields.57 = value;
         self
     }
@@ -6547,12 +7031,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `exampleOfWork` field (optional)
-    pub fn example_of_work(mut self, value: impl Into<Option<RecipeExampleOfWork<S>>>) -> Self {
+    pub fn example_of_work(
+        mut self,
+        value: impl Into<Option<RecipeExampleOfWork<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
-    pub fn maybe_example_of_work(mut self, value: Option<RecipeExampleOfWork<S>>) -> Self {
+    pub fn maybe_example_of_work(
+        mut self,
+        value: Option<RecipeExampleOfWork<S>>,
+    ) -> Self {
         self._fields.58 = value;
         self
     }
@@ -6690,7 +7180,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `ingredients` field (optional)
-    pub fn ingredients(mut self, value: impl Into<Option<RecipeIngredients<S>>>) -> Self {
+    pub fn ingredients(
+        mut self,
+        value: impl Into<Option<RecipeIngredients<S>>>,
+    ) -> Self {
         self._fields.69 = value.into();
         self
     }
@@ -6730,7 +7223,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
-    pub fn maybe_interactivity_type(mut self, value: Option<RecipeInteractivityType<S>>) -> Self {
+    pub fn maybe_interactivity_type(
+        mut self,
+        value: Option<RecipeInteractivityType<S>>,
+    ) -> Self {
         self._fields.71 = value;
         self
     }
@@ -6789,12 +7285,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `isBasedOnUrl` field (optional)
-    pub fn is_based_on_url(mut self, value: impl Into<Option<RecipeIsBasedOnUrl<S>>>) -> Self {
+    pub fn is_based_on_url(
+        mut self,
+        value: impl Into<Option<RecipeIsBasedOnUrl<S>>>,
+    ) -> Self {
         self._fields.75 = value.into();
         self
     }
     /// Set the `isBasedOnUrl` field to an Option value (optional)
-    pub fn maybe_is_based_on_url(mut self, value: Option<RecipeIsBasedOnUrl<S>>) -> Self {
+    pub fn maybe_is_based_on_url(
+        mut self,
+        value: Option<RecipeIsBasedOnUrl<S>>,
+    ) -> Self {
         self._fields.75 = value;
         self
     }
@@ -6810,7 +7312,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
-    pub fn maybe_is_family_friendly(mut self, value: Option<RecipeIsFamilyFriendly<S>>) -> Self {
+    pub fn maybe_is_family_friendly(
+        mut self,
+        value: Option<RecipeIsFamilyFriendly<S>>,
+    ) -> Self {
         self._fields.76 = value;
         self
     }
@@ -6876,12 +7381,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `locationCreated` field (optional)
-    pub fn location_created(mut self, value: impl Into<Option<RecipeLocationCreated<S>>>) -> Self {
+    pub fn location_created(
+        mut self,
+        value: impl Into<Option<RecipeLocationCreated<S>>>,
+    ) -> Self {
         self._fields.81 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
-    pub fn maybe_location_created(mut self, value: Option<RecipeLocationCreated<S>>) -> Self {
+    pub fn maybe_location_created(
+        mut self,
+        value: Option<RecipeLocationCreated<S>>,
+    ) -> Self {
         self._fields.81 = value;
         self
     }
@@ -6910,7 +7421,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<RecipeMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<RecipeMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.83 = value;
         self
     }
@@ -6944,12 +7458,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `materialExtent` field (optional)
-    pub fn material_extent(mut self, value: impl Into<Option<RecipeMaterialExtent<S>>>) -> Self {
+    pub fn material_extent(
+        mut self,
+        value: impl Into<Option<RecipeMaterialExtent<S>>>,
+    ) -> Self {
         self._fields.86 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
-    pub fn maybe_material_extent(mut self, value: Option<RecipeMaterialExtent<S>>) -> Self {
+    pub fn maybe_material_extent(
+        mut self,
+        value: Option<RecipeMaterialExtent<S>>,
+    ) -> Self {
         self._fields.86 = value;
         self
     }
@@ -7022,7 +7542,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `performTime` field (optional)
-    pub fn perform_time(mut self, value: impl Into<Option<RecipePerformTime<S>>>) -> Self {
+    pub fn perform_time(
+        mut self,
+        value: impl Into<Option<RecipePerformTime<S>>>,
+    ) -> Self {
         self._fields.92 = value.into();
         self
     }
@@ -7048,12 +7571,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<RecipePotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<RecipePotentialAction<S>>>,
+    ) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<RecipePotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<RecipePotentialAction<S>>,
+    ) -> Self {
         self._fields.94 = value;
         self
     }
@@ -7100,7 +7629,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `publication` field (optional)
-    pub fn publication(mut self, value: impl Into<Option<RecipePublication<S>>>) -> Self {
+    pub fn publication(
+        mut self,
+        value: impl Into<Option<RecipePublication<S>>>,
+    ) -> Self {
         self._fields.98 = value.into();
         self
     }
@@ -7134,7 +7666,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
-    pub fn maybe_publisher_imprint(mut self, value: Option<RecipePublisherImprint<S>>) -> Self {
+    pub fn maybe_publisher_imprint(
+        mut self,
+        value: Option<RecipePublisherImprint<S>>,
+    ) -> Self {
         self._fields.100 = value;
         self
     }
@@ -7161,12 +7696,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `recipeCategory` field (optional)
-    pub fn recipe_category(mut self, value: impl Into<Option<RecipeRecipeCategory<S>>>) -> Self {
+    pub fn recipe_category(
+        mut self,
+        value: impl Into<Option<RecipeRecipeCategory<S>>>,
+    ) -> Self {
         self._fields.102 = value.into();
         self
     }
     /// Set the `recipeCategory` field to an Option value (optional)
-    pub fn maybe_recipe_category(mut self, value: Option<RecipeRecipeCategory<S>>) -> Self {
+    pub fn maybe_recipe_category(
+        mut self,
+        value: Option<RecipeRecipeCategory<S>>,
+    ) -> Self {
         self._fields.102 = value;
         self
     }
@@ -7174,12 +7715,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `recipeCuisine` field (optional)
-    pub fn recipe_cuisine(mut self, value: impl Into<Option<RecipeRecipeCuisine<S>>>) -> Self {
+    pub fn recipe_cuisine(
+        mut self,
+        value: impl Into<Option<RecipeRecipeCuisine<S>>>,
+    ) -> Self {
         self._fields.103 = value.into();
         self
     }
     /// Set the `recipeCuisine` field to an Option value (optional)
-    pub fn maybe_recipe_cuisine(mut self, value: Option<RecipeRecipeCuisine<S>>) -> Self {
+    pub fn maybe_recipe_cuisine(
+        mut self,
+        value: Option<RecipeRecipeCuisine<S>>,
+    ) -> Self {
         self._fields.103 = value;
         self
     }
@@ -7195,7 +7742,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `recipeIngredient` field to an Option value (optional)
-    pub fn maybe_recipe_ingredient(mut self, value: Option<RecipeRecipeIngredient<S>>) -> Self {
+    pub fn maybe_recipe_ingredient(
+        mut self,
+        value: Option<RecipeRecipeIngredient<S>>,
+    ) -> Self {
         self._fields.104 = value;
         self
     }
@@ -7211,7 +7761,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `recipeInstructions` field to an Option value (optional)
-    pub fn maybe_recipe_instructions(mut self, value: Option<RecipeRecipeInstructions<S>>) -> Self {
+    pub fn maybe_recipe_instructions(
+        mut self,
+        value: Option<RecipeRecipeInstructions<S>>,
+    ) -> Self {
         self._fields.105 = value;
         self
     }
@@ -7219,7 +7772,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `recipeYield` field (optional)
-    pub fn recipe_yield(mut self, value: impl Into<Option<RecipeRecipeYield<S>>>) -> Self {
+    pub fn recipe_yield(
+        mut self,
+        value: impl Into<Option<RecipeRecipeYield<S>>>,
+    ) -> Self {
         self._fields.106 = value.into();
         self
     }
@@ -7245,12 +7801,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `releasedEvent` field (optional)
-    pub fn released_event(mut self, value: impl Into<Option<RecipeReleasedEvent<S>>>) -> Self {
+    pub fn released_event(
+        mut self,
+        value: impl Into<Option<RecipeReleasedEvent<S>>>,
+    ) -> Self {
         self._fields.108 = value.into();
         self
     }
     /// Set the `releasedEvent` field to an Option value (optional)
-    pub fn maybe_released_event(mut self, value: Option<RecipeReleasedEvent<S>>) -> Self {
+    pub fn maybe_released_event(
+        mut self,
+        value: Option<RecipeReleasedEvent<S>>,
+    ) -> Self {
         self._fields.108 = value;
         self
     }
@@ -7297,12 +7859,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `schemaVersion` field (optional)
-    pub fn schema_version(mut self, value: impl Into<Option<RecipeSchemaVersion<S>>>) -> Self {
+    pub fn schema_version(
+        mut self,
+        value: impl Into<Option<RecipeSchemaVersion<S>>>,
+    ) -> Self {
         self._fields.112 = value.into();
         self
     }
     /// Set the `schemaVersion` field to an Option value (optional)
-    pub fn maybe_schema_version(mut self, value: Option<RecipeSchemaVersion<S>>) -> Self {
+    pub fn maybe_schema_version(
+        mut self,
+        value: Option<RecipeSchemaVersion<S>>,
+    ) -> Self {
         self._fields.112 = value;
         self
     }
@@ -7310,12 +7878,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `sdDatePublished` field (optional)
-    pub fn sd_date_published(mut self, value: impl Into<Option<RecipeSdDatePublished<S>>>) -> Self {
+    pub fn sd_date_published(
+        mut self,
+        value: impl Into<Option<RecipeSdDatePublished<S>>>,
+    ) -> Self {
         self._fields.113 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
-    pub fn maybe_sd_date_published(mut self, value: Option<RecipeSdDatePublished<S>>) -> Self {
+    pub fn maybe_sd_date_published(
+        mut self,
+        value: Option<RecipeSdDatePublished<S>>,
+    ) -> Self {
         self._fields.113 = value;
         self
     }
@@ -7336,7 +7910,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `sdPublisher` field (optional)
-    pub fn sd_publisher(mut self, value: impl Into<Option<RecipeSdPublisher<S>>>) -> Self {
+    pub fn sd_publisher(
+        mut self,
+        value: impl Into<Option<RecipeSdPublisher<S>>>,
+    ) -> Self {
         self._fields.115 = value.into();
         self
     }
@@ -7370,7 +7947,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
-    pub fn maybe_source_organization(mut self, value: Option<RecipeSourceOrganization<S>>) -> Self {
+    pub fn maybe_source_organization(
+        mut self,
+        value: Option<RecipeSourceOrganization<S>>,
+    ) -> Self {
         self._fields.117 = value;
         self
     }
@@ -7391,12 +7971,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `spatialCoverage` field (optional)
-    pub fn spatial_coverage(mut self, value: impl Into<Option<RecipeSpatialCoverage<S>>>) -> Self {
+    pub fn spatial_coverage(
+        mut self,
+        value: impl Into<Option<RecipeSpatialCoverage<S>>>,
+    ) -> Self {
         self._fields.119 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
-    pub fn maybe_spatial_coverage(mut self, value: Option<RecipeSpatialCoverage<S>>) -> Self {
+    pub fn maybe_spatial_coverage(
+        mut self,
+        value: Option<RecipeSpatialCoverage<S>>,
+    ) -> Self {
         self._fields.119 = value;
         self
     }
@@ -7456,12 +8042,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `suitableForDiet` field (optional)
-    pub fn suitable_for_diet(mut self, value: impl Into<Option<RecipeSuitableForDiet<S>>>) -> Self {
+    pub fn suitable_for_diet(
+        mut self,
+        value: impl Into<Option<RecipeSuitableForDiet<S>>>,
+    ) -> Self {
         self._fields.124 = value.into();
         self
     }
     /// Set the `suitableForDiet` field to an Option value (optional)
-    pub fn maybe_suitable_for_diet(mut self, value: Option<RecipeSuitableForDiet<S>>) -> Self {
+    pub fn maybe_suitable_for_diet(
+        mut self,
+        value: Option<RecipeSuitableForDiet<S>>,
+    ) -> Self {
         self._fields.124 = value;
         self
     }
@@ -7516,7 +8108,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
-    pub fn maybe_temporal_coverage(mut self, value: Option<RecipeTemporalCoverage<S>>) -> Self {
+    pub fn maybe_temporal_coverage(
+        mut self,
+        value: Option<RecipeTemporalCoverage<S>>,
+    ) -> Self {
         self._fields.128 = value;
         self
     }
@@ -7550,7 +8145,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `thumbnailUrl` field (optional)
-    pub fn thumbnail_url(mut self, value: impl Into<Option<RecipeThumbnailUrl<S>>>) -> Self {
+    pub fn thumbnail_url(
+        mut self,
+        value: impl Into<Option<RecipeThumbnailUrl<S>>>,
+    ) -> Self {
         self._fields.131 = value.into();
         self
     }
@@ -7563,7 +8161,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `timeRequired` field (optional)
-    pub fn time_required(mut self, value: impl Into<Option<RecipeTimeRequired<S>>>) -> Self {
+    pub fn time_required(
+        mut self,
+        value: impl Into<Option<RecipeTimeRequired<S>>>,
+    ) -> Self {
         self._fields.132 = value.into();
         self
     }
@@ -7610,7 +8211,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
-    pub fn maybe_translation_of_work(mut self, value: Option<RecipeTranslationOfWork<S>>) -> Self {
+    pub fn maybe_translation_of_work(
+        mut self,
+        value: Option<RecipeTranslationOfWork<S>>,
+    ) -> Self {
         self._fields.135 = value;
         self
     }
@@ -7631,12 +8235,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `typicalAgeRange` field (optional)
-    pub fn typical_age_range(mut self, value: impl Into<Option<RecipeTypicalAgeRange<S>>>) -> Self {
+    pub fn typical_age_range(
+        mut self,
+        value: impl Into<Option<RecipeTypicalAgeRange<S>>>,
+    ) -> Self {
         self._fields.137 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
-    pub fn maybe_typical_age_range(mut self, value: Option<RecipeTypicalAgeRange<S>>) -> Self {
+    pub fn maybe_typical_age_range(
+        mut self,
+        value: Option<RecipeTypicalAgeRange<S>>,
+    ) -> Self {
         self._fields.137 = value;
         self
     }
@@ -7709,7 +8319,10 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `workExample` field (optional)
-    pub fn work_example(mut self, value: impl Into<Option<RecipeWorkExample<S>>>) -> Self {
+    pub fn work_example(
+        mut self,
+        value: impl Into<Option<RecipeWorkExample<S>>>,
+    ) -> Self {
         self._fields.143 = value.into();
         self
     }
@@ -7722,12 +8335,18 @@ impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
 
 impl<St: recipe_state::State, S: BosStr> RecipeBuilder<St, S> {
     /// Set the `workTranslation` field (optional)
-    pub fn work_translation(mut self, value: impl Into<Option<RecipeWorkTranslation<S>>>) -> Self {
+    pub fn work_translation(
+        mut self,
+        value: impl Into<Option<RecipeWorkTranslation<S>>>,
+    ) -> Self {
         self._fields.144 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
-    pub fn maybe_work_translation(mut self, value: Option<RecipeWorkTranslation<S>>) -> Self {
+    pub fn maybe_work_translation(
+        mut self,
+        value: Option<RecipeWorkTranslation<S>>,
+    ) -> Self {
         self._fields.144 = value;
         self
     }

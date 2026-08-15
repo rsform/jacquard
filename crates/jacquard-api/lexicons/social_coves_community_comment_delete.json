@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.comment.delete",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a comment. Only the comment author can delete their own comments.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the comment to delete",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "errors": [
+        {
+          "description": "Comment with the specified URI does not exist",
+          "name": "CommentNotFound"
+        },
+        {
+          "description": "User is not authorized to delete this comment (not the author)",
+          "name": "NotAuthorized"
+        }
+      ]
+    }
+  }
+}

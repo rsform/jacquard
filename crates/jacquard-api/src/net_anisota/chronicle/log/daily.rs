@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::chronicle::log::daily;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::chronicle::log::daily;
 /// Aggregate activity counts for the day (no timestamps or URIs)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ActivityCounts<S: BosStr = DefaultStr> {
     ///Likes sent today
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,17 +48,19 @@ pub struct ActivityCounts<S: BosStr = DefaultStr> {
     ///Reposts sent today
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reposts_sent: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_activity_counts_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// ES256 cryptographic signature proving record authenticity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     ///Signing algorithm (ES256)
     pub alg: S,
@@ -75,17 +74,19 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     pub signed_at: Datetime,
     ///Signature schema version
     pub version: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_chronicle_signature_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Engagement received on user's posts (aggregate counts only)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EngagementCounts<S: BosStr = DefaultStr> {
     ///Likes received on posts today
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -99,17 +100,19 @@ pub struct EngagementCounts<S: BosStr = DefaultStr> {
     ///Reposts received today
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reposts_received: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_engagement_counts_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Summary of expeditions for the day (details in chronicle.expedition)
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpeditionSummary<S: BosStr = DefaultStr> {
     ///Number of expeditions completed today
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -123,17 +126,19 @@ pub struct ExpeditionSummary<S: BosStr = DefaultStr> {
     ///Total expedition duration in milliseconds
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_duration: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_expedition_summary_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Per-category counts of activity performed inside anisota (never inferred; recorded at write time).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InAppCounts<S: BosStr = DefaultStr> {
     ///Likes created in anisota
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -150,22 +155,29 @@ pub struct InAppCounts<S: BosStr = DefaultStr> {
     ///Reposts created in anisota
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reposts: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_in_app_counts_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// One device's in-anisota activity counts for the day. Keyed by a stable per-install-per-account device id, so concurrent putRecords from different devices never clobber each other. The reserved deviceId 'scheduled' holds scheduled posts published server-side by the cocoon cron worker on their publish day.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct InAppDeviceBucket<S: BosStr = DefaultStr> {
     pub counts: daily::InAppCounts<S>,
     ///Stable per-install-per-account device id (random; no fingerprinting). Reserved value 'scheduled' for cocoon-published scheduled posts.
     pub device_id: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_in_app_device_bucket_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -206,7 +218,12 @@ pub struct Daily<S: BosStr = DefaultStr> {
     pub upper_log_refs: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub walks: Option<daily::WalkSummary<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_daily_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -224,10 +241,7 @@ pub struct DailyGetRecordOutput<S: BosStr = DefaultStr> {
 /// Activity pattern data for the day based on half-hour blocks
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PatternsData<S: BosStr = DefaultStr> {
     ///Number of half-hour blocks with activity today
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -238,17 +252,19 @@ pub struct PatternsData<S: BosStr = DefaultStr> {
     ///XP awarded for offline time
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offline_xp_awarded: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_patterns_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Player state snapshot for this day
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlayerSnapshot<S: BosStr = DefaultStr> {
     ///Number of items acquired today
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -269,17 +285,19 @@ pub struct PlayerSnapshot<S: BosStr = DefaultStr> {
     ///XP gained during this day
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained_today: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_player_snapshot_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Summary of walks for the day (details in chronicle.walk). Parallel to expeditionSummary; both are merged additively.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WalkSummary<S: BosStr = DefaultStr> {
     ///Number of walks completed today (additive)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -290,7 +308,12 @@ pub struct WalkSummary<S: BosStr = DefaultStr> {
     ///AT URIs of walk records that occurred on this day
     #[serde(skip_serializing_if = "Option::is_none")]
     pub walk_refs: Option<Vec<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_walk_summary_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -759,11 +782,24 @@ impl<S: BosStr> LexiconSchema for WalkSummary<S> {
     }
 }
 
+fn deserialize_activity_counts_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.log.daily"),
@@ -772,9 +808,11 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("activityCounts"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Aggregate activity counts for the day (no timestamps or URIs)",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Aggregate activity counts for the day (no timestamps or URIs)",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -821,58 +859,63 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chronicleSignature"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "ES256 cryptographic signature proving record authenticity",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("sig"),
-                        SmolStr::new_static("alg"),
-                        SmolStr::new_static("kid"),
-                        SmolStr::new_static("signedAt"),
-                        SmolStr::new_static("nonce"),
-                        SmolStr::new_static("version"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "ES256 cryptographic signature proving record authenticity",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("sig"), SmolStr::new_static("alg"),
+                            SmolStr::new_static("kid"), SmolStr::new_static("signedAt"),
+                            SmolStr::new_static("nonce"), SmolStr::new_static("version")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alg"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Signing algorithm (ES256)")),
+                                description: Some(
+                                    CowStr::new_static("Signing algorithm (ES256)"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("kid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Key identifier for the signing key",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Key identifier for the signing key"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("nonce"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Unique random nonce to prevent replay",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Unique random nonce to prevent replay"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sig"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Base64-encoded ES256 signature",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Base64-encoded ES256 signature"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("signedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("When the record was signed")),
+                                description: Some(
+                                    CowStr::new_static("When the record was signed"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -891,9 +934,11 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("engagementCounts"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Engagement received on user's posts (aggregate counts only)",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Engagement received on user's posts (aggregate counts only)",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -933,9 +978,11 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("expeditionSummary"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Summary of expeditions for the day (details in chronicle.expedition)",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Summary of expeditions for the day (details in chronicle.expedition)",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1265,11 +1312,14 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("playerSnapshot"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Player state snapshot for this day")),
-                    required: Some(vec![
-                        SmolStr::new_static("level"),
-                        SmolStr::new_static("totalXP"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("Player state snapshot for this day"),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("level"), SmolStr::new_static("totalXP")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1377,9 +1427,22 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_chronicle_signature_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod chronicle_signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1490,22 +1553,21 @@ pub mod chronicle_signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChronicleSignatureBuilder<St: chronicle_signature_state::State, S: BosStr = DefaultStr> {
+pub struct ChronicleSignatureBuilder<
+    St: chronicle_signature_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<Datetime>,
-        Option<i64>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ChronicleSignature<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChronicleSignatureBuilder<chronicle_signature_state::Empty, DefaultStr> {
+    pub fn new() -> ChronicleSignatureBuilder<
+        chronicle_signature_state::Empty,
+        DefaultStr,
+    > {
         ChronicleSignatureBuilder::new()
     }
 }
@@ -1676,7 +1738,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChronicleSignature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ChronicleSignature<S> {
         ChronicleSignature {
             alg: self._fields.0.unwrap(),
             kid: self._fields.1.unwrap(),
@@ -1689,9 +1754,61 @@ where
     }
 }
 
+fn deserialize_engagement_counts_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_expedition_summary_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_in_app_counts_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_in_app_device_bucket_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod in_app_device_bucket_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1734,7 +1851,10 @@ pub mod in_app_device_bucket_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct InAppDeviceBucketBuilder<St: in_app_device_bucket_state::State, S: BosStr = DefaultStr> {
+pub struct InAppDeviceBucketBuilder<
+    St: in_app_device_bucket_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<daily::InAppCounts<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
@@ -1742,7 +1862,10 @@ pub struct InAppDeviceBucketBuilder<St: in_app_device_bucket_state::State, S: Bo
 
 impl InAppDeviceBucket<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> InAppDeviceBucketBuilder<in_app_device_bucket_state::Empty, DefaultStr> {
+    pub fn new() -> InAppDeviceBucketBuilder<
+        in_app_device_bucket_state::Empty,
+        DefaultStr,
+    > {
         InAppDeviceBucketBuilder::new()
     }
 }
@@ -1829,7 +1952,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> InAppDeviceBucket<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> InAppDeviceBucket<S> {
         InAppDeviceBucket {
             counts: self._fields.0.unwrap(),
             device_id: self._fields.1.unwrap(),
@@ -1838,9 +1964,28 @@ where
     }
 }
 
+fn deserialize_daily_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod daily_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1971,7 +2116,19 @@ impl DailyBuilder<daily_state::Empty, DefaultStr> {
         DailyBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1984,7 +2141,19 @@ impl<S: BosStr> DailyBuilder<daily_state::Empty, S> {
         DailyBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2035,7 +2204,10 @@ where
     St::Date: daily_state::IsUnset,
 {
     /// Set the `date` field (required)
-    pub fn date(mut self, value: impl Into<S>) -> DailyBuilder<daily_state::SetDate<St>, S> {
+    pub fn date(
+        mut self,
+        value: impl Into<S>,
+    ) -> DailyBuilder<daily_state::SetDate<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DailyBuilder {
             _state: PhantomData,
@@ -2047,12 +2219,18 @@ where
 
 impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
     /// Set the `engagement` field (optional)
-    pub fn engagement(mut self, value: impl Into<Option<daily::EngagementCounts<S>>>) -> Self {
+    pub fn engagement(
+        mut self,
+        value: impl Into<Option<daily::EngagementCounts<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `engagement` field to an Option value (optional)
-    pub fn maybe_engagement(mut self, value: Option<daily::EngagementCounts<S>>) -> Self {
+    pub fn maybe_engagement(
+        mut self,
+        value: Option<daily::EngagementCounts<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -2073,12 +2251,18 @@ impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
 
 impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
     /// Set the `expeditions` field (optional)
-    pub fn expeditions(mut self, value: impl Into<Option<daily::ExpeditionSummary<S>>>) -> Self {
+    pub fn expeditions(
+        mut self,
+        value: impl Into<Option<daily::ExpeditionSummary<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `expeditions` field to an Option value (optional)
-    pub fn maybe_expeditions(mut self, value: Option<daily::ExpeditionSummary<S>>) -> Self {
+    pub fn maybe_expeditions(
+        mut self,
+        value: Option<daily::ExpeditionSummary<S>>,
+    ) -> Self {
         self._fields.5 = value;
         self
     }
@@ -2086,12 +2270,18 @@ impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
 
 impl<St: daily_state::State, S: BosStr> DailyBuilder<St, S> {
     /// Set the `inApp` field (optional)
-    pub fn in_app(mut self, value: impl Into<Option<Vec<daily::InAppDeviceBucket<S>>>>) -> Self {
+    pub fn in_app(
+        mut self,
+        value: impl Into<Option<Vec<daily::InAppDeviceBucket<S>>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `inApp` field to an Option value (optional)
-    pub fn maybe_in_app(mut self, value: Option<Vec<daily::InAppDeviceBucket<S>>>) -> Self {
+    pub fn maybe_in_app(
+        mut self,
+        value: Option<Vec<daily::InAppDeviceBucket<S>>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
@@ -2236,9 +2426,35 @@ where
     }
 }
 
+fn deserialize_patterns_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_player_snapshot_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod player_snapshot_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2281,7 +2497,10 @@ pub mod player_snapshot_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct PlayerSnapshotBuilder<St: player_snapshot_state::State, S: BosStr = DefaultStr> {
+pub struct PlayerSnapshotBuilder<
+    St: player_snapshot_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
@@ -2454,7 +2673,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlayerSnapshot<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlayerSnapshot<S> {
         PlayerSnapshot {
             items_acquired_today: self._fields.0,
             items_consumed_today: self._fields.1,
@@ -2466,4 +2688,17 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_walk_summary_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

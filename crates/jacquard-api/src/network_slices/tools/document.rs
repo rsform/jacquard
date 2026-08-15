@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,57 +25,64 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::tools::document;
-use crate::network_slices::tools::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::tools::richtext::facet::Facet;
+use crate::network_slices::tools::document;
 /// A fenced code block
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CodeBlock<S: BosStr = DefaultStr> {
     pub code: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lang: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_code_block_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A heading block (h1-h3) with optional inline formatting
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Heading<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
     pub level: i64,
     pub text: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_heading_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An embedded image with alt text
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ImageEmbed<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
     pub image: BlobRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_image_embed_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -94,9 +101,15 @@ pub struct Document<S: BosStr = DefaultStr> {
     pub title: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_document_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -130,46 +143,52 @@ pub struct DocumentGetRecordOutput<S: BosStr = DefaultStr> {
 /// A paragraph block with optional inline formatting
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Paragraph<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
     pub text: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_paragraph_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// A blockquote with optional inline formatting
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Quote<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
     pub text: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_quote_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// An embedded Tangled repo card
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TangledEmbed<S: BosStr = DefaultStr> {
     ///The repo owner's handle
     pub handle: S,
     ///The repository name
     pub repo: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_tangled_embed_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -300,16 +319,19 @@ impl<S: BosStr> LexiconSchema for ImageEmbed<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -476,11 +498,24 @@ impl<S: BosStr> LexiconSchema for TangledEmbed<S> {
     }
 }
 
+fn deserialize_code_block_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.tools.document"),
@@ -516,13 +551,14 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("heading"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A heading block (h1-h3) with optional inline formatting",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("level"),
-                        SmolStr::new_static("text"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "A heading block (h1-h3) with optional inline formatting",
+                        ),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("level"), SmolStr::new_static("text")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -561,7 +597,9 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("imageEmbed"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An embedded image with alt text")),
+                    description: Some(
+                        CowStr::new_static("An embedded image with alt text"),
+                    ),
                     required: Some(vec![SmolStr::new_static("image")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -569,16 +607,16 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Alt text for accessibility")),
+                                description: Some(
+                                    CowStr::new_static("Alt text for accessibility"),
+                                ),
                                 max_length: Some(1000usize),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -590,21 +628,22 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("slug"),
-                            SmolStr::new_static("blocks"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"), SmolStr::new_static("slug"),
+                                SmolStr::new_static("blocks"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
                             map.insert(
                                 SmolStr::new_static("blocks"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Document content as array of blocks",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Document content as array of blocks"),
+                                    ),
                                     items: LexArrayItem::Union(LexRefUnion {
                                         refs: vec![
                                             CowStr::new_static("#paragraph"),
@@ -612,7 +651,7 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
                                             CowStr::new_static("#codeBlock"),
                                             CowStr::new_static("#quote"),
                                             CowStr::new_static("#tangledEmbed"),
-                                            CowStr::new_static("#imageEmbed"),
+                                            CowStr::new_static("#imageEmbed")
                                         ],
                                         ..Default::default()
                                     }),
@@ -629,9 +668,11 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("slug"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "URL-friendly identifier, unique per author",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "URL-friendly identifier, unique per author",
+                                        ),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -661,9 +702,11 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("paragraph"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A paragraph block with optional inline formatting",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A paragraph block with optional inline formatting",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -695,9 +738,11 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("quote"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "A blockquote with optional inline formatting",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A blockquote with optional inline formatting",
+                        ),
+                    ),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -729,18 +774,21 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tangledEmbed"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("An embedded Tangled repo card")),
-                    required: Some(vec![
-                        SmolStr::new_static("handle"),
-                        SmolStr::new_static("repo"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("An embedded Tangled repo card"),
+                    ),
+                    required: Some(
+                        vec![SmolStr::new_static("handle"), SmolStr::new_static("repo")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The repo owner's handle")),
+                                description: Some(
+                                    CowStr::new_static("The repo owner's handle"),
+                                ),
                                 max_length: Some(300usize),
                                 ..Default::default()
                             }),
@@ -748,7 +796,9 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("repo"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The repository name")),
+                                description: Some(
+                                    CowStr::new_static("The repository name"),
+                                ),
                                 max_length: Some(300usize),
                                 ..Default::default()
                             }),
@@ -764,9 +814,22 @@ fn lexicon_doc_network_slices_tools_document() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_heading_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod heading_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -889,7 +952,10 @@ where
     St::Text: heading_state::IsUnset,
 {
     /// Set the `text` field (required)
-    pub fn text(mut self, value: impl Into<S>) -> HeadingBuilder<heading_state::SetText<St>, S> {
+    pub fn text(
+        mut self,
+        value: impl Into<S>,
+    ) -> HeadingBuilder<heading_state::SetText<St>, S> {
         self._fields.2 = Option::Some(value.into());
         HeadingBuilder {
             _state: PhantomData,
@@ -925,9 +991,22 @@ where
     }
 }
 
+fn deserialize_image_embed_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod image_embed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1046,7 +1125,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ImageEmbed<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageEmbed<S> {
         ImageEmbed {
             alt: self._fields.0,
             image: self._fields.1.unwrap(),
@@ -1055,9 +1137,28 @@ where
     }
 }
 
+fn deserialize_document_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod document_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1222,7 +1323,10 @@ where
     St::Slug: document_state::IsUnset,
 {
     /// Set the `slug` field (required)
-    pub fn slug(mut self, value: impl Into<S>) -> DocumentBuilder<document_state::SetSlug<St>, S> {
+    pub fn slug(
+        mut self,
+        value: impl Into<S>,
+    ) -> DocumentBuilder<document_state::SetSlug<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
@@ -1294,4 +1398,43 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_paragraph_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_quote_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_tangled_embed_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

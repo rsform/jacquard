@@ -1,0 +1,82 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.enable",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Enable an aggregator for a community. Creates an authorization record in the community's repository. Requires moderator permissions.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "community",
+            "aggregatorDid"
+          ],
+          "properties": {
+            "aggregatorDid": {
+              "type": "string",
+              "description": "DID of the aggregator to enable",
+              "format": "did"
+            },
+            "community": {
+              "type": "string",
+              "description": "DID or handle of the community",
+              "format": "at-identifier"
+            },
+            "config": {
+              "type": "unknown",
+              "description": "Aggregator-specific configuration. Must conform to the aggregator's configSchema."
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "authorization"
+          ],
+          "properties": {
+            "authorization": {
+              "type": "ref",
+              "description": "The created authorization details",
+              "ref": "social.coves.aggregator.defs#authorizationView"
+            },
+            "cid": {
+              "type": "string",
+              "description": "CID of the created authorization record",
+              "format": "cid"
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the created authorization record",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Caller is not a moderator of this community",
+          "name": "NotAuthorized"
+        },
+        {
+          "description": "Aggregator DID does not exist or has no service declaration",
+          "name": "AggregatorNotFound"
+        },
+        {
+          "description": "Config does not match aggregator's configSchema",
+          "name": "InvalidConfig"
+        },
+        {
+          "description": "Aggregator is already enabled for this community",
+          "name": "AlreadyEnabled"
+        }
+      ]
+    }
+  }
+}

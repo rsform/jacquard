@@ -30,5 +30,22 @@
         default.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
         lexgen.program = "${self'.packages.jacquard-lexgen}/bin/lex-fetch";
       };
+
+      # Opt-in shell for the full-stack e2e harness (`nix develop .#e2e -c
+      # just e2e`). Inherits the default developer shell and adds only the
+      # orchestration tools the lifecycle controller needs.
+      devShells.e2e = pkgs.mkShell {
+        name = "jacquard-e2e-shell";
+        inputsFrom = [ self'.devShells.default ];
+        packages = with pkgs; [
+          docker-client
+          docker-buildx
+          docker-compose
+          curl
+          jq
+          openssl
+          python3
+        ];
+      };
     };
 }

@@ -4,4 +4,7 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 //! Generated bindings for the `fm.teal` Lexicon namespace/module.
+pub mod actor;
 pub mod alpha;
+pub mod feed;
+pub mod stats;

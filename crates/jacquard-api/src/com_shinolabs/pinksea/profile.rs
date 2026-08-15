@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::com_shinolabs::pinksea::profile;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::com_shinolabs::pinksea::profile;
 /// A profile of a PinkSea user.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -51,7 +51,12 @@ pub struct Profile<S: BosStr = DefaultStr> {
     ///The display name of the user.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nickname: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_profile_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -66,17 +71,20 @@ pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Profile<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ProfileLink<S: BosStr = DefaultStr> {
     ///The URL of the link.
     pub link: UriValue<S>,
     ///The name of the link.
     pub name: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_profile_link_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -221,9 +229,28 @@ impl<S: BosStr> LexiconSchema for ProfileLink<S> {
     }
 }
 
+fn deserialize_profile_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -316,7 +343,10 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `links` field (optional)
-    pub fn links(mut self, value: impl Into<Option<Vec<profile::ProfileLink<S>>>>) -> Self {
+    pub fn links(
+        mut self,
+        value: impl Into<Option<Vec<profile::ProfileLink<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -367,10 +397,10 @@ where
 }
 
 fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("com.shinolabs.pinksea.profile"),
@@ -379,7 +409,9 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static("A profile of a PinkSea user.")),
+                    description: Some(
+                        CowStr::new_static("A profile of a PinkSea user."),
+                    ),
                     record: LexRecordRecord::Object(LexObject {
                         properties: {
                             #[allow(unused_mut)]
@@ -394,7 +426,9 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("bio"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static("The bio of the user.")),
+                                    description: Some(
+                                        CowStr::new_static("The bio of the user."),
+                                    ),
                                     max_length: Some(2400usize),
                                     max_graphemes: Some(240usize),
                                     ..Default::default()
@@ -403,9 +437,11 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("links"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "The links to outside platforms for this user",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The links to outside platforms for this user",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static("#profileLink"),
                                         ..Default::default()
@@ -417,9 +453,9 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("nickname"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The display name of the user.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The display name of the user."),
+                                    ),
                                     max_length: Some(640usize),
                                     max_graphemes: Some(64usize),
                                     ..Default::default()
@@ -435,17 +471,18 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("profileLink"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("link"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("link")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("link"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URL of the link.")),
+                                description: Some(
+                                    CowStr::new_static("The URL of the link."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -453,7 +490,9 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("name"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The name of the link.")),
+                                description: Some(
+                                    CowStr::new_static("The name of the link."),
+                                ),
                                 max_length: Some(500usize),
                                 max_graphemes: Some(50usize),
                                 ..Default::default()
@@ -470,9 +509,22 @@ fn lexicon_doc_com_shinolabs_pinksea_profile() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_profile_link_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod profile_link_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -610,7 +662,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ProfileLink<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileLink<S> {
         ProfileLink {
             link: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

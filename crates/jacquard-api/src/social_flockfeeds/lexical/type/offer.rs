@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// An offer to transfer some rights to an item or to provide a service — for example, an offer to sell tickets to an event, to rent the DVD of a movie, to stream a TV show over the internet, to repair a motorcycle, or to loan a book.\n\nNote: As the [[businessFunction]] property, which identifies the form of offer (e.g. sell, lease, repair, dispose), defaults to http://purl.org/goodrelations/v1#Sell; an Offer without a defined businessFunction value can be assumed to be an offer to sell.\n\nFor [GTIN](http://www.gs1.org/barcodes/technical/idkeys/gtin)-related fields, see [Check Digit calculator](http://www.gs1.org/barcodes/support/check_digit_calculator) and [validation guide](http://www.gs1us.org/resources/standards/gtin-validation-guide) from [GS1](http://www.gs1.org/).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
@@ -173,9 +170,15 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub valid_through: Option<EmbeddedValidThrough<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warranty: Option<EmbeddedWarranty<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_embedded_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -189,6 +192,7 @@ pub enum EmbeddedAddOn<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     Embedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -363,6 +367,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -398,6 +403,7 @@ pub enum EmbeddedItemOffered<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -432,6 +438,7 @@ pub enum EmbeddedOfferedBy<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -483,6 +490,7 @@ pub enum EmbeddedSeller<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -505,6 +513,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -671,9 +680,15 @@ pub struct Offer<S: BosStr = DefaultStr> {
     pub valid_through: Option<OfferValidThrough<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warranty: Option<OfferWarranty<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_offer_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -687,6 +702,7 @@ pub enum OfferAddOn<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     Embedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -861,6 +877,7 @@ pub enum OfferImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -896,6 +913,7 @@ pub enum OfferItemOffered<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -930,6 +948,7 @@ pub enum OfferOfferedBy<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -981,6 +1000,7 @@ pub enum OfferSeller<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1003,6 +1023,7 @@ pub enum OfferSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1102,11 +1123,24 @@ impl<S: BosStr> LexiconSchema for Offer<S> {
     }
 }
 
+fn deserialize_embedded_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_social_flockfeeds_lexical_type_Offer() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Offer"),
@@ -2538,9 +2572,28 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Offer() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_offer_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod offer_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2651,11 +2704,72 @@ impl OfferBuilder<offer_state::Empty, DefaultStr> {
         OfferBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2668,11 +2782,72 @@ impl<S: BosStr> OfferBuilder<offer_state::Empty, S> {
         OfferBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2721,7 +2896,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
         self
     }
     /// Set the `additionalProperty` field to an Option value (optional)
-    pub fn maybe_additional_property(mut self, value: Option<OfferAdditionalProperty<S>>) -> Self {
+    pub fn maybe_additional_property(
+        mut self,
+        value: Option<OfferAdditionalProperty<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -2729,12 +2907,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<OfferAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<OfferAdditionalType<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<OfferAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<OfferAdditionalType<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -2761,12 +2945,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<OfferAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<OfferAggregateRating<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<OfferAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<OfferAggregateRating<S>>,
+    ) -> Self {
         self._fields.5 = value;
         self
     }
@@ -2774,7 +2964,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<OfferAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<OfferAlternateName<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -2813,7 +3006,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `availability` field (optional)
-    pub fn availability(mut self, value: impl Into<Option<OfferAvailability<S>>>) -> Self {
+    pub fn availability(
+        mut self,
+        value: impl Into<Option<OfferAvailability<S>>>,
+    ) -> Self {
         self._fields.9 = value.into();
         self
     }
@@ -2826,12 +3022,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `availabilityEnds` field (optional)
-    pub fn availability_ends(mut self, value: impl Into<Option<OfferAvailabilityEnds<S>>>) -> Self {
+    pub fn availability_ends(
+        mut self,
+        value: impl Into<Option<OfferAvailabilityEnds<S>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `availabilityEnds` field to an Option value (optional)
-    pub fn maybe_availability_ends(mut self, value: Option<OfferAvailabilityEnds<S>>) -> Self {
+    pub fn maybe_availability_ends(
+        mut self,
+        value: Option<OfferAvailabilityEnds<S>>,
+    ) -> Self {
         self._fields.10 = value;
         self
     }
@@ -2847,7 +3049,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
         self
     }
     /// Set the `availabilityStarts` field to an Option value (optional)
-    pub fn maybe_availability_starts(mut self, value: Option<OfferAvailabilityStarts<S>>) -> Self {
+    pub fn maybe_availability_starts(
+        mut self,
+        value: Option<OfferAvailabilityStarts<S>>,
+    ) -> Self {
         self._fields.11 = value;
         self
     }
@@ -2863,7 +3068,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
         self
     }
     /// Set the `availableAtOrFrom` field to an Option value (optional)
-    pub fn maybe_available_at_or_from(mut self, value: Option<OfferAvailableAtOrFrom<S>>) -> Self {
+    pub fn maybe_available_at_or_from(
+        mut self,
+        value: Option<OfferAvailableAtOrFrom<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
@@ -2890,12 +3098,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `businessFunction` field (optional)
-    pub fn business_function(mut self, value: impl Into<Option<OfferBusinessFunction<S>>>) -> Self {
+    pub fn business_function(
+        mut self,
+        value: impl Into<Option<OfferBusinessFunction<S>>>,
+    ) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `businessFunction` field to an Option value (optional)
-    pub fn maybe_business_function(mut self, value: Option<OfferBusinessFunction<S>>) -> Self {
+    pub fn maybe_business_function(
+        mut self,
+        value: Option<OfferBusinessFunction<S>>,
+    ) -> Self {
         self._fields.14 = value;
         self
     }
@@ -2943,7 +3157,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
         self
     }
     /// Set the `deliveryLeadTime` field to an Option value (optional)
-    pub fn maybe_delivery_lead_time(mut self, value: Option<OfferDeliveryLeadTime<S>>) -> Self {
+    pub fn maybe_delivery_lead_time(
+        mut self,
+        value: Option<OfferDeliveryLeadTime<S>>,
+    ) -> Self {
         self._fields.17 = value;
         self
     }
@@ -3002,12 +3219,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `eligibleDuration` field (optional)
-    pub fn eligible_duration(mut self, value: impl Into<Option<OfferEligibleDuration<S>>>) -> Self {
+    pub fn eligible_duration(
+        mut self,
+        value: impl Into<Option<OfferEligibleDuration<S>>>,
+    ) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `eligibleDuration` field to an Option value (optional)
-    pub fn maybe_eligible_duration(mut self, value: Option<OfferEligibleDuration<S>>) -> Self {
+    pub fn maybe_eligible_duration(
+        mut self,
+        value: Option<OfferEligibleDuration<S>>,
+    ) -> Self {
         self._fields.21 = value;
         self
     }
@@ -3015,12 +3238,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `eligibleQuantity` field (optional)
-    pub fn eligible_quantity(mut self, value: impl Into<Option<OfferEligibleQuantity<S>>>) -> Self {
+    pub fn eligible_quantity(
+        mut self,
+        value: impl Into<Option<OfferEligibleQuantity<S>>>,
+    ) -> Self {
         self._fields.22 = value.into();
         self
     }
     /// Set the `eligibleQuantity` field to an Option value (optional)
-    pub fn maybe_eligible_quantity(mut self, value: Option<OfferEligibleQuantity<S>>) -> Self {
+    pub fn maybe_eligible_quantity(
+        mut self,
+        value: Option<OfferEligibleQuantity<S>>,
+    ) -> Self {
         self._fields.22 = value;
         self
     }
@@ -3028,12 +3257,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `eligibleRegion` field (optional)
-    pub fn eligible_region(mut self, value: impl Into<Option<OfferEligibleRegion<S>>>) -> Self {
+    pub fn eligible_region(
+        mut self,
+        value: impl Into<Option<OfferEligibleRegion<S>>>,
+    ) -> Self {
         self._fields.23 = value.into();
         self
     }
     /// Set the `eligibleRegion` field to an Option value (optional)
-    pub fn maybe_eligible_region(mut self, value: Option<OfferEligibleRegion<S>>) -> Self {
+    pub fn maybe_eligible_region(
+        mut self,
+        value: Option<OfferEligibleRegion<S>>,
+    ) -> Self {
         self._fields.23 = value;
         self
     }
@@ -3152,7 +3387,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
-    pub fn maybe_has_gs1_digital_link(mut self, value: Option<OfferHasGs1DigitalLink<S>>) -> Self {
+    pub fn maybe_has_gs1_digital_link(
+        mut self,
+        value: Option<OfferHasGs1DigitalLink<S>>,
+    ) -> Self {
         self._fields.31 = value;
         self
     }
@@ -3160,12 +3398,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `hasMeasurement` field (optional)
-    pub fn has_measurement(mut self, value: impl Into<Option<OfferHasMeasurement<S>>>) -> Self {
+    pub fn has_measurement(
+        mut self,
+        value: impl Into<Option<OfferHasMeasurement<S>>>,
+    ) -> Self {
         self._fields.32 = value.into();
         self
     }
     /// Set the `hasMeasurement` field to an Option value (optional)
-    pub fn maybe_has_measurement(mut self, value: Option<OfferHasMeasurement<S>>) -> Self {
+    pub fn maybe_has_measurement(
+        mut self,
+        value: Option<OfferHasMeasurement<S>>,
+    ) -> Self {
         self._fields.32 = value;
         self
     }
@@ -3218,12 +3462,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `includesObject` field (optional)
-    pub fn includes_object(mut self, value: impl Into<Option<OfferIncludesObject<S>>>) -> Self {
+    pub fn includes_object(
+        mut self,
+        value: impl Into<Option<OfferIncludesObject<S>>>,
+    ) -> Self {
         self._fields.36 = value.into();
         self
     }
     /// Set the `includesObject` field to an Option value (optional)
-    pub fn maybe_includes_object(mut self, value: Option<OfferIncludesObject<S>>) -> Self {
+    pub fn maybe_includes_object(
+        mut self,
+        value: Option<OfferIncludesObject<S>>,
+    ) -> Self {
         self._fields.36 = value;
         self
     }
@@ -3231,12 +3481,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `ineligibleRegion` field (optional)
-    pub fn ineligible_region(mut self, value: impl Into<Option<OfferIneligibleRegion<S>>>) -> Self {
+    pub fn ineligible_region(
+        mut self,
+        value: impl Into<Option<OfferIneligibleRegion<S>>>,
+    ) -> Self {
         self._fields.37 = value.into();
         self
     }
     /// Set the `ineligibleRegion` field to an Option value (optional)
-    pub fn maybe_ineligible_region(mut self, value: Option<OfferIneligibleRegion<S>>) -> Self {
+    pub fn maybe_ineligible_region(
+        mut self,
+        value: Option<OfferIneligibleRegion<S>>,
+    ) -> Self {
         self._fields.37 = value;
         self
     }
@@ -3244,12 +3500,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `inventoryLevel` field (optional)
-    pub fn inventory_level(mut self, value: impl Into<Option<OfferInventoryLevel<S>>>) -> Self {
+    pub fn inventory_level(
+        mut self,
+        value: impl Into<Option<OfferInventoryLevel<S>>>,
+    ) -> Self {
         self._fields.38 = value.into();
         self
     }
     /// Set the `inventoryLevel` field to an Option value (optional)
-    pub fn maybe_inventory_level(mut self, value: Option<OfferInventoryLevel<S>>) -> Self {
+    pub fn maybe_inventory_level(
+        mut self,
+        value: Option<OfferInventoryLevel<S>>,
+    ) -> Self {
         self._fields.38 = value;
         self
     }
@@ -3265,7 +3527,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
-    pub fn maybe_is_family_friendly(mut self, value: Option<OfferIsFamilyFriendly<S>>) -> Self {
+    pub fn maybe_is_family_friendly(
+        mut self,
+        value: Option<OfferIsFamilyFriendly<S>>,
+    ) -> Self {
         self._fields.39 = value;
         self
     }
@@ -3273,7 +3538,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `itemCondition` field (optional)
-    pub fn item_condition(mut self, value: impl Into<Option<OfferItemCondition<S>>>) -> Self {
+    pub fn item_condition(
+        mut self,
+        value: impl Into<Option<OfferItemCondition<S>>>,
+    ) -> Self {
         self._fields.40 = value.into();
         self
     }
@@ -3286,7 +3554,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `itemOffered` field (optional)
-    pub fn item_offered(mut self, value: impl Into<Option<OfferItemOffered<S>>>) -> Self {
+    pub fn item_offered(
+        mut self,
+        value: impl Into<Option<OfferItemOffered<S>>>,
+    ) -> Self {
         self._fields.41 = value.into();
         self
     }
@@ -3299,7 +3570,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `leaseLength` field (optional)
-    pub fn lease_length(mut self, value: impl Into<Option<OfferLeaseLength<S>>>) -> Self {
+    pub fn lease_length(
+        mut self,
+        value: impl Into<Option<OfferLeaseLength<S>>>,
+    ) -> Self {
         self._fields.42 = value.into();
         self
     }
@@ -3320,7 +3594,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<OfferMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<OfferMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.43 = value;
         self
     }
@@ -3380,12 +3657,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<OfferPotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<OfferPotentialAction<S>>>,
+    ) -> Self {
         self._fields.48 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<OfferPotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<OfferPotentialAction<S>>,
+    ) -> Self {
         self._fields.48 = value;
         self
     }
@@ -3406,7 +3689,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `priceCurrency` field (optional)
-    pub fn price_currency(mut self, value: impl Into<Option<OfferPriceCurrency<S>>>) -> Self {
+    pub fn price_currency(
+        mut self,
+        value: impl Into<Option<OfferPriceCurrency<S>>>,
+    ) -> Self {
         self._fields.50 = value.into();
         self
     }
@@ -3427,7 +3713,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
         self
     }
     /// Set the `priceSpecification` field to an Option value (optional)
-    pub fn maybe_price_specification(mut self, value: Option<OfferPriceSpecification<S>>) -> Self {
+    pub fn maybe_price_specification(
+        mut self,
+        value: Option<OfferPriceSpecification<S>>,
+    ) -> Self {
         self._fields.51 = value;
         self
     }
@@ -3435,12 +3724,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `priceValidUntil` field (optional)
-    pub fn price_valid_until(mut self, value: impl Into<Option<OfferPriceValidUntil<S>>>) -> Self {
+    pub fn price_valid_until(
+        mut self,
+        value: impl Into<Option<OfferPriceValidUntil<S>>>,
+    ) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `priceValidUntil` field to an Option value (optional)
-    pub fn maybe_price_valid_until(mut self, value: Option<OfferPriceValidUntil<S>>) -> Self {
+    pub fn maybe_price_valid_until(
+        mut self,
+        value: Option<OfferPriceValidUntil<S>>,
+    ) -> Self {
         self._fields.52 = value;
         self
     }
@@ -3500,7 +3795,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `serialNumber` field (optional)
-    pub fn serial_number(mut self, value: impl Into<Option<OfferSerialNumber<S>>>) -> Self {
+    pub fn serial_number(
+        mut self,
+        value: impl Into<Option<OfferSerialNumber<S>>>,
+    ) -> Self {
         self._fields.57 = value.into();
         self
     }
@@ -3513,12 +3811,18 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `shippingDetails` field (optional)
-    pub fn shipping_details(mut self, value: impl Into<Option<OfferShippingDetails<S>>>) -> Self {
+    pub fn shipping_details(
+        mut self,
+        value: impl Into<Option<OfferShippingDetails<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `shippingDetails` field to an Option value (optional)
-    pub fn maybe_shipping_details(mut self, value: Option<OfferShippingDetails<S>>) -> Self {
+    pub fn maybe_shipping_details(
+        mut self,
+        value: Option<OfferShippingDetails<S>>,
+    ) -> Self {
         self._fields.58 = value;
         self
     }
@@ -3597,7 +3901,10 @@ impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
 
 impl<St: offer_state::State, S: BosStr> OfferBuilder<St, S> {
     /// Set the `validThrough` field (optional)
-    pub fn valid_through(mut self, value: impl Into<Option<OfferValidThrough<S>>>) -> Self {
+    pub fn valid_through(
+        mut self,
+        value: impl Into<Option<OfferValidThrough<S>>>,
+    ) -> Self {
         self._fields.64 = value.into();
         self
     }

@@ -15,7 +15,7 @@ use jacquard_common::CowStr;
 use jacquard_common::IntoStatic;
 use jacquard_common::bos::{BosStr, DefaultStr};
 use jacquard_common::deps::fluent_uri::Uri;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use smol_str::SmolStr;
 
 /// The `prompt` parameter for an OAuth authorization request.
@@ -177,11 +177,34 @@ mod tests {
             "atproto rpc:app.bsky.feed.getTimeline transition:generic"
         );
     }
+
+    #[test]
+    fn callback_params_form_round_trip() {
+        let params = CallbackParams {
+            code: SmolStr::new_static("authorization-code"),
+            state: Some(SmolStr::new_static("state/with spaces")),
+            iss: Some(SmolStr::new_static("https://issuer.example/path")),
+        };
+
+        let encoded = serde_html_form::to_string(&params).unwrap();
+        assert_eq!(
+            encoded,
+            "code=authorization-code&state=state%2Fwith+spaces&iss=https%3A%2F%2Fissuer.example%2Fpath"
+        );
+
+        let decoded: CallbackParams = serde_html_form::from_str(&encoded).unwrap();
+        assert_eq!(decoded.code, params.code);
+        assert_eq!(decoded.state, params.state);
+        assert_eq!(decoded.iss, params.iss);
+    }
 }
 
 /// Query parameters delivered to the OAuth redirect URI after user authorization.
-#[derive(Debug, Deserialize)]
-#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(bound(
+    serialize = "S: serde::Serialize + BosStr",
+    deserialize = "S: serde::Deserialize<'de> + BosStr"
+))]
 pub struct CallbackParams<S: BosStr = DefaultStr> {
     /// The authorization code issued by the authorization server.
     pub code: S,

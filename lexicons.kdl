@@ -16,6 +16,7 @@ source "slices" type="git" priority=100 {
 
 source "bluesky" type="git" priority=101 {
     repo "https://github.com/bluesky-social/atproto"
+    ref "permissioned-data"
     pattern "lexicons/**/*.json"
 }
 

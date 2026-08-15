@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::dev_vielle::dnd::astral;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::dev_vielle::dnd::astral;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -41,7 +41,12 @@ pub struct Astral<S: BosStr = DefaultStr> {
     #[serde(default = "_default_astral_points")]
     pub points: i64,
     pub powers: Vec<astral::Power<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_astral_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -55,6 +60,7 @@ pub struct AstralGetRecordOutput<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     pub value: Astral<S>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Power<S: BosStr = DefaultStr> {
@@ -84,7 +90,9 @@ impl<S: BosStr> Power<S> {
             Self::DevVielleDndPowerEldritchAdaptability => {
                 "dev.vielle.dnd.power#eldritchAdaptability"
             }
-            Self::DevVielleDndPowerEldritchAssault => "dev.vielle.dnd.power#eldritchAssault",
+            Self::DevVielleDndPowerEldritchAssault => {
+                "dev.vielle.dnd.power#eldritchAssault"
+            }
             Self::DevVielleDndPowerRuneSeeker => "dev.vielle.dnd.power#runeSeeker",
             Self::DevVielleDndPowerFateScriber => "dev.vielle.dnd.power#fateScriber",
             Self::DevVielleDndPowerFaceless => "dev.vielle.dnd.power#faceless",
@@ -92,7 +100,9 @@ impl<S: BosStr> Power<S> {
             Self::DevVielleDndPowerSpray => "dev.vielle.dnd.power#spray",
             Self::DevVielleDndPowerAcursed => "dev.vielle.dnd.power#acursed",
             Self::DevVielleDndPowerDarksight => "dev.vielle.dnd.power#darksight",
-            Self::DevVielleDndPowerEldritchVisage => "dev.vielle.dnd.power#eldritchVisage",
+            Self::DevVielleDndPowerEldritchVisage => {
+                "dev.vielle.dnd.power#eldritchVisage"
+            }
             Self::DevVielleDndPowerRegenerate => "dev.vielle.dnd.power#regenerate",
             Self::DevVielleDndPowerInstil => "dev.vielle.dnd.power#instil",
             Self::DevVielleDndPowerEldritchEnchantment => {
@@ -111,7 +121,9 @@ impl<S: BosStr> Power<S> {
             "dev.vielle.dnd.power#eldritchAdaptability" => {
                 Self::DevVielleDndPowerEldritchAdaptability
             }
-            "dev.vielle.dnd.power#eldritchAssault" => Self::DevVielleDndPowerEldritchAssault,
+            "dev.vielle.dnd.power#eldritchAssault" => {
+                Self::DevVielleDndPowerEldritchAssault
+            }
             "dev.vielle.dnd.power#runeSeeker" => Self::DevVielleDndPowerRuneSeeker,
             "dev.vielle.dnd.power#fateScriber" => Self::DevVielleDndPowerFateScriber,
             "dev.vielle.dnd.power#faceless" => Self::DevVielleDndPowerFaceless,
@@ -119,7 +131,9 @@ impl<S: BosStr> Power<S> {
             "dev.vielle.dnd.power#spray" => Self::DevVielleDndPowerSpray,
             "dev.vielle.dnd.power#acursed" => Self::DevVielleDndPowerAcursed,
             "dev.vielle.dnd.power#darksight" => Self::DevVielleDndPowerDarksight,
-            "dev.vielle.dnd.power#eldritchVisage" => Self::DevVielleDndPowerEldritchVisage,
+            "dev.vielle.dnd.power#eldritchVisage" => {
+                Self::DevVielleDndPowerEldritchVisage
+            }
             "dev.vielle.dnd.power#regenerate" => Self::DevVielleDndPowerRegenerate,
             "dev.vielle.dnd.power#instil" => Self::DevVielleDndPowerInstil,
             "dev.vielle.dnd.power#eldritchEnchantment" => {
@@ -176,7 +190,9 @@ where
             Power::DevVielleDndPowerEldritchAdaptability => {
                 Power::DevVielleDndPowerEldritchAdaptability
             }
-            Power::DevVielleDndPowerEldritchAssault => Power::DevVielleDndPowerEldritchAssault,
+            Power::DevVielleDndPowerEldritchAssault => {
+                Power::DevVielleDndPowerEldritchAssault
+            }
             Power::DevVielleDndPowerRuneSeeker => Power::DevVielleDndPowerRuneSeeker,
             Power::DevVielleDndPowerFateScriber => Power::DevVielleDndPowerFateScriber,
             Power::DevVielleDndPowerFaceless => Power::DevVielleDndPowerFaceless,
@@ -184,7 +200,9 @@ where
             Power::DevVielleDndPowerSpray => Power::DevVielleDndPowerSpray,
             Power::DevVielleDndPowerAcursed => Power::DevVielleDndPowerAcursed,
             Power::DevVielleDndPowerDarksight => Power::DevVielleDndPowerDarksight,
-            Power::DevVielleDndPowerEldritchVisage => Power::DevVielleDndPowerEldritchVisage,
+            Power::DevVielleDndPowerEldritchVisage => {
+                Power::DevVielleDndPowerEldritchVisage
+            }
             Power::DevVielleDndPowerRegenerate => Power::DevVielleDndPowerRegenerate,
             Power::DevVielleDndPowerInstil => Power::DevVielleDndPowerInstil,
             Power::DevVielleDndPowerEldritchEnchantment => {
@@ -247,13 +265,32 @@ impl<S: BosStr> LexiconSchema for Astral<S> {
     }
 }
 
+fn deserialize_astral_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 fn _default_astral_points() -> i64 {
     0i64
 }
 
 pub mod astral_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -401,10 +438,10 @@ where
 }
 
 fn lexicon_doc_dev_vielle_dnd_astral() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("dev.vielle.dnd.astral"),
@@ -415,10 +452,11 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("literal:self")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("points"),
-                            SmolStr::new_static("powers"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("points"), SmolStr::new_static("powers")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -447,9 +485,7 @@ fn lexicon_doc_dev_vielle_dnd_astral() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("power"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map
         },

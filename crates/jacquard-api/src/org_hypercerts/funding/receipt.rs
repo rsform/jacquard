@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_certified::Did;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_certified::Did;
 /// Records a funding receipt for a payment from one user to another user. It may be recorded by the recipient, by the sender, or by a third party. The sender may remain anonymous.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -66,7 +66,12 @@ pub struct Receipt<S: BosStr = DefaultStr> {
     ///Identifier of the underlying payment transaction (e.g. bank reference, onchain transaction hash, or processor-specific ID). Use paymentNetwork to specify the network where applicable.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transaction_id: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_receipt_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -202,9 +207,28 @@ impl<S: BosStr> LexiconSchema for Receipt<S> {
     }
 }
 
+fn deserialize_receipt_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod receipt_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -332,9 +356,7 @@ impl ReceiptBuilder<receipt_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         ReceiptBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -345,9 +367,7 @@ impl<S: BosStr> ReceiptBuilder<receipt_state::Empty, S> {
     pub fn builder() -> Self {
         ReceiptBuilder {
             _state: PhantomData,
-            _fields: (
-                None, None, None, None, None, None, None, None, None, None, None,
-            ),
+            _fields: (None, None, None, None, None, None, None, None, None, None, None),
             _type: PhantomData,
         }
     }
@@ -500,7 +520,10 @@ where
     St::To: receipt_state::IsUnset,
 {
     /// Set the `to` field (required)
-    pub fn to(mut self, value: impl Into<S>) -> ReceiptBuilder<receipt_state::SetTo<St>, S> {
+    pub fn to(
+        mut self,
+        value: impl Into<S>,
+    ) -> ReceiptBuilder<receipt_state::SetTo<St>, S> {
         self._fields.9 = Option::Some(value.into());
         ReceiptBuilder {
             _state: PhantomData,
@@ -569,10 +592,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_funding_receipt() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.funding.receipt"),

@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::report::AssignmentView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::report::AssignmentView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnassignModerator<S: BosStr = DefaultStr> {
     ///The ID of the report to unassign.
     pub report_id: i64,
@@ -29,11 +26,9 @@ pub struct UnassignModerator<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UnassignModeratorOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: AssignmentView<S>,
@@ -41,9 +36,18 @@ pub struct UnassignModeratorOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum UnassignModeratorError {
     /// The report ID is invalid.
@@ -51,10 +55,7 @@ pub enum UnassignModeratorError {
     InvalidAssignment(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for UnassignModeratorError {
@@ -91,8 +92,9 @@ impl jacquard_common::xrpc::XrpcResp for UnassignModeratorResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UnassignModerator<S> {
     const NSID: &'static str = "tools.ozone.report.unassignModerator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = UnassignModeratorResponse;
 }
 
@@ -102,15 +104,16 @@ Path: `/xrpc/tools.ozone.report.unassignModerator`. The request payload type is 
 pub struct UnassignModeratorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for UnassignModeratorRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.report.unassignModerator";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = UnassignModerator<S>;
     type Response = UnassignModeratorResponse;
 }
 
 pub mod unassign_moderator_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -141,7 +144,10 @@ pub mod unassign_moderator_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct UnassignModeratorBuilder<St: unassign_moderator_state::State, S: BosStr = DefaultStr> {
+pub struct UnassignModeratorBuilder<
+    St: unassign_moderator_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
     _type: PhantomData<fn() -> S>,
@@ -149,7 +155,10 @@ pub struct UnassignModeratorBuilder<St: unassign_moderator_state::State, S: BosS
 
 impl UnassignModerator<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> UnassignModeratorBuilder<unassign_moderator_state::Empty, DefaultStr> {
+    pub fn new() -> UnassignModeratorBuilder<
+        unassign_moderator_state::Empty,
+        DefaultStr,
+    > {
         UnassignModeratorBuilder::new()
     }
 }
@@ -215,7 +224,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UnassignModerator<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnassignModerator<S> {
         UnassignModerator {
             report_id: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

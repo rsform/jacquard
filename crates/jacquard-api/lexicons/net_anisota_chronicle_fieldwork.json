@@ -1,0 +1,130 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.chronicle.fieldwork",
+  "defs": {
+    "chronicleSignature": {
+      "type": "object",
+      "description": "ES256 cryptographic signature proving record authenticity. The signature itself proves legitimacy - no separate verification lexicons needed.",
+      "required": [
+        "sig",
+        "alg",
+        "kid",
+        "signedAt",
+        "nonce",
+        "version"
+      ],
+      "properties": {
+        "alg": {
+          "type": "string",
+          "description": "Signing algorithm (ES256)"
+        },
+        "kid": {
+          "type": "string",
+          "description": "Key identifier for the signing key"
+        },
+        "nonce": {
+          "type": "string",
+          "description": "Unique random nonce to prevent replay"
+        },
+        "sig": {
+          "type": "string",
+          "description": "Base64-encoded ES256 signature"
+        },
+        "signedAt": {
+          "type": "string",
+          "description": "When the record was signed",
+          "format": "datetime"
+        },
+        "version": {
+          "type": "integer",
+          "description": "Signature schema version"
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "Signed quest completion record. rkey is the quest ID (e.g. 'first-post', 'make-camp'). Created once with createRecord when the quest is completed. Immutable.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "questId",
+          "track",
+          "xpAwarded",
+          "completedAt",
+          "signature",
+          "createdAt"
+        ],
+        "properties": {
+          "completedAt": {
+            "type": "string",
+            "description": "When the quest was completed",
+            "format": "datetime"
+          },
+          "context": {
+            "type": "ref",
+            "ref": "#questContext"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the quest record was created",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what was accomplished",
+            "maxLength": 500
+          },
+          "name": {
+            "type": "string",
+            "description": "Display title of the quest",
+            "maxLength": 100
+          },
+          "questId": {
+            "type": "string",
+            "description": "Unique identifier for the quest (e.g. 'first-post'). Matches the record's rkey.",
+            "maxLength": 100
+          },
+          "retroactive": {
+            "type": "boolean",
+            "description": "Whether the quest was completed retroactively from existing activity rather than live"
+          },
+          "signature": {
+            "type": "ref",
+            "ref": "#chronicleSignature"
+          },
+          "track": {
+            "type": "string",
+            "description": "Quest track this quest belongs to (e.g. 'field-basics', 'observatory', 'expedition', 'craft')",
+            "maxLength": 50
+          },
+          "xpAwarded": {
+            "type": "integer",
+            "description": "XP awarded for completing this quest",
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "questContext": {
+      "type": "object",
+      "description": "Contextual data at the time of quest completion",
+      "properties": {
+        "appMode": {
+          "type": "string",
+          "description": "App mode ('story' or 'open') when the quest was completed"
+        },
+        "level": {
+          "type": "integer",
+          "description": "Player level when the quest was completed",
+          "minimum": 1
+        },
+        "totalXP": {
+          "type": "integer",
+          "description": "Total XP when the quest was completed",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

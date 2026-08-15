@@ -1,0 +1,57 @@
+{
+  "lexicon": 1,
+  "id": "dev.atfs.repo.uploadFile",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Upload a file to be served by this atfs instance over IPFS and plain HTTP. Intentionally fully wire-compatible with com.atproto.repo.uploadBlob — same binary request body, same inter-service auth mechanism, same response shape — so any uploadBlob client works against this endpoint unchanged, by switching only the NSID in the request path and the `lxm` claim of its auth token. This method is also mounted, unmodified, as com.atproto.repo.uploadBlob itself, for callers that have no reason to know atfs has its own name for it; a token minted for one NSID is rejected on the other's path. Requires auth (a caller's own inter-service auth JWT, signed by its account's signing key); restricted to the instance's configured account allowlist (see dev.atfs.server's accounts field).",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "tag": {
+            "type": "array",
+            "description": "Free-form labels to attach to the uploaded content — `?tag=board-x&tag=v1.2.3&tag=atfs` — belonging to this call's claim (this account, upload) rather than to the blob itself: see dev.atfs.file's tags field for what that means for a reader. Absent means no tags, never an error, the same spirit as an absent Content-Type defaulting rather than failing. Repeat claims union tags in rather than replacing them, so re-uploading identical bytes under a new tag leaves the blob carrying the old ones too — that's what content addressing implies: one blob, one pin set. Tags only ever accumulate this way — nothing removes or replaces one once set, short of releasing the whole claim (dev.atfs.repo.deleteFile) and re-uploading. Bounded the same way dev.atfs.file's tags array documents — at most 16 tags, each 1-128 bytes, no control characters — and a violation is rejected with InvalidRequest rather than silently truncated or dropped, so a scripted upload that mistypes a tag fails loudly instead of publishing unlabelled. This parameter exists only on dev.atfs.repo.uploadFile's own path: the com.atproto.repo.uploadBlob alias stays wire-identical on purpose, so it carries no `tag` parameter of its own and an ordinary uploadBlob client simply never sends one — mounting the same handler under both NSIDs means the parameter is accepted whichever path a caller used, but no uploadBlob-speaking client has any reason to know it exists.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "maxGraphemes": 128
+            }
+          }
+        }
+      },
+      "input": {
+        "encoding": "*/*"
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "blob"
+          ],
+          "properties": {
+            "blob": {
+              "type": "blob",
+              "description": "The PDS's own uploadBlob response shape: the uploaded bytes' blessed CID (see dev.atfs.file's cid field), the mimeType recorded (defaulting to application/octet-stream when the request carried no Content-Type), and size in bytes."
+            },
+            "ipfsRoot": {
+              "type": "cid-link",
+              "description": "atfs's own addition to the PDS response shape, absent from a plain com.atproto.repo.uploadBlob response: the CID to fetch the just-uploaded file over the IPFS network, exactly as dev.atfs.file's ipfsRoot field documents — the UnixFS root for a large file, or equal to blob's own CID when it fits a single Bitswap block. Standard atproto clients ignore unknown top-level fields, so this stays response-compatible with the PDS. Omitted (not a misleading zero value) on the rare occasion indexing hasn't finished yet; the file is already safely stored either way, and a later dev.atfs.repo.getFile or /ipfs/<cid> request is unaffected."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The request body exceeds this instance's maximum blob size.",
+          "name": "BlobTooLarge"
+        },
+        {
+          "description": "This instance has no room to store more content: its data volume has reached the free space it keeps in reserve, or what is left of that is already promised to uploads and pins in flight. Nothing was stored, and the instance keeps serving and deleting normally — releasing content with dev.atfs.repo.deleteFile is what makes room again. Retrying is reasonable, but only after something has been deleted or an upload in flight has finished.",
+          "name": "InsufficientStorage"
+        }
+      ]
+    }
+  }
+}

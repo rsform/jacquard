@@ -1,0 +1,31 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.account.deleteEmail",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Remove an email address from the authenticated account. Cannot remove the primary address.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "email"
+          ],
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "Email address to remove."
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The primary email address cannot be deleted. Set another address as primary first.",
+          "name": "CannotDeletePrimary"
+        }
+      ]
+    }
+  }
+}

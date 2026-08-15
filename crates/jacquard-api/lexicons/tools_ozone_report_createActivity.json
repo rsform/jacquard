@@ -10,7 +10,6 @@
         "schema": {
           "type": "object",
           "required": [
-            "reportId",
             "activity"
           ],
           "properties": {
@@ -25,6 +24,10 @@
                 "tools.ozone.report.defs#reopenActivity",
                 "tools.ozone.report.defs#noteActivity"
               ]
+            },
+            "eventId": {
+              "type": "integer",
+              "description": "ID of the report moderation event. Resolves to the report created from that event. Exactly one of reportId or eventId must be provided."
             },
             "internalNote": {
               "type": "string",
@@ -41,7 +44,7 @@
             },
             "reportId": {
               "type": "integer",
-              "description": "ID of the report to record activity on"
+              "description": "ID of the report to record activity on. Exactly one of reportId or eventId must be provided."
             }
           }
         }
@@ -63,7 +66,7 @@
       },
       "errors": [
         {
-          "description": "No report exists with the given reportId",
+          "description": "No report exists with the given reportId or eventId",
           "name": "ReportNotFound"
         },
         {

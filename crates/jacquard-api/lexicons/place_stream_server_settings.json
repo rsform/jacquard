@@ -8,11 +8,14 @@
       "key": "any",
       "record": {
         "type": "object",
-        "required": [],
         "properties": {
           "debugRecording": {
             "type": "boolean",
             "description": "Whether this node may archive your livestream for improving the service"
+          },
+          "livestreamRecording": {
+            "type": "boolean",
+            "description": "Whether this node should record your livestreams into VODs that you can publish"
           }
         }
       }

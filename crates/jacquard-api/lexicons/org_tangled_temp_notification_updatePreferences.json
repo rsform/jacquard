@@ -1,0 +1,48 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.notification.updatePreferences",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Update notification preferences for the authenticated user. Only provided fields are updated.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "emailNotifications": {
+              "type": "boolean"
+            },
+            "followed": {
+              "type": "boolean"
+            },
+            "issueClosed": {
+              "type": "boolean"
+            },
+            "issueCommented": {
+              "type": "boolean"
+            },
+            "issueCreated": {
+              "type": "boolean"
+            },
+            "pullCommented": {
+              "type": "boolean"
+            },
+            "pullCreated": {
+              "type": "boolean"
+            },
+            "pullMerged": {
+              "type": "boolean"
+            },
+            "repoStarred": {
+              "type": "boolean"
+            },
+            "userMentioned": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

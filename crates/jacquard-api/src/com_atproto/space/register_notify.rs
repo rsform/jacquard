@@ -10,19 +10,16 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RegisterNotify<S: BosStr = DefaultStr> {
     ///Service identifier of the subscriber: a DID with an optional service fragment naming the entry in its DID document to deliver to (e.g. 'did:web:syncer.example.com#atproto_space_syncer'). notifyWrite calls are addressed to this identifier.
     pub service: S,
@@ -32,11 +29,9 @@ pub struct RegisterNotify<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RegisterNotifyOutput<S: BosStr = DefaultStr> {
     ///When the registration expires. May be later than the expiry of the space credential the request was authenticated with; renew before this time to stay subscribed.
     pub expires_at: Datetime,
@@ -44,9 +39,18 @@ pub struct RegisterNotifyOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum RegisterNotifyError {
     #[serde(rename = "SpaceNotFound")]
@@ -56,10 +60,7 @@ pub enum RegisterNotifyError {
     ServiceNotResolvable(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for RegisterNotifyError {
@@ -103,8 +104,9 @@ impl jacquard_common::xrpc::XrpcResp for RegisterNotifyResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RegisterNotify<S> {
     const NSID: &'static str = "com.atproto.space.registerNotify";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = RegisterNotifyResponse;
 }
 
@@ -114,15 +116,16 @@ Path: `/xrpc/com.atproto.space.registerNotify`. The request payload type is `Reg
 pub struct RegisterNotifyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for RegisterNotifyRequest {
     const PATH: &'static str = "/xrpc/com.atproto.space.registerNotify";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = RegisterNotify<S>;
     type Response = RegisterNotifyResponse;
 }
 
 pub mod register_notify_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -165,7 +168,10 @@ pub mod register_notify_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct RegisterNotifyBuilder<St: register_notify_state::State, S: BosStr = DefaultStr> {
+pub struct RegisterNotifyBuilder<
+    St: register_notify_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtSpaceUri<S>>),
     _type: PhantomData<fn() -> S>,
@@ -260,7 +266,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RegisterNotify<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RegisterNotify<S> {
         RegisterNotify {
             service: self._fields.0.unwrap(),
             space: self._fields.1.unwrap(),

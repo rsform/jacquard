@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::beta::game::log;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::beta::game::log;
 /// Details about achievement check/claim operation
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct AchievementCheckData<S: BosStr = DefaultStr> {
     ///Time taken to check/claim in milliseconds
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,17 +51,19 @@ pub struct AchievementCheckData<S: BosStr = DefaultStr> {
     ///Total number of achievements checked
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_checked: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_achievement_check_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Details about item/specimen collection
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CollectionData<S: BosStr = DefaultStr> {
     ///Catch probability for specimens (decimal string between 0.0 and 1.0)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -87,17 +86,19 @@ pub struct CollectionData<S: BosStr = DefaultStr> {
     ///Milliseconds between card being viewed and collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time_since_viewed: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_collection_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Details about daily rewards claim
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DailyRewardsData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reward_items: Option<Vec<log::RewardItem<S>>>,
@@ -110,17 +111,19 @@ pub struct DailyRewardsData<S: BosStr = DefaultStr> {
     ///Milliseconds since last claim
     #[serde(skip_serializing_if = "Option::is_none")]
     pub time_since_last_claim: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_daily_rewards_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Context about the feed when event occurred
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct FeedContext<S: BosStr = DefaultStr> {
     ///URI of the feed being viewed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -134,17 +137,19 @@ pub struct FeedContext<S: BosStr = DefaultStr> {
     ///User's scroll position or card index
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scroll_position: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_feed_context_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Details about game cards generated or interacted with
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GameCardData<S: BosStr = DefaultStr> {
     ///Type of game card
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -167,17 +172,19 @@ pub struct GameCardData<S: BosStr = DefaultStr> {
     ///Rarity of the item/specimen
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rarity: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_game_card_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Details about item usage
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ItemUsageData<S: BosStr = DefaultStr> {
     ///Effect that was applied
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -194,7 +201,12 @@ pub struct ItemUsageData<S: BosStr = DefaultStr> {
     ///Remaining quantity after use
     #[serde(skip_serializing_if = "Option::is_none")]
     pub remaining_quantity: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_item_usage_data_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -243,7 +255,12 @@ pub struct Log<S: BosStr = DefaultStr> {
     pub session_uri: Option<S>,
     ///When the event occurred (ISO 8601)
     pub timestamp: Datetime,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_log_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -261,10 +278,7 @@ pub struct LogGetRecordOutput<S: BosStr = DefaultStr> {
 /// Additional event-specific metadata
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Metadata<S: BosStr = DefaultStr> {
     ///Version of the client application
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -278,17 +292,19 @@ pub struct Metadata<S: BosStr = DefaultStr> {
     ///Platform (web, mobile, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_metadata_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Item received as a reward
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct RewardItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_id: Option<S>,
@@ -296,7 +312,12 @@ pub struct RewardItem<S: BosStr = DefaultStr> {
     pub quantity: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rarity: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_reward_item_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -641,11 +662,24 @@ impl<S: BosStr> LexiconSchema for RewardItem<S> {
     }
 }
 
+fn deserialize_achievement_check_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.beta.game.log"),
@@ -654,9 +688,11 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("achievementCheckData"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Details about achievement check/claim operation",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Details about achievement check/claim operation",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -670,9 +706,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("checkType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Type of achievement check performed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Type of achievement check performed"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -686,9 +722,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("claimedAchievements"),
                             LexObjectProperty::Array(LexArray {
-                                description: Some(CowStr::new_static(
-                                    "IDs of achievements that were claimed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("IDs of achievements that were claimed"),
+                                ),
                                 items: LexArrayItem::String(LexString {
                                     ..Default::default()
                                 }),
@@ -789,7 +825,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("dailyRewardsData"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Details about daily rewards claim")),
+                    description: Some(
+                        CowStr::new_static("Details about daily rewards claim"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -832,18 +870,18 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("feedContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Context about the feed when event occurred",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Context about the feed when event occurred"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("feedUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URI of the feed being viewed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URI of the feed being viewed"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -876,9 +914,11 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("gameCardData"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Details about game cards generated or interacted with",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Details about game cards generated or interacted with",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -892,18 +932,20 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("cardUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Unique identifier for the game card",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Unique identifier for the game card"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("generationSeed"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Random seed used for generation (for verification)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Random seed used for generation (for verification)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -917,7 +959,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("itemId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("ID of the item/specimen")),
+                                description: Some(
+                                    CowStr::new_static("ID of the item/specimen"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -931,9 +975,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("rarity"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Rarity of the item/specimen",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Rarity of the item/specimen"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -952,23 +996,27 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("effectApplied"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Effect that was applied")),
+                                description: Some(
+                                    CowStr::new_static("Effect that was applied"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("inventoryRecordUri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URI of the modified inventory record",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URI of the modified inventory record"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("itemId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("ID of the item used")),
+                                description: Some(
+                                    CowStr::new_static("ID of the item used"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1155,16 +1203,18 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("metadata"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Additional event-specific metadata")),
+                    description: Some(
+                        CowStr::new_static("Additional event-specific metadata"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("clientVersion"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Version of the client application",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Version of the client application"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1184,9 +1234,9 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("platform"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Platform (web, mobile, etc.)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Platform (web, mobile, etc.)"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1204,9 +1254,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("itemId"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("quantity"),
@@ -1217,9 +1265,7 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("rarity"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map
                     },
@@ -1232,9 +1278,93 @@ fn lexicon_doc_net_anisota_beta_game_log() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_collection_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_daily_rewards_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_feed_context_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_game_card_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_item_usage_data_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_log_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1333,7 +1463,20 @@ impl LogBuilder<log_state::Empty, DefaultStr> {
         LogBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -1347,7 +1490,20 @@ impl<S: BosStr> LogBuilder<log_state::Empty, S> {
         LogBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
                 None,
             ),
             _type: PhantomData,
@@ -1376,12 +1532,18 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `collectionData` field (optional)
-    pub fn collection_data(mut self, value: impl Into<Option<log::CollectionData<S>>>) -> Self {
+    pub fn collection_data(
+        mut self,
+        value: impl Into<Option<log::CollectionData<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `collectionData` field to an Option value (optional)
-    pub fn maybe_collection_data(mut self, value: Option<log::CollectionData<S>>) -> Self {
+    pub fn maybe_collection_data(
+        mut self,
+        value: Option<log::CollectionData<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1410,7 +1572,10 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
         self
     }
     /// Set the `dailyRewardsData` field to an Option value (optional)
-    pub fn maybe_daily_rewards_data(mut self, value: Option<log::DailyRewardsData<S>>) -> Self {
+    pub fn maybe_daily_rewards_data(
+        mut self,
+        value: Option<log::DailyRewardsData<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1422,7 +1587,10 @@ where
     St::EventType: log_state::IsUnset,
 {
     /// Set the `eventType` field (required)
-    pub fn event_type(mut self, value: impl Into<S>) -> LogBuilder<log_state::SetEventType<St>, S> {
+    pub fn event_type(
+        mut self,
+        value: impl Into<S>,
+    ) -> LogBuilder<log_state::SetEventType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -1434,7 +1602,10 @@ where
 
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `feedContext` field (optional)
-    pub fn feed_context(mut self, value: impl Into<Option<log::FeedContext<S>>>) -> Self {
+    pub fn feed_context(
+        mut self,
+        value: impl Into<Option<log::FeedContext<S>>>,
+    ) -> Self {
         self._fields.5 = value.into();
         self
     }
@@ -1447,7 +1618,10 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `gameCardData` field (optional)
-    pub fn game_card_data(mut self, value: impl Into<Option<log::GameCardData<S>>>) -> Self {
+    pub fn game_card_data(
+        mut self,
+        value: impl Into<Option<log::GameCardData<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
@@ -1473,12 +1647,18 @@ impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
 
 impl<St: log_state::State, S: BosStr> LogBuilder<St, S> {
     /// Set the `itemUsageData` field (optional)
-    pub fn item_usage_data(mut self, value: impl Into<Option<log::ItemUsageData<S>>>) -> Self {
+    pub fn item_usage_data(
+        mut self,
+        value: impl Into<Option<log::ItemUsageData<S>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `itemUsageData` field to an Option value (optional)
-    pub fn maybe_item_usage_data(mut self, value: Option<log::ItemUsageData<S>>) -> Self {
+    pub fn maybe_item_usage_data(
+        mut self,
+        value: Option<log::ItemUsageData<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1529,7 +1709,10 @@ where
     St::SessionId: log_state::IsUnset,
 {
     /// Set the `sessionId` field (required)
-    pub fn session_id(mut self, value: impl Into<S>) -> LogBuilder<log_state::SetSessionId<St>, S> {
+    pub fn session_id(
+        mut self,
+        value: impl Into<S>,
+    ) -> LogBuilder<log_state::SetSessionId<St>, S> {
         self._fields.12 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -1620,4 +1803,30 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_metadata_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_reward_item_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

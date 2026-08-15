@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,7 +27,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A digital painting created on aesthetic.computer
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -54,7 +54,12 @@ pub struct Painting<S: BosStr = DefaultStr> {
     pub thumbnail: Option<BlobRef<S>>,
     ///Creation timestamp (ISO 8601)
     pub when: Datetime,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_painting_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -183,20 +188,25 @@ impl<S: BosStr> LexiconSchema for Painting<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/png", "image/jpeg"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumbnail"),
-                        accepted: vec!["image/png".to_string(), "image/jpeg".to_string()],
+                        accepted: vec![
+                            "image/png".to_string(), "image/jpeg".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -206,9 +216,28 @@ impl<S: BosStr> LexiconSchema for Painting<S> {
     }
 }
 
+fn deserialize_painting_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod painting_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -355,7 +384,10 @@ where
     St::Code: painting_state::IsUnset,
 {
     /// Set the `code` field (required)
-    pub fn code(mut self, value: impl Into<S>) -> PaintingBuilder<painting_state::SetCode<St>, S> {
+    pub fn code(
+        mut self,
+        value: impl Into<S>,
+    ) -> PaintingBuilder<painting_state::SetCode<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PaintingBuilder {
             _state: PhantomData,
@@ -403,7 +435,10 @@ where
     St::Ref: painting_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(mut self, value: impl Into<S>) -> PaintingBuilder<painting_state::SetRef<St>, S> {
+    pub fn r#ref(
+        mut self,
+        value: impl Into<S>,
+    ) -> PaintingBuilder<painting_state::SetRef<St>, S> {
         self._fields.3 = Option::Some(value.into());
         PaintingBuilder {
             _state: PhantomData,
@@ -419,7 +454,10 @@ where
     St::Slug: painting_state::IsUnset,
 {
     /// Set the `slug` field (required)
-    pub fn slug(mut self, value: impl Into<S>) -> PaintingBuilder<painting_state::SetSlug<St>, S> {
+    pub fn slug(
+        mut self,
+        value: impl Into<S>,
+    ) -> PaintingBuilder<painting_state::SetSlug<St>, S> {
         self._fields.4 = Option::Some(value.into());
         PaintingBuilder {
             _state: PhantomData,
@@ -499,10 +537,10 @@ where
 }
 
 fn lexicon_doc_computer_aesthetic_painting() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("computer.aesthetic.painting"),

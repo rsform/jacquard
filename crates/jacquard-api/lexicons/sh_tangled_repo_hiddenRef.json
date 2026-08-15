@@ -25,8 +25,8 @@
             },
             "repo": {
               "type": "string",
-              "description": "AT-URI of the repository",
-              "format": "at-uri"
+              "description": "DID of the fork that the hidden ref belongs to",
+              "format": "did"
             }
           }
         }

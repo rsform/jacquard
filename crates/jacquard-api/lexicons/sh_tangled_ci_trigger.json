@@ -1,0 +1,116 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.ci.trigger",
+  "defs": {
+    "manual": {
+      "type": "object",
+      "required": [
+        "sha"
+      ],
+      "properties": {
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "ref",
+            "ref": "#pair"
+          }
+        },
+        "ref": {
+          "type": "string",
+          "description": "optional ref the SHA was resolved from, for display and TANGLED_REF"
+        },
+        "sha": {
+          "type": "string",
+          "description": "commit SHA the manual run targets",
+          "minLength": 40,
+          "maxLength": 40
+        },
+        "sourceRepo": {
+          "type": "string",
+          "description": "Repository DID to check out code and workflow definitions from, if different from the target repo.",
+          "format": "did"
+        }
+      }
+    },
+    "pair": {
+      "type": "object",
+      "required": [
+        "key",
+        "value"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "pullRequest": {
+      "type": "object",
+      "description": "TODO: reference PR record with strongRef instead of embedding raw values",
+      "required": [
+        "targetBranch",
+        "sourceSha"
+      ],
+      "properties": {
+        "action": {
+          "type": "string",
+          "description": "the pull request lifecycle action that produced this trigger",
+          "enum": [
+            "opened",
+            "reopened",
+            "closed",
+            "merged",
+            "synchronize"
+          ]
+        },
+        "pull": {
+          "type": "string",
+          "description": "AT-URI of the sh.tangled.repo.pull record this run belongs to",
+          "format": "at-uri"
+        },
+        "sourceBranch": {
+          "type": "string"
+        },
+        "sourceRepo": {
+          "type": "string",
+          "description": "Repository DID to check out code and workflow definitions from, if different from the target repo.",
+          "format": "did"
+        },
+        "sourceSha": {
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 40
+        },
+        "targetBranch": {
+          "type": "string"
+        }
+      }
+    },
+    "push": {
+      "type": "object",
+      "required": [
+        "ref",
+        "newSha",
+        "oldSha"
+      ],
+      "properties": {
+        "newSha": {
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 40
+        },
+        "oldSha": {
+          "type": "string",
+          "minLength": 40,
+          "maxLength": 40
+        },
+        "ref": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

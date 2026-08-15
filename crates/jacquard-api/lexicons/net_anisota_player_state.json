@@ -12,6 +12,15 @@
           "updatedAt"
         ],
         "properties": {
+          "acceptedTermsAt": {
+            "type": "string",
+            "description": "ISO datetime the player most recently accepted the Terms of Service / Privacy Policy.",
+            "format": "datetime"
+          },
+          "acceptedTermsVersion": {
+            "type": "integer",
+            "description": "The highest Terms of Service / Privacy Policy version this player has accepted (see src/utils/termsVersion.js TERMS_VERSION). Drives the first-run acceptance gate; when this is below the current TERMS_VERSION the user is re-prompted to accept."
+          },
           "activeBlocksIntentionDaily": {
             "type": "string",
             "description": "Target active blocks per day (decimal string, e.g. '6')"
@@ -36,6 +45,14 @@
             "type": "string",
             "description": "Activity style intention Y position as grid percentage (0-100, creating axis)"
           },
+          "appMode": {
+            "type": "string",
+            "description": "Chosen app experience: 'story' (full immersive) or 'open' (simpler). Authoritative cross-device value for the mode picked during onboarding."
+          },
+          "completedChapters": {
+            "type": "unknown",
+            "description": "Object mapping completed story/onboarding chapter ids (e.g. 'welcome') to the ISO datetime they were completed. Drives whether the onboarding/changelog overlays are shown."
+          },
           "currentLight": {
             "type": "string",
             "description": "Current light charge in Wh (decimal string, e.g. '280.0')"
@@ -48,6 +65,14 @@
             "type": "unknown",
             "description": "Equipment slots: object mapping slotId (hands, backpack, camp) to arrays of equipped item ID strings"
           },
+          "inventoryMigrationV2": {
+            "type": "boolean",
+            "description": "Whether the v2 inventory/equipment migration has been applied for this player."
+          },
+          "inventoryMigrationV3": {
+            "type": "boolean",
+            "description": "Whether the v3 inventory/equipment migration (power-station id remap) has been applied for this player."
+          },
           "lastSessionStart": {
             "type": "string",
             "description": "When the current session started (for multi-device awareness)",
@@ -56,6 +81,14 @@
           "lightDrainActive": {
             "type": "boolean",
             "description": "Whether light drain was active when state was saved"
+          },
+          "longestRestMinutes": {
+            "type": "string",
+            "description": "Rest ledger high-water-mark: the longest rest stretch ever (time away from the forest between walks) in minutes, as a decimal string. Monotonic — only ever increases. Everything else the rest ledger shows is computed on read from the walk records; this is the one durable figure."
+          },
+          "onboardingGoals": {
+            "type": "string",
+            "description": "Comma-joined list of goal ids the player selected during onboarding (e.g. 'offline-more,reply-more'). Stored as a string to avoid depending on array support."
           },
           "slotCapacity": {
             "type": "unknown",

@@ -1,0 +1,95 @@
+{
+  "lexicon": 1,
+  "id": "app.bsky.video.getUploadStatus",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get the authoritative status of the upload phase. Terminal states remain readable. completedJobId and jobStatus are present only for completed sessions; failureReason is present only for failed sessions.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "jobId"
+        ],
+        "properties": {
+          "jobId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "jobId",
+            "partSizeBytes",
+            "partCount",
+            "receivedParts",
+            "expiresAt",
+            "state"
+          ],
+          "properties": {
+            "completedJobId": {
+              "type": "string",
+              "description": "Present only when state is completed; may differ from jobId on deduplication.",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "datetime"
+            },
+            "failureReason": {
+              "type": "string",
+              "description": "Present only when state is failed.",
+              "maxLength": 1024
+            },
+            "jobId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            "jobStatus": {
+              "type": "ref",
+              "description": "Present only when state is completed.",
+              "ref": "app.bsky.video.defs#jobStatus"
+            },
+            "partCount": {
+              "type": "integer"
+            },
+            "partSizeBytes": {
+              "type": "integer"
+            },
+            "receivedParts": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "state": {
+              "type": "string",
+              "maxLength": 32,
+              "knownValues": [
+                "created",
+                "finishing",
+                "completed",
+                "failed",
+                "aborted",
+                "expired"
+              ]
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "The job ID is unknown or aged out of retention; known terminal sessions remain readable and are never reported as not found.",
+          "name": "UploadNotFound"
+        }
+      ]
+    }
+  }
+}

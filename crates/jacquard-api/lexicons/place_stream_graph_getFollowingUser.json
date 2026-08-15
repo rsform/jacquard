@@ -28,7 +28,6 @@
         "encoding": "application/json",
         "schema": {
           "type": "object",
-          "required": [],
           "properties": {
             "follow": {
               "type": "ref",

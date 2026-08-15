@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::tools_ozone::report::ReportActivityView;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::tools_ozone::report::ReportActivityView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryActivities<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_types: Option<Vec<S>>,
@@ -42,11 +39,9 @@ pub struct QueryActivities<S: BosStr = DefaultStr> {
     pub sort_direction: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryActivitiesOutput<S: BosStr = DefaultStr> {
     pub activities: Vec<ReportActivityView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -93,7 +88,7 @@ fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod query_activities_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -111,7 +106,10 @@ pub mod query_activities_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct QueryActivitiesBuilder<St: query_activities_state::State, S: BosStr = DefaultStr> {
+pub struct QueryActivitiesBuilder<
+    St: query_activities_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,

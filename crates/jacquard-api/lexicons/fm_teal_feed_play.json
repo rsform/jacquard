@@ -1,0 +1,113 @@
+{
+  "lexicon": 1,
+  "id": "fm.teal.feed.play",
+  "description": "This lexicon is in a not officially released state. It is subject to change. | A declaration of a teal.fm play. Plays are submitted as a result of a user listening to a track. Plays should be marked as tracked when a user has listened to the entire track if it's under 2 minutes long, or half of the track's duration up to 4 minutes, whichever is longest.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "trackName"
+        ],
+        "properties": {
+          "artistMbIds": {
+            "type": "array",
+            "description": "DEPRECATED: USE 'artists' INSTEAD. Array of Musicbrainz artist IDs.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "artistNames": {
+            "type": "array",
+            "description": "DEPRECATED: USE 'artists' INSTEAD. Array of artist names in order of original appearance.",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256,
+              "maxGraphemes": 2560
+            }
+          },
+          "artists": {
+            "type": "array",
+            "description": "Array of artists in order of original appearance.",
+            "items": {
+              "type": "ref",
+              "ref": "fm.teal.feed.defs#artist"
+            }
+          },
+          "duration": {
+            "type": "integer",
+            "description": "The length of the track in seconds"
+          },
+          "isrc": {
+            "type": "string",
+            "description": "The ISRC code associated with the recording"
+          },
+          "musicServiceUri": {
+            "type": "string",
+            "description": "The canonical URI identifying the listening surface or music service.",
+            "format": "uri"
+          },
+          "originUri": {
+            "type": "string",
+            "description": "The exact URI where the listening event originated.",
+            "format": "uri"
+          },
+          "playedTime": {
+            "type": "string",
+            "description": "The datetime at which playback began.",
+            "format": "datetime"
+          },
+          "recordingMbId": {
+            "type": "string",
+            "description": "The MusicBrainz recording ID URI of the track, formatted as mbid:<uuid>",
+            "format": "uri"
+          },
+          "releaseDiscriminant": {
+            "type": "string",
+            "description": "Distinguishing information for release variants (e.g. 'Deluxe Edition', 'Remastered', '2023 Remaster', 'Special Edition'). Used to differentiate between different versions of the same base release while maintaining grouping capabilities.",
+            "maxLength": 128,
+            "maxGraphemes": 1280
+          },
+          "releaseMbId": {
+            "type": "string",
+            "description": "The MusicBrainz release ID URI, formatted as mbid:<uuid>",
+            "format": "uri"
+          },
+          "releaseName": {
+            "type": "string",
+            "description": "The name of the release/album",
+            "maxLength": 256,
+            "maxGraphemes": 2560
+          },
+          "submissionClientAgent": {
+            "type": "string",
+            "description": "A metadata string specifying the user agent where the format is `<app-identifier>/<version> (<kernel/OS-base>; <platform/OS-version>; <device-model>)`. If string is provided, only `app-identifier` and `version` are required. `app-identifier` is recommended to be in reverse dns format. Defaults to 'manual/unknown' if unavailable or not provided.",
+            "maxLength": 256,
+            "maxGraphemes": 2560
+          },
+          "trackDiscriminant": {
+            "type": "string",
+            "description": "Distinguishing information for track variants (e.g. 'Acoustic Version', 'Live at Wembley', 'Radio Edit', 'Demo'). Used to differentiate between different versions of the same base track while maintaining grouping capabilities.",
+            "maxLength": 128,
+            "maxGraphemes": 1280
+          },
+          "trackMbId": {
+            "type": "string",
+            "description": "The MusicBrainz ID URI of the track, formatted as mbid:<uuid>",
+            "format": "uri"
+          },
+          "trackName": {
+            "type": "string",
+            "description": "The name of the track",
+            "minLength": 1,
+            "maxLength": 256,
+            "maxGraphemes": 2560
+          }
+        }
+      }
+    }
+  }
+}

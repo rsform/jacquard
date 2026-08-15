@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +24,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::chronicle::fieldwork;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::chronicle::fieldwork;
 /// ES256 cryptographic signature proving record authenticity. The signature itself proves legitimacy - no separate verification lexicons needed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     ///Signing algorithm (ES256)
     pub alg: S,
@@ -48,7 +45,12 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     pub signed_at: Datetime,
     ///Signature schema version
     pub version: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_chronicle_signature_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -84,7 +86,12 @@ pub struct Fieldwork<S: BosStr = DefaultStr> {
     pub track: S,
     ///XP awarded for completing this quest
     pub xp_awarded: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_fieldwork_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -102,10 +109,7 @@ pub struct FieldworkGetRecordOutput<S: BosStr = DefaultStr> {
 /// Contextual data at the time of quest completion
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QuestContext<S: BosStr = DefaultStr> {
     ///App mode ('story' or 'open') when the quest was completed
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -116,7 +120,12 @@ pub struct QuestContext<S: BosStr = DefaultStr> {
     ///Total XP when the quest was completed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_xp: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_quest_context_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -268,9 +277,22 @@ impl<S: BosStr> LexiconSchema for QuestContext<S> {
     }
 }
 
+fn deserialize_chronicle_signature_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod chronicle_signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -381,22 +403,21 @@ pub mod chronicle_signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChronicleSignatureBuilder<St: chronicle_signature_state::State, S: BosStr = DefaultStr> {
+pub struct ChronicleSignatureBuilder<
+    St: chronicle_signature_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<Datetime>,
-        Option<i64>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ChronicleSignature<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChronicleSignatureBuilder<chronicle_signature_state::Empty, DefaultStr> {
+    pub fn new() -> ChronicleSignatureBuilder<
+        chronicle_signature_state::Empty,
+        DefaultStr,
+    > {
         ChronicleSignatureBuilder::new()
     }
 }
@@ -567,7 +588,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChronicleSignature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ChronicleSignature<S> {
         ChronicleSignature {
             alg: self._fields.0.unwrap(),
             kid: self._fields.1.unwrap(),
@@ -581,10 +605,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_chronicle_fieldwork() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.fieldwork"),
@@ -789,18 +813,22 @@ fn lexicon_doc_net_anisota_chronicle_fieldwork() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("questContext"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Contextual data at the time of quest completion",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Contextual data at the time of quest completion",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("appMode"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "App mode ('story' or 'open') when the quest was completed",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "App mode ('story' or 'open') when the quest was completed",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -829,9 +857,28 @@ fn lexicon_doc_net_anisota_chronicle_fieldwork() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_fieldwork_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod fieldwork_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1016,7 +1063,10 @@ where
 
 impl<St: fieldwork_state::State, S: BosStr> FieldworkBuilder<St, S> {
     /// Set the `context` field (optional)
-    pub fn context(mut self, value: impl Into<Option<fieldwork::QuestContext<S>>>) -> Self {
+    pub fn context(
+        mut self,
+        value: impl Into<Option<fieldwork::QuestContext<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
@@ -1188,7 +1238,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Fieldwork<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Fieldwork<S> {
         Fieldwork {
             completed_at: self._fields.0.unwrap(),
             context: self._fields.1,
@@ -1203,4 +1256,17 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_quest_context_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -19,20 +19,112 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
-/// Marks where members-only content begins; blocks after this delimiter are only served to readers with an active paid membership.
+use serde::{Serialize, Deserialize};
+/// Marks where members-only content begins and declares which publication members can read past it.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MembersOnlyDelimiter<S: BosStr = DefaultStr> {
-    ///Id of the lowest membership tier whose members can read past the delimiter; tiers rank by price, so pricier tiers read through too. Absent means any paid membership.
+    ///Whether access is available to all subscribers, all paid members, or selected paid tiers.
+    pub audience: MembersOnlyDelimiterAudience<S>,
+    ///Paid tier ids that grant access when audience is tiers. An empty selection grants no membership access.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub tier: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub tier_ids: Option<Vec<S>>,
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_members_only_delimiter_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Whether access is available to all subscribers, all paid members, or selected paid tiers.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MembersOnlyDelimiterAudience<S: BosStr = DefaultStr> {
+    Subscribers,
+    Paid,
+    Tiers,
+    Other(S),
+}
+
+impl<S: BosStr> MembersOnlyDelimiterAudience<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Subscribers => "subscribers",
+            Self::Paid => "paid",
+            Self::Tiers => "tiers",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "subscribers" => Self::Subscribers,
+            "paid" => Self::Paid,
+            "tiers" => Self::Tiers,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for MembersOnlyDelimiterAudience<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for MembersOnlyDelimiterAudience<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for MembersOnlyDelimiterAudience<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for MembersOnlyDelimiterAudience<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for MembersOnlyDelimiterAudience<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for MembersOnlyDelimiterAudience<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MembersOnlyDelimiterAudience<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MembersOnlyDelimiterAudience::Subscribers => {
+                MembersOnlyDelimiterAudience::Subscribers
+            }
+            MembersOnlyDelimiterAudience::Paid => MembersOnlyDelimiterAudience::Paid,
+            MembersOnlyDelimiterAudience::Tiers => MembersOnlyDelimiterAudience::Tiers,
+            MembersOnlyDelimiterAudience::Other(v) => {
+                MembersOnlyDelimiterAudience::Other(v.into_static())
+            }
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for MembersOnlyDelimiter<S> {
@@ -50,11 +142,24 @@ impl<S: BosStr> LexiconSchema for MembersOnlyDelimiter<S> {
     }
 }
 
+fn deserialize_members_only_delimiter_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_pub_leaflet_blocks_membersOnlyDelimiter() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.membersOnlyDelimiter"),
@@ -65,21 +170,35 @@ fn lexicon_doc_pub_leaflet_blocks_membersOnlyDelimiter() -> LexiconDoc<'static> 
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "Marks where members-only content begins; blocks after this delimiter are only served to readers with an active paid membership.",
+                            "Marks where members-only content begins and declares which publication members can read past it.",
                         ),
                     ),
-                    required: Some(vec![]),
+                    required: Some(vec![SmolStr::new_static("audience")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
-                            SmolStr::new_static("tier"),
+                            SmolStr::new_static("audience"),
                             LexObjectProperty::String(LexString {
                                 description: Some(
                                     CowStr::new_static(
-                                        "Id of the lowest membership tier whose members can read past the delimiter; tiers rank by price, so pricier tiers read through too. Absent means any paid membership.",
+                                        "Whether access is available to all subscribers, all paid members, or selected paid tiers.",
                                     ),
                                 ),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("tierIds"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Paid tier ids that grant access when audience is tiers. An empty selection grants no membership access.",
+                                    ),
+                                ),
+                                items: LexArrayItem::String(LexString {
+                                    ..Default::default()
+                                }),
                                 ..Default::default()
                             }),
                         );

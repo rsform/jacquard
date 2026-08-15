@@ -1,0 +1,98 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.feed.defs",
+  "defs": {
+    "feedViewPost": {
+      "type": "object",
+      "description": "A post with optional context about why it appears in a feed",
+      "required": [
+        "post"
+      ],
+      "properties": {
+        "post": {
+          "type": "ref",
+          "ref": "social.coves.community.post.defs#postView"
+        },
+        "reason": {
+          "type": "union",
+          "description": "Additional context for why this post is in the feed",
+          "refs": [
+            "#reasonRepost",
+            "#reasonPin"
+          ]
+        },
+        "reply": {
+          "type": "ref",
+          "ref": "#replyRef"
+        }
+      }
+    },
+    "postRef": {
+      "type": "object",
+      "description": "Minimal reference to a post",
+      "required": [
+        "uri",
+        "cid"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid"
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        }
+      }
+    },
+    "reasonPin": {
+      "type": "object",
+      "description": "Indicates this post is pinned in a community",
+      "required": [
+        "community"
+      ],
+      "properties": {
+        "community": {
+          "type": "ref",
+          "ref": "social.coves.community.post.defs#communityRef"
+        }
+      }
+    },
+    "reasonRepost": {
+      "type": "object",
+      "description": "Indicates this post was reposted",
+      "required": [
+        "by",
+        "indexedAt"
+      ],
+      "properties": {
+        "by": {
+          "type": "ref",
+          "ref": "social.coves.community.post.defs#authorView"
+        },
+        "indexedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "replyRef": {
+      "type": "object",
+      "description": "Reference to parent and root posts in a reply thread",
+      "required": [
+        "root",
+        "parent"
+      ],
+      "properties": {
+        "parent": {
+          "type": "ref",
+          "ref": "#postRef"
+        },
+        "root": {
+          "type": "ref",
+          "ref": "#postRef"
+        }
+      }
+    }
+  }
+}

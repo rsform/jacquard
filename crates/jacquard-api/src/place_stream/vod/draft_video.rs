@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,6 +25,9 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::place_stream::ActivityGame;
 use crate::place_stream::ActivityLabel;
 use crate::place_stream::media::SourceClip;
@@ -33,9 +36,6 @@ use crate::place_stream::metadata::content_rights::ContentRights;
 use crate::place_stream::metadata::content_warnings::ContentWarnings;
 use crate::place_stream::richtext::video_facet::VideoFacet;
 use crate::place_stream::video::Connection;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A draft VOD: pre-publication video metadata and processing state. Modeled as a permissioned-data-style record (CBOR-serialized, addressed by an ats:// URI) stored in statedb until the permissioned-data spec ships (bluesky-social/proposals PR #94, the 0016-permissioned-data proposal). Publishing promotes it to a public place.stream.video record.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -82,9 +82,15 @@ pub struct DraftVideo<S: BosStr = DefaultStr> {
     pub thumb: Option<BlobRef<S>>,
     ///Title of the video. May be a placeholder while processing; the user edits before publishing.
     pub title: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_draft_video_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -95,6 +101,7 @@ pub enum DraftVideoActivity<S: BosStr = DefaultStr> {
     #[serde(rename = "place.stream.defs#activityLabel")]
     ActivityLabel(Box<ActivityLabel<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -291,7 +298,8 @@ impl<S: BosStr> LexiconSchema for DraftVideo<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
+                        .count();
                     if count > 64usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -318,16 +326,19 @@ impl<S: BosStr> LexiconSchema for DraftVideo<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
@@ -365,9 +376,28 @@ impl<S: BosStr> LexiconSchema for DraftVideo<S> {
     }
 }
 
+fn deserialize_draft_video_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod draft_video_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -465,7 +495,20 @@ impl DraftVideoBuilder<draft_video_state::Empty, DefaultStr> {
         DraftVideoBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -478,7 +521,20 @@ impl<S: BosStr> DraftVideoBuilder<draft_video_state::Empty, S> {
         DraftVideoBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -526,7 +582,10 @@ impl<St: draft_video_state::State, S: BosStr> DraftVideoBuilder<St, S> {
 
 impl<St: draft_video_state::State, S: BosStr> DraftVideoBuilder<St, S> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(mut self, value: impl Into<Option<ContentWarnings<S>>>) -> Self {
+    pub fn content_warnings(
+        mut self,
+        value: impl Into<Option<ContentWarnings<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -571,12 +630,18 @@ impl<St: draft_video_state::State, S: BosStr> DraftVideoBuilder<St, S> {
 
 impl<St: draft_video_state::State, S: BosStr> DraftVideoBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<VideoFacet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<VideoFacet<S>>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<VideoFacet<S>>>) -> Self {
+    pub fn maybe_description_facets(
+        mut self,
+        value: Option<Vec<VideoFacet<S>>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
@@ -713,7 +778,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DraftVideo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DraftVideo<S> {
         DraftVideo {
             activity: self._fields.0,
             connections: self._fields.1,
@@ -735,10 +803,10 @@ where
 }
 
 fn lexicon_doc_place_stream_vod_draftVideo() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.vod.draftVideo"),

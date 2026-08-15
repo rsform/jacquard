@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// A multitrack composition made in the Anisota Lab's Synth studio and saved to the owner's library. The piece is stored as compact musical event data (not audio), so it can be reloaded into the synth, replayed and edited. The shared loop has a tempo and step length; each track is either a 'tone' voice (a waveform playing degrees of the composition's scale) or a 'drum' lane (the studio's synthesized kit). A track's notes are stored in 'cells' as interleaved integers — for a tone track [step, degree, step, degree, ...] where degree indexes the scale ladder; for a drum track [step, piece, ...] where piece is 0..4 (kick, snare, hat, clap, tom). 'fx' captures the rack the piece was shaped with.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -56,17 +56,19 @@ pub struct Synth<S: BosStr = DefaultStr> {
     pub tempo: i64,
     ///The overlapping tracks, played together on the loop
     pub tracks: Vec<Data<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_synth_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The shared rack the composition was shaped with, each 0..100
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SynthFx<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cutoff: Option<i64>,
@@ -78,7 +80,12 @@ pub struct SynthFx<S: BosStr = DefaultStr> {
     pub master: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reso: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_synth_fx_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -234,6 +241,25 @@ impl<S: BosStr> LexiconSchema for Synth<S> {
     }
 }
 
+fn deserialize_synth_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 impl<S: BosStr> LexiconSchema for SynthFx<S> {
     fn nsid() -> &'static str {
         "net.anisota.lab.synth"
@@ -249,11 +275,24 @@ impl<S: BosStr> LexiconSchema for SynthFx<S> {
     }
 }
 
+fn deserialize_synth_fx_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_net_anisota_lab_synth() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.lab.synth"),
@@ -478,7 +517,7 @@ fn lexicon_doc_net_anisota_lab_synth() -> LexiconDoc<'static> {
 
 pub mod synth_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -658,7 +697,10 @@ where
     St::Name: synth_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SynthBuilder<synth_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> SynthBuilder<synth_state::SetName<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SynthBuilder {
             _state: PhantomData,
@@ -700,7 +742,10 @@ where
     St::Steps: synth_state::IsUnset,
 {
     /// Set the `steps` field (required)
-    pub fn steps(mut self, value: impl Into<i64>) -> SynthBuilder<synth_state::SetSteps<St>, S> {
+    pub fn steps(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SynthBuilder<synth_state::SetSteps<St>, S> {
         self._fields.5 = Option::Some(value.into());
         SynthBuilder {
             _state: PhantomData,
@@ -716,7 +761,10 @@ where
     St::Tempo: synth_state::IsUnset,
 {
     /// Set the `tempo` field (required)
-    pub fn tempo(mut self, value: impl Into<i64>) -> SynthBuilder<synth_state::SetTempo<St>, S> {
+    pub fn tempo(
+        mut self,
+        value: impl Into<i64>,
+    ) -> SynthBuilder<synth_state::SetTempo<St>, S> {
         self._fields.6 = Option::Some(value.into());
         SynthBuilder {
             _state: PhantomData,

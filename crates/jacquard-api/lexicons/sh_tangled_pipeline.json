@@ -30,6 +30,7 @@
       "key": "tid",
       "record": {
         "type": "object",
+        "description": "DEPRECATED: use sh.tangled.ci.pipeline instead",
         "required": [
           "triggerMetadata",
           "workflows"
@@ -51,6 +52,9 @@
     },
     "manualTriggerData": {
       "type": "object",
+      "required": [
+        "sha"
+      ],
       "properties": {
         "inputs": {
           "type": "array",
@@ -58,6 +62,16 @@
             "type": "ref",
             "ref": "#pair"
           }
+        },
+        "ref": {
+          "type": "string",
+          "description": "optional ref the SHA was resolved from, for display and TANGLED_REF"
+        },
+        "sha": {
+          "type": "string",
+          "description": "commit SHA the manual run targets",
+          "minLength": 40,
+          "maxLength": 40
         }
       }
     },
@@ -81,12 +95,24 @@
       "required": [
         "sourceBranch",
         "targetBranch",
-        "sourceSha",
-        "action"
+        "sourceSha"
       ],
       "properties": {
         "action": {
-          "type": "string"
+          "type": "string",
+          "description": "the pull request lifecycle action that produced this trigger",
+          "enum": [
+            "opened",
+            "reopened",
+            "closed",
+            "merged",
+            "synchronize"
+          ]
+        },
+        "pull": {
+          "type": "string",
+          "description": "AT-URI of the sh.tangled.repo.pull record this run belongs to",
+          "format": "at-uri"
         },
         "sourceBranch": {
           "type": "string"
@@ -154,6 +180,11 @@
         "repo": {
           "type": "ref",
           "ref": "#triggerRepo"
+        },
+        "sourceRepo": {
+          "type": "string",
+          "description": "Repository DID that code and workflow definitions are checked out from, when different from repo (e.g. a fork's commit for a fork-based manual trigger). If absent, source uses repo itself.",
+          "format": "did"
         }
       }
     },
@@ -206,6 +237,12 @@
         },
         "raw": {
           "type": "string"
+        },
+        "runsOn": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

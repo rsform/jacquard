@@ -24,7 +24,8 @@
           "type": "string",
           "knownValues": [
             "small",
-            "medium"
+            "medium",
+            "chapter"
           ]
         }
       }

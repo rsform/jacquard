@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -23,20 +23,22 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct StandardSitePublication<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_publication_theme: Option<bool>,
     pub uri: AtUri<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_standard_site_publication_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -55,9 +57,22 @@ impl<S: BosStr> LexiconSchema for StandardSitePublication<S> {
     }
 }
 
+fn deserialize_standard_site_publication_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod standard_site_publication_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -99,15 +114,20 @@ pub struct StandardSitePublicationBuilder<
 
 impl StandardSitePublication<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> StandardSitePublicationBuilder<standard_site_publication_state::Empty, DefaultStr> {
+    pub fn new() -> StandardSitePublicationBuilder<
+        standard_site_publication_state::Empty,
+        DefaultStr,
+    > {
         StandardSitePublicationBuilder::new()
     }
 }
 
 impl<S: BosStr> StandardSitePublication<S> {
     /// Create a new builder for this type
-    pub fn builder() -> StandardSitePublicationBuilder<standard_site_publication_state::Empty, S> {
+    pub fn builder() -> StandardSitePublicationBuilder<
+        standard_site_publication_state::Empty,
+        S,
+    > {
         StandardSitePublicationBuilder::builder()
     }
 }
@@ -123,7 +143,9 @@ impl StandardSitePublicationBuilder<standard_site_publication_state::Empty, Defa
     }
 }
 
-impl<S: BosStr> StandardSitePublicationBuilder<standard_site_publication_state::Empty, S> {
+impl<
+    S: BosStr,
+> StandardSitePublicationBuilder<standard_site_publication_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         StandardSitePublicationBuilder {
@@ -134,7 +156,10 @@ impl<S: BosStr> StandardSitePublicationBuilder<standard_site_publication_state::
     }
 }
 
-impl<St: standard_site_publication_state::State, S: BosStr> StandardSitePublicationBuilder<St, S> {
+impl<
+    St: standard_site_publication_state::State,
+    S: BosStr,
+> StandardSitePublicationBuilder<St, S> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -147,7 +172,10 @@ impl<St: standard_site_publication_state::State, S: BosStr> StandardSitePublicat
     }
 }
 
-impl<St: standard_site_publication_state::State, S: BosStr> StandardSitePublicationBuilder<St, S> {
+impl<
+    St: standard_site_publication_state::State,
+    S: BosStr,
+> StandardSitePublicationBuilder<St, S> {
     /// Set the `showPublicationTheme` field (optional)
     pub fn show_publication_theme(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -208,10 +236,10 @@ where
 }
 
 fn lexicon_doc_pub_leaflet_blocks_standardSitePublication() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("pub.leaflet.blocks.standardSitePublication"),
@@ -226,9 +254,7 @@ fn lexicon_doc_pub_leaflet_blocks_standardSitePublication() -> LexiconDoc<'stati
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("cid"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("showPublicationTheme"),

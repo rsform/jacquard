@@ -21,10 +21,12 @@
           "type": "union",
           "refs": [
             "pub.leaflet.blocks.iframe",
+            "pub.leaflet.blocks.html",
             "pub.leaflet.blocks.text",
             "pub.leaflet.blocks.blockquote",
             "pub.leaflet.blocks.header",
             "pub.leaflet.blocks.image",
+            "pub.leaflet.blocks.imageGallery",
             "pub.leaflet.blocks.unorderedList",
             "pub.leaflet.blocks.orderedList",
             "pub.leaflet.blocks.website",
@@ -33,11 +35,13 @@
             "pub.leaflet.blocks.horizontalRule",
             "pub.leaflet.blocks.bskyPost",
             "pub.leaflet.blocks.standardSitePost",
+            "pub.leaflet.blocks.standardSitePublication",
             "pub.leaflet.blocks.page",
             "pub.leaflet.blocks.poll",
             "pub.leaflet.blocks.button",
             "pub.leaflet.blocks.postsList",
-            "pub.leaflet.blocks.signup"
+            "pub.leaflet.blocks.signup",
+            "pub.leaflet.blocks.membersOnlyDelimiter"
           ]
         }
       }

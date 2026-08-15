@@ -1,0 +1,76 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.embed.images",
+  "defs": {
+    "aspectRatio": {
+      "type": "object",
+      "description": "Image aspect ratio for client display",
+      "required": [
+        "width",
+        "height"
+      ],
+      "properties": {
+        "height": {
+          "type": "integer",
+          "description": "Height component of aspect ratio",
+          "minimum": 1
+        },
+        "width": {
+          "type": "integer",
+          "description": "Width component of aspect ratio",
+          "minimum": 1
+        }
+      }
+    },
+    "image": {
+      "type": "object",
+      "description": "Individual image with metadata",
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "description": "Alt text for accessibility",
+          "maxLength": 10000,
+          "maxGraphemes": 1000
+        },
+        "aspectRatio": {
+          "type": "ref",
+          "description": "Aspect ratio for client-side rendering optimization",
+          "ref": "#aspectRatio"
+        },
+        "image": {
+          "type": "blob",
+          "description": "Image blob reference",
+          "accept": [
+            "image/png",
+            "image/jpeg",
+            "image/webp",
+            "image/gif"
+          ],
+          "maxSize": 10000000
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "description": "Image set embed supporting multiple images (max 8)",
+      "required": [
+        "images"
+      ],
+      "properties": {
+        "images": {
+          "type": "array",
+          "description": "Set of images in the post",
+          "items": {
+            "type": "ref",
+            "ref": "#image"
+          },
+          "minLength": 1,
+          "maxLength": 8
+        }
+      }
+    }
+  }
+}

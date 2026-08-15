@@ -54,7 +54,6 @@
       "key": "literal:self",
       "record": {
         "type": "object",
-        "required": [],
         "properties": {
           "badges": {
             "type": "ref",

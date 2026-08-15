@@ -8,22 +8,19 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
+#[allow(unused_imports)]
+use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
+use jacquard_derive::{IntoStatic, open_union};
+use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::TagView;
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
-#[allow(unused_imports)]
-use core::marker::PhantomData;
-use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
-use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -50,11 +47,9 @@ pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     pub tag: S,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -64,6 +59,7 @@ pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -125,7 +121,7 @@ fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
 
 pub mod get_tagged_resources_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -156,8 +152,10 @@ pub mod get_tagged_resources_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetTaggedResourcesBuilder<St: get_tagged_resources_state::State, S: BosStr = DefaultStr>
-{
+pub struct GetTaggedResourcesBuilder<
+    St: get_tagged_resources_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
@@ -173,7 +171,10 @@ pub struct GetTaggedResourcesBuilder<St: get_tagged_resources_state::State, S: B
 
 impl GetTaggedResources<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetTaggedResourcesBuilder<get_tagged_resources_state::Empty, DefaultStr> {
+    pub fn new() -> GetTaggedResourcesBuilder<
+        get_tagged_resources_state::Empty,
+        DefaultStr,
+    > {
         GetTaggedResourcesBuilder::new()
     }
 }

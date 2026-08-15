@@ -1,0 +1,81 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.repo.listWebhooks",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "List webhooks configured for a repository.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "repoDid"
+        ],
+        "properties": {
+          "repoDid": {
+            "type": "string",
+            "description": "DID of the repository as minted by the knot.",
+            "format": "did"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "webhooks"
+          ],
+          "properties": {
+            "webhooks": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#webhook"
+              }
+            }
+          }
+        }
+      }
+    },
+    "webhook": {
+      "type": "object",
+      "required": [
+        "id",
+        "url",
+        "active",
+        "events",
+        "createdAt"
+      ],
+      "properties": {
+        "active": {
+          "type": "boolean",
+          "description": "Whether the webhook is currently enabled."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "events": {
+          "type": "array",
+          "description": "Event types this webhook is subscribed to (e.g. 'push', 'repository:renamed').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "integer",
+          "description": "Webhook identifier."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "url": {
+          "type": "string",
+          "description": "Endpoint URL that receives webhook payloads.",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

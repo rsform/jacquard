@@ -1,0 +1,81 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.register",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Register an existing aggregator DID with this Coves instance. Aggregators must first create their own DID via PLC directory, then call this endpoint to register. Domain ownership is verified via .well-known/atproto-did file.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "domain"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "DID of the aggregator (did:plc or did:web format)",
+              "format": "did"
+            },
+            "domain": {
+              "type": "string",
+              "description": "Hostname where the aggregator is hosted, without scheme (e.g., 'rss-bot.example.com'). Must serve a .well-known/atproto-did file containing the DID.",
+              "maxLength": 253
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "did",
+            "handle"
+          ],
+          "properties": {
+            "did": {
+              "type": "string",
+              "description": "DID of the registered aggregator",
+              "format": "did"
+            },
+            "handle": {
+              "type": "string",
+              "description": "Handle extracted from DID document",
+              "maxLength": 512
+            },
+            "message": {
+              "type": "string",
+              "description": "Success message with next steps",
+              "maxLength": 1000
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "DID format is invalid or not did:plc or did:web format",
+          "name": "InvalidDID"
+        },
+        {
+          "description": "Could not verify domain ownership via .well-known/atproto-did or DID mismatch",
+          "name": "DomainVerificationFailed"
+        },
+        {
+          "description": "This aggregator DID is already registered with this instance",
+          "name": "AlreadyRegistered"
+        },
+        {
+          "description": "Could not resolve DID document to extract handle and PDS URL",
+          "name": "DIDResolutionFailed"
+        },
+        {
+          "description": "Internal server error occurred during registration",
+          "name": "RegistrationFailed"
+        }
+      ]
+    }
+  }
+}

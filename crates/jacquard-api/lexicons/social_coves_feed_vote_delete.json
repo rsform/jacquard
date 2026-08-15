@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.feed.vote.delete",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a vote on a post or comment",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "subject"
+          ],
+          "properties": {
+            "subject": {
+              "type": "ref",
+              "description": "Strong reference to the post or comment to remove the vote from",
+              "ref": "com.atproto.repo.strongRef"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      "errors": [
+        {
+          "description": "No vote found for this subject",
+          "name": "VoteNotFound"
+        },
+        {
+          "description": "User is not authorized to delete this vote",
+          "name": "NotAuthorized"
+        }
+      ]
+    }
+  }
+}

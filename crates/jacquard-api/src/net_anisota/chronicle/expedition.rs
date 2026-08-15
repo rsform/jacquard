@@ -8,12 +8,13 @@
 //! Generated bindings for the `net.anisota.chronicle.expedition` Lexicon namespace/module.
 pub mod camp;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,17 +28,14 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::chronicle::expedition;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::chronicle::expedition;
 /// ES256 cryptographic signature proving record authenticity
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     ///Signing algorithm (ES256)
     pub alg: S,
@@ -51,17 +49,19 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
     pub signed_at: Datetime,
     ///Signature schema version
     pub version: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_chronicle_signature_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Environmental conditions during expedition
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpeditionConditions<S: BosStr = DefaultStr> {
     ///Forest biome type
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -78,17 +78,19 @@ pub struct ExpeditionConditions<S: BosStr = DefaultStr> {
     ///Weather condition during expedition
     #[serde(skip_serializing_if = "Option::is_none")]
     pub weather: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_expedition_conditions_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// What was found/gathered during the expedition
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpeditionFindings<S: BosStr = DefaultStr> {
     ///Number of items collected
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -111,17 +113,19 @@ pub struct ExpeditionFindings<S: BosStr = DefaultStr> {
     ///XP gained from the expedition
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_expedition_findings_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Periodic snapshot of expedition progress for cross-device sync
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpeditionHeartbeat<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light: Option<expedition::HeartbeatLight<S>>,
@@ -130,17 +134,19 @@ pub struct ExpeditionHeartbeat<S: BosStr = DefaultStr> {
     ///When this heartbeat was written
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_expedition_heartbeat_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Light resource tracking for the expedition
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ExpeditionLight<S: BosStr = DefaultStr> {
     ///Light level when expedition ended (in minutes)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -160,17 +166,19 @@ pub struct ExpeditionLight<S: BosStr = DefaultStr> {
     ///Light status at start of expedition
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_expedition_light_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Light state at heartbeat time
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HeartbeatLight<S: BosStr = DefaultStr> {
     ///Current light level
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -184,17 +192,19 @@ pub struct HeartbeatLight<S: BosStr = DefaultStr> {
     ///Whether light is frozen (at hub/trailhead)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub frozen: Option<bool>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_heartbeat_light_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Session progress counters at heartbeat time
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HeartbeatProgress<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub items_count: Option<i64>,
@@ -212,7 +222,12 @@ pub struct HeartbeatProgress<S: BosStr = DefaultStr> {
     pub specimens_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_heartbeat_progress_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -266,7 +281,12 @@ pub struct Expedition<S: BosStr = DefaultStr> {
     ///When the record was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_expedition_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -650,9 +670,22 @@ impl<S: BosStr> LexiconSchema for Expedition<S> {
     }
 }
 
+fn deserialize_chronicle_signature_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod chronicle_signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -763,22 +796,21 @@ pub mod chronicle_signature_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ChronicleSignatureBuilder<St: chronicle_signature_state::State, S: BosStr = DefaultStr> {
+pub struct ChronicleSignatureBuilder<
+    St: chronicle_signature_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<Datetime>,
-        Option<i64>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<Datetime>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ChronicleSignature<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ChronicleSignatureBuilder<chronicle_signature_state::Empty, DefaultStr> {
+    pub fn new() -> ChronicleSignatureBuilder<
+        chronicle_signature_state::Empty,
+        DefaultStr,
+    > {
         ChronicleSignatureBuilder::new()
     }
 }
@@ -949,7 +981,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ChronicleSignature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ChronicleSignature<S> {
         ChronicleSignature {
             alg: self._fields.0.unwrap(),
             kid: self._fields.1.unwrap(),
@@ -963,10 +998,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.chronicle.expedition"),
@@ -975,58 +1010,63 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("chronicleSignature"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "ES256 cryptographic signature proving record authenticity",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("sig"),
-                        SmolStr::new_static("alg"),
-                        SmolStr::new_static("kid"),
-                        SmolStr::new_static("signedAt"),
-                        SmolStr::new_static("nonce"),
-                        SmolStr::new_static("version"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "ES256 cryptographic signature proving record authenticity",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("sig"), SmolStr::new_static("alg"),
+                            SmolStr::new_static("kid"), SmolStr::new_static("signedAt"),
+                            SmolStr::new_static("nonce"), SmolStr::new_static("version")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("alg"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Signing algorithm (ES256)")),
+                                description: Some(
+                                    CowStr::new_static("Signing algorithm (ES256)"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("kid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Key identifier for the signing key",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Key identifier for the signing key"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("nonce"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Unique random nonce to prevent replay",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Unique random nonce to prevent replay"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("sig"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Base64-encoded ES256 signature",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Base64-encoded ES256 signature"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("signedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("When the record was signed")),
+                                description: Some(
+                                    CowStr::new_static("When the record was signed"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1045,9 +1085,9 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("expeditionConditions"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Environmental conditions during expedition",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Environmental conditions during expedition"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1061,36 +1101,38 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("lightLevel"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Time-of-day light condition at expedition start",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Time-of-day light condition at expedition start",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("moonPhase"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Moon phase condition (nighttime only)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Moon phase condition (nighttime only)"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userState"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "User fatigue state at expedition start",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("User fatigue state at expedition start"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("weather"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Weather condition during expedition",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Weather condition during expedition"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1102,9 +1144,11 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("expeditionFindings"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "What was found/gathered during the expedition",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "What was found/gathered during the expedition",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1165,9 +1209,11 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("expeditionHeartbeat"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Periodic snapshot of expedition progress for cross-device sync",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Periodic snapshot of expedition progress for cross-device sync",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1188,9 +1234,9 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("updatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When this heartbeat was written",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When this heartbeat was written"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1203,9 +1249,9 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("expeditionLight"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Light resource tracking for the expedition",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Light resource tracking for the expedition"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1246,9 +1292,9 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("status"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Light status at start of expedition",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Light status at start of expedition"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1260,7 +1306,9 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("heartbeatLight"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Light state at heartbeat time")),
+                    description: Some(
+                        CowStr::new_static("Light state at heartbeat time"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1296,9 +1344,9 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("heartbeatProgress"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Session progress counters at heartbeat time",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Session progress counters at heartbeat time"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1530,9 +1578,106 @@ fn lexicon_doc_net_anisota_chronicle_expedition() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_expedition_conditions_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_expedition_findings_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_expedition_heartbeat_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_expedition_light_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_heartbeat_light_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_heartbeat_progress_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_expedition_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod expedition_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1632,8 +1777,22 @@ impl ExpeditionBuilder<expedition_state::Empty, DefaultStr> {
         ExpeditionBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1646,8 +1805,22 @@ impl<S: BosStr> ExpeditionBuilder<expedition_state::Empty, S> {
         ExpeditionBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -1716,7 +1889,10 @@ impl<St: expedition_state::State, S: BosStr> ExpeditionBuilder<St, S> {
         self
     }
     /// Set the `conditions` field to an Option value (optional)
-    pub fn maybe_conditions(mut self, value: Option<expedition::ExpeditionConditions<S>>) -> Self {
+    pub fn maybe_conditions(
+        mut self,
+        value: Option<expedition::ExpeditionConditions<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1769,12 +1945,18 @@ impl<St: expedition_state::State, S: BosStr> ExpeditionBuilder<St, S> {
 
 impl<St: expedition_state::State, S: BosStr> ExpeditionBuilder<St, S> {
     /// Set the `findings` field (optional)
-    pub fn findings(mut self, value: impl Into<Option<expedition::ExpeditionFindings<S>>>) -> Self {
+    pub fn findings(
+        mut self,
+        value: impl Into<Option<expedition::ExpeditionFindings<S>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `findings` field to an Option value (optional)
-    pub fn maybe_findings(mut self, value: Option<expedition::ExpeditionFindings<S>>) -> Self {
+    pub fn maybe_findings(
+        mut self,
+        value: Option<expedition::ExpeditionFindings<S>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1790,7 +1972,10 @@ impl<St: expedition_state::State, S: BosStr> ExpeditionBuilder<St, S> {
         self
     }
     /// Set the `heartbeat` field to an Option value (optional)
-    pub fn maybe_heartbeat(mut self, value: Option<expedition::ExpeditionHeartbeat<S>>) -> Self {
+    pub fn maybe_heartbeat(
+        mut self,
+        value: Option<expedition::ExpeditionHeartbeat<S>>,
+    ) -> Self {
         self._fields.9 = value;
         self
     }
@@ -1798,7 +1983,10 @@ impl<St: expedition_state::State, S: BosStr> ExpeditionBuilder<St, S> {
 
 impl<St: expedition_state::State, S: BosStr> ExpeditionBuilder<St, S> {
     /// Set the `light` field (optional)
-    pub fn light(mut self, value: impl Into<Option<expedition::ExpeditionLight<S>>>) -> Self {
+    pub fn light(
+        mut self,
+        value: impl Into<Option<expedition::ExpeditionLight<S>>>,
+    ) -> Self {
         self._fields.10 = value.into();
         self
     }
@@ -1916,7 +2104,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Expedition<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Expedition<S> {
         Expedition {
             abandon_reason: self._fields.0,
             active_duration: self._fields.1,

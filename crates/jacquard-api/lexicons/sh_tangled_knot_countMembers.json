@@ -1,0 +1,43 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.knot.countMembers",
+  "defs": {
+    "main": {
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "subject"
+        ],
+        "properties": {
+          "subject": {
+            "type": "string",
+            "description": "Knot identifier whose member records to list."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "count",
+            "distinctAuthors"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "description": "Total number of matching records.",
+              "minimum": 0
+            },
+            "distinctAuthors": {
+              "type": "integer",
+              "description": "Number of distinct authors among the matching records.",
+              "minimum": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.graph.scopedMute",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An index of the accounts whose reposts or quote posts the viewer has muted through Bluesky's native scoped mute (app.bsky.graph.muteActor with onlyReposts / onlyQuoteposts). Bluesky stores the mute itself, but app.bsky.graph.getMutes returns only fully muted accounts, so a scoped mute is otherwise discoverable only by loading each profile. This record lets Anisota list and undo them, and enforce them client-side on unauthenticated reads where no viewer state comes back. It is a cache, not the source of truth: entries are reconciled against viewerState.mutedOnlyReposts / mutedOnlyQuoteposts and dropped when the server disagrees.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "subjects",
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "When this index was first written",
+            "format": "datetime"
+          },
+          "subjects": {
+            "type": "array",
+            "description": "The accounts currently carrying a native scoped mute.",
+            "items": {
+              "type": "ref",
+              "ref": "#scopedMuteEntry"
+            },
+            "maxLength": 1000
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When this index was last reconciled or edited",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "scopedMuteEntry": {
+      "type": "object",
+      "description": "One account's native scoped mute. At least one scope flag is true — an entry with neither is a full mute or no mute at all, and does not belong here.",
+      "required": [
+        "subject"
+      ],
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "description": "When this scoped mute was set from Anisota",
+          "format": "datetime"
+        },
+        "onlyQuoteposts": {
+          "type": "boolean",
+          "description": "Their quote posts are muted",
+          "default": false
+        },
+        "onlyReposts": {
+          "type": "boolean",
+          "description": "Their reposts are muted",
+          "default": false
+        },
+        "subject": {
+          "type": "string",
+          "description": "DID of the scope-muted account",
+          "format": "did"
+        }
+      }
+    }
+  }
+}

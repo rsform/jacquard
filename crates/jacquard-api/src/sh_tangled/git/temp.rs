@@ -22,12 +22,13 @@ pub mod list_commits;
 pub mod list_languages;
 pub mod list_tags;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,47 +39,49 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::sh_tangled::git::temp;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::sh_tangled::git::temp;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Branch<S: BosStr = DefaultStr> {
     ///hydrated commit object
     pub commit: temp::Commit<S>,
     ///branch name
     pub name: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_branch_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Commit<S: BosStr = DefaultStr> {
     pub author: temp::Signature<S>,
     pub committer: temp::Signature<S>,
     pub hash: temp::Hash<S>,
     pub message: S,
     pub tree: temp::Hash<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_commit_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 pub type Hash<S = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Signature<S: BosStr = DefaultStr> {
     ///Person email
     pub email: S,
@@ -86,15 +89,18 @@ pub struct Signature<S: BosStr = DefaultStr> {
     pub name: S,
     ///Timestamp of the signature
     pub when: Datetime,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_signature_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Submodule<S: BosStr = DefaultStr> {
     ///Branch to track in the submodule
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -103,15 +109,18 @@ pub struct Submodule<S: BosStr = DefaultStr> {
     pub name: S,
     ///Submodule repository URL
     pub url: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_submodule_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Tag<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
@@ -119,7 +128,12 @@ pub struct Tag<S: BosStr = DefaultStr> {
     pub name: S,
     pub tagger: temp::Signature<S>,
     pub target: Data<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_tag_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -198,9 +212,22 @@ impl<S: BosStr> LexiconSchema for Tag<S> {
     }
 }
 
+fn deserialize_branch_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod branch_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -310,7 +337,10 @@ where
     St::Name: branch_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> BranchBuilder<branch_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> BranchBuilder<branch_state::SetName<St>, S> {
         self._fields.1 = Option::Some(value.into());
         BranchBuilder {
             _state: PhantomData,
@@ -345,10 +375,10 @@ where
 }
 
 fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("sh.tangled.git.temp.defs"),
@@ -357,10 +387,9 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("branch"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("commit"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("commit")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -386,13 +415,13 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("commit"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("hash"),
-                        SmolStr::new_static("author"),
-                        SmolStr::new_static("committer"),
-                        SmolStr::new_static("message"),
-                        SmolStr::new_static("tree"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("hash"), SmolStr::new_static("author"),
+                            SmolStr::new_static("committer"),
+                            SmolStr::new_static("message"), SmolStr::new_static("tree")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -419,9 +448,7 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("tree"),
@@ -437,18 +464,17 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("hash"),
-                LexUserType::String(LexString {
-                    ..Default::default()
-                }),
+                LexUserType::String(LexString { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("signature"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("email"),
-                        SmolStr::new_static("when"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("email"),
+                            SmolStr::new_static("when")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -469,7 +495,9 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("when"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Timestamp of the signature")),
+                                description: Some(
+                                    CowStr::new_static("Timestamp of the signature"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -482,19 +510,18 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("submodule"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("url"),
-                    ]),
+                    required: Some(
+                        vec![SmolStr::new_static("name"), SmolStr::new_static("url")],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("branch"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Branch to track in the submodule",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Branch to track in the submodule"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -508,7 +535,9 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Submodule repository URL")),
+                                description: Some(
+                                    CowStr::new_static("Submodule repository URL"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -520,19 +549,18 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("tag"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("name"),
-                        SmolStr::new_static("tagger"),
-                        SmolStr::new_static("target"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("name"), SmolStr::new_static("tagger"),
+                            SmolStr::new_static("target")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("message"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("name"),
@@ -565,9 +593,22 @@ fn lexicon_doc_sh_tangled_git_temp_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_commit_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod commit_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -834,9 +875,22 @@ where
     }
 }
 
+fn deserialize_signature_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod signature_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1009,7 +1063,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Signature<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Signature<S> {
         Signature {
             email: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1019,9 +1076,35 @@ where
     }
 }
 
+fn deserialize_submodule_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_tag_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod tag_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1080,12 +1163,7 @@ pub mod tag_state {
 /// Builder for constructing an instance of this type.
 pub struct TagBuilder<St: tag_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<S>,
-        Option<S>,
-        Option<temp::Signature<S>>,
-        Option<Data<S>>,
-    ),
+    _fields: (Option<S>, Option<S>, Option<temp::Signature<S>>, Option<Data<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1179,7 +1257,10 @@ where
     St::Target: tag_state::IsUnset,
 {
     /// Set the `target` field (required)
-    pub fn target(mut self, value: impl Into<Data<S>>) -> TagBuilder<tag_state::SetTarget<St>, S> {
+    pub fn target(
+        mut self,
+        value: impl Into<Data<S>>,
+    ) -> TagBuilder<tag_state::SetTarget<St>, S> {
         self._fields.3 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,

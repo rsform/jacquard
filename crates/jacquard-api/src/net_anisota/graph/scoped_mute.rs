@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did};
+use jacquard_common::types::string::{Did, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::graph::scoped_mute;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::graph::scoped_mute;
 /// An index of the accounts whose reposts or quote posts the viewer has muted through Bluesky's native scoped mute (app.bsky.graph.muteActor with onlyReposts / onlyQuoteposts). Bluesky stores the mute itself, but app.bsky.graph.getMutes returns only fully muted accounts, so a scoped mute is otherwise discoverable only by loading each profile. This record lets Anisota list and undo them, and enforce them client-side on unauthenticated reads where no viewer state comes back. It is a cache, not the source of truth: entries are reconciled against viewerState.mutedOnlyReposts / mutedOnlyQuoteposts and dropped when the server disagrees.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -45,7 +45,12 @@ pub struct ScopedMute<S: BosStr = DefaultStr> {
     ///When this index was last reconciled or edited
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_scoped_mute_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,10 +68,7 @@ pub struct ScopedMuteGetRecordOutput<S: BosStr = DefaultStr> {
 /// One account's native scoped mute. At least one scope flag is true — an entry with neither is a full mute or no mute at all, and does not belong here.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ScopedMuteEntry<S: BosStr = DefaultStr> {
     ///When this scoped mute was set from Anisota
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -81,7 +83,12 @@ pub struct ScopedMuteEntry<S: BosStr = DefaultStr> {
     pub only_reposts: Option<bool>,
     ///DID of the scope-muted account
     pub subject: Did<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_scoped_mute_entry_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -159,9 +166,28 @@ impl<S: BosStr> LexiconSchema for ScopedMuteEntry<S> {
     }
 }
 
+fn deserialize_scoped_mute_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod scoped_mute_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -317,7 +343,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ScopedMute<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ScopedMute<S> {
         ScopedMute {
             created_at: self._fields.0.unwrap(),
             subjects: self._fields.1.unwrap(),
@@ -328,10 +357,10 @@ where
 }
 
 fn lexicon_doc_net_anisota_graph_scopedMute() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.graph.scopedMute"),
@@ -458,6 +487,19 @@ fn lexicon_doc_net_anisota_graph_scopedMute() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_scoped_mute_entry_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn _default_scoped_mute_entry_only_quoteposts() -> Option<bool> {
     Some(false)
 }
@@ -468,7 +510,7 @@ fn _default_scoped_mute_entry_only_reposts() -> Option<bool> {
 
 pub mod scoped_mute_entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -499,7 +541,10 @@ pub mod scoped_mute_entry_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ScopedMuteEntryBuilder<St: scoped_mute_entry_state::State, S: BosStr = DefaultStr> {
+pub struct ScopedMuteEntryBuilder<
+    St: scoped_mute_entry_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<bool>, Option<bool>, Option<Did<S>>),
     _type: PhantomData<fn() -> S>,
@@ -615,7 +660,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ScopedMuteEntry<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ScopedMuteEntry<S> {
         ScopedMuteEntry {
             created_at: self._fields.0,
             only_quoteposts: self._fields.1.or_else(|| Some(false)),

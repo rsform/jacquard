@@ -6,16 +6,16 @@
       "type": "permission-set",
       "title": "View bookmarks",
       "title:lang": {
+        "de": "Lesezeichen anzeigen",
         "ja": "ブックマークの表示",
-        "es": "Ver marcadores",
         "pt": "Ver favoritos",
-        "de": "Lesezeichen anzeigen"
+        "es": "Ver marcadores"
       },
       "detail": "View the account's saved bookmarks.",
       "detail:lang": {
         "pt": "Ver os favoritos salvos da conta.",
-        "de": "Die gespeicherten Lesezeichen des Kontos anzeigen.",
         "es": "Ver los marcadores guardados de la cuenta.",
+        "de": "Die gespeicherten Lesezeichen des Kontos anzeigen.",
         "ja": "アカウントに保存されたブックマークを表示します。"
       },
       "permissions": [

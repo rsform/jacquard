@@ -1,0 +1,34 @@
+{
+  "lexicon": 1,
+  "id": "stream.kralsei.score.boop",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A character getting booped in the nose",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "character",
+          "createdAt"
+        ],
+        "properties": {
+          "character": {
+            "type": "string",
+            "description": "Character that got booped",
+            "maxLength": 32,
+            "knownValues": [
+              "kris",
+              "ralsei"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Time of boop",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

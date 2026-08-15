@@ -1,0 +1,77 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.actor.getPosts",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Get a user's posts for their profile page.",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "description": "DID or handle of the user",
+            "format": "at-identifier"
+          },
+          "community": {
+            "type": "string",
+            "description": "Filter to posts in a specific community",
+            "format": "at-identifier"
+          },
+          "cursor": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "filter": {
+            "type": "string",
+            "description": "Filter for post types",
+            "default": "posts-with-replies",
+            "maxLength": 64,
+            "knownValues": [
+              "posts-with-replies",
+              "posts-no-replies",
+              "posts-with-media"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "feed"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string",
+              "maxLength": 500
+            },
+            "feed": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "social.coves.feed.defs#feedViewPost"
+              }
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Actor not found",
+          "name": "NotFound"
+        }
+      ]
+    }
+  }
+}

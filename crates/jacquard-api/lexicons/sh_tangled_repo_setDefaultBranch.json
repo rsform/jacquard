@@ -19,7 +19,8 @@
             },
             "repo": {
               "type": "string",
-              "format": "at-uri"
+              "description": "DID of the repository",
+              "format": "did"
             }
           }
         }

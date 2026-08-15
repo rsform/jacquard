@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,6 +24,9 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::article;
 use crate::social_flockfeeds::lexical::r#type::brand;
 use crate::social_flockfeeds::lexical::r#type::event;
@@ -32,16 +35,10 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A retail good store.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accepted_payment_method: Option<EmbeddedAcceptedPaymentMethod<S>>,
@@ -276,7 +273,9 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub smoking_allowed: Option<EmbeddedSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub special_opening_hours_specification: Option<EmbeddedSpecialOpeningHoursSpecification<S>>,
+    pub special_opening_hours_specification: Option<
+        EmbeddedSpecialOpeningHoursSpecification<S>,
+    >,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sponsor: Option<EmbeddedSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -295,9 +294,15 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub url: Option<EmbeddedUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vat_id: Option<EmbeddedVatId<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_embedded_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -347,6 +352,7 @@ pub enum EmbeddedAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -380,6 +386,7 @@ pub enum EmbeddedBranchOf<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -389,6 +396,7 @@ pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -438,6 +446,7 @@ pub enum EmbeddedDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -466,6 +475,7 @@ pub enum EmbeddedDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -484,6 +494,7 @@ pub enum EmbeddedEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -491,6 +502,7 @@ pub enum EmbeddedEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -505,6 +517,7 @@ pub enum EmbeddedEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -512,6 +525,7 @@ pub enum EmbeddedEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -528,6 +542,7 @@ pub enum EmbeddedFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -535,6 +550,7 @@ pub enum EmbeddedFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -555,6 +571,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -689,6 +706,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -747,6 +765,7 @@ pub enum EmbeddedLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -765,6 +784,7 @@ pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -782,6 +802,7 @@ pub enum EmbeddedMakesOffer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -808,6 +829,7 @@ pub enum EmbeddedMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -815,6 +837,7 @@ pub enum EmbeddedMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -825,6 +848,7 @@ pub enum EmbeddedMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -869,6 +893,7 @@ pub enum EmbeddedOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -876,6 +901,7 @@ pub enum EmbeddedParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -890,6 +916,7 @@ pub enum EmbeddedPhoto<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -897,6 +924,7 @@ pub enum EmbeddedPhotos<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -973,6 +1001,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -981,6 +1010,7 @@ pub enum EmbeddedSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -988,6 +1018,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1260,7 +1291,9 @@ pub struct Store<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub smoking_allowed: Option<StoreSmokingAllowed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub special_opening_hours_specification: Option<StoreSpecialOpeningHoursSpecification<S>>,
+    pub special_opening_hours_specification: Option<
+        StoreSpecialOpeningHoursSpecification<S>,
+    >,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sponsor: Option<StoreSponsor<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1279,9 +1312,15 @@ pub struct Store<S: BosStr = DefaultStr> {
     pub url: Option<StoreUrl<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vat_id: Option<StoreVatId<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_store_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1331,6 +1370,7 @@ pub enum StoreAlumni<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1364,6 +1404,7 @@ pub enum StoreBranchOf<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1373,6 +1414,7 @@ pub enum StoreBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1422,6 +1464,7 @@ pub enum StoreDepartment<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1450,6 +1493,7 @@ pub enum StoreDiversityStaffingReport<S: BosStr = DefaultStr> {
     ArticleEmbedded(Box<article::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1468,6 +1512,7 @@ pub enum StoreEmployee<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1475,6 +1520,7 @@ pub enum StoreEmployees<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1489,6 +1535,7 @@ pub enum StoreEvent<S: BosStr = DefaultStr> {
     EventEmbedded(Box<event::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1496,6 +1543,7 @@ pub enum StoreEvents<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1512,6 +1560,7 @@ pub enum StoreFounder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1519,6 +1568,7 @@ pub enum StoreFounders<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1539,6 +1589,7 @@ pub enum StoreFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1673,6 +1724,7 @@ pub enum StoreImage<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1731,6 +1783,7 @@ pub enum StoreLegalRepresentative<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1749,6 +1802,7 @@ pub enum StoreLogo<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1766,6 +1820,7 @@ pub enum StoreMakesOffer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1792,6 +1847,7 @@ pub enum StoreMember<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1799,6 +1855,7 @@ pub enum StoreMemberOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1809,6 +1866,7 @@ pub enum StoreMembers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1853,6 +1911,7 @@ pub enum StoreOwns<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1860,6 +1919,7 @@ pub enum StoreParentOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1874,6 +1934,7 @@ pub enum StorePhoto<S: BosStr = DefaultStr> {
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1881,6 +1942,7 @@ pub enum StorePhotos<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1957,6 +2019,7 @@ pub enum StoreSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1965,6 +2028,7 @@ pub enum StoreSubOrganization<S: BosStr = DefaultStr> {
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1972,6 +2036,7 @@ pub enum StoreSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2076,11 +2141,24 @@ impl<S: BosStr> LexiconSchema for Store<S> {
     }
 }
 
+fn deserialize_embedded_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_social_flockfeeds_lexical_type_Store() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Store"),
@@ -4748,9 +4826,28 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Store() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_store_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod store_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -4921,15 +5018,132 @@ impl StoreBuilder<store_state::Empty, DefaultStr> {
         StoreBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -4942,15 +5156,132 @@ impl<S: BosStr> StoreBuilder<store_state::Empty, S> {
         StoreBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -5005,7 +5336,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `additionalProperty` field to an Option value (optional)
-    pub fn maybe_additional_property(mut self, value: Option<StoreAdditionalProperty<S>>) -> Self {
+    pub fn maybe_additional_property(
+        mut self,
+        value: Option<StoreAdditionalProperty<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -5013,12 +5347,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<StoreAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<StoreAdditionalType<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<StoreAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<StoreAdditionalType<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -5058,12 +5398,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<StoreAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<StoreAggregateRating<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<StoreAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<StoreAggregateRating<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
@@ -5071,7 +5417,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<StoreAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<StoreAlternateName<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
@@ -5097,12 +5446,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `amenityFeature` field (optional)
-    pub fn amenity_feature(mut self, value: impl Into<Option<StoreAmenityFeature<S>>>) -> Self {
+    pub fn amenity_feature(
+        mut self,
+        value: impl Into<Option<StoreAmenityFeature<S>>>,
+    ) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `amenityFeature` field to an Option value (optional)
-    pub fn maybe_amenity_feature(mut self, value: Option<StoreAmenityFeature<S>>) -> Self {
+    pub fn maybe_amenity_feature(
+        mut self,
+        value: Option<StoreAmenityFeature<S>>,
+    ) -> Self {
         self._fields.9 = value;
         self
     }
@@ -5207,7 +5562,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `contactPoint` field (optional)
-    pub fn contact_point(mut self, value: impl Into<Option<StoreContactPoint<S>>>) -> Self {
+    pub fn contact_point(
+        mut self,
+        value: impl Into<Option<StoreContactPoint<S>>>,
+    ) -> Self {
         self._fields.17 = value.into();
         self
     }
@@ -5220,7 +5578,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `contactPoints` field (optional)
-    pub fn contact_points(mut self, value: impl Into<Option<StoreContactPoints<S>>>) -> Self {
+    pub fn contact_points(
+        mut self,
+        value: impl Into<Option<StoreContactPoints<S>>>,
+    ) -> Self {
         self._fields.18 = value.into();
         self
     }
@@ -5233,7 +5594,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `containedIn` field (optional)
-    pub fn contained_in(mut self, value: impl Into<Option<StoreContainedIn<S>>>) -> Self {
+    pub fn contained_in(
+        mut self,
+        value: impl Into<Option<StoreContainedIn<S>>>,
+    ) -> Self {
         self._fields.19 = value.into();
         self
     }
@@ -5254,7 +5618,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `containedInPlace` field to an Option value (optional)
-    pub fn maybe_contained_in_place(mut self, value: Option<StoreContainedInPlace<S>>) -> Self {
+    pub fn maybe_contained_in_place(
+        mut self,
+        value: Option<StoreContainedInPlace<S>>,
+    ) -> Self {
         self._fields.20 = value;
         self
     }
@@ -5262,7 +5629,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `containsPlace` field (optional)
-    pub fn contains_place(mut self, value: impl Into<Option<StoreContainsPlace<S>>>) -> Self {
+    pub fn contains_place(
+        mut self,
+        value: impl Into<Option<StoreContainsPlace<S>>>,
+    ) -> Self {
         self._fields.21 = value.into();
         self
     }
@@ -5283,7 +5653,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `correctionsPolicy` field to an Option value (optional)
-    pub fn maybe_corrections_policy(mut self, value: Option<StoreCorrectionsPolicy<S>>) -> Self {
+    pub fn maybe_corrections_policy(
+        mut self,
+        value: Option<StoreCorrectionsPolicy<S>>,
+    ) -> Self {
         self._fields.22 = value;
         self
     }
@@ -5299,7 +5672,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `currenciesAccepted` field to an Option value (optional)
-    pub fn maybe_currencies_accepted(mut self, value: Option<StoreCurrenciesAccepted<S>>) -> Self {
+    pub fn maybe_currencies_accepted(
+        mut self,
+        value: Option<StoreCurrenciesAccepted<S>>,
+    ) -> Self {
         self._fields.23 = value;
         self
     }
@@ -5352,12 +5728,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `dissolutionDate` field (optional)
-    pub fn dissolution_date(mut self, value: impl Into<Option<StoreDissolutionDate<S>>>) -> Self {
+    pub fn dissolution_date(
+        mut self,
+        value: impl Into<Option<StoreDissolutionDate<S>>>,
+    ) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `dissolutionDate` field to an Option value (optional)
-    pub fn maybe_dissolution_date(mut self, value: Option<StoreDissolutionDate<S>>) -> Self {
+    pub fn maybe_dissolution_date(
+        mut self,
+        value: Option<StoreDissolutionDate<S>>,
+    ) -> Self {
         self._fields.27 = value;
         self
     }
@@ -5365,12 +5747,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `diversityPolicy` field (optional)
-    pub fn diversity_policy(mut self, value: impl Into<Option<StoreDiversityPolicy<S>>>) -> Self {
+    pub fn diversity_policy(
+        mut self,
+        value: impl Into<Option<StoreDiversityPolicy<S>>>,
+    ) -> Self {
         self._fields.28 = value.into();
         self
     }
     /// Set the `diversityPolicy` field to an Option value (optional)
-    pub fn maybe_diversity_policy(mut self, value: Option<StoreDiversityPolicy<S>>) -> Self {
+    pub fn maybe_diversity_policy(
+        mut self,
+        value: Option<StoreDiversityPolicy<S>>,
+    ) -> Self {
         self._fields.28 = value;
         self
     }
@@ -5449,7 +5837,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `ethicsPolicy` field (optional)
-    pub fn ethics_policy(mut self, value: impl Into<Option<StoreEthicsPolicy<S>>>) -> Self {
+    pub fn ethics_policy(
+        mut self,
+        value: impl Into<Option<StoreEthicsPolicy<S>>>,
+    ) -> Self {
         self._fields.34 = value.into();
         self
     }
@@ -5527,7 +5918,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `foundingDate` field (optional)
-    pub fn founding_date(mut self, value: impl Into<Option<StoreFoundingDate<S>>>) -> Self {
+    pub fn founding_date(
+        mut self,
+        value: impl Into<Option<StoreFoundingDate<S>>>,
+    ) -> Self {
         self._fields.40 = value.into();
         self
     }
@@ -5540,12 +5934,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `foundingLocation` field (optional)
-    pub fn founding_location(mut self, value: impl Into<Option<StoreFoundingLocation<S>>>) -> Self {
+    pub fn founding_location(
+        mut self,
+        value: impl Into<Option<StoreFoundingLocation<S>>>,
+    ) -> Self {
         self._fields.41 = value.into();
         self
     }
     /// Set the `foundingLocation` field to an Option value (optional)
-    pub fn maybe_founding_location(mut self, value: Option<StoreFoundingLocation<S>>) -> Self {
+    pub fn maybe_founding_location(
+        mut self,
+        value: Option<StoreFoundingLocation<S>>,
+    ) -> Self {
         self._fields.41 = value;
         self
     }
@@ -5592,7 +5992,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoContains` field (optional)
-    pub fn geo_contains(mut self, value: impl Into<Option<StoreGeoContains<S>>>) -> Self {
+    pub fn geo_contains(
+        mut self,
+        value: impl Into<Option<StoreGeoContains<S>>>,
+    ) -> Self {
         self._fields.45 = value.into();
         self
     }
@@ -5605,7 +6008,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoCoveredBy` field (optional)
-    pub fn geo_covered_by(mut self, value: impl Into<Option<StoreGeoCoveredBy<S>>>) -> Self {
+    pub fn geo_covered_by(
+        mut self,
+        value: impl Into<Option<StoreGeoCoveredBy<S>>>,
+    ) -> Self {
         self._fields.46 = value.into();
         self
     }
@@ -5644,7 +6050,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoDisjoint` field (optional)
-    pub fn geo_disjoint(mut self, value: impl Into<Option<StoreGeoDisjoint<S>>>) -> Self {
+    pub fn geo_disjoint(
+        mut self,
+        value: impl Into<Option<StoreGeoDisjoint<S>>>,
+    ) -> Self {
         self._fields.49 = value.into();
         self
     }
@@ -5670,7 +6079,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoIntersects` field (optional)
-    pub fn geo_intersects(mut self, value: impl Into<Option<StoreGeoIntersects<S>>>) -> Self {
+    pub fn geo_intersects(
+        mut self,
+        value: impl Into<Option<StoreGeoIntersects<S>>>,
+    ) -> Self {
         self._fields.51 = value.into();
         self
     }
@@ -5683,7 +6095,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `geoOverlaps` field (optional)
-    pub fn geo_overlaps(mut self, value: impl Into<Option<StoreGeoOverlaps<S>>>) -> Self {
+    pub fn geo_overlaps(
+        mut self,
+        value: impl Into<Option<StoreGeoOverlaps<S>>>,
+    ) -> Self {
         self._fields.52 = value.into();
         self
     }
@@ -5741,12 +6156,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasCertification` field (optional)
-    pub fn has_certification(mut self, value: impl Into<Option<StoreHasCertification<S>>>) -> Self {
+    pub fn has_certification(
+        mut self,
+        value: impl Into<Option<StoreHasCertification<S>>>,
+    ) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `hasCertification` field to an Option value (optional)
-    pub fn maybe_has_certification(mut self, value: Option<StoreHasCertification<S>>) -> Self {
+    pub fn maybe_has_certification(
+        mut self,
+        value: Option<StoreHasCertification<S>>,
+    ) -> Self {
         self._fields.56 = value;
         self
     }
@@ -5754,7 +6175,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasCredential` field (optional)
-    pub fn has_credential(mut self, value: impl Into<Option<StoreHasCredential<S>>>) -> Self {
+    pub fn has_credential(
+        mut self,
+        value: impl Into<Option<StoreHasCredential<S>>>,
+    ) -> Self {
         self._fields.57 = value.into();
         self
     }
@@ -5794,7 +6218,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `hasGS1DigitalLink` field to an Option value (optional)
-    pub fn maybe_has_gs1_digital_link(mut self, value: Option<StoreHasGs1DigitalLink<S>>) -> Self {
+    pub fn maybe_has_gs1_digital_link(
+        mut self,
+        value: Option<StoreHasGs1DigitalLink<S>>,
+    ) -> Self {
         self._fields.59 = value;
         self
     }
@@ -5823,7 +6250,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `hasMemberProgram` field to an Option value (optional)
-    pub fn maybe_has_member_program(mut self, value: Option<StoreHasMemberProgram<S>>) -> Self {
+    pub fn maybe_has_member_program(
+        mut self,
+        value: Option<StoreHasMemberProgram<S>>,
+    ) -> Self {
         self._fields.61 = value;
         self
     }
@@ -5850,12 +6280,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `hasOfferCatalog` field (optional)
-    pub fn has_offer_catalog(mut self, value: impl Into<Option<StoreHasOfferCatalog<S>>>) -> Self {
+    pub fn has_offer_catalog(
+        mut self,
+        value: impl Into<Option<StoreHasOfferCatalog<S>>>,
+    ) -> Self {
         self._fields.63 = value.into();
         self
     }
     /// Set the `hasOfferCatalog` field to an Option value (optional)
-    pub fn maybe_has_offer_catalog(mut self, value: Option<StoreHasOfferCatalog<S>>) -> Self {
+    pub fn maybe_has_offer_catalog(
+        mut self,
+        value: Option<StoreHasOfferCatalog<S>>,
+    ) -> Self {
         self._fields.63 = value;
         self
     }
@@ -5903,7 +6339,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `hasShippingService` field to an Option value (optional)
-    pub fn maybe_has_shipping_service(mut self, value: Option<StoreHasShippingService<S>>) -> Self {
+    pub fn maybe_has_shipping_service(
+        mut self,
+        value: Option<StoreHasShippingService<S>>,
+    ) -> Self {
         self._fields.66 = value;
         self
     }
@@ -5988,7 +6427,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `iso6523Code` field (optional)
-    pub fn iso6523_code(mut self, value: impl Into<Option<StoreIso6523Code<S>>>) -> Self {
+    pub fn iso6523_code(
+        mut self,
+        value: impl Into<Option<StoreIso6523Code<S>>>,
+    ) -> Self {
         self._fields.72 = value.into();
         self
     }
@@ -6027,7 +6469,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `knowsLanguage` field (optional)
-    pub fn knows_language(mut self, value: impl Into<Option<StoreKnowsLanguage<S>>>) -> Self {
+    pub fn knows_language(
+        mut self,
+        value: impl Into<Option<StoreKnowsLanguage<S>>>,
+    ) -> Self {
         self._fields.75 = value.into();
         self
     }
@@ -6053,7 +6498,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `legalAddress` field (optional)
-    pub fn legal_address(mut self, value: impl Into<Option<StoreLegalAddress<S>>>) -> Self {
+    pub fn legal_address(
+        mut self,
+        value: impl Into<Option<StoreLegalAddress<S>>>,
+    ) -> Self {
         self._fields.77 = value.into();
         self
     }
@@ -6158,7 +6606,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<StoreMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<StoreMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.84 = value;
         self
     }
@@ -6289,12 +6740,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `nonprofitStatus` field (optional)
-    pub fn nonprofit_status(mut self, value: impl Into<Option<StoreNonprofitStatus<S>>>) -> Self {
+    pub fn nonprofit_status(
+        mut self,
+        value: impl Into<Option<StoreNonprofitStatus<S>>>,
+    ) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `nonprofitStatus` field to an Option value (optional)
-    pub fn maybe_nonprofit_status(mut self, value: Option<StoreNonprofitStatus<S>>) -> Self {
+    pub fn maybe_nonprofit_status(
+        mut self,
+        value: Option<StoreNonprofitStatus<S>>,
+    ) -> Self {
         self._fields.94 = value;
         self
     }
@@ -6310,7 +6767,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `numberOfEmployees` field to an Option value (optional)
-    pub fn maybe_number_of_employees(mut self, value: Option<StoreNumberOfEmployees<S>>) -> Self {
+    pub fn maybe_number_of_employees(
+        mut self,
+        value: Option<StoreNumberOfEmployees<S>>,
+    ) -> Self {
         self._fields.95 = value;
         self
     }
@@ -6318,7 +6778,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `openingHours` field (optional)
-    pub fn opening_hours(mut self, value: impl Into<Option<StoreOpeningHours<S>>>) -> Self {
+    pub fn opening_hours(
+        mut self,
+        value: impl Into<Option<StoreOpeningHours<S>>>,
+    ) -> Self {
         self._fields.96 = value.into();
         self
     }
@@ -6390,7 +6853,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
         self
     }
     /// Set the `parentOrganization` field to an Option value (optional)
-    pub fn maybe_parent_organization(mut self, value: Option<StoreParentOrganization<S>>) -> Self {
+    pub fn maybe_parent_organization(
+        mut self,
+        value: Option<StoreParentOrganization<S>>,
+    ) -> Self {
         self._fields.100 = value;
         self
     }
@@ -6398,12 +6864,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `paymentAccepted` field (optional)
-    pub fn payment_accepted(mut self, value: impl Into<Option<StorePaymentAccepted<S>>>) -> Self {
+    pub fn payment_accepted(
+        mut self,
+        value: impl Into<Option<StorePaymentAccepted<S>>>,
+    ) -> Self {
         self._fields.101 = value.into();
         self
     }
     /// Set the `paymentAccepted` field to an Option value (optional)
-    pub fn maybe_payment_accepted(mut self, value: Option<StorePaymentAccepted<S>>) -> Self {
+    pub fn maybe_payment_accepted(
+        mut self,
+        value: Option<StorePaymentAccepted<S>>,
+    ) -> Self {
         self._fields.101 = value;
         self
     }
@@ -6437,12 +6909,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<StorePotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<StorePotentialAction<S>>>,
+    ) -> Self {
         self._fields.104 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<StorePotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<StorePotentialAction<S>>,
+    ) -> Self {
         self._fields.104 = value;
         self
     }
@@ -6463,7 +6941,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `publicAccess` field (optional)
-    pub fn public_access(mut self, value: impl Into<Option<StorePublicAccess<S>>>) -> Self {
+    pub fn public_access(
+        mut self,
+        value: impl Into<Option<StorePublicAccess<S>>>,
+    ) -> Self {
         self._fields.106 = value.into();
         self
     }
@@ -6547,7 +7028,10 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `serviceArea` field (optional)
-    pub fn service_area(mut self, value: impl Into<Option<StoreServiceArea<S>>>) -> Self {
+    pub fn service_area(
+        mut self,
+        value: impl Into<Option<StoreServiceArea<S>>>,
+    ) -> Self {
         self._fields.112 = value.into();
         self
     }
@@ -6586,12 +7070,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `smokingAllowed` field (optional)
-    pub fn smoking_allowed(mut self, value: impl Into<Option<StoreSmokingAllowed<S>>>) -> Self {
+    pub fn smoking_allowed(
+        mut self,
+        value: impl Into<Option<StoreSmokingAllowed<S>>>,
+    ) -> Self {
         self._fields.115 = value.into();
         self
     }
     /// Set the `smokingAllowed` field to an Option value (optional)
-    pub fn maybe_smoking_allowed(mut self, value: Option<StoreSmokingAllowed<S>>) -> Self {
+    pub fn maybe_smoking_allowed(
+        mut self,
+        value: Option<StoreSmokingAllowed<S>>,
+    ) -> Self {
         self._fields.115 = value;
         self
     }
@@ -6631,12 +7121,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `subOrganization` field (optional)
-    pub fn sub_organization(mut self, value: impl Into<Option<StoreSubOrganization<S>>>) -> Self {
+    pub fn sub_organization(
+        mut self,
+        value: impl Into<Option<StoreSubOrganization<S>>>,
+    ) -> Self {
         self._fields.118 = value.into();
         self
     }
     /// Set the `subOrganization` field to an Option value (optional)
-    pub fn maybe_sub_organization(mut self, value: Option<StoreSubOrganization<S>>) -> Self {
+    pub fn maybe_sub_organization(
+        mut self,
+        value: Option<StoreSubOrganization<S>>,
+    ) -> Self {
         self._fields.118 = value;
         self
     }
@@ -6683,12 +7179,18 @@ impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
 
 impl<St: store_state::State, S: BosStr> StoreBuilder<St, S> {
     /// Set the `tourBookingPage` field (optional)
-    pub fn tour_booking_page(mut self, value: impl Into<Option<StoreTourBookingPage<S>>>) -> Self {
+    pub fn tour_booking_page(
+        mut self,
+        value: impl Into<Option<StoreTourBookingPage<S>>>,
+    ) -> Self {
         self._fields.122 = value.into();
         self
     }
     /// Set the `tourBookingPage` field to an Option value (optional)
-    pub fn maybe_tour_booking_page(mut self, value: Option<StoreTourBookingPage<S>>) -> Self {
+    pub fn maybe_tour_booking_page(
+        mut self,
+        value: Option<StoreTourBookingPage<S>>,
+    ) -> Self {
         self._fields.122 = value;
         self
     }

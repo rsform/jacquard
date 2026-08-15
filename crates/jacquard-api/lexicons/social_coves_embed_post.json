@@ -1,0 +1,38 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.embed.post",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Embedded reference to another post (quoted post)",
+      "required": [
+        "post"
+      ],
+      "properties": {
+        "post": {
+          "type": "ref",
+          "description": "Strong reference to the embedded post (includes URI and CID)",
+          "ref": "com.atproto.repo.strongRef"
+        }
+      }
+    },
+    "view": {
+      "type": "object",
+      "description": "View of a quoted-post embed as served by the AppView, optionally enriched with resolved post data",
+      "required": [
+        "post"
+      ],
+      "properties": {
+        "post": {
+          "type": "ref",
+          "description": "Strong reference to the embedded post (includes URI and CID)",
+          "ref": "com.atproto.repo.strongRef"
+        },
+        "resolved": {
+          "type": "unknown",
+          "description": "Resolved data for the referenced post (e.g., a hydrated Bluesky post), or an unavailable marker with a user-facing message"
+        }
+      }
+    }
+  }
+}

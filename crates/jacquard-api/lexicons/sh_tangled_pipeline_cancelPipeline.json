@@ -4,7 +4,7 @@
   "defs": {
     "main": {
       "type": "procedure",
-      "description": "Cancel a running pipeline",
+      "description": "DEPRECATED: use sh.tangled.ci.cancelPipeline instead - Cancel a running pipeline",
       "input": {
         "encoding": "application/json",
         "schema": {

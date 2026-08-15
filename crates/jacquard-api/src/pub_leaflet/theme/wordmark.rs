@@ -23,19 +23,54 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::pub_leaflet::theme::wordmark;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct AspectRatio<S: BosStr = DefaultStr> {
+    pub height: i64,
+    pub width: i64,
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_aspect_ratio_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Wordmark<S: BosStr = DefaultStr> {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub aspect_ratio: Option<wordmark::AspectRatio<S>>,
     pub image: BlobRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_wordmark_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+impl<S: BosStr> LexiconSchema for AspectRatio<S> {
+    fn nsid() -> &'static str {
+        "pub.leaflet.theme.wordmark"
+    }
+    fn def_name() -> &'static str {
+        "aspectRatio"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_pub_leaflet_theme_wordmark()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        Ok(())
+    }
 }
 
 impl<S: BosStr> LexiconSchema for Wordmark<S> {
@@ -67,16 +102,19 @@ impl<S: BosStr> LexiconSchema for Wordmark<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
@@ -90,9 +128,258 @@ impl<S: BosStr> LexiconSchema for Wordmark<S> {
     }
 }
 
+fn deserialize_aspect_ratio_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+pub mod aspect_ratio_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Height;
+        type Width;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Height = Unset;
+        type Width = Unset;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Height = Set<members::height>;
+        type Width = St::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Height = St::Height;
+        type Width = Set<members::width>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `height` field
+        pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct AspectRatioBuilder<St: aspect_ratio_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (Option<i64>, Option<i64>),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl AspectRatio<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
+        AspectRatioBuilder::new()
+    }
+}
+
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+        AspectRatioBuilder::builder()
+    }
+}
+
+impl AspectRatioBuilder<aspect_ratio_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> AspectRatioBuilder<aspect_ratio_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: (None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
+where
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsUnset,
+{
+    /// Set the `height` field (required)
+    pub fn height(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetHeight<St>, S> {
+        self._fields.0 = Option::Some(value.into());
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
+where
+    St: aspect_ratio_state::State,
+    St::Width: aspect_ratio_state::IsUnset,
+{
+    /// Set the `width` field (required)
+    pub fn width(
+        mut self,
+        value: impl Into<i64>,
+    ) -> AspectRatioBuilder<aspect_ratio_state::SetWidth<St>, S> {
+        self._fields.1 = Option::Some(value.into());
+        AspectRatioBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> AspectRatioBuilder<St, S>
+where
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsSet,
+    St::Width: aspect_ratio_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> AspectRatio<S> {
+        AspectRatio {
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
+        AspectRatio {
+            height: self._fields.0.unwrap(),
+            width: self._fields.1.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+fn lexicon_doc_pub_leaflet_theme_wordmark() -> LexiconDoc<'static> {
+    #[allow(unused_imports)]
+    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
+    use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
+    LexiconDoc {
+        lexicon: Lexicon::Lexicon1,
+        id: CowStr::new_static("pub.leaflet.theme.wordmark"),
+        defs: {
+            let mut map = BTreeMap::new();
+            map.insert(
+                SmolStr::new_static("aspectRatio"),
+                LexUserType::Object(LexObject {
+                    required: Some(
+                        vec![SmolStr::new_static("width"), SmolStr::new_static("height")],
+                    ),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("height"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
+                SmolStr::new_static("main"),
+                LexUserType::Object(LexObject {
+                    required: Some(vec![SmolStr::new_static("image")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("aspectRatio"),
+                            LexObjectProperty::Ref(LexRef {
+                                r#ref: CowStr::new_static("#aspectRatio"),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("image"),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("width"),
+                            LexObjectProperty::Integer(LexInteger {
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map
+        },
+        ..Default::default()
+    }
+}
+
+fn deserialize_wordmark_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod wordmark_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -125,7 +412,7 @@ pub mod wordmark_state {
 /// Builder for constructing an instance of this type.
 pub struct WordmarkBuilder<St: wordmark_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<BlobRef<S>>, Option<i64>),
+    _fields: (Option<wordmark::AspectRatio<S>>, Option<BlobRef<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -148,7 +435,7 @@ impl WordmarkBuilder<wordmark_state::Empty, DefaultStr> {
     pub fn new() -> Self {
         WordmarkBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
     }
@@ -159,9 +446,28 @@ impl<S: BosStr> WordmarkBuilder<wordmark_state::Empty, S> {
     pub fn builder() -> Self {
         WordmarkBuilder {
             _state: PhantomData,
-            _fields: (None, None),
+            _fields: (None, None, None),
             _type: PhantomData,
         }
+    }
+}
+
+impl<St: wordmark_state::State, S: BosStr> WordmarkBuilder<St, S> {
+    /// Set the `aspectRatio` field (optional)
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<wordmark::AspectRatio<S>>>,
+    ) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `aspectRatio` field to an Option value (optional)
+    pub fn maybe_aspect_ratio(
+        mut self,
+        value: Option<wordmark::AspectRatio<S>>,
+    ) -> Self {
+        self._fields.0 = value;
+        self
     }
 }
 
@@ -175,7 +481,7 @@ where
         mut self,
         value: impl Into<BlobRef<S>>,
     ) -> WordmarkBuilder<wordmark_state::SetImage<St>, S> {
-        self._fields.0 = Option::Some(value.into());
+        self._fields.1 = Option::Some(value.into());
         WordmarkBuilder {
             _state: PhantomData,
             _fields: self._fields,
@@ -187,12 +493,12 @@ where
 impl<St: wordmark_state::State, S: BosStr> WordmarkBuilder<St, S> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
-        self._fields.1 = value.into();
+        self._fields.2 = value.into();
         self
     }
     /// Set the `width` field to an Option value (optional)
     pub fn maybe_width(mut self, value: Option<i64>) -> Self {
-        self._fields.1 = value;
+        self._fields.2 = value;
         self
     }
 }
@@ -205,57 +511,19 @@ where
     /// Build the final struct.
     pub fn build(self) -> Wordmark<S> {
         Wordmark {
-            image: self._fields.0.unwrap(),
-            width: self._fields.1,
+            aspect_ratio: self._fields.0,
+            image: self._fields.1.unwrap(),
+            width: self._fields.2,
             extra_data: Default::default(),
         }
     }
     /// Build the final struct with custom extra_data.
     pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Wordmark<S> {
         Wordmark {
-            image: self._fields.0.unwrap(),
-            width: self._fields.1,
+            aspect_ratio: self._fields.0,
+            image: self._fields.1.unwrap(),
+            width: self._fields.2,
             extra_data: Some(extra_data),
         }
-    }
-}
-
-fn lexicon_doc_pub_leaflet_theme_wordmark() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
-    #[allow(unused_imports)]
-    use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
-    use jacquard_lexicon::lexicon::*;
-    LexiconDoc {
-        lexicon: Lexicon::Lexicon1,
-        id: CowStr::new_static("pub.leaflet.theme.wordmark"),
-        defs: {
-            let mut map = BTreeMap::new();
-            map.insert(
-                SmolStr::new_static("main"),
-                LexUserType::Object(LexObject {
-                    required: Some(vec![SmolStr::new_static("image")]),
-                    properties: {
-                        #[allow(unused_mut)]
-                        let mut map = BTreeMap::new();
-                        map.insert(
-                            SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
-                        );
-                        map.insert(
-                            SmolStr::new_static("width"),
-                            LexObjectProperty::Integer(LexInteger {
-                                ..Default::default()
-                            }),
-                        );
-                        map
-                    },
-                    ..Default::default()
-                }),
-            );
-            map
-        },
-        ..Default::default()
     }
 }

@@ -1,0 +1,26 @@
+{
+  "lexicon": 1,
+  "id": "org.tangled.temp.notification.deleteNotification",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Delete a notification.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri"
+          ],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "description": "at-uri of the notification to delete.",
+              "format": "at-uri"
+            }
+          }
+        }
+      }
+    }
+  }
+}

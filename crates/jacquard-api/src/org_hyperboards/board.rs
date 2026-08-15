@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,22 +24,19 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::org_hyperboards::board;
 use crate::org_hypercerts::SmallImage;
 use crate::org_hypercerts::SmallVideo;
 use crate::org_hypercerts::Uri;
 use crate::org_hypercerts::claim::activity::ContributorIdentity;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use crate::org_hyperboards::board;
 /// Visual configuration for a hyperboard's background, colors, and layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BoardConfig<S: BosStr = DefaultStr> {
     ///Display aspect ratio of the board.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,7 +68,12 @@ pub struct BoardConfig<S: BosStr = DefaultStr> {
     ///Shape used to crop contributor images on this board.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub image_shape: Option<BoardConfigImageShape<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_board_config_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -153,10 +155,13 @@ where
             BoardConfigAspectRatio::_169 => BoardConfigAspectRatio::_169,
             BoardConfigAspectRatio::_43 => BoardConfigAspectRatio::_43,
             BoardConfigAspectRatio::_11 => BoardConfigAspectRatio::_11,
-            BoardConfigAspectRatio::Other(v) => BoardConfigAspectRatio::Other(v.into_static()),
+            BoardConfigAspectRatio::Other(v) => {
+                BoardConfigAspectRatio::Other(v.into_static())
+            }
         }
     }
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -216,7 +221,8 @@ impl<S: BosStr> Serialize for BoardConfigBackgroundType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for BoardConfigBackgroundType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for BoardConfigBackgroundType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -323,7 +329,9 @@ where
         match self {
             BoardConfigImageShape::Circular => BoardConfigImageShape::Circular,
             BoardConfigImageShape::Square => BoardConfigImageShape::Square,
-            BoardConfigImageShape::Other(v) => BoardConfigImageShape::Other(v.into_static()),
+            BoardConfigImageShape::Other(v) => {
+                BoardConfigImageShape::Other(v.into_static())
+            }
         }
     }
 }
@@ -331,10 +339,7 @@ where
 /// Configuration for a specific contributor within a board. Values serve as fallbacks when the contributor has not defined them on their profile. It can also be used to override contributor settings on this board without changing their global profile.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContributorConfig<S: BosStr = DefaultStr> {
     ///Identifies the contributor being styled. A strong reference to an org.hypercerts.claim.contributorInformation record, or a contributorIdentity (DID or identifier string) for contributors without a dedicated record.
     pub contributor: ContributorConfigContributor<S>,
@@ -359,9 +364,15 @@ pub struct ContributorConfig<S: BosStr = DefaultStr> {
     ///Video for this contributor, as a URI (embed/direct link) or uploaded video blob.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub video: Option<ContributorConfigVideo<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_contributor_config_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -373,6 +384,7 @@ pub enum ContributorConfigContributor<S: BosStr = DefaultStr> {
     ActivityContributorIdentity(Box<ContributorIdentity<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -383,6 +395,7 @@ pub enum ContributorConfigHoverImage<S: BosStr = DefaultStr> {
     SmallImage(Box<SmallImage<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -392,6 +405,7 @@ pub enum ContributorConfigImage<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#smallImage")]
     SmallImage(Box<SmallImage<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -423,7 +437,12 @@ pub struct Board<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the org.hypercerts.claim.activity or org.hypercerts.claim.collection this board visualizes.
     pub subject: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_board_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -646,11 +665,24 @@ impl<S: BosStr> LexiconSchema for Board<S> {
     }
 }
 
+fn deserialize_board_config_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hyperboards.board"),
@@ -659,18 +691,20 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("boardConfig"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Visual configuration for a hyperboard's background, colors, and layout.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Visual configuration for a hyperboard's background, colors, and layout.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("aspectRatio"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Display aspect ratio of the board.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Display aspect ratio of the board."),
+                                ),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -678,9 +712,11 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Background color as a hex string (e.g. '#ffffff').",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Background color as a hex string (e.g. '#ffffff').",
+                                    ),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -694,9 +730,9 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundIframeUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URI of the background iframe.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URI of the background iframe."),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 max_length: Some(2048usize),
                                 ..Default::default()
@@ -705,12 +741,14 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundImage"),
                             LexObjectProperty::Union(LexRefUnion {
-                                description: Some(CowStr::new_static(
-                                    "Background image as a URI or image blob.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Background image as a URI or image blob.",
+                                    ),
+                                ),
                                 refs: vec![
                                     CowStr::new_static("org.hypercerts.defs#uri"),
-                                    CowStr::new_static("org.hypercerts.defs#smallImage"),
+                                    CowStr::new_static("org.hypercerts.defs#smallImage")
                                 ],
                                 ..Default::default()
                             }),
@@ -726,9 +764,9 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("backgroundType"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Type of background content.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("Type of background content."),
+                                ),
                                 max_length: Some(10usize),
                                 ..Default::default()
                             }),
@@ -736,9 +774,11 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("borderColor"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Border color as a hex string (e.g. '#000000').",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Border color as a hex string (e.g. '#000000').",
+                                    ),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -752,9 +792,11 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("imageShape"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Shape used to crop contributor images on this board.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Shape used to crop contributor images on this board.",
+                                    ),
+                                ),
                                 max_length: Some(20usize),
                                 ..Default::default()
                             }),
@@ -960,9 +1002,22 @@ fn lexicon_doc_org_hyperboards_board() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_contributor_config_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod contributor_config_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -993,7 +1048,10 @@ pub mod contributor_config_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ContributorConfigBuilder<St: contributor_config_state::State, S: BosStr = DefaultStr> {
+pub struct ContributorConfigBuilder<
+    St: contributor_config_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ContributorConfigContributor<S>>,
@@ -1010,7 +1068,10 @@ pub struct ContributorConfigBuilder<St: contributor_config_state::State, S: BosS
 
 impl ContributorConfig<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ContributorConfigBuilder<contributor_config_state::Empty, DefaultStr> {
+    pub fn new() -> ContributorConfigBuilder<
+        contributor_config_state::Empty,
+        DefaultStr,
+    > {
         ContributorConfigBuilder::new()
     }
 }
@@ -1091,12 +1152,18 @@ impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St
 
 impl<St: contributor_config_state::State, S: BosStr> ContributorConfigBuilder<St, S> {
     /// Set the `hoverImage` field (optional)
-    pub fn hover_image(mut self, value: impl Into<Option<ContributorConfigHoverImage<S>>>) -> Self {
+    pub fn hover_image(
+        mut self,
+        value: impl Into<Option<ContributorConfigHoverImage<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `hoverImage` field to an Option value (optional)
-    pub fn maybe_hover_image(mut self, value: Option<ContributorConfigHoverImage<S>>) -> Self {
+    pub fn maybe_hover_image(
+        mut self,
+        value: Option<ContributorConfigHoverImage<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -1174,7 +1241,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ContributorConfig<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContributorConfig<S> {
         ContributorConfig {
             contributor: self._fields.0.unwrap(),
             display_name: self._fields.1,
@@ -1189,9 +1259,28 @@ where
     }
 }
 
+fn deserialize_board_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod board_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

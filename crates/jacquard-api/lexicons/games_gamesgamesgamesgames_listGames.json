@@ -12,7 +12,8 @@
             "type": "array",
             "description": "Filter by age rating in 'organization:rating' format (e.g. esrb:M, pegi:Eighteen).",
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 64
             }
           },
           "applicationTypes": {
@@ -20,6 +21,7 @@
             "description": "Filter by application type (e.g. game, dlc, bundle).",
             "items": {
               "type": "string",
+              "maxLength": 64,
               "knownValues": [
                 "addon",
                 "bundle",
@@ -41,20 +43,28 @@
             }
           },
           "cursor": {
-            "type": "string"
+            "type": "string",
+            "maxLength": 256
           },
           "did": {
             "type": "string",
+            "description": "Restrict results to games in this DID's repo. Omitting it returns games from every repo — it does NOT default to the authenticated caller. Owner-facing surfaces must pass it explicitly.",
             "format": "did"
           },
           "genres": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 64
             }
           },
           "includeCancelled": {
             "type": "boolean",
+            "default": false
+          },
+          "includeUnpublished": {
+            "type": "boolean",
+            "description": "Include the caller's own unpublished drafts. Requires authentication and `did` set to the caller's own DID; the request is rejected otherwise.",
             "default": false
           },
           "includeUnrated": {
@@ -71,24 +81,33 @@
           "modes": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 64
             }
           },
           "playerPerspectives": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 64
             }
           },
           "sort": {
             "type": "string",
-            "description": "Field to sort by (e.g. name, createdAt, indexed_at).",
-            "default": "indexed_at"
+            "description": "Field to sort by. Constrained because the value reaches an ORDER BY clause, which cannot be parameterised.",
+            "default": "indexed_at",
+            "maxLength": 64,
+            "enum": [
+              "indexed_at",
+              "createdAt",
+              "name"
+            ]
           },
           "sortDirection": {
             "type": "string",
             "description": "Sort direction.",
             "default": "desc",
+            "maxLength": 64,
             "enum": [
               "asc",
               "desc"
@@ -97,7 +116,8 @@
           "themes": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 64
             }
           }
         }
@@ -111,7 +131,8 @@
           ],
           "properties": {
             "cursor": {
-              "type": "string"
+              "type": "string",
+              "maxLength": 256
             },
             "games": {
               "type": "array",

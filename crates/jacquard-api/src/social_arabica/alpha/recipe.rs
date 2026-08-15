@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::social_arabica::alpha::recipe;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::social_arabica::alpha::recipe;
 /// A reusable brewing recipe with parameters for repeatable coffee preparation
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -63,7 +63,12 @@ pub struct Recipe<S: BosStr = DefaultStr> {
     ///Amount of water in tenths of grams (e.g., 3000 = 300.0g)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub water_amount: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_recipe_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -81,16 +86,18 @@ pub struct RecipeGetRecordOutput<S: BosStr = DefaultStr> {
 /// Information about a single pour in a multi-pour brewing method
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Pour<S: BosStr = DefaultStr> {
     ///Time of this pour relative to brew start (seconds)
     pub time_seconds: i64,
     ///Amount of water in this pour (grams or ml)
     pub water_amount: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_pour_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -226,9 +233,28 @@ impl<S: BosStr> LexiconSchema for Pour<S> {
     }
 }
 
+fn deserialize_recipe_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod recipe_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -387,7 +413,10 @@ where
     St::Name: recipe_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> RecipeBuilder<recipe_state::SetName<St>, S> {
+    pub fn name(
+        mut self,
+        value: impl Into<S>,
+    ) -> RecipeBuilder<recipe_state::SetName<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RecipeBuilder {
             _state: PhantomData,
@@ -488,10 +517,10 @@ where
 }
 
 fn lexicon_doc_social_arabica_alpha_recipe() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.arabica.alpha.recipe"),
@@ -625,13 +654,17 @@ fn lexicon_doc_social_arabica_alpha_recipe() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("pour"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Information about a single pour in a multi-pour brewing method",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("waterAmount"),
-                        SmolStr::new_static("timeSeconds"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static(
+                            "Information about a single pour in a multi-pour brewing method",
+                        ),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("waterAmount"),
+                            SmolStr::new_static("timeSeconds")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -660,9 +693,22 @@ fn lexicon_doc_social_arabica_alpha_recipe() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_pour_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod pour_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

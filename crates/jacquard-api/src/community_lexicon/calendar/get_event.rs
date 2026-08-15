@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -21,17 +21,14 @@ use jacquard_derive::{IntoStatic, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::community_lexicon::calendar::get_event;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::community_lexicon::calendar::get_event;
 /// An event record with RSVP counts and URL.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct EventView<S: BosStr = DefaultStr> {
     ///Number of users who have RSVP'd as going.
     pub count_going: i64,
@@ -41,25 +38,26 @@ pub struct EventView<S: BosStr = DefaultStr> {
     pub count_not_going: i64,
     ///The canonical URL for this event on Smoke Signal.
     pub url: UriValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_event_view_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEvent<S: BosStr = DefaultStr> {
     pub record_key: S,
     pub repository: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetEventOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Data<S>,
@@ -67,19 +65,25 @@ pub struct GetEventOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetEventError {
     #[serde(rename = "NotFound")]
     NotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEventError {
@@ -146,9 +150,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetEventRequest {
     type Response = GetEventResponse;
 }
 
+fn deserialize_event_view_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod event_view_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -358,7 +375,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EventView<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EventView<S> {
         EventView {
             count_going: self._fields.0.unwrap(),
             count_interested: self._fields.1.unwrap(),
@@ -370,10 +390,10 @@ where
 }
 
 fn lexicon_doc_community_lexicon_calendar_getEvent() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("community.lexicon.calendar.getEvent"),
@@ -382,15 +402,17 @@ fn lexicon_doc_community_lexicon_calendar_getEvent() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("eventView"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "An event record with RSVP counts and URL.",
-                    )),
-                    required: Some(vec![
-                        SmolStr::new_static("countGoing"),
-                        SmolStr::new_static("countInterested"),
-                        SmolStr::new_static("countNotGoing"),
-                        SmolStr::new_static("url"),
-                    ]),
+                    description: Some(
+                        CowStr::new_static("An event record with RSVP counts and URL."),
+                    ),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("countGoing"),
+                            SmolStr::new_static("countInterested"),
+                            SmolStr::new_static("countNotGoing"),
+                            SmolStr::new_static("url")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -415,9 +437,11 @@ fn lexicon_doc_community_lexicon_calendar_getEvent() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The canonical URL for this event on Smoke Signal.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The canonical URL for this event on Smoke Signal.",
+                                    ),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -430,39 +454,45 @@ fn lexicon_doc_community_lexicon_calendar_getEvent() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![
-                            SmolStr::new_static("repository"),
-                            SmolStr::new_static("recordKey"),
-                        ]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("recordKey"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The record key (rkey) of the event.",
-                                    )),
-                                    max_length: Some(150usize),
-                                    max_graphemes: Some(150usize),
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repository"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The DID of the repository containing the event.",
-                                    )),
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(
+                                vec![
+                                    SmolStr::new_static("repository"),
+                                    SmolStr::new_static("recordKey")
+                                ],
+                            ),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("recordKey"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static("The record key (rkey) of the event."),
+                                        ),
+                                        max_length: Some(150usize),
+                                        max_graphemes: Some(150usize),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repository"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "The DID of the repository containing the event.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -474,7 +504,7 @@ fn lexicon_doc_community_lexicon_calendar_getEvent() -> LexiconDoc<'static> {
 
 pub mod get_event_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {

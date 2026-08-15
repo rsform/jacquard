@@ -25,7 +25,7 @@
           "description": {
             "type": "string",
             "description": "Public roaster description or tasting notes for the beans",
-            "maxLength": 1000
+            "maxLength": 5000
           },
           "link": {
             "type": "string",

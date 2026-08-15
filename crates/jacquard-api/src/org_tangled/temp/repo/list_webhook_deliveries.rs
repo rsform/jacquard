@@ -10,27 +10,24 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
-use jacquard_common::types::string::{Datetime, Did, UriValue};
+use jacquard_common::types::string::{Did, Datetime, UriValue};
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_tangled::temp::repo::list_webhook_deliveries;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_tangled::temp::repo::list_webhook_deliveries;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Delivery<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///UUID for tracking this delivery attempt.
@@ -46,15 +43,18 @@ pub struct Delivery<S: BosStr = DefaultStr> {
     pub response_code: Option<i64>,
     pub success: bool,
     pub url: UriValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_delivery_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListWebhookDeliveries<S: BosStr = DefaultStr> {
     pub id: i64,
     /// (min: 1, max: 100)
@@ -63,11 +63,9 @@ pub struct ListWebhookDeliveries<S: BosStr = DefaultStr> {
     pub repo_did: Did<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListWebhookDeliveriesOutput<S: BosStr = DefaultStr> {
     pub deliveries: Vec<list_webhook_deliveries::Delivery<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -117,9 +115,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListWebhookDeliveriesRequest {
     type Response = ListWebhookDeliveriesResponse;
 }
 
+fn deserialize_delivery_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod delivery_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -345,7 +356,10 @@ where
     St::Id: delivery_state::IsUnset,
 {
     /// Set the `id` field (required)
-    pub fn id(mut self, value: impl Into<i64>) -> DeliveryBuilder<delivery_state::SetId<St>, S> {
+    pub fn id(
+        mut self,
+        value: impl Into<i64>,
+    ) -> DeliveryBuilder<delivery_state::SetId<St>, S> {
         self._fields.3 = Option::Some(value.into());
         DeliveryBuilder {
             _state: PhantomData,
@@ -475,10 +489,10 @@ where
 }
 
 fn lexicon_doc_org_tangled_temp_repo_listWebhookDeliveries() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.tangled.temp.repo.listWebhookDeliveries"),
@@ -487,14 +501,14 @@ fn lexicon_doc_org_tangled_temp_repo_listWebhookDeliveries() -> LexiconDoc<'stat
             map.insert(
                 SmolStr::new_static("delivery"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("id"),
-                        SmolStr::new_static("deliveryId"),
-                        SmolStr::new_static("event"),
-                        SmolStr::new_static("url"),
-                        SmolStr::new_static("success"),
-                        SmolStr::new_static("createdAt"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("id"), SmolStr::new_static("deliveryId"),
+                            SmolStr::new_static("event"), SmolStr::new_static("url"),
+                            SmolStr::new_static("success"),
+                            SmolStr::new_static("createdAt")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -508,18 +522,22 @@ fn lexicon_doc_org_tangled_temp_repo_listWebhookDeliveries() -> LexiconDoc<'stat
                         map.insert(
                             SmolStr::new_static("deliveryId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "UUID for tracking this delivery attempt.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "UUID for tracking this delivery attempt.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("event"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Event type that triggered the delivery.",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Event type that triggered the delivery.",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -531,15 +549,11 @@ fn lexicon_doc_org_tangled_temp_repo_listWebhookDeliveries() -> LexiconDoc<'stat
                         );
                         map.insert(
                             SmolStr::new_static("requestBody"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("responseBody"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("responseCode"),
@@ -568,40 +582,45 @@ fn lexicon_doc_org_tangled_temp_repo_listWebhookDeliveries() -> LexiconDoc<'stat
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::XrpcQuery(LexXrpcQuery {
-                    parameters: Some(LexXrpcQueryParameter::Params(LexXrpcParameters {
-                        required: Some(vec![
-                            SmolStr::new_static("repoDid"),
-                            SmolStr::new_static("id"),
-                        ]),
-                        properties: {
-                            #[allow(unused_mut)]
-                            let mut map = BTreeMap::new();
-                            map.insert(
-                                SmolStr::new_static("id"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("limit"),
-                                LexXrpcParametersProperty::Integer(LexInteger {
-                                    ..Default::default()
-                                }),
-                            );
-                            map.insert(
-                                SmolStr::new_static("repoDid"),
-                                LexXrpcParametersProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "DID of the repository as minted by the knot.",
-                                    )),
-                                    format: Some(LexStringFormat::Did),
-                                    ..Default::default()
-                                }),
-                            );
-                            map
-                        },
-                        ..Default::default()
-                    })),
+                    parameters: Some(
+                        LexXrpcQueryParameter::Params(LexXrpcParameters {
+                            required: Some(
+                                vec![
+                                    SmolStr::new_static("repoDid"), SmolStr::new_static("id")
+                                ],
+                            ),
+                            properties: {
+                                #[allow(unused_mut)]
+                                let mut map = BTreeMap::new();
+                                map.insert(
+                                    SmolStr::new_static("id"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("limit"),
+                                    LexXrpcParametersProperty::Integer(LexInteger {
+                                        ..Default::default()
+                                    }),
+                                );
+                                map.insert(
+                                    SmolStr::new_static("repoDid"),
+                                    LexXrpcParametersProperty::String(LexString {
+                                        description: Some(
+                                            CowStr::new_static(
+                                                "DID of the repository as minted by the knot.",
+                                            ),
+                                        ),
+                                        format: Some(LexStringFormat::Did),
+                                        ..Default::default()
+                                    }),
+                                );
+                                map
+                            },
+                            ..Default::default()
+                        }),
+                    ),
                     ..Default::default()
                 }),
             );
@@ -613,7 +632,7 @@ fn lexicon_doc_org_tangled_temp_repo_listWebhookDeliveries() -> LexiconDoc<'stat
 
 pub mod list_webhook_deliveries_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -667,14 +686,20 @@ pub struct ListWebhookDeliveriesBuilder<
 
 impl ListWebhookDeliveries<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ListWebhookDeliveriesBuilder<list_webhook_deliveries_state::Empty, DefaultStr> {
+    pub fn new() -> ListWebhookDeliveriesBuilder<
+        list_webhook_deliveries_state::Empty,
+        DefaultStr,
+    > {
         ListWebhookDeliveriesBuilder::new()
     }
 }
 
 impl<S: BosStr> ListWebhookDeliveries<S> {
     /// Create a new builder for this type
-    pub fn builder() -> ListWebhookDeliveriesBuilder<list_webhook_deliveries_state::Empty, S> {
+    pub fn builder() -> ListWebhookDeliveriesBuilder<
+        list_webhook_deliveries_state::Empty,
+        S,
+    > {
         ListWebhookDeliveriesBuilder::builder()
     }
 }
@@ -720,7 +745,10 @@ where
     }
 }
 
-impl<St: list_webhook_deliveries_state::State, S: BosStr> ListWebhookDeliveriesBuilder<St, S> {
+impl<
+    St: list_webhook_deliveries_state::State,
+    S: BosStr,
+> ListWebhookDeliveriesBuilder<St, S> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();

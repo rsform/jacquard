@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,6 +25,9 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::place_stream::ActivityGame;
 use crate::place_stream::ActivityLabel;
@@ -34,19 +37,18 @@ use crate::place_stream::metadata::content_rights::ContentRights;
 use crate::place_stream::metadata::content_warnings::ContentWarnings;
 use crate::place_stream::richtext::video_facet::VideoFacet;
 use crate::place_stream::video;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Connection<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<StrongRef<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_connection_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -92,9 +94,15 @@ pub struct Video<S: BosStr = DefaultStr> {
     pub thumb: Option<BlobRef<S>>,
     ///Title of the video referenced by this record
     pub title: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_video_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -105,6 +113,7 @@ pub enum VideoActivity<S: BosStr = DefaultStr> {
     #[serde(rename = "place.stream.defs#activityLabel")]
     ActivityLabel(Box<ActivityLabel<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -233,7 +242,8 @@ impl<S: BosStr> LexiconSchema for Video<S> {
         if let Some(values) = &self.tags {
             for value in values {
                 {
-                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true).count();
+                    let count = UnicodeSegmentation::graphemes(value.as_ref(), true)
+                        .count();
                     if count > 64usize {
                         return Err(ConstraintError::MaxGraphemes {
                             path: ValidationPath::from_field("tags"),
@@ -260,16 +270,19 @@ impl<S: BosStr> LexiconSchema for Video<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("thumb"),
@@ -307,11 +320,24 @@ impl<S: BosStr> LexiconSchema for Video<S> {
     }
 }
 
+fn deserialize_connection_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_place_stream_video() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.video"),
@@ -503,9 +529,28 @@ fn lexicon_doc_place_stream_video() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_video_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod video_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -617,7 +662,18 @@ impl VideoBuilder<video_state::Empty, DefaultStr> {
         VideoBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -630,7 +686,18 @@ impl<S: BosStr> VideoBuilder<video_state::Empty, S> {
         VideoBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -652,12 +719,18 @@ impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
 
 impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `connections` field (optional)
-    pub fn connections(mut self, value: impl Into<Option<Vec<video::Connection<S>>>>) -> Self {
+    pub fn connections(
+        mut self,
+        value: impl Into<Option<Vec<video::Connection<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `connections` field to an Option value (optional)
-    pub fn maybe_connections(mut self, value: Option<Vec<video::Connection<S>>>) -> Self {
+    pub fn maybe_connections(
+        mut self,
+        value: Option<Vec<video::Connection<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -678,7 +751,10 @@ impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
 
 impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(mut self, value: impl Into<Option<ContentWarnings<S>>>) -> Self {
+    pub fn content_warnings(
+        mut self,
+        value: impl Into<Option<ContentWarnings<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
@@ -723,12 +799,18 @@ impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
 
 impl<St: video_state::State, S: BosStr> VideoBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<VideoFacet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<VideoFacet<S>>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `descriptionFacets` field to an Option value (optional)
-    pub fn maybe_description_facets(mut self, value: Option<Vec<VideoFacet<S>>>) -> Self {
+    pub fn maybe_description_facets(
+        mut self,
+        value: Option<Vec<VideoFacet<S>>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
@@ -804,7 +886,10 @@ where
     St::Title: video_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> VideoBuilder<video_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> VideoBuilder<video_state::SetTitle<St>, S> {
         self._fields.11 = Option::Some(value.into());
         VideoBuilder {
             _state: PhantomData,

@@ -10,28 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Hello<S: BosStr = DefaultStr> {
     /// (max length: 55)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct HelloOutput<S: BosStr = DefaultStr> {
     pub message: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -68,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for HelloRequest {
 
 pub mod hello_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -147,8 +142,6 @@ where
 {
     /// Build the final struct.
     pub fn build(self) -> Hello<S> {
-        Hello {
-            subject: self._fields.0,
-        }
+        Hello { subject: self._fields.0 }
     }
 }

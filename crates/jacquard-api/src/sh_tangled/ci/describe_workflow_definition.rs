@@ -10,18 +10,15 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DescribeWorkflowDefinition<S: BosStr = DefaultStr> {
     pub repo: Did<S>,
     pub sha: S,
@@ -29,11 +26,9 @@ pub struct DescribeWorkflowDefinition<S: BosStr = DefaultStr> {
     pub source_repo: Option<Did<S>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct DescribeWorkflowDefinitionOutput<S: BosStr = DefaultStr> {
     ///Whether the workflow definition is derived from this repository at all. When false, no commit-to-commit comparison is meaningful (e.g. definitions managed externally), and callers should not surface change warnings.
     pub derived: bool,
@@ -47,9 +42,18 @@ pub struct DescribeWorkflowDefinitionOutput<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum DescribeWorkflowDefinitionError {
     /// Invalid request parameters
@@ -57,10 +61,7 @@ pub enum DescribeWorkflowDefinitionError {
     InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DescribeWorkflowDefinitionError {
@@ -114,7 +115,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DescribeWorkflowDefinitionRequest {
 
 pub mod describe_workflow_definition_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -168,22 +169,28 @@ pub struct DescribeWorkflowDefinitionBuilder<
 
 impl DescribeWorkflowDefinition<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new()
-    -> DescribeWorkflowDefinitionBuilder<describe_workflow_definition_state::Empty, DefaultStr>
-    {
+    pub fn new() -> DescribeWorkflowDefinitionBuilder<
+        describe_workflow_definition_state::Empty,
+        DefaultStr,
+    > {
         DescribeWorkflowDefinitionBuilder::new()
     }
 }
 
 impl<S: BosStr> DescribeWorkflowDefinition<S> {
     /// Create a new builder for this type
-    pub fn builder()
-    -> DescribeWorkflowDefinitionBuilder<describe_workflow_definition_state::Empty, S> {
+    pub fn builder() -> DescribeWorkflowDefinitionBuilder<
+        describe_workflow_definition_state::Empty,
+        S,
+    > {
         DescribeWorkflowDefinitionBuilder::builder()
     }
 }
 
-impl DescribeWorkflowDefinitionBuilder<describe_workflow_definition_state::Empty, DefaultStr> {
+impl DescribeWorkflowDefinitionBuilder<
+    describe_workflow_definition_state::Empty,
+    DefaultStr,
+> {
     /// Create a new builder with all fields unset, using the default string type, if needed
     pub fn new() -> Self {
         DescribeWorkflowDefinitionBuilder {
@@ -194,7 +201,9 @@ impl DescribeWorkflowDefinitionBuilder<describe_workflow_definition_state::Empty
     }
 }
 
-impl<S: BosStr> DescribeWorkflowDefinitionBuilder<describe_workflow_definition_state::Empty, S> {
+impl<
+    S: BosStr,
+> DescribeWorkflowDefinitionBuilder<describe_workflow_definition_state::Empty, S> {
     /// Create a new builder with all fields unset
     pub fn builder() -> Self {
         DescribeWorkflowDefinitionBuilder {
@@ -214,7 +223,10 @@ where
     pub fn repo(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DescribeWorkflowDefinitionBuilder<describe_workflow_definition_state::SetRepo<St>, S> {
+    ) -> DescribeWorkflowDefinitionBuilder<
+        describe_workflow_definition_state::SetRepo<St>,
+        S,
+    > {
         self._fields.0 = Option::Some(value.into());
         DescribeWorkflowDefinitionBuilder {
             _state: PhantomData,
@@ -233,7 +245,10 @@ where
     pub fn sha(
         mut self,
         value: impl Into<S>,
-    ) -> DescribeWorkflowDefinitionBuilder<describe_workflow_definition_state::SetSha<St>, S> {
+    ) -> DescribeWorkflowDefinitionBuilder<
+        describe_workflow_definition_state::SetSha<St>,
+        S,
+    > {
         self._fields.1 = Option::Some(value.into());
         DescribeWorkflowDefinitionBuilder {
             _state: PhantomData,
@@ -243,9 +258,10 @@ where
     }
 }
 
-impl<St: describe_workflow_definition_state::State, S: BosStr>
-    DescribeWorkflowDefinitionBuilder<St, S>
-{
+impl<
+    St: describe_workflow_definition_state::State,
+    S: BosStr,
+> DescribeWorkflowDefinitionBuilder<St, S> {
     /// Set the `sourceRepo` field (optional)
     pub fn source_repo(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.2 = value.into();

@@ -1,0 +1,46 @@
+{
+  "lexicon": 1,
+  "id": "test.blobby.get",
+  "description": "Curated query for the Axum fixture: fetches a blobby record.",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Fetch a blob-bearing record by at-uri.",
+      "parameters": {
+        "type": "params",
+        "required": ["uri"],
+        "properties": {
+          "uri": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "At-uri of the record to fetch."
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": ["uri", "value"],
+          "properties": {
+            "uri": {
+              "type": "string",
+              "format": "at-uri",
+              "description": "Canonical at-uri of the returned record."
+            },
+            "value": {
+              "type": "ref",
+              "ref": "test.blobby.record"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "name": "BlobbyNotFound",
+          "description": "No record exists at the given uri."
+        }
+      ]
+    }
+  }
+}

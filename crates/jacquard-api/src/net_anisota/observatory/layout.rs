@@ -10,13 +10,13 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::collection::{Collection, RecordError};
-use jacquard_common::types::string::{AtUri, Cid, Datetime, Did, Handle};
+use jacquard_common::types::string::{Did, Handle, AtUri, Cid, Datetime};
 use jacquard_common::types::uri::{RecordUri, UriError};
 use jacquard_common::types::value::Data;
 use jacquard_common::xrpc::XrpcResp;
@@ -24,33 +24,32 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::net_anisota::observatory::layout;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::net_anisota::observatory::layout;
 /// Attribution for the original crafter of this layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct CreatedBy<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub handle: Option<Handle<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_created_by_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// The grid configuration captured by this layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Layout<S: BosStr = DefaultStr> {
     ///Built-in button overrides keyed by button key (enter, atmosphere, post, chronicle, inventory, harvest, tutorial). Each value may carry enabled, order, size, and variant.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,17 +57,25 @@ pub struct Layout<S: BosStr = DefaultStr> {
     ///Patterns visualization configuration captured with this layout
     #[serde(skip_serializing_if = "Option::is_none")]
     pub patterns_indicator: Option<Data<S>>,
-    ///Whether tiles shuffle within divider-bounded groups each session
+    ///Row-based layout. Each row sits on a shared six-column track; tile spans are derived from the row's tile count and balance and always sum to 6. Rows are the authority for geometry; tileOrder is the flattened reading order of the same tiles, kept in sync so clients that predate the row model still render the layout. When rows is absent, or disagrees with tileOrder, a client re-derives rows from tileOrder. No maxLength: every row holds at least one tile, so rows.length can never exceed tileOrder.length, which is itself uncapped — a cap here and not there would make a legal tileOrder unrepresentable.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rows: Option<Vec<layout::Row<S>>>,
+    ///Whether tiles shuffle within divider-bounded groups each session. Retained for compatibility with clients that still shuffle; a client using the row model preserves the stored value on write but does not act on it, because rows describe a stable layout.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shuffle_layout: Option<bool>,
-    ///Unified rendering order. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array.
+    ///The flattened projection of rows: rows in order, tiles in order within each row. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array. rows is the geometry authority and this field is the compatibility flattening kept for clients that predate the row model — a reader that understands rows uses it only to reconcile (dropping tokens no row claims, appending tokens no row carries).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tile_order: Option<Vec<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_layout_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// A saved Observatory grid layout. Each record is a complete, self-contained snapshot of a layout — built-in button configuration, unified tile order, and embedded element snapshots — so it can be shared by URL and saved ('learned') into another user's PDS without depending on the original author's element records, mirroring the spell architecture. tileOrder entries are 'builtin:<key>' for built-in tiles or 'element:<index>' pointing into the embedded elements array. An optional schedule makes the layout activate automatically during a daily time window.
+/// A saved Observatory grid layout. Each record is a complete, self-contained snapshot of a layout — built-in button configuration, the row geometry, the flattened tile order, and embedded element snapshots — so it can be shared by URL and saved ('learned') into another user's PDS without depending on the original author's element records, mirroring the spell architecture. Tile references are 'builtin:<key>' for built-in tiles or 'element:<index>' pointing into the embedded elements array. layout.rows is the authority for geometry; layout.tileOrder is the flattened reading order of the same tiles, kept in sync so clients that predate the row model still render the layout. An optional schedule makes the layout activate automatically during a daily time window.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -98,7 +105,12 @@ pub struct LayoutRecord<S: BosStr = DefaultStr> {
     pub source: Option<layout::Source<S>>,
     ///When this layout was last modified
     pub updated_at: Datetime,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_layout_record_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -113,13 +125,285 @@ pub struct LayoutRecordGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: LayoutRecord<S>,
 }
 
+/// One row of the Observatory grid. 'tiles' rows hold 1-3 tiles across the six-column track. 'ledger' rows render their tiles as hairline lines (label left, meta right) and absorb the long tail. 'structure' rows hold exactly one divider, heading or empty-space element and act as a boundary between rows. Entries in the tiles array use the same token vocabulary as tileOrder: 'builtin:<key>' or 'element:<index>'. kind, band and balance use knownValues and are therefore open: a reader that does not recognise a value clamps it for that session only and must not rewrite the stored value.
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct Row<S: BosStr = DefaultStr> {
+    ///How a two-tile row divides the track: even 3:3, left 4:2, right 2:4. Meaningless (and canonically 'even') for any other tile count.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub balance: Option<RowBalance<S>>,
+    ///The one height every tile in this row takes. Ignored by ledger rows, and by structure rows whose tile is a divider or heading.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub band: Option<RowBand<S>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kind: Option<RowKind<S>>,
+    pub tiles: Vec<S>,
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_row_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// How a two-tile row divides the track: even 3:3, left 4:2, right 2:4. Meaningless (and canonically 'even') for any other tile count.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RowBalance<S: BosStr = DefaultStr> {
+    Even,
+    Left,
+    Right,
+    Other(S),
+}
+
+impl<S: BosStr> RowBalance<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Even => "even",
+            Self::Left => "left",
+            Self::Right => "right",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "even" => Self::Even,
+            "left" => Self::Left,
+            "right" => Self::Right,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for RowBalance<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for RowBalance<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for RowBalance<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RowBalance<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for RowBalance<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for RowBalance<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RowBalance<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RowBalance::Even => RowBalance::Even,
+            RowBalance::Left => RowBalance::Left,
+            RowBalance::Right => RowBalance::Right,
+            RowBalance::Other(v) => RowBalance::Other(v.into_static()),
+        }
+    }
+}
+
+/// The one height every tile in this row takes. Ignored by ledger rows, and by structure rows whose tile is a divider or heading.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RowBand<S: BosStr = DefaultStr> {
+    Compact,
+    Standard,
+    Tall,
+    Panel,
+    Other(S),
+}
+
+impl<S: BosStr> RowBand<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Compact => "compact",
+            Self::Standard => "standard",
+            Self::Tall => "tall",
+            Self::Panel => "panel",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "compact" => Self::Compact,
+            "standard" => Self::Standard,
+            "tall" => Self::Tall,
+            "panel" => Self::Panel,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for RowBand<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for RowBand<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for RowBand<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RowBand<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for RowBand<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for RowBand<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RowBand<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RowBand::Compact => RowBand::Compact,
+            RowBand::Standard => RowBand::Standard,
+            RowBand::Tall => RowBand::Tall,
+            RowBand::Panel => RowBand::Panel,
+            RowBand::Other(v) => RowBand::Other(v.into_static()),
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RowKind<S: BosStr = DefaultStr> {
+    Tiles,
+    Ledger,
+    Structure,
+    Other(S),
+}
+
+impl<S: BosStr> RowKind<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Tiles => "tiles",
+            Self::Ledger => "ledger",
+            Self::Structure => "structure",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "tiles" => Self::Tiles,
+            "ledger" => Self::Ledger,
+            "structure" => Self::Structure,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for RowKind<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for RowKind<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for RowKind<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RowKind<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for RowKind<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for RowKind<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RowKind<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RowKind::Tiles => RowKind::Tiles,
+            RowKind::Ledger => RowKind::Ledger,
+            RowKind::Structure => RowKind::Structure,
+            RowKind::Other(v) => RowKind::Other(v.into_static()),
+        }
+    }
+}
+
 /// Optional daily activation window. When enabled, the layout takes over the Observatory between startTime and endTime (wrapping past midnight when startTime > endTime), optionally restricted to certain days of the week.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Schedule<S: BosStr = DefaultStr> {
     ///Days the window applies to (0 = Sunday … 6 = Saturday). Empty or absent means every day.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -133,17 +417,19 @@ pub struct Schedule<S: BosStr = DefaultStr> {
     ///Window start as 'HH:MM' (24-hour, local time)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start_time: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_schedule_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-/// Provenance for this layout. 'original' was crafted here, 'learned' was saved from another user's shared layout (see originalUri/originalDid), and 'migrated' marks the layout the one-time unify migration captured from the user's live grid — that value is the migration's idempotency sentinel and must be preserved when a record is re-saved, or the migration will run again and duplicate the layout.
+/// Provenance for this layout. 'original' was crafted here, 'learned' was saved from another user's shared layout (see originalUri/originalDid), 'migrated' marks the layout the one-time unify migration captured from the user's live grid, and 'starter' marks the layout a published generation of the starter grid wrote when it moved an account onto that generation. The last two are those passes' idempotency sentinels and must be preserved when a record is re-saved, or the pass will run again and duplicate the layout.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Source<S: BosStr = DefaultStr> {
     ///DID of the user this layout was learned from
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -153,15 +439,22 @@ pub struct Source<S: BosStr = DefaultStr> {
     pub original_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<SourceType<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_source_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SourceType<S: BosStr = DefaultStr> {
     Original,
     Learned,
     Migrated,
+    Starter,
     Other(S),
 }
 
@@ -171,6 +464,7 @@ impl<S: BosStr> SourceType<S> {
             Self::Original => "original",
             Self::Learned => "learned",
             Self::Migrated => "migrated",
+            Self::Starter => "starter",
             Self::Other(s) => s.as_ref(),
         }
     }
@@ -180,6 +474,7 @@ impl<S: BosStr> SourceType<S> {
             "original" => Self::Original,
             "learned" => Self::Learned,
             "migrated" => Self::Migrated,
+            "starter" => Self::Starter,
             _ => Self::Other(s),
         }
     }
@@ -233,6 +528,7 @@ where
             SourceType::Original => SourceType::Original,
             SourceType::Learned => SourceType::Learned,
             SourceType::Migrated => SourceType::Migrated,
+            SourceType::Starter => SourceType::Starter,
             SourceType::Other(v) => SourceType::Other(v.into_static()),
         }
     }
@@ -349,6 +645,72 @@ impl<S: BosStr> LexiconSchema for LayoutRecord<S> {
     }
 }
 
+impl<S: BosStr> LexiconSchema for Row<S> {
+    fn nsid() -> &'static str {
+        "net.anisota.observatory.layout"
+    }
+    fn def_name() -> &'static str {
+        "row"
+    }
+    fn lexicon_doc() -> LexiconDoc<'static> {
+        lexicon_doc_net_anisota_observatory_layout()
+    }
+    fn validate(&self) -> Result<(), ConstraintError> {
+        if let Some(ref value) = self.balance {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("balance"),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.band {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("band"),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        if let Some(ref value) = self.kind {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 32usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("kind"),
+                    max: 32usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        {
+            let value = &self.tiles;
+            #[allow(unused_comparisons)]
+            if value.len() > 12usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tiles"),
+                    max: 12usize,
+                    actual: value.len(),
+                });
+            }
+        }
+        for value in &self.tiles {
+            #[allow(unused_comparisons)]
+            if <str>::len(value.as_ref()) > 64usize {
+                return Err(ConstraintError::MaxLength {
+                    path: ValidationPath::from_field("tiles"),
+                    max: 64usize,
+                    actual: <str>::len(value.as_ref()),
+                });
+            }
+        }
+        Ok(())
+    }
+}
+
 impl<S: BosStr> LexiconSchema for Schedule<S> {
     fn nsid() -> &'static str {
         "net.anisota.observatory.layout"
@@ -431,11 +793,24 @@ impl<S: BosStr> LexiconSchema for Source<S> {
     }
 }
 
+fn deserialize_created_by_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("net.anisota.observatory.layout"),
@@ -444,9 +819,11 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("createdBy"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Attribution for the original crafter of this layout.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Attribution for the original crafter of this layout.",
+                        ),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -493,6 +870,21 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
                             }),
                         );
                         map.insert(
+                            SmolStr::new_static("rows"),
+                            LexObjectProperty::Array(LexArray {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Row-based layout. Each row sits on a shared six-column track; tile spans are derived from the row's tile count and balance and always sum to 6. Rows are the authority for geometry; tileOrder is the flattened reading order of the same tiles, kept in sync so clients that predate the row model still render the layout. When rows is absent, or disagrees with tileOrder, a client re-derives rows from tileOrder. No maxLength: every row holds at least one tile, so rows.length can never exceed tileOrder.length, which is itself uncapped — a cap here and not there would make a legal tileOrder unrepresentable.",
+                                    ),
+                                ),
+                                items: LexArrayItem::Ref(LexRef {
+                                    r#ref: CowStr::new_static("#row"),
+                                    ..Default::default()
+                                }),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
                             SmolStr::new_static("shuffleLayout"),
                             LexObjectProperty::Boolean(LexBoolean {
                                 ..Default::default()
@@ -503,7 +895,7 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
                             LexObjectProperty::Array(LexArray {
                                 description: Some(
                                     CowStr::new_static(
-                                        "Unified rendering order. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array.",
+                                        "The flattened projection of rows: rows in order, tiles in order within each row. Entries are 'builtin:<key>' or 'element:<index>' into the record's elements array. rows is the geometry authority and this field is the compatibility flattening kept for clients that predate the row model — a reader that understands rows uses it only to reconcile (dropping tokens no row claims, appending tokens no row carries).",
                                     ),
                                 ),
                                 items: LexArrayItem::String(LexString {
@@ -523,7 +915,7 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     description: Some(
                         CowStr::new_static(
-                            "A saved Observatory grid layout. Each record is a complete, self-contained snapshot of a layout — built-in button configuration, unified tile order, and embedded element snapshots — so it can be shared by URL and saved ('learned') into another user's PDS without depending on the original author's element records, mirroring the spell architecture. tileOrder entries are 'builtin:<key>' for built-in tiles or 'element:<index>' pointing into the embedded elements array. An optional schedule makes the layout activate automatically during a daily time window.",
+                            "A saved Observatory grid layout. Each record is a complete, self-contained snapshot of a layout — built-in button configuration, the row geometry, the flattened tile order, and embedded element snapshots — so it can be shared by URL and saved ('learned') into another user's PDS without depending on the original author's element records, mirroring the spell architecture. Tile references are 'builtin:<key>' for built-in tiles or 'element:<index>' pointing into the embedded elements array. layout.rows is the authority for geometry; layout.tileOrder is the flattened reading order of the same tiles, kept in sync so clients that predate the row model still render the layout. An optional schedule makes the layout activate automatically during a daily time window.",
                         ),
                     ),
                     key: Some(CowStr::new_static("any")),
@@ -630,6 +1022,65 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
                 }),
             );
             map.insert(
+                SmolStr::new_static("row"),
+                LexUserType::Object(LexObject {
+                    description: Some(
+                        CowStr::new_static(
+                            "One row of the Observatory grid. 'tiles' rows hold 1-3 tiles across the six-column track. 'ledger' rows render their tiles as hairline lines (label left, meta right) and absorb the long tail. 'structure' rows hold exactly one divider, heading or empty-space element and act as a boundary between rows. Entries in the tiles array use the same token vocabulary as tileOrder: 'builtin:<key>' or 'element:<index>'. kind, band and balance use knownValues and are therefore open: a reader that does not recognise a value clamps it for that session only and must not rewrite the stored value.",
+                        ),
+                    ),
+                    required: Some(vec![SmolStr::new_static("tiles")]),
+                    properties: {
+                        #[allow(unused_mut)]
+                        let mut map = BTreeMap::new();
+                        map.insert(
+                            SmolStr::new_static("balance"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "How a two-tile row divides the track: even 3:3, left 4:2, right 2:4. Meaningless (and canonically 'even') for any other tile count.",
+                                    ),
+                                ),
+                                max_length: Some(32usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("band"),
+                            LexObjectProperty::String(LexString {
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The one height every tile in this row takes. Ignored by ledger rows, and by structure rows whose tile is a divider or heading.",
+                                    ),
+                                ),
+                                max_length: Some(32usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("kind"),
+                            LexObjectProperty::String(LexString {
+                                max_length: Some(32usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("tiles"),
+                            LexObjectProperty::Array(LexArray {
+                                items: LexArrayItem::String(LexString {
+                                    max_length: Some(64usize),
+                                    ..Default::default()
+                                }),
+                                max_length: Some(12usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map
+                    },
+                    ..Default::default()
+                }),
+            );
+            map.insert(
                 SmolStr::new_static("schedule"),
                 LexUserType::Object(LexObject {
                     description: Some(
@@ -695,7 +1146,7 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "Provenance for this layout. 'original' was crafted here, 'learned' was saved from another user's shared layout (see originalUri/originalDid), and 'migrated' marks the layout the one-time unify migration captured from the user's live grid — that value is the migration's idempotency sentinel and must be preserved when a record is re-saved, or the migration will run again and duplicate the layout.",
+                            "Provenance for this layout. 'original' was crafted here, 'learned' was saved from another user's shared layout (see originalUri/originalDid), 'migrated' marks the layout the one-time unify migration captured from the user's live grid, and 'starter' marks the layout a published generation of the starter grid wrote when it moved an account onto that generation. The last two are those passes' idempotency sentinels and must be preserved when a record is re-saved, or the pass will run again and duplicate the layout.",
                         ),
                     ),
                     properties: {
@@ -740,9 +1191,41 @@ fn lexicon_doc_net_anisota_observatory_layout() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_layout_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_layout_record_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod layout_record_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1009,7 +1492,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LayoutRecord<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LayoutRecord<S> {
         LayoutRecord {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1,
@@ -1023,4 +1509,208 @@ where
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_row_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+pub mod row_state {
+
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
+    #[allow(unused)]
+    use ::core::marker::PhantomData;
+    mod sealed {
+        pub trait Sealed {}
+    }
+    /// State trait tracking which required fields have been set
+    pub trait State: sealed::Sealed {
+        type Tiles;
+    }
+    /// Empty state - all required fields are unset
+    pub struct Empty(());
+    impl sealed::Sealed for Empty {}
+    impl State for Empty {
+        type Tiles = Unset;
+    }
+    ///State transition - sets the `tiles` field to Set
+    pub struct SetTiles<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTiles<St> {}
+    impl<St: State> State for SetTiles<St> {
+        type Tiles = Set<members::tiles>;
+    }
+    /// Marker types for field names
+    #[allow(non_camel_case_types)]
+    pub mod members {
+        ///Marker type for the `tiles` field
+        pub struct tiles(());
+    }
+}
+
+/// Builder for constructing an instance of this type.
+pub struct RowBuilder<St: row_state::State, S: BosStr = DefaultStr> {
+    _state: PhantomData<fn() -> St>,
+    _fields: (
+        Option<RowBalance<S>>,
+        Option<RowBand<S>>,
+        Option<RowKind<S>>,
+        Option<Vec<S>>,
+    ),
+    _type: PhantomData<fn() -> S>,
+}
+
+impl Row<DefaultStr> {
+    /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
+    pub fn new() -> RowBuilder<row_state::Empty, DefaultStr> {
+        RowBuilder::new()
+    }
+}
+
+impl<S: BosStr> Row<S> {
+    /// Create a new builder for this type
+    pub fn builder() -> RowBuilder<row_state::Empty, S> {
+        RowBuilder::builder()
+    }
+}
+
+impl RowBuilder<row_state::Empty, DefaultStr> {
+    /// Create a new builder with all fields unset, using the default string type, if needed
+    pub fn new() -> Self {
+        RowBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<S: BosStr> RowBuilder<row_state::Empty, S> {
+    /// Create a new builder with all fields unset
+    pub fn builder() -> Self {
+        RowBuilder {
+            _state: PhantomData,
+            _fields: (None, None, None, None),
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
+    /// Set the `balance` field (optional)
+    pub fn balance(mut self, value: impl Into<Option<RowBalance<S>>>) -> Self {
+        self._fields.0 = value.into();
+        self
+    }
+    /// Set the `balance` field to an Option value (optional)
+    pub fn maybe_balance(mut self, value: Option<RowBalance<S>>) -> Self {
+        self._fields.0 = value;
+        self
+    }
+}
+
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
+    /// Set the `band` field (optional)
+    pub fn band(mut self, value: impl Into<Option<RowBand<S>>>) -> Self {
+        self._fields.1 = value.into();
+        self
+    }
+    /// Set the `band` field to an Option value (optional)
+    pub fn maybe_band(mut self, value: Option<RowBand<S>>) -> Self {
+        self._fields.1 = value;
+        self
+    }
+}
+
+impl<St: row_state::State, S: BosStr> RowBuilder<St, S> {
+    /// Set the `kind` field (optional)
+    pub fn kind(mut self, value: impl Into<Option<RowKind<S>>>) -> Self {
+        self._fields.2 = value.into();
+        self
+    }
+    /// Set the `kind` field to an Option value (optional)
+    pub fn maybe_kind(mut self, value: Option<RowKind<S>>) -> Self {
+        self._fields.2 = value;
+        self
+    }
+}
+
+impl<St, S: BosStr> RowBuilder<St, S>
+where
+    St: row_state::State,
+    St::Tiles: row_state::IsUnset,
+{
+    /// Set the `tiles` field (required)
+    pub fn tiles(
+        mut self,
+        value: impl Into<Vec<S>>,
+    ) -> RowBuilder<row_state::SetTiles<St>, S> {
+        self._fields.3 = Option::Some(value.into());
+        RowBuilder {
+            _state: PhantomData,
+            _fields: self._fields,
+            _type: PhantomData,
+        }
+    }
+}
+
+impl<St, S: BosStr> RowBuilder<St, S>
+where
+    St: row_state::State,
+    St::Tiles: row_state::IsSet,
+{
+    /// Build the final struct.
+    pub fn build(self) -> Row<S> {
+        Row {
+            balance: self._fields.0,
+            band: self._fields.1,
+            kind: self._fields.2,
+            tiles: self._fields.3.unwrap(),
+            extra_data: Default::default(),
+        }
+    }
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Row<S> {
+        Row {
+            balance: self._fields.0,
+            band: self._fields.1,
+            kind: self._fields.2,
+            tiles: self._fields.3.unwrap(),
+            extra_data: Some(extra_data),
+        }
+    }
+}
+
+fn deserialize_schedule_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_source_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,13 +24,10 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct WebEmbed<S: BosStr = DefaultStr> {
     ///Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,7 +58,12 @@ pub struct WebEmbed<S: BosStr = DefaultStr> {
     ///CSS width value (e.g., "100%", "75%". "50%" minimum)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub width: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_web_embed_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -122,16 +124,19 @@ impl<S: BosStr> LexiconSchema for WebEmbed<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["image/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("preview"),
@@ -169,9 +174,22 @@ impl<S: BosStr> LexiconSchema for WebEmbed<S> {
     }
 }
 
+fn deserialize_web_embed_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod web_embed_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -431,10 +449,10 @@ where
 }
 
 fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.offprint.block.webEmbed"),
@@ -450,14 +468,18 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("alignment"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Horizontal alignment")),
+                                description: Some(
+                                    CowStr::new_static("Horizontal alignment"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Page description/excerpt")),
+                                description: Some(
+                                    CowStr::new_static("Page description/excerpt"),
+                                ),
                                 max_graphemes: Some(1000usize),
                                 ..Default::default()
                             }),
@@ -472,9 +494,9 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("embedUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "oEmbed URL for iframe embedding",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("oEmbed URL for iframe embedding"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -489,23 +511,23 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("href"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The URL of the embedded page",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The URL of the embedded page"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("preview"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("siteName"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Name of the website")),
+                                description: Some(
+                                    CowStr::new_static("Name of the website"),
+                                ),
                                 max_graphemes: Some(100usize),
                                 ..Default::default()
                             }),
@@ -521,9 +543,11 @@ fn lexicon_doc_app_offprint_block_webEmbed() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("width"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "CSS width value (e.g., \"100%\", \"75%\". \"50%\" minimum)",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "CSS width value (e.g., \"100%\", \"75%\". \"50%\" minimum)",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );

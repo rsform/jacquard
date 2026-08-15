@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,6 +24,9 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::social_flockfeeds::lexical::r#type::event;
 use crate::social_flockfeeds::lexical::r#type::image_object;
 use crate::social_flockfeeds::lexical::r#type::music_group;
@@ -31,16 +34,10 @@ use crate::social_flockfeeds::lexical::r#type::offer;
 use crate::social_flockfeeds::lexical::r#type::organization;
 use crate::social_flockfeeds::lexical::r#type::person;
 use crate::social_flockfeeds::lexical::r#type::product;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A movie.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
@@ -316,9 +313,15 @@ pub struct Embedded<S: BosStr = DefaultStr> {
     pub work_example: Option<EmbeddedWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub work_translation: Option<EmbeddedWorkTranslation<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_embedded_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -373,6 +376,7 @@ pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -386,6 +390,7 @@ pub enum EmbeddedActor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -393,6 +398,7 @@ pub enum EmbeddedActors<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -449,6 +455,7 @@ pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -466,6 +473,7 @@ pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -512,6 +520,7 @@ pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -521,6 +530,7 @@ pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -556,6 +566,7 @@ pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -595,6 +606,7 @@ pub enum EmbeddedDirector<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -602,6 +614,7 @@ pub enum EmbeddedDirectors<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -630,6 +643,7 @@ pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -686,6 +700,7 @@ pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -718,6 +733,7 @@ pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -752,6 +768,7 @@ pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -759,6 +776,7 @@ pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -810,6 +828,7 @@ pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -817,6 +836,7 @@ pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -838,6 +858,7 @@ pub enum EmbeddedMusicBy<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -850,6 +871,7 @@ pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -876,6 +898,7 @@ pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -883,6 +906,7 @@ pub enum EmbeddedProductionCompany<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -893,6 +917,7 @@ pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -909,6 +934,7 @@ pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -916,6 +942,7 @@ pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -929,6 +956,7 @@ pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -975,6 +1003,7 @@ pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -987,6 +1016,7 @@ pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1008,6 +1038,7 @@ pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1015,6 +1046,7 @@ pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1048,6 +1080,7 @@ pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1083,6 +1116,7 @@ pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1406,9 +1440,15 @@ pub struct Movie<S: BosStr = DefaultStr> {
     pub work_example: Option<MovieWorkExample<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub work_translation: Option<MovieWorkTranslation<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_movie_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1463,6 +1503,7 @@ pub enum MovieAccountablePerson<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1476,6 +1517,7 @@ pub enum MovieActor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1483,6 +1525,7 @@ pub enum MovieActors<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1539,6 +1582,7 @@ pub enum MovieAuthor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1556,6 +1600,7 @@ pub enum MovieCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1602,6 +1647,7 @@ pub enum MovieContributor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1611,6 +1657,7 @@ pub enum MovieCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1646,6 +1693,7 @@ pub enum MovieCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1685,6 +1733,7 @@ pub enum MovieDirector<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1692,6 +1741,7 @@ pub enum MovieDirectors<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1720,6 +1770,7 @@ pub enum MovieEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1776,6 +1827,7 @@ pub enum MovieFunder<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1808,6 +1860,7 @@ pub enum MovieImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1842,6 +1895,7 @@ pub enum MovieIsBasedOn<S: BosStr = DefaultStr> {
     ProductEmbedded(Box<product::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1849,6 +1903,7 @@ pub enum MovieIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1900,6 +1955,7 @@ pub enum MovieMaintainer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1907,6 +1963,7 @@ pub enum MovieMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1928,6 +1985,7 @@ pub enum MovieMusicBy<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1940,6 +1998,7 @@ pub enum MovieOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1966,6 +2025,7 @@ pub enum MovieProducer<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -1973,6 +2033,7 @@ pub enum MovieProductionCompany<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1983,6 +2044,7 @@ pub enum MovieProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -1999,6 +2061,7 @@ pub enum MoviePublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2006,6 +2069,7 @@ pub enum MoviePublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2019,6 +2083,7 @@ pub enum MovieRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2065,6 +2130,7 @@ pub enum MovieSdPublisher<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2077,6 +2143,7 @@ pub enum MovieSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2098,6 +2165,7 @@ pub enum MovieSponsor<S: BosStr = DefaultStr> {
     PersonEmbedded(Box<person::Embedded<S>>),
 }
 
+
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -2105,6 +2173,7 @@ pub enum MovieSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2138,6 +2207,7 @@ pub enum MovieThumbnail<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2173,6 +2243,7 @@ pub enum MovieTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -2287,11 +2358,24 @@ impl<S: BosStr> LexiconSchema for Movie<S> {
     }
 }
 
+fn deserialize_embedded_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 fn lexicon_doc_social_flockfeeds_lexical_type_Movie() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("social.flockfeeds.lexical.type.Movie"),
@@ -5179,9 +5263,28 @@ fn lexicon_doc_social_flockfeeds_lexical_type_Movie() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_movie_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod movie_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -5363,16 +5466,143 @@ impl MovieBuilder<movie_state::Empty, DefaultStr> {
         MovieBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -5385,16 +5615,143 @@ impl<S: BosStr> MovieBuilder<movie_state::Empty, S> {
         MovieBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None, None, None, None, None, None, None, None, None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -5461,12 +5818,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `accessibilityAPI` field (optional)
-    pub fn accessibility_api(mut self, value: impl Into<Option<MovieAccessibilityApi<S>>>) -> Self {
+    pub fn accessibility_api(
+        mut self,
+        value: impl Into<Option<MovieAccessibilityApi<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `accessibilityAPI` field to an Option value (optional)
-    pub fn maybe_accessibility_api(mut self, value: Option<MovieAccessibilityApi<S>>) -> Self {
+    pub fn maybe_accessibility_api(
+        mut self,
+        value: Option<MovieAccessibilityApi<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -5558,7 +5921,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `accountablePerson` field to an Option value (optional)
-    pub fn maybe_accountable_person(mut self, value: Option<MovieAccountablePerson<S>>) -> Self {
+    pub fn maybe_accountable_person(
+        mut self,
+        value: Option<MovieAccountablePerson<S>>,
+    ) -> Self {
         self._fields.9 = value;
         self
     }
@@ -5574,7 +5940,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `acquireLicensePage` field to an Option value (optional)
-    pub fn maybe_acquire_license_page(mut self, value: Option<MovieAcquireLicensePage<S>>) -> Self {
+    pub fn maybe_acquire_license_page(
+        mut self,
+        value: Option<MovieAcquireLicensePage<S>>,
+    ) -> Self {
         self._fields.10 = value;
         self
     }
@@ -5608,12 +5977,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `additionalType` field (optional)
-    pub fn additional_type(mut self, value: impl Into<Option<MovieAdditionalType<S>>>) -> Self {
+    pub fn additional_type(
+        mut self,
+        value: impl Into<Option<MovieAdditionalType<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `additionalType` field to an Option value (optional)
-    pub fn maybe_additional_type(mut self, value: Option<MovieAdditionalType<S>>) -> Self {
+    pub fn maybe_additional_type(
+        mut self,
+        value: Option<MovieAdditionalType<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
@@ -5621,12 +5996,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `aggregateRating` field (optional)
-    pub fn aggregate_rating(mut self, value: impl Into<Option<MovieAggregateRating<S>>>) -> Self {
+    pub fn aggregate_rating(
+        mut self,
+        value: impl Into<Option<MovieAggregateRating<S>>>,
+    ) -> Self {
         self._fields.14 = value.into();
         self
     }
     /// Set the `aggregateRating` field to an Option value (optional)
-    pub fn maybe_aggregate_rating(mut self, value: Option<MovieAggregateRating<S>>) -> Self {
+    pub fn maybe_aggregate_rating(
+        mut self,
+        value: Option<MovieAggregateRating<S>>,
+    ) -> Self {
         self._fields.14 = value;
         self
     }
@@ -5634,7 +6015,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `alternateName` field (optional)
-    pub fn alternate_name(mut self, value: impl Into<Option<MovieAlternateName<S>>>) -> Self {
+    pub fn alternate_name(
+        mut self,
+        value: impl Into<Option<MovieAlternateName<S>>>,
+    ) -> Self {
         self._fields.15 = value.into();
         self
     }
@@ -5692,12 +6076,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `associatedMedia` field (optional)
-    pub fn associated_media(mut self, value: impl Into<Option<MovieAssociatedMedia<S>>>) -> Self {
+    pub fn associated_media(
+        mut self,
+        value: impl Into<Option<MovieAssociatedMedia<S>>>,
+    ) -> Self {
         self._fields.19 = value.into();
         self
     }
     /// Set the `associatedMedia` field to an Option value (optional)
-    pub fn maybe_associated_media(mut self, value: Option<MovieAssociatedMedia<S>>) -> Self {
+    pub fn maybe_associated_media(
+        mut self,
+        value: Option<MovieAssociatedMedia<S>>,
+    ) -> Self {
         self._fields.19 = value;
         self
     }
@@ -5809,7 +6199,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `commentCount` field (optional)
-    pub fn comment_count(mut self, value: impl Into<Option<MovieCommentCount<S>>>) -> Self {
+    pub fn comment_count(
+        mut self,
+        value: impl Into<Option<MovieCommentCount<S>>>,
+    ) -> Self {
         self._fields.28 = value.into();
         self
     }
@@ -5830,7 +6223,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `conditionsOfAccess` field to an Option value (optional)
-    pub fn maybe_conditions_of_access(mut self, value: Option<MovieConditionsOfAccess<S>>) -> Self {
+    pub fn maybe_conditions_of_access(
+        mut self,
+        value: Option<MovieConditionsOfAccess<S>>,
+    ) -> Self {
         self._fields.29 = value;
         self
     }
@@ -5838,12 +6234,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `contentLocation` field (optional)
-    pub fn content_location(mut self, value: impl Into<Option<MovieContentLocation<S>>>) -> Self {
+    pub fn content_location(
+        mut self,
+        value: impl Into<Option<MovieContentLocation<S>>>,
+    ) -> Self {
         self._fields.30 = value.into();
         self
     }
     /// Set the `contentLocation` field to an Option value (optional)
-    pub fn maybe_content_location(mut self, value: Option<MovieContentLocation<S>>) -> Self {
+    pub fn maybe_content_location(
+        mut self,
+        value: Option<MovieContentLocation<S>>,
+    ) -> Self {
         self._fields.30 = value;
         self
     }
@@ -5851,7 +6253,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `contentRating` field (optional)
-    pub fn content_rating(mut self, value: impl Into<Option<MovieContentRating<S>>>) -> Self {
+    pub fn content_rating(
+        mut self,
+        value: impl Into<Option<MovieContentRating<S>>>,
+    ) -> Self {
         self._fields.31 = value.into();
         self
     }
@@ -5896,12 +6301,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `copyrightHolder` field (optional)
-    pub fn copyright_holder(mut self, value: impl Into<Option<MovieCopyrightHolder<S>>>) -> Self {
+    pub fn copyright_holder(
+        mut self,
+        value: impl Into<Option<MovieCopyrightHolder<S>>>,
+    ) -> Self {
         self._fields.34 = value.into();
         self
     }
     /// Set the `copyrightHolder` field to an Option value (optional)
-    pub fn maybe_copyright_holder(mut self, value: Option<MovieCopyrightHolder<S>>) -> Self {
+    pub fn maybe_copyright_holder(
+        mut self,
+        value: Option<MovieCopyrightHolder<S>>,
+    ) -> Self {
         self._fields.34 = value;
         self
     }
@@ -5909,12 +6320,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `copyrightNotice` field (optional)
-    pub fn copyright_notice(mut self, value: impl Into<Option<MovieCopyrightNotice<S>>>) -> Self {
+    pub fn copyright_notice(
+        mut self,
+        value: impl Into<Option<MovieCopyrightNotice<S>>>,
+    ) -> Self {
         self._fields.35 = value.into();
         self
     }
     /// Set the `copyrightNotice` field to an Option value (optional)
-    pub fn maybe_copyright_notice(mut self, value: Option<MovieCopyrightNotice<S>>) -> Self {
+    pub fn maybe_copyright_notice(
+        mut self,
+        value: Option<MovieCopyrightNotice<S>>,
+    ) -> Self {
         self._fields.35 = value;
         self
     }
@@ -5922,7 +6339,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `copyrightYear` field (optional)
-    pub fn copyright_year(mut self, value: impl Into<Option<MovieCopyrightYear<S>>>) -> Self {
+    pub fn copyright_year(
+        mut self,
+        value: impl Into<Option<MovieCopyrightYear<S>>>,
+    ) -> Self {
         self._fields.36 = value.into();
         self
     }
@@ -5948,12 +6368,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `countryOfOrigin` field (optional)
-    pub fn country_of_origin(mut self, value: impl Into<Option<MovieCountryOfOrigin<S>>>) -> Self {
+    pub fn country_of_origin(
+        mut self,
+        value: impl Into<Option<MovieCountryOfOrigin<S>>>,
+    ) -> Self {
         self._fields.38 = value.into();
         self
     }
     /// Set the `countryOfOrigin` field to an Option value (optional)
-    pub fn maybe_country_of_origin(mut self, value: Option<MovieCountryOfOrigin<S>>) -> Self {
+    pub fn maybe_country_of_origin(
+        mut self,
+        value: Option<MovieCountryOfOrigin<S>>,
+    ) -> Self {
         self._fields.38 = value;
         self
     }
@@ -5969,7 +6395,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `creativeWorkStatus` field to an Option value (optional)
-    pub fn maybe_creative_work_status(mut self, value: Option<MovieCreativeWorkStatus<S>>) -> Self {
+    pub fn maybe_creative_work_status(
+        mut self,
+        value: Option<MovieCreativeWorkStatus<S>>,
+    ) -> Self {
         self._fields.39 = value;
         self
     }
@@ -6003,7 +6432,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `dateCreated` field (optional)
-    pub fn date_created(mut self, value: impl Into<Option<MovieDateCreated<S>>>) -> Self {
+    pub fn date_created(
+        mut self,
+        value: impl Into<Option<MovieDateCreated<S>>>,
+    ) -> Self {
         self._fields.42 = value.into();
         self
     }
@@ -6016,7 +6448,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `dateModified` field (optional)
-    pub fn date_modified(mut self, value: impl Into<Option<MovieDateModified<S>>>) -> Self {
+    pub fn date_modified(
+        mut self,
+        value: impl Into<Option<MovieDateModified<S>>>,
+    ) -> Self {
         self._fields.43 = value.into();
         self
     }
@@ -6029,7 +6464,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `datePublished` field (optional)
-    pub fn date_published(mut self, value: impl Into<Option<MovieDatePublished<S>>>) -> Self {
+    pub fn date_published(
+        mut self,
+        value: impl Into<Option<MovieDatePublished<S>>>,
+    ) -> Self {
         self._fields.44 = value.into();
         self
     }
@@ -6063,7 +6501,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `digitalSourceType` field to an Option value (optional)
-    pub fn maybe_digital_source_type(mut self, value: Option<MovieDigitalSourceType<S>>) -> Self {
+    pub fn maybe_digital_source_type(
+        mut self,
+        value: Option<MovieDigitalSourceType<S>>,
+    ) -> Self {
         self._fields.46 = value;
         self
     }
@@ -6116,7 +6557,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `discussionUrl` field (optional)
-    pub fn discussion_url(mut self, value: impl Into<Option<MovieDiscussionUrl<S>>>) -> Self {
+    pub fn discussion_url(
+        mut self,
+        value: impl Into<Option<MovieDiscussionUrl<S>>>,
+    ) -> Self {
         self._fields.50 = value.into();
         self
     }
@@ -6187,12 +6631,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `educationalLevel` field (optional)
-    pub fn educational_level(mut self, value: impl Into<Option<MovieEducationalLevel<S>>>) -> Self {
+    pub fn educational_level(
+        mut self,
+        value: impl Into<Option<MovieEducationalLevel<S>>>,
+    ) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `educationalLevel` field to an Option value (optional)
-    pub fn maybe_educational_level(mut self, value: Option<MovieEducationalLevel<S>>) -> Self {
+    pub fn maybe_educational_level(
+        mut self,
+        value: Option<MovieEducationalLevel<S>>,
+    ) -> Self {
         self._fields.55 = value;
         self
     }
@@ -6200,12 +6650,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `educationalUse` field (optional)
-    pub fn educational_use(mut self, value: impl Into<Option<MovieEducationalUse<S>>>) -> Self {
+    pub fn educational_use(
+        mut self,
+        value: impl Into<Option<MovieEducationalUse<S>>>,
+    ) -> Self {
         self._fields.56 = value.into();
         self
     }
     /// Set the `educationalUse` field to an Option value (optional)
-    pub fn maybe_educational_use(mut self, value: Option<MovieEducationalUse<S>>) -> Self {
+    pub fn maybe_educational_use(
+        mut self,
+        value: Option<MovieEducationalUse<S>>,
+    ) -> Self {
         self._fields.56 = value;
         self
     }
@@ -6226,12 +6682,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `encodingFormat` field (optional)
-    pub fn encoding_format(mut self, value: impl Into<Option<MovieEncodingFormat<S>>>) -> Self {
+    pub fn encoding_format(
+        mut self,
+        value: impl Into<Option<MovieEncodingFormat<S>>>,
+    ) -> Self {
         self._fields.58 = value.into();
         self
     }
     /// Set the `encodingFormat` field to an Option value (optional)
-    pub fn maybe_encoding_format(mut self, value: Option<MovieEncodingFormat<S>>) -> Self {
+    pub fn maybe_encoding_format(
+        mut self,
+        value: Option<MovieEncodingFormat<S>>,
+    ) -> Self {
         self._fields.58 = value;
         self
     }
@@ -6252,12 +6714,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `exampleOfWork` field (optional)
-    pub fn example_of_work(mut self, value: impl Into<Option<MovieExampleOfWork<S>>>) -> Self {
+    pub fn example_of_work(
+        mut self,
+        value: impl Into<Option<MovieExampleOfWork<S>>>,
+    ) -> Self {
         self._fields.60 = value.into();
         self
     }
     /// Set the `exampleOfWork` field to an Option value (optional)
-    pub fn maybe_example_of_work(mut self, value: Option<MovieExampleOfWork<S>>) -> Self {
+    pub fn maybe_example_of_work(
+        mut self,
+        value: Option<MovieExampleOfWork<S>>,
+    ) -> Self {
         self._fields.60 = value;
         self
     }
@@ -6422,7 +6890,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `interactivityType` field to an Option value (optional)
-    pub fn maybe_interactivity_type(mut self, value: Option<MovieInteractivityType<S>>) -> Self {
+    pub fn maybe_interactivity_type(
+        mut self,
+        value: Option<MovieInteractivityType<S>>,
+    ) -> Self {
         self._fields.72 = value;
         self
     }
@@ -6438,7 +6909,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `interpretedAsClaim` field to an Option value (optional)
-    pub fn maybe_interpreted_as_claim(mut self, value: Option<MovieInterpretedAsClaim<S>>) -> Self {
+    pub fn maybe_interpreted_as_claim(
+        mut self,
+        value: Option<MovieInterpretedAsClaim<S>>,
+    ) -> Self {
         self._fields.73 = value;
         self
     }
@@ -6478,7 +6952,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `isBasedOnUrl` field (optional)
-    pub fn is_based_on_url(mut self, value: impl Into<Option<MovieIsBasedOnUrl<S>>>) -> Self {
+    pub fn is_based_on_url(
+        mut self,
+        value: impl Into<Option<MovieIsBasedOnUrl<S>>>,
+    ) -> Self {
         self._fields.76 = value.into();
         self
     }
@@ -6499,7 +6976,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `isFamilyFriendly` field to an Option value (optional)
-    pub fn maybe_is_family_friendly(mut self, value: Option<MovieIsFamilyFriendly<S>>) -> Self {
+    pub fn maybe_is_family_friendly(
+        mut self,
+        value: Option<MovieIsFamilyFriendly<S>>,
+    ) -> Self {
         self._fields.77 = value;
         self
     }
@@ -6565,12 +7045,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `locationCreated` field (optional)
-    pub fn location_created(mut self, value: impl Into<Option<MovieLocationCreated<S>>>) -> Self {
+    pub fn location_created(
+        mut self,
+        value: impl Into<Option<MovieLocationCreated<S>>>,
+    ) -> Self {
         self._fields.82 = value.into();
         self
     }
     /// Set the `locationCreated` field to an Option value (optional)
-    pub fn maybe_location_created(mut self, value: Option<MovieLocationCreated<S>>) -> Self {
+    pub fn maybe_location_created(
+        mut self,
+        value: Option<MovieLocationCreated<S>>,
+    ) -> Self {
         self._fields.82 = value;
         self
     }
@@ -6599,7 +7085,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `mainEntityOfPage` field to an Option value (optional)
-    pub fn maybe_main_entity_of_page(mut self, value: Option<MovieMainEntityOfPage<S>>) -> Self {
+    pub fn maybe_main_entity_of_page(
+        mut self,
+        value: Option<MovieMainEntityOfPage<S>>,
+    ) -> Self {
         self._fields.84 = value;
         self
     }
@@ -6633,12 +7122,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `materialExtent` field (optional)
-    pub fn material_extent(mut self, value: impl Into<Option<MovieMaterialExtent<S>>>) -> Self {
+    pub fn material_extent(
+        mut self,
+        value: impl Into<Option<MovieMaterialExtent<S>>>,
+    ) -> Self {
         self._fields.87 = value.into();
         self
     }
     /// Set the `materialExtent` field to an Option value (optional)
-    pub fn maybe_material_extent(mut self, value: Option<MovieMaterialExtent<S>>) -> Self {
+    pub fn maybe_material_extent(
+        mut self,
+        value: Option<MovieMaterialExtent<S>>,
+    ) -> Self {
         self._fields.87 = value;
         self
     }
@@ -6724,12 +7219,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `potentialAction` field (optional)
-    pub fn potential_action(mut self, value: impl Into<Option<MoviePotentialAction<S>>>) -> Self {
+    pub fn potential_action(
+        mut self,
+        value: impl Into<Option<MoviePotentialAction<S>>>,
+    ) -> Self {
         self._fields.94 = value.into();
         self
     }
     /// Set the `potentialAction` field to an Option value (optional)
-    pub fn maybe_potential_action(mut self, value: Option<MoviePotentialAction<S>>) -> Self {
+    pub fn maybe_potential_action(
+        mut self,
+        value: Option<MoviePotentialAction<S>>,
+    ) -> Self {
         self._fields.94 = value;
         self
     }
@@ -6758,7 +7259,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `productionCompany` field to an Option value (optional)
-    pub fn maybe_production_company(mut self, value: Option<MovieProductionCompany<S>>) -> Self {
+    pub fn maybe_production_company(
+        mut self,
+        value: Option<MovieProductionCompany<S>>,
+    ) -> Self {
         self._fields.96 = value;
         self
     }
@@ -6805,12 +7309,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `publisherImprint` field (optional)
-    pub fn publisher_imprint(mut self, value: impl Into<Option<MoviePublisherImprint<S>>>) -> Self {
+    pub fn publisher_imprint(
+        mut self,
+        value: impl Into<Option<MoviePublisherImprint<S>>>,
+    ) -> Self {
         self._fields.100 = value.into();
         self
     }
     /// Set the `publisherImprint` field to an Option value (optional)
-    pub fn maybe_publisher_imprint(mut self, value: Option<MoviePublisherImprint<S>>) -> Self {
+    pub fn maybe_publisher_imprint(
+        mut self,
+        value: Option<MoviePublisherImprint<S>>,
+    ) -> Self {
         self._fields.100 = value;
         self
     }
@@ -6850,7 +7360,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `releasedEvent` field (optional)
-    pub fn released_event(mut self, value: impl Into<Option<MovieReleasedEvent<S>>>) -> Self {
+    pub fn released_event(
+        mut self,
+        value: impl Into<Option<MovieReleasedEvent<S>>>,
+    ) -> Self {
         self._fields.103 = value.into();
         self
     }
@@ -6902,7 +7415,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `schemaVersion` field (optional)
-    pub fn schema_version(mut self, value: impl Into<Option<MovieSchemaVersion<S>>>) -> Self {
+    pub fn schema_version(
+        mut self,
+        value: impl Into<Option<MovieSchemaVersion<S>>>,
+    ) -> Self {
         self._fields.107 = value.into();
         self
     }
@@ -6915,12 +7431,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `sdDatePublished` field (optional)
-    pub fn sd_date_published(mut self, value: impl Into<Option<MovieSdDatePublished<S>>>) -> Self {
+    pub fn sd_date_published(
+        mut self,
+        value: impl Into<Option<MovieSdDatePublished<S>>>,
+    ) -> Self {
         self._fields.108 = value.into();
         self
     }
     /// Set the `sdDatePublished` field to an Option value (optional)
-    pub fn maybe_sd_date_published(mut self, value: Option<MovieSdDatePublished<S>>) -> Self {
+    pub fn maybe_sd_date_published(
+        mut self,
+        value: Option<MovieSdDatePublished<S>>,
+    ) -> Self {
         self._fields.108 = value;
         self
     }
@@ -6941,7 +7463,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `sdPublisher` field (optional)
-    pub fn sd_publisher(mut self, value: impl Into<Option<MovieSdPublisher<S>>>) -> Self {
+    pub fn sd_publisher(
+        mut self,
+        value: impl Into<Option<MovieSdPublisher<S>>>,
+    ) -> Self {
         self._fields.110 = value.into();
         self
     }
@@ -6975,7 +7500,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `sourceOrganization` field to an Option value (optional)
-    pub fn maybe_source_organization(mut self, value: Option<MovieSourceOrganization<S>>) -> Self {
+    pub fn maybe_source_organization(
+        mut self,
+        value: Option<MovieSourceOrganization<S>>,
+    ) -> Self {
         self._fields.112 = value;
         self
     }
@@ -6996,12 +7524,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `spatialCoverage` field (optional)
-    pub fn spatial_coverage(mut self, value: impl Into<Option<MovieSpatialCoverage<S>>>) -> Self {
+    pub fn spatial_coverage(
+        mut self,
+        value: impl Into<Option<MovieSpatialCoverage<S>>>,
+    ) -> Self {
         self._fields.114 = value.into();
         self
     }
     /// Set the `spatialCoverage` field to an Option value (optional)
-    pub fn maybe_spatial_coverage(mut self, value: Option<MovieSpatialCoverage<S>>) -> Self {
+    pub fn maybe_spatial_coverage(
+        mut self,
+        value: Option<MovieSpatialCoverage<S>>,
+    ) -> Self {
         self._fields.114 = value;
         self
     }
@@ -7035,12 +7569,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `subtitleLanguage` field (optional)
-    pub fn subtitle_language(mut self, value: impl Into<Option<MovieSubtitleLanguage<S>>>) -> Self {
+    pub fn subtitle_language(
+        mut self,
+        value: impl Into<Option<MovieSubtitleLanguage<S>>>,
+    ) -> Self {
         self._fields.117 = value.into();
         self
     }
     /// Set the `subtitleLanguage` field to an Option value (optional)
-    pub fn maybe_subtitle_language(mut self, value: Option<MovieSubtitleLanguage<S>>) -> Self {
+    pub fn maybe_subtitle_language(
+        mut self,
+        value: Option<MovieSubtitleLanguage<S>>,
+    ) -> Self {
         self._fields.117 = value;
         self
     }
@@ -7074,12 +7614,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `temporalCoverage` field (optional)
-    pub fn temporal_coverage(mut self, value: impl Into<Option<MovieTemporalCoverage<S>>>) -> Self {
+    pub fn temporal_coverage(
+        mut self,
+        value: impl Into<Option<MovieTemporalCoverage<S>>>,
+    ) -> Self {
         self._fields.120 = value.into();
         self
     }
     /// Set the `temporalCoverage` field to an Option value (optional)
-    pub fn maybe_temporal_coverage(mut self, value: Option<MovieTemporalCoverage<S>>) -> Self {
+    pub fn maybe_temporal_coverage(
+        mut self,
+        value: Option<MovieTemporalCoverage<S>>,
+    ) -> Self {
         self._fields.120 = value;
         self
     }
@@ -7113,7 +7659,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `thumbnailUrl` field (optional)
-    pub fn thumbnail_url(mut self, value: impl Into<Option<MovieThumbnailUrl<S>>>) -> Self {
+    pub fn thumbnail_url(
+        mut self,
+        value: impl Into<Option<MovieThumbnailUrl<S>>>,
+    ) -> Self {
         self._fields.123 = value.into();
         self
     }
@@ -7126,7 +7675,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `timeRequired` field (optional)
-    pub fn time_required(mut self, value: impl Into<Option<MovieTimeRequired<S>>>) -> Self {
+    pub fn time_required(
+        mut self,
+        value: impl Into<Option<MovieTimeRequired<S>>>,
+    ) -> Self {
         self._fields.124 = value.into();
         self
     }
@@ -7173,7 +7725,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
         self
     }
     /// Set the `translationOfWork` field to an Option value (optional)
-    pub fn maybe_translation_of_work(mut self, value: Option<MovieTranslationOfWork<S>>) -> Self {
+    pub fn maybe_translation_of_work(
+        mut self,
+        value: Option<MovieTranslationOfWork<S>>,
+    ) -> Self {
         self._fields.127 = value;
         self
     }
@@ -7194,12 +7749,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `typicalAgeRange` field (optional)
-    pub fn typical_age_range(mut self, value: impl Into<Option<MovieTypicalAgeRange<S>>>) -> Self {
+    pub fn typical_age_range(
+        mut self,
+        value: impl Into<Option<MovieTypicalAgeRange<S>>>,
+    ) -> Self {
         self._fields.129 = value.into();
         self
     }
     /// Set the `typicalAgeRange` field to an Option value (optional)
-    pub fn maybe_typical_age_range(mut self, value: Option<MovieTypicalAgeRange<S>>) -> Self {
+    pub fn maybe_typical_age_range(
+        mut self,
+        value: Option<MovieTypicalAgeRange<S>>,
+    ) -> Self {
         self._fields.129 = value;
         self
     }
@@ -7272,7 +7833,10 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `workExample` field (optional)
-    pub fn work_example(mut self, value: impl Into<Option<MovieWorkExample<S>>>) -> Self {
+    pub fn work_example(
+        mut self,
+        value: impl Into<Option<MovieWorkExample<S>>>,
+    ) -> Self {
         self._fields.135 = value.into();
         self
     }
@@ -7285,12 +7849,18 @@ impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
 
 impl<St: movie_state::State, S: BosStr> MovieBuilder<St, S> {
     /// Set the `workTranslation` field (optional)
-    pub fn work_translation(mut self, value: impl Into<Option<MovieWorkTranslation<S>>>) -> Self {
+    pub fn work_translation(
+        mut self,
+        value: impl Into<Option<MovieWorkTranslation<S>>>,
+    ) -> Self {
         self._fields.136 = value.into();
         self
     }
     /// Set the `workTranslation` field to an Option value (optional)
-    pub fn maybe_work_translation(mut self, value: Option<MovieWorkTranslation<S>>) -> Self {
+    pub fn maybe_work_translation(
+        mut self,
+        value: Option<MovieWorkTranslation<S>>,
+    ) -> Self {
         self._fields.136 = value;
         self
     }

@@ -1,0 +1,130 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.ci.subscribePipelineLogs",
+  "defs": {
+    "control": {
+      "type": "object",
+      "required": [
+        "time",
+        "workflow",
+        "step",
+        "content"
+      ],
+      "properties": {
+        "command": {
+          "type": "string",
+          "description": "Step command"
+        },
+        "content": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "description": "Step kind",
+          "enum": [
+            "system",
+            "user"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "description": "Step status",
+          "enum": [
+            "start",
+            "end"
+          ]
+        },
+        "step": {
+          "type": "integer",
+          "description": "Step ID"
+        },
+        "time": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "workflow": {
+          "type": "string",
+          "description": "workflow name"
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "time",
+        "workflow",
+        "step",
+        "content",
+        "stream"
+      ],
+      "properties": {
+        "content": {
+          "type": "string"
+        },
+        "step": {
+          "type": "integer",
+          "description": "Step ID"
+        },
+        "stream": {
+          "type": "string",
+          "enum": [
+            "stdout",
+            "stderr"
+          ]
+        },
+        "time": {
+          "type": "string",
+          "format": "datetime"
+        },
+        "workflow": {
+          "type": "string",
+          "description": "workflow name"
+        }
+      }
+    },
+    "main": {
+      "type": "subscription",
+      "description": "Pipeline logs stream",
+      "parameters": {
+        "type": "params",
+        "required": [
+          "pipeline"
+        ],
+        "properties": {
+          "pipeline": {
+            "type": "string",
+            "description": "Pipeline ID",
+            "format": "tid"
+          },
+          "workflows": {
+            "type": "array",
+            "description": "filter logs by specific workflows",
+            "items": {
+              "type": "string",
+              "description": "Workflow name"
+            }
+          }
+        }
+      },
+      "message": {
+        "schema": {
+          "type": "union",
+          "refs": [
+            "#control",
+            "#data"
+          ]
+        }
+      },
+      "errors": [
+        {
+          "description": "Workflow not found",
+          "name": "WorkflowNotFound"
+        },
+        {
+          "description": "Invalid request parameters",
+          "name": "InvalidRequest"
+        }
+      ]
+    }
+  }
+}

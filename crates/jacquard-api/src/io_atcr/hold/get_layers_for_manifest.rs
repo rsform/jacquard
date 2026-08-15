@@ -8,30 +8,25 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::io_atcr::hold::layer::Layer;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::io_atcr::hold::layer::Layer;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLayersForManifest<S: BosStr = DefaultStr> {
     pub manifest: AtUri<S>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLayersForManifestOutput<S: BosStr = DefaultStr> {
     pub layers: Vec<Layer<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -68,7 +63,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetLayersForManifestRequest {
 
 pub mod get_layers_for_manifest_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -110,14 +105,20 @@ pub struct GetLayersForManifestBuilder<
 
 impl GetLayersForManifest<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> GetLayersForManifestBuilder<get_layers_for_manifest_state::Empty, DefaultStr> {
+    pub fn new() -> GetLayersForManifestBuilder<
+        get_layers_for_manifest_state::Empty,
+        DefaultStr,
+    > {
         GetLayersForManifestBuilder::new()
     }
 }
 
 impl<S: BosStr> GetLayersForManifest<S> {
     /// Create a new builder for this type
-    pub fn builder() -> GetLayersForManifestBuilder<get_layers_for_manifest_state::Empty, S> {
+    pub fn builder() -> GetLayersForManifestBuilder<
+        get_layers_for_manifest_state::Empty,
+        S,
+    > {
         GetLayersForManifestBuilder::builder()
     }
 }

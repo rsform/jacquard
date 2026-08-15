@@ -1,0 +1,64 @@
+{
+  "lexicon": 1,
+  "id": "net.anisota.spell.book",
+  "defs": {
+    "entry": {
+      "type": "object",
+      "description": "A reference to one of the user's spells plus its cast state and position.",
+      "required": [
+        "rkey"
+      ],
+      "properties": {
+        "cast": {
+          "type": "boolean",
+          "description": "Whether the spell is currently cast (active). Defaults to false when absent."
+        },
+        "order": {
+          "type": "integer",
+          "description": "Zero-based display order within the spell book.",
+          "minimum": 0
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the net.anisota.spell.custom record this entry points to, in the same repo.",
+          "maxLength": 512
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "The user's spell book: a single index record (stored at rkey 'self') that tracks which net.anisota.spell.custom records the user has, whether each is currently cast (active), and in what order they appear. The individual spell definitions live in the net.anisota.spell.custom collection; this record only references them by rkey, so casting/dismissing/reordering a spell touches only this small index rather than rewriting each spell.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "entries",
+          "updatedAt"
+        ],
+        "properties": {
+          "activePresets": {
+            "type": "array",
+            "description": "Legacy: identifiers of built-in preset spells the user had activated before presets were replaced by real shared spell records. Retained for backward compatibility.",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            }
+          },
+          "entries": {
+            "type": "array",
+            "description": "The user's spells, in display order, each referencing a net.anisota.spell.custom record in the same repo.",
+            "items": {
+              "type": "ref",
+              "ref": "#entry"
+            }
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "When the spell book was last modified",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

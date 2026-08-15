@@ -224,6 +224,10 @@ pub enum AuthorizationToken<S: BosStr = DefaultStr> {
     Bearer(S),
     /// DPoP token (proof-of-possession) for OAuth
     Dpop(S),
+    /// Delegation token for permissioned-space credential minting. Sent with
+    /// the `Bearer` scheme; the accompanying DPoP proof must omit `ath`
+    /// (the delegation token is not hashed into the proof).
+    Delegation(S),
 }
 
 impl<S: BosStr> AuthorizationToken<S> {
@@ -234,6 +238,9 @@ impl<S: BosStr> AuthorizationToken<S> {
                 AuthorizationToken::Bearer(token.borrow_or_share())
             }
             AuthorizationToken::Dpop(token) => AuthorizationToken::Dpop(token.borrow_or_share()),
+            AuthorizationToken::Delegation(token) => {
+                AuthorizationToken::Delegation(token.borrow_or_share())
+            }
         }
     }
 }
@@ -248,6 +255,9 @@ where
         match self {
             AuthorizationToken::Bearer(token) => AuthorizationToken::Bearer(token.into_static()),
             AuthorizationToken::Dpop(token) => AuthorizationToken::Dpop(token.into_static()),
+            AuthorizationToken::Delegation(token) => {
+                AuthorizationToken::Delegation(token.into_static())
+            }
         }
     }
 }

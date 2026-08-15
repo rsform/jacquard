@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::app_greengale::blog::BlobMetadata;
 use crate::app_greengale::blog::Ogp;
 use crate::app_greengale::blog::Theme;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A markdown blog post with extended theme and LaTeX support.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -62,7 +62,12 @@ pub struct Entry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_entry_visibility")]
     pub visibility: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_entry_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -166,6 +171,25 @@ impl<S: BosStr> LexiconSchema for Entry<S> {
     }
 }
 
+fn deserialize_entry_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 fn _default_entry_latex() -> Option<bool> {
     Some(false)
 }
@@ -176,7 +200,7 @@ fn _default_entry_visibility<S: FromStaticStr>() -> ::core::option::Option<S> {
 
 pub mod entry_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -278,7 +302,10 @@ where
     St::Content: entry_state::IsUnset,
 {
     /// Set the `content` field (required)
-    pub fn content(mut self, value: impl Into<S>) -> EntryBuilder<entry_state::SetContent<St>, S> {
+    pub fn content(
+        mut self,
+        value: impl Into<S>,
+    ) -> EntryBuilder<entry_state::SetContent<St>, S> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
@@ -417,10 +444,10 @@ where
 }
 
 fn lexicon_doc_app_greengale_blog_entry() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("app.greengale.blog.entry"),
@@ -429,9 +456,11 @@ fn lexicon_doc_app_greengale_blog_entry() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A markdown blog post with extended theme and LaTeX support.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A markdown blog post with extended theme and LaTeX support.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
                         required: Some(vec![SmolStr::new_static("content")]),
@@ -453,9 +482,9 @@ fn lexicon_doc_app_greengale_blog_entry() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Markdown content of the blog post",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Markdown content of the blog post"),
+                                    ),
                                     max_length: Some(100000usize),
                                     ..Default::default()
                                 }),
@@ -504,9 +533,9 @@ fn lexicon_doc_app_greengale_blog_entry() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("visibility"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Controls who can view this entry",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Controls who can view this entry"),
+                                    ),
                                     max_length: Some(16usize),
                                     ..Default::default()
                                 }),

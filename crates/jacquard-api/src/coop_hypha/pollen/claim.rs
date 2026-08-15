@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,12 +25,12 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::coop_hypha::pollen::embed::text::Text;
 use crate::ing_dasl::pfp_ref::PfpRef;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A provenance claim linking a perceptual fingerprint (PFP) to a blob.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -51,7 +51,12 @@ pub struct Claim<S: BosStr = DefaultStr> {
     ///Ref to the source record containing the blob.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<StrongRef<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_claim_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -114,9 +119,28 @@ impl<S: BosStr> LexiconSchema for Claim<S> {
     }
 }
 
+fn deserialize_claim_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod claim_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -243,7 +267,10 @@ where
     St::Cid: claim_state::IsUnset,
 {
     /// Set the `cid` field (required)
-    pub fn cid(mut self, value: impl Into<CidLink<S>>) -> ClaimBuilder<claim_state::SetCid<St>, S> {
+    pub fn cid(
+        mut self,
+        value: impl Into<CidLink<S>>,
+    ) -> ClaimBuilder<claim_state::SetCid<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ClaimBuilder {
             _state: PhantomData,
@@ -297,7 +324,10 @@ where
     St::Pfp: claim_state::IsUnset,
 {
     /// Set the `pfp` field (required)
-    pub fn pfp(mut self, value: impl Into<PfpRef<S>>) -> ClaimBuilder<claim_state::SetPfp<St>, S> {
+    pub fn pfp(
+        mut self,
+        value: impl Into<PfpRef<S>>,
+    ) -> ClaimBuilder<claim_state::SetPfp<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ClaimBuilder {
             _state: PhantomData,
@@ -353,10 +383,10 @@ where
 }
 
 fn lexicon_doc_coop_hypha_pollen_claim() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("coop.hypha.pollen.claim"),
@@ -365,17 +395,20 @@ fn lexicon_doc_coop_hypha_pollen_claim() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "A provenance claim linking a perceptual fingerprint (PFP) to a blob.",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "A provenance claim linking a perceptual fingerprint (PFP) to a blob.",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("pfp"),
-                            SmolStr::new_static("cid"),
-                            SmolStr::new_static("content"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("pfp"), SmolStr::new_static("cid"),
+                                SmolStr::new_static("content"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -388,19 +421,21 @@ fn lexicon_doc_coop_hypha_pollen_claim() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("content"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    description: Some(CowStr::new_static(
-                                        "Content of the claim, such as text.",
-                                    )),
-                                    refs: vec![CowStr::new_static("coop.hypha.pollen.embed.text")],
+                                    description: Some(
+                                        CowStr::new_static("Content of the claim, such as text."),
+                                    ),
+                                    refs: vec![
+                                        CowStr::new_static("coop.hypha.pollen.embed.text")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Timestamp when this claim was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("Timestamp when this claim was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),

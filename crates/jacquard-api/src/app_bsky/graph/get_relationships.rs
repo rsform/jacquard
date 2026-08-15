@@ -8,34 +8,29 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::graph::NotFoundActor;
-use crate::app_bsky::graph::Relationship;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::{IntoStatic, open_union};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::graph::NotFoundActor;
+use crate::app_bsky::graph::Relationship;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRelationships<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub others: Option<Vec<AtIdentifier<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetRelationshipsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor: Option<Did<S>>,
@@ -43,6 +38,7 @@ pub struct GetRelationshipsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -54,9 +50,18 @@ pub enum GetRelationshipsOutputRelationshipsItem<S: BosStr = DefaultStr> {
     NotFoundActor(Box<NotFoundActor<S>>),
 }
 
+
 #[derive(
-    Serialize, Deserialize, Debug, Clone, PartialEq, Eq, thiserror::Error, miette::Diagnostic,
+    Serialize,
+    Deserialize,
+    Debug,
+    Clone,
+    PartialEq,
+    Eq,
+    thiserror::Error,
+    miette::Diagnostic
 )]
+
 #[serde(tag = "error", content = "message")]
 pub enum GetRelationshipsError {
     /// the primary actor at-identifier could not be resolved
@@ -64,10 +69,7 @@ pub enum GetRelationshipsError {
     ActorNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: SmolStr,
-        message: Option<SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetRelationshipsError {
@@ -121,7 +123,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetRelationshipsRequest {
 
 pub mod get_relationships_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -152,7 +154,10 @@ pub mod get_relationships_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct GetRelationshipsBuilder<St: get_relationships_state::State, S: BosStr = DefaultStr> {
+pub struct GetRelationshipsBuilder<
+    St: get_relationships_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<Vec<AtIdentifier<S>>>),
     _type: PhantomData<fn() -> S>,

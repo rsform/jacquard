@@ -13,6 +13,7 @@ pub mod funding;
 pub mod helper;
 pub mod workscope;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
@@ -32,88 +33,100 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// Object containing a blob to external data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LargeBlob<S: BosStr = DefaultStr> {
     ///Blob to external data (up to 100MB)
     pub blob: BlobRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_large_blob_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a large image
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct LargeImage<S: BosStr = DefaultStr> {
     ///Image (up to 10MB)
     pub image: BlobRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_large_image_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a blob to external data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SmallBlob<S: BosStr = DefaultStr> {
     ///Blob to external data (up to 10MB)
     pub blob: BlobRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_small_blob_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a small image
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SmallImage<S: BosStr = DefaultStr> {
     ///Image (up to 5MB)
     pub image: BlobRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_small_image_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a small video
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SmallVideo<S: BosStr = DefaultStr> {
     ///Video (up to 20MB)
     pub video: BlobRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_small_video_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Object containing a URI to external data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Uri<S: BosStr = DefaultStr> {
     ///URI to external data
     pub uri: UriValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_uri_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -146,16 +159,19 @@ impl<S: BosStr> LexiconSchema for LargeBlob<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -197,25 +213,31 @@ impl<S: BosStr> LexiconSchema for LargeImage<S> {
             let value = &self.image;
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/jpeg", "image/jpg", "image/png", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let accepted: &[&str] = &[
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
                         accepted: vec![
-                            "image/jpeg".to_string(),
-                            "image/jpg".to_string(),
-                            "image/png".to_string(),
-                            "image/webp".to_string(),
+                            "image/jpeg".to_string(), "image/jpg".to_string(),
+                            "image/png".to_string(), "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -255,16 +277,19 @@ impl<S: BosStr> LexiconSchema for SmallBlob<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["*/*"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("blob"),
@@ -306,25 +331,31 @@ impl<S: BosStr> LexiconSchema for SmallImage<S> {
             let value = &self.image;
             {
                 let mime = value.blob().mime_type.as_str();
-                let accepted: &[&str] = &["image/jpeg", "image/jpg", "image/png", "image/webp"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let accepted: &[&str] = &[
+                    "image/jpeg",
+                    "image/jpg",
+                    "image/png",
+                    "image/webp",
+                ];
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("image"),
                         accepted: vec![
-                            "image/jpeg".to_string(),
-                            "image/jpg".to_string(),
-                            "image/png".to_string(),
-                            "image/webp".to_string(),
+                            "image/jpeg".to_string(), "image/jpg".to_string(),
+                            "image/png".to_string(), "image/webp".to_string()
                         ],
                         actual: mime.to_string(),
                     });
@@ -364,20 +395,25 @@ impl<S: BosStr> LexiconSchema for SmallVideo<S> {
             {
                 let mime = value.blob().mime_type.as_str();
                 let accepted: &[&str] = &["video/mp4", "video/webm"];
-                let matched = accepted.iter().any(|pattern| {
-                    if *pattern == "*/*" {
-                        true
-                    } else if pattern.ends_with("/*") {
-                        let prefix = &pattern[..pattern.len() - 2];
-                        mime.starts_with(prefix) && mime.as_bytes().get(prefix.len()) == Some(&b'/')
-                    } else {
-                        mime == *pattern
-                    }
-                });
+                let matched = accepted
+                    .iter()
+                    .any(|pattern| {
+                        if *pattern == "*/*" {
+                            true
+                        } else if pattern.ends_with("/*") {
+                            let prefix = &pattern[..pattern.len() - 2];
+                            mime.starts_with(prefix)
+                                && mime.as_bytes().get(prefix.len()) == Some(&b'/')
+                        } else {
+                            mime == *pattern
+                        }
+                    });
                 if !matched {
                     return Err(ConstraintError::BlobMimeTypeNotAccepted {
                         path: ValidationPath::from_field("video"),
-                        accepted: vec!["video/mp4".to_string(), "video/webm".to_string()],
+                        accepted: vec![
+                            "video/mp4".to_string(), "video/webm".to_string()
+                        ],
                         actual: mime.to_string(),
                     });
                 }
@@ -402,9 +438,22 @@ impl<S: BosStr> LexiconSchema for Uri<S> {
     }
 }
 
+fn deserialize_large_blob_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod large_blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -509,7 +558,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LargeBlob<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LargeBlob<S> {
         LargeBlob {
             blob: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -518,10 +570,10 @@ where
 }
 
 fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.hypercerts.defs"),
@@ -530,18 +582,16 @@ fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("largeBlob"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Object containing a blob to external data",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Object containing a blob to external data"),
+                    ),
                     required: Some(vec![SmolStr::new_static("blob")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -551,16 +601,16 @@ fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("largeImage"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Object containing a large image")),
+                    description: Some(
+                        CowStr::new_static("Object containing a large image"),
+                    ),
                     required: Some(vec![SmolStr::new_static("image")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -570,18 +620,16 @@ fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("smallBlob"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Object containing a blob to external data",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Object containing a blob to external data"),
+                    ),
                     required: Some(vec![SmolStr::new_static("blob")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("blob"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -591,16 +639,16 @@ fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("smallImage"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Object containing a small image")),
+                    description: Some(
+                        CowStr::new_static("Object containing a small image"),
+                    ),
                     required: Some(vec![SmolStr::new_static("image")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("image"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -610,16 +658,16 @@ fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("smallVideo"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Object containing a small video")),
+                    description: Some(
+                        CowStr::new_static("Object containing a small video"),
+                    ),
                     required: Some(vec![SmolStr::new_static("video")]),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("video"),
-                            LexObjectProperty::Blob(LexBlob {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::Blob(LexBlob { ..Default::default() }),
                         );
                         map
                     },
@@ -629,9 +677,9 @@ fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("uri"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static(
-                        "Object containing a URI to external data",
-                    )),
+                    description: Some(
+                        CowStr::new_static("Object containing a URI to external data"),
+                    ),
                     required: Some(vec![SmolStr::new_static("uri")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -639,7 +687,9 @@ fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("uri"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("URI to external data")),
+                                description: Some(
+                                    CowStr::new_static("URI to external data"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -655,9 +705,22 @@ fn lexicon_doc_org_hypercerts_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_large_image_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod large_image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -762,7 +825,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> LargeImage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LargeImage<S> {
         LargeImage {
             image: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -770,9 +836,22 @@ where
     }
 }
 
+fn deserialize_small_blob_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod small_blob_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -877,7 +956,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SmallBlob<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SmallBlob<S> {
         SmallBlob {
             blob: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -885,9 +967,22 @@ where
     }
 }
 
+fn deserialize_small_image_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod small_image_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -992,7 +1087,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SmallImage<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SmallImage<S> {
         SmallImage {
             image: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1000,9 +1098,22 @@ where
     }
 }
 
+fn deserialize_small_video_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod small_video_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1107,7 +1218,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SmallVideo<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SmallVideo<S> {
         SmallVideo {
             video: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1115,9 +1229,22 @@ where
     }
 }
 
+fn deserialize_uri_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod uri_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1196,7 +1323,10 @@ where
     St::Uri: uri_state::IsUnset,
 {
     /// Set the `uri` field (required)
-    pub fn uri(mut self, value: impl Into<UriValue<S>>) -> UriBuilder<uri_state::SetUri<St>, S> {
+    pub fn uri(
+        mut self,
+        value: impl Into<UriValue<S>>,
+    ) -> UriBuilder<uri_state::SetUri<St>, S> {
         self._fields.0 = Option::Some(value.into());
         UriBuilder {
             _state: PhantomData,

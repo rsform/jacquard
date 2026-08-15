@@ -8,20 +8,17 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::app_bsky::ageassurance::Config;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::ageassurance::Config;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetConfigOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
     pub value: Config<S>,
@@ -50,6 +47,12 @@ impl jacquard_common::xrpc::XrpcRequest for GetConfig {
     const NSID: &'static str = "app.bsky.ageassurance.getConfig";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetConfigResponse;
+    fn encode_body(
+        &self,
+        _buffer: &mut Vec<u8>,
+    ) -> Result<(), jacquard_common::xrpc::EncodeError> {
+        Ok(())
+    }
 }
 
 /** Endpoint marker for the `app.bsky.ageassurance.getConfig` query.

@@ -8,21 +8,18 @@
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReviewContribution<S: BosStr = DefaultStr> {
     pub contribution: StrongRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -31,6 +28,7 @@ pub struct ReviewContribution<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ReviewContributionStatus<S: BosStr = DefaultStr> {
@@ -81,7 +79,8 @@ impl<S: BosStr> Serialize for ReviewContributionStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReviewContributionStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ReviewContributionStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -107,17 +106,19 @@ where
         match self {
             ReviewContributionStatus::Approved => ReviewContributionStatus::Approved,
             ReviewContributionStatus::Denied => ReviewContributionStatus::Denied,
-            ReviewContributionStatus::NeedsRevision => ReviewContributionStatus::NeedsRevision,
-            ReviewContributionStatus::Other(v) => ReviewContributionStatus::Other(v.into_static()),
+            ReviewContributionStatus::NeedsRevision => {
+                ReviewContributionStatus::NeedsRevision
+            }
+            ReviewContributionStatus::Other(v) => {
+                ReviewContributionStatus::Other(v.into_static())
+            }
         }
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ReviewContributionOutput<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -137,8 +138,9 @@ impl jacquard_common::xrpc::XrpcResp for ReviewContributionResponse {
 
 impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ReviewContribution<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.reviewContribution";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Response = ReviewContributionResponse;
 }
 
@@ -148,15 +150,16 @@ Path: `/xrpc/games.gamesgamesgamesgames.reviewContribution`. The request payload
 pub struct ReviewContributionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ReviewContributionRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.reviewContribution";
-    const METHOD: jacquard_common::xrpc::XrpcMethod =
-        jacquard_common::xrpc::XrpcMethod::Procedure("application/json");
+    const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
+        "application/json",
+    );
     type Request<S: BosStr> = ReviewContribution<S>;
     type Response = ReviewContributionResponse;
 }
 
 pub mod review_contribution_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -199,19 +202,21 @@ pub mod review_contribution_state {
 }
 
 /// Builder for constructing an instance of this type.
-pub struct ReviewContributionBuilder<St: review_contribution_state::State, S: BosStr = DefaultStr> {
+pub struct ReviewContributionBuilder<
+    St: review_contribution_state::State,
+    S: BosStr = DefaultStr,
+> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<StrongRef<S>>,
-        Option<S>,
-        Option<ReviewContributionStatus<S>>,
-    ),
+    _fields: (Option<StrongRef<S>>, Option<S>, Option<ReviewContributionStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
 impl ReviewContribution<DefaultStr> {
     /// Create a new builder for this type, using the default string type (DefaultStr = SmolStr) if needed
-    pub fn new() -> ReviewContributionBuilder<review_contribution_state::Empty, DefaultStr> {
+    pub fn new() -> ReviewContributionBuilder<
+        review_contribution_state::Empty,
+        DefaultStr,
+    > {
         ReviewContributionBuilder::new()
     }
 }
@@ -312,7 +317,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReviewContribution<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReviewContribution<S> {
         ReviewContribution {
             contribution: self._fields.0.unwrap(),
             reason: self._fields.1,

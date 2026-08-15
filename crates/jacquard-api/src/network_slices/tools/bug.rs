@@ -10,12 +10,13 @@ pub mod comment;
 pub mod issue;
 pub mod response;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +30,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::network_slices::tools::Images;
-use crate::network_slices::tools::richtext::facet::Facet;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::network_slices::tools::Images;
+use crate::network_slices::tools::richtext::facet::Facet;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -60,9 +61,15 @@ pub struct Bug<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub steps_to_reproduce_facets: Option<Vec<Facet<S>>>,
     pub title: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_bug_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum BugSeverity<S: BosStr = DefaultStr> {
@@ -290,9 +297,28 @@ impl<S: BosStr> LexiconSchema for Bug<S> {
     }
 }
 
+fn deserialize_bug_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod bug_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -522,7 +548,10 @@ where
 
 impl<St: bug_state::State, S: BosStr> BugBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
@@ -539,7 +568,10 @@ where
     St::Namespace: bug_state::IsUnset,
 {
     /// Set the `namespace` field (required)
-    pub fn namespace(mut self, value: impl Into<S>) -> BugBuilder<bug_state::SetNamespace<St>, S> {
+    pub fn namespace(
+        mut self,
+        value: impl Into<S>,
+    ) -> BugBuilder<bug_state::SetNamespace<St>, S> {
         self._fields.5 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
@@ -589,12 +621,18 @@ where
 
 impl<St: bug_state::State, S: BosStr> BugBuilder<St, S> {
     /// Set the `stepsToReproduceFacets` field (optional)
-    pub fn steps_to_reproduce_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn steps_to_reproduce_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `stepsToReproduceFacets` field to an Option value (optional)
-    pub fn maybe_steps_to_reproduce_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
+    pub fn maybe_steps_to_reproduce_facets(
+        mut self,
+        value: Option<Vec<Facet<S>>>,
+    ) -> Self {
         self._fields.8 = value;
         self
     }
@@ -606,7 +644,10 @@ where
     St::Title: bug_state::IsUnset,
 {
     /// Set the `title` field (required)
-    pub fn title(mut self, value: impl Into<S>) -> BugBuilder<bug_state::SetTitle<St>, S> {
+    pub fn title(
+        mut self,
+        value: impl Into<S>,
+    ) -> BugBuilder<bug_state::SetTitle<St>, S> {
         self._fields.9 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
@@ -661,10 +702,10 @@ where
 }
 
 fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.slices.tools.bug"),
@@ -675,14 +716,16 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                 LexUserType::Record(LexRecord {
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("title"),
-                            SmolStr::new_static("namespace"),
-                            SmolStr::new_static("description"),
-                            SmolStr::new_static("stepsToReproduce"),
-                            SmolStr::new_static("severity"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("title"),
+                                SmolStr::new_static("namespace"),
+                                SmolStr::new_static("description"),
+                                SmolStr::new_static("stepsToReproduce"),
+                                SmolStr::new_static("severity"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -696,9 +739,9 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("attachments"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    refs: vec![CowStr::new_static(
-                                        "network.slices.tools.defs#images",
-                                    )],
+                                    refs: vec![
+                                        CowStr::new_static("network.slices.tools.defs#images")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
@@ -720,9 +763,11 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("descriptionFacets"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Annotations of description (mentions and links)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Annotations of description (mentions and links)",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "network.slices.tools.richtext.facet",
@@ -735,9 +780,11 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("namespace"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "Target namespace like 'social.grain' or 'app.bsky'",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Target namespace like 'social.grain' or 'app.bsky'",
+                                        ),
+                                    ),
                                     ..Default::default()
                                 }),
                             );
@@ -758,9 +805,11 @@ fn lexicon_doc_network_slices_tools_bug() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("stepsToReproduceFacets"),
                                 LexObjectProperty::Array(LexArray {
-                                    description: Some(CowStr::new_static(
-                                        "Annotations of steps to reproduce (mentions and links)",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "Annotations of steps to reproduce (mentions and links)",
+                                        ),
+                                    ),
                                     items: LexArrayItem::Ref(LexRef {
                                         r#ref: CowStr::new_static(
                                             "network.slices.tools.richtext.facet",

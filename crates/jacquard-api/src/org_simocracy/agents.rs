@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,11 +24,11 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::app_bsky::richtext::facet::Facet;
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::app_bsky::richtext::facet::Facet;
+use crate::com_atproto::repo::strong_ref::StrongRef;
 /// A sim's constitution and agent configuration. One document per sim.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -54,7 +54,12 @@ pub struct Agents<S: BosStr = DefaultStr> {
     pub short_description_facets: Option<Vec<Facet<S>>>,
     ///Reference to the sim record this constitution belongs to
     pub sim: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_agents_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -163,9 +168,28 @@ impl<S: BosStr> LexiconSchema for Agents<S> {
     }
 }
 
+fn deserialize_agents_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod agents_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -305,7 +329,10 @@ impl<St: agents_state::State, S: BosStr> AgentsBuilder<St, S> {
 
 impl<St: agents_state::State, S: BosStr> AgentsBuilder<St, S> {
     /// Set the `descriptionFacets` field (optional)
-    pub fn description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
@@ -337,12 +364,18 @@ where
 
 impl<St: agents_state::State, S: BosStr> AgentsBuilder<St, S> {
     /// Set the `shortDescriptionFacets` field (optional)
-    pub fn short_description_facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
+    pub fn short_description_facets(
+        mut self,
+        value: impl Into<Option<Vec<Facet<S>>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `shortDescriptionFacets` field to an Option value (optional)
-    pub fn maybe_short_description_facets(mut self, value: Option<Vec<Facet<S>>>) -> Self {
+    pub fn maybe_short_description_facets(
+        mut self,
+        value: Option<Vec<Facet<S>>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -401,10 +434,10 @@ where
 }
 
 fn lexicon_doc_org_simocracy_agents() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.simocracy.agents"),

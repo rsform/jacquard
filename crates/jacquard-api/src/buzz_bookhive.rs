@@ -15,12 +15,13 @@ pub mod hive_book;
 pub mod list_genres;
 pub mod search_books;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +32,11 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::buzz_bookhive;
-use crate::com_atproto::repo::strong_ref::StrongRef;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::com_atproto::repo::strong_ref::StrongRef;
+use crate::buzz_bookhive;
 /// User has abandoned the book
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Hash)]
@@ -46,11 +47,9 @@ impl core::fmt::Display for Abandoned {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Activity<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///The hive id of the book
@@ -62,9 +61,15 @@ pub struct Activity<S: BosStr = DefaultStr> {
     pub user_did: S,
     ///The handle of the user who added the book
     pub user_handle: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_activity_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ActivityType<S: BosStr = DefaultStr> {
@@ -154,10 +159,7 @@ where
 /// External identifiers for a book
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BookIdentifiers<S: BosStr = DefaultStr> {
     ///Goodreads book ID
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -171,17 +173,19 @@ pub struct BookIdentifiers<S: BosStr = DefaultStr> {
     ///13-digit ISBN
     #[serde(skip_serializing_if = "Option::is_none")]
     pub isbn13: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_book_identifiers_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Reading progress tracking data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BookProgress<S: BosStr = DefaultStr> {
     ///Current chapter the user is on
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -200,15 +204,18 @@ pub struct BookProgress<S: BosStr = DefaultStr> {
     pub total_pages: Option<i64>,
     ///When the progress was last updated
     pub updated_at: Datetime,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_book_progress_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Comment<S: BosStr = DefaultStr> {
     pub book: StrongRef<S>,
     ///The content of the comment.
@@ -220,7 +227,12 @@ pub struct Comment<S: BosStr = DefaultStr> {
     ///The handle of the user who made the comment
     pub handle: S,
     pub parent: StrongRef<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_comment_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -244,11 +256,9 @@ impl core::fmt::Display for Owned {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Profile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<S>,
@@ -261,7 +271,12 @@ pub struct Profile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_following: Option<bool>,
     pub reviews: i64,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_profile_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -275,11 +290,9 @@ impl core::fmt::Display for Reading {
     }
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Review<S: BosStr = DefaultStr> {
     ///The date the review was created
     pub created_at: Datetime,
@@ -292,15 +305,18 @@ pub struct Review<S: BosStr = DefaultStr> {
     ///The number of stars given to the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stars: Option<i64>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_review_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UserBook<S: BosStr = DefaultStr> {
     ///The authors of the book (tab separated)
     pub authors: S,
@@ -342,9 +358,15 @@ pub struct UserBook<S: BosStr = DefaultStr> {
     ///The handle of the user who added the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_handle: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_user_book_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UserBookStatus<S: BosStr = DefaultStr> {
@@ -750,9 +772,22 @@ impl<S: BosStr> LexiconSchema for UserBook<S> {
     }
 }
 
+fn deserialize_activity_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod activity_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1063,10 +1098,10 @@ where
 }
 
 fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("buzz.bookhive.defs"),
@@ -1074,21 +1109,20 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
             let mut map = BTreeMap::new();
             map.insert(
                 SmolStr::new_static("abandoned"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("activity"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("type"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("hiveId"),
-                        SmolStr::new_static("title"),
-                        SmolStr::new_static("userDid"),
-                        SmolStr::new_static("userHandle"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("type"),
+                            SmolStr::new_static("createdAt"),
+                            SmolStr::new_static("hiveId"), SmolStr::new_static("title"),
+                            SmolStr::new_static("userDid"),
+                            SmolStr::new_static("userHandle")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1102,38 +1136,42 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("hiveId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The hive id of the book")),
+                                description: Some(
+                                    CowStr::new_static("The hive id of the book"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("title"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The title of the book")),
+                                description: Some(
+                                    CowStr::new_static("The title of the book"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("type"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("userDid"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the user who added the book",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The DID of the user who added the book"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("userHandle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The handle of the user who added the book",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The handle of the user who added the book",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1145,7 +1183,9 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bookIdentifiers"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("External identifiers for a book")),
+                    description: Some(
+                        CowStr::new_static("External identifiers for a book"),
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
@@ -1159,7 +1199,9 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("hiveId"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("BookHive's internal ID")),
+                                description: Some(
+                                    CowStr::new_static("BookHive's internal ID"),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1185,7 +1227,9 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("bookProgress"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Reading progress tracking data")),
+                    description: Some(
+                        CowStr::new_static("Reading progress tracking data"),
+                    ),
                     required: Some(vec![SmolStr::new_static("updatedAt")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -1229,9 +1273,9 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("updatedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the progress was last updated",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the progress was last updated"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1321,33 +1365,29 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("finished"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("owned"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("profile"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("displayName"),
-                        SmolStr::new_static("handle"),
-                        SmolStr::new_static("booksRead"),
-                        SmolStr::new_static("reviews"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("displayName"),
+                            SmolStr::new_static("handle"),
+                            SmolStr::new_static("booksRead"),
+                            SmolStr::new_static("reviews")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("avatar"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("booksRead"),
@@ -1358,21 +1398,15 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
                         );
                         map.insert(
                             SmolStr::new_static("description"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("displayName"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
-                            LexObjectProperty::String(LexString {
-                                ..Default::default()
-                            }),
+                            LexObjectProperty::String(LexString { ..Default::default() }),
                         );
                         map.insert(
                             SmolStr::new_static("isFollowing"),
@@ -1394,28 +1428,27 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("reading"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map.insert(
                 SmolStr::new_static("review"),
                 LexUserType::Object(LexObject {
-                    required: Some(vec![
-                        SmolStr::new_static("review"),
-                        SmolStr::new_static("createdAt"),
-                        SmolStr::new_static("did"),
-                        SmolStr::new_static("handle"),
-                    ]),
+                    required: Some(
+                        vec![
+                            SmolStr::new_static("review"),
+                            SmolStr::new_static("createdAt"), SmolStr::new_static("did"),
+                            SmolStr::new_static("handle")
+                        ],
+                    ),
                     properties: {
                         #[allow(unused_mut)]
                         let mut map = BTreeMap::new();
                         map.insert(
                             SmolStr::new_static("createdAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The date the review was created",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("The date the review was created"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -1423,18 +1456,22 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("did"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The DID of the user who made the review",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The DID of the user who made the review",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("handle"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "The handle of the user who made the review",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "The handle of the user who made the review",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -1629,9 +1666,7 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
             );
             map.insert(
                 SmolStr::new_static("wantToRead"),
-                LexUserType::Token(LexToken {
-                    ..Default::default()
-                }),
+                LexUserType::Token(LexToken { ..Default::default() }),
             );
             map
         },
@@ -1639,9 +1674,35 @@ fn lexicon_doc_buzz_bookhive_defs() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_book_identifiers_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_book_progress_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod book_progress_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -1823,7 +1884,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BookProgress<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BookProgress<S> {
         BookProgress {
             current_chapter: self._fields.0,
             current_page: self._fields.1,
@@ -1836,9 +1900,22 @@ where
     }
 }
 
+fn deserialize_comment_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod comment_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2061,7 +2138,10 @@ where
     St::Did: comment_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<S>) -> CommentBuilder<comment_state::SetDid<St>, S> {
+    pub fn did(
+        mut self,
+        value: impl Into<S>,
+    ) -> CommentBuilder<comment_state::SetDid<St>, S> {
         self._fields.3 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
@@ -2145,9 +2225,22 @@ where
     }
 }
 
+fn deserialize_profile_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod profile_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2421,9 +2514,22 @@ where
     }
 }
 
+fn deserialize_review_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod review_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2498,13 +2604,7 @@ pub mod review_state {
 /// Builder for constructing an instance of this type.
 pub struct ReviewBuilder<St: review_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<S>,
-        Option<S>,
-        Option<i64>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<S>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -2569,7 +2669,10 @@ where
     St::Did: review_state::IsUnset,
 {
     /// Set the `did` field (required)
-    pub fn did(mut self, value: impl Into<S>) -> ReviewBuilder<review_state::SetDid<St>, S> {
+    pub fn did(
+        mut self,
+        value: impl Into<S>,
+    ) -> ReviewBuilder<review_state::SetDid<St>, S> {
         self._fields.1 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
@@ -2585,7 +2688,10 @@ where
     St::Handle: review_state::IsUnset,
 {
     /// Set the `handle` field (required)
-    pub fn handle(mut self, value: impl Into<S>) -> ReviewBuilder<review_state::SetHandle<St>, S> {
+    pub fn handle(
+        mut self,
+        value: impl Into<S>,
+    ) -> ReviewBuilder<review_state::SetHandle<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
@@ -2601,7 +2707,10 @@ where
     St::Review: review_state::IsUnset,
 {
     /// Set the `review` field (required)
-    pub fn review(mut self, value: impl Into<S>) -> ReviewBuilder<review_state::SetReview<St>, S> {
+    pub fn review(
+        mut self,
+        value: impl Into<S>,
+    ) -> ReviewBuilder<review_state::SetReview<St>, S> {
         self._fields.3 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
@@ -2656,9 +2765,22 @@ where
     }
 }
 
+fn deserialize_user_book_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod user_book_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -2812,8 +2934,22 @@ impl UserBookBuilder<user_book_state::Empty, DefaultStr> {
         UserBookBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2826,8 +2962,22 @@ impl<S: BosStr> UserBookBuilder<user_book_state::Empty, S> {
         UserBookBuilder {
             _state: PhantomData,
             _fields: (
-                None, None, None, None, None, None, None, None, None, None, None, None, None, None,
-                None, None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
             ),
             _type: PhantomData,
         }
@@ -2863,7 +3013,10 @@ impl<St: user_book_state::State, S: BosStr> UserBookBuilder<St, S> {
         self
     }
     /// Set the `bookProgress` field to an Option value (optional)
-    pub fn maybe_book_progress(mut self, value: Option<buzz_bookhive::BookProgress<S>>) -> Self {
+    pub fn maybe_book_progress(
+        mut self,
+        value: Option<buzz_bookhive::BookProgress<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }

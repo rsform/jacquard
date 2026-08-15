@@ -9,8 +9,8 @@ use jacquard_common::types::did::Did;
 use jacquard_common::types::tid::Tid;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_repo::permissioned::{
-    CommitContext, LtHash, SignedCommit, SpaceTypeDeclaration, WriteOperation, WriteState,
-    apply_writes, format_cursor, list_repo_ops,
+    CommitContext, LtHash, SpaceTypeDeclaration, WriteOperation, WriteState, apply_writes,
+    format_cursor, list_repo_ops, sign_commit_with_ikm, verify_commit,
 };
 use std::str::FromStr;
 
@@ -53,8 +53,8 @@ fn permissioned_data_conformance() {
         rev: Tid::new("3jzfcijpj2m2a").unwrap(),
     };
     let key = SigningKey::from_bytes(&[11; 32]);
-    let commit = SignedCommit::sign_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
-    commit.verify(&context, &key.verifying_key()).unwrap();
+    let commit = sign_commit_with_ikm([9; 32], &context, &key, [0x20; 32]).unwrap();
+    verify_commit(&commit, &context, &key.verifying_key()).unwrap();
 
     let mut state = WriteState::default();
     let operation = WriteOperation::Create {

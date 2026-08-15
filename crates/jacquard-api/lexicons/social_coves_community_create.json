@@ -1,0 +1,150 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.create",
+  "defs": {
+    "main": {
+      "type": "procedure",
+      "description": "Create a new community. Requires authentication.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "name",
+            "description"
+          ],
+          "properties": {
+            "allowExternalDiscovery": {
+              "type": "boolean",
+              "description": "Whether other Coves instances can index and discover this community",
+              "default": true
+            },
+            "avatarBlob": {
+              "type": "string",
+              "description": "Base64-encoded avatar image data (png, jpeg, or webp)",
+              "maxLength": 1400000
+            },
+            "avatarMimeType": {
+              "type": "string",
+              "description": "MIME type of the avatar image (image/png, image/jpeg, image/webp)",
+              "maxLength": 128
+            },
+            "bannerBlob": {
+              "type": "string",
+              "description": "Base64-encoded banner image data (png, jpeg, or webp)",
+              "maxLength": 2800000
+            },
+            "bannerMimeType": {
+              "type": "string",
+              "description": "MIME type of the banner image (image/png, image/jpeg, image/webp)",
+              "maxLength": 128
+            },
+            "categories": {
+              "type": "array",
+              "description": "Community categories for discovery",
+              "items": {
+                "type": "string",
+                "maxLength": 50
+              },
+              "maxLength": 3
+            },
+            "description": {
+              "type": "string",
+              "description": "Community description",
+              "maxLength": 10000,
+              "maxGraphemes": 1000
+            },
+            "displayName": {
+              "type": "string",
+              "description": "Display name for the community",
+              "maxLength": 1280,
+              "maxGraphemes": 128
+            },
+            "language": {
+              "type": "string",
+              "description": "Primary language of the community",
+              "format": "language"
+            },
+            "membershipThreshold": {
+              "type": "integer",
+              "description": "Reputation threshold required for membership",
+              "default": 100,
+              "minimum": 0,
+              "maximum": 10000
+            },
+            "name": {
+              "type": "string",
+              "description": "Short community name used as the local part of the handle (e.g., 'gaming'). Must be a valid DNS label: ASCII letters, digits, and hyphens only.",
+              "maxLength": 63
+            },
+            "rules": {
+              "type": "array",
+              "description": "Community rules",
+              "items": {
+                "type": "string",
+                "maxLength": 2000,
+                "maxGraphemes": 200
+              },
+              "maxLength": 10
+            },
+            "visibility": {
+              "type": "string",
+              "description": "Community visibility level",
+              "default": "public",
+              "maxLength": 64,
+              "knownValues": [
+                "public",
+                "unlisted",
+                "private"
+              ]
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "uri",
+            "cid",
+            "did",
+            "handle"
+          ],
+          "properties": {
+            "cid": {
+              "type": "string",
+              "description": "CID of the created community profile",
+              "format": "cid"
+            },
+            "did": {
+              "type": "string",
+              "description": "DID of the created community",
+              "format": "did"
+            },
+            "handle": {
+              "type": "string",
+              "description": "Scoped handle of the created community (~name@instance)",
+              "maxLength": 512
+            },
+            "uri": {
+              "type": "string",
+              "description": "AT-URI of the created community profile",
+              "format": "at-uri"
+            }
+          }
+        }
+      },
+      "errors": [
+        {
+          "description": "Community name is already taken",
+          "name": "NameTaken"
+        },
+        {
+          "description": "User has reached the maximum number of communities they can create",
+          "name": "TooManyCommunities"
+        }
+      ]
+    }
+  }
+}

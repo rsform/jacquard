@@ -1,0 +1,111 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.community.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A community's profile information (V2: stored in community's own repository)",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 1000000
+          },
+          "banner": {
+            "type": "blob",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 2000000
+          },
+          "contentWarnings": {
+            "type": "array",
+            "description": "Required content warnings for this community",
+            "items": {
+              "type": "string",
+              "maxLength": 32,
+              "knownValues": [
+                "nsfw",
+                "violence",
+                "spoilers"
+              ]
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "DID of the user who created this community",
+            "format": "did"
+          },
+          "description": {
+            "type": "string",
+            "description": "Community description with rich text support",
+            "maxLength": 10000,
+            "maxGraphemes": 1000
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "description": "Rich text annotations for description",
+            "items": {
+              "type": "ref",
+              "ref": "social.coves.richtext.facet"
+            }
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name for the community",
+            "maxLength": 1280,
+            "maxGraphemes": 128
+          },
+          "hostedBy": {
+            "type": "string",
+            "description": "DID of the instance hosting this community",
+            "format": "did"
+          },
+          "moderationType": {
+            "type": "string",
+            "description": "Type of moderation system (moderator=traditional moderator team, sortition=community tribunal)",
+            "default": "moderator",
+            "maxLength": 64,
+            "knownValues": [
+              "moderator",
+              "sortition"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "Short community name (local part of handle). Must be a valid DNS label: ASCII letters, digits, and hyphens only.",
+            "maxLength": 63
+          },
+          "visibility": {
+            "type": "string",
+            "description": "Community visibility level",
+            "default": "public",
+            "maxLength": 64,
+            "knownValues": [
+              "public",
+              "unlisted",
+              "private"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

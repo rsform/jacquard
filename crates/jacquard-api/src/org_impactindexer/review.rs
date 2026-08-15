@@ -9,12 +9,13 @@
 pub mod comment;
 pub mod like;
 
+
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,17 +25,14 @@ use jacquard_derive::IntoStatic;
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::org_impactindexer::review;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::org_impactindexer::review;
 /// Reference to the subject being reviewed.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SubjectRef<S: BosStr = DefaultStr> {
     ///Optional CID for record subjects to pin to a specific version.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -43,7 +41,12 @@ pub struct SubjectRef<S: BosStr = DefaultStr> {
     pub r#type: review::SubjectType<S>,
     ///The subject identifier. For records: AT-URI (at://did/collection/rkey). For users: DID (did:plc:xxx). For PDSes: hostname (example.com). For lexicons: NSID (app.bsky.feed.post).
     pub uri: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_subject_ref_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -175,9 +178,22 @@ impl<S: BosStr> LexiconSchema for SubjectRef<S> {
     }
 }
 
+fn deserialize_subject_ref_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod subject_ref_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -329,7 +345,10 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SubjectRef<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SubjectRef<S> {
         SubjectRef {
             cid: self._fields.0,
             r#type: self._fields.1.unwrap(),
@@ -340,10 +359,10 @@ where
 }
 
 fn lexicon_doc_org_impactindexer_review_defs() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("org.impactindexer.review.defs"),
@@ -400,7 +419,9 @@ fn lexicon_doc_org_impactindexer_review_defs() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("subjectType"),
                 LexUserType::String(LexString {
-                    description: Some(CowStr::new_static("The type of subject being reviewed.")),
+                    description: Some(
+                        CowStr::new_static("The type of subject being reviewed."),
+                    ),
                     max_length: Some(32usize),
                     ..Default::default()
                 }),

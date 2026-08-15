@@ -30,7 +30,8 @@
           "properties": {
             "id": {
               "type": "string",
-              "description": "The ID of the created draft."
+              "description": "The ID of the created draft.",
+              "format": "tid"
             }
           }
         }

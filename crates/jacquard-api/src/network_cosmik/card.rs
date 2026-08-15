@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,12 +24,12 @@ use jacquard_derive::{IntoStatic, lexicon, open_union};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
+#[allow(unused_imports)]
+use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
+use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::network_cosmik::Provenance;
 use crate::network_cosmik::card;
-#[allow(unused_imports)]
-use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
 /// A record representing a card with content.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -59,9 +59,15 @@ pub struct Card<S: BosStr = DefaultStr> {
     ///Optional URL associated with the card. Required for URL cards, optional for NOTE cards.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<UriValue<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_card_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
+
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -166,41 +172,42 @@ pub struct CardGetRecordOutput<S: BosStr = DefaultStr> {
 /// Content structure for a note card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct NoteContent<S: BosStr = DefaultStr> {
     ///The note text content
     pub text: S,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_note_content_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Content structure for a URL card.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UrlContent<S: BosStr = DefaultStr> {
     ///Optional metadata about the URL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<card::UrlMetadata<S>>,
     ///The URL being saved
     pub url: UriValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_url_content_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Metadata about a URL.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(
-    rename_all = "camelCase",
-    bound(deserialize = "S: Deserialize<'de> + BosStr")
-)]
+#[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct UrlMetadata<S: BosStr = DefaultStr> {
     ///Author of the content
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -232,7 +239,12 @@ pub struct UrlMetadata<S: BosStr = DefaultStr> {
     ///Type of content (e.g., 'video', 'article')
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_url_metadata_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -340,9 +352,28 @@ impl<S: BosStr> LexiconSchema for UrlMetadata<S> {
     }
 }
 
+fn deserialize_card_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod card_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -573,10 +604,10 @@ where
 }
 
 fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("network.cosmik.card"),
@@ -675,7 +706,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("noteContent"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Content structure for a note card.")),
+                    description: Some(
+                        CowStr::new_static("Content structure for a note card."),
+                    ),
                     required: Some(vec![SmolStr::new_static("text")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -683,7 +716,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("text"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The note text content")),
+                                description: Some(
+                                    CowStr::new_static("The note text content"),
+                                ),
                                 max_length: Some(10000usize),
                                 ..Default::default()
                             }),
@@ -696,7 +731,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("urlContent"),
                 LexUserType::Object(LexObject {
-                    description: Some(CowStr::new_static("Content structure for a URL card.")),
+                    description: Some(
+                        CowStr::new_static("Content structure for a URL card."),
+                    ),
                     required: Some(vec![SmolStr::new_static("url")]),
                     properties: {
                         #[allow(unused_mut)]
@@ -711,7 +748,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("url"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("The URL being saved")),
+                                description: Some(
+                                    CowStr::new_static("The URL being saved"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -731,32 +770,38 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("author"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Author of the content")),
+                                description: Some(
+                                    CowStr::new_static("Author of the content"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("description"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static("Description of the page")),
+                                description: Some(
+                                    CowStr::new_static("Description of the page"),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("doi"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Digital Object Identifier (DOI) for academic content",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Digital Object Identifier (DOI) for academic content",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("imageUrl"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "URL of a representative image",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("URL of a representative image"),
+                                ),
                                 format: Some(LexStringFormat::Uri),
                                 ..Default::default()
                             }),
@@ -764,18 +809,20 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("isbn"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "International Standard Book Number (ISBN) for books",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "International Standard Book Number (ISBN) for books",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
                         map.insert(
                             SmolStr::new_static("publishedDate"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the content was published",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the content was published"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -783,9 +830,9 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("retrievedAt"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "When the metadata was retrieved",
-                                )),
+                                description: Some(
+                                    CowStr::new_static("When the metadata was retrieved"),
+                                ),
                                 format: Some(LexStringFormat::Datetime),
                                 ..Default::default()
                             }),
@@ -807,9 +854,11 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
                         map.insert(
                             SmolStr::new_static("type"),
                             LexObjectProperty::String(LexString {
-                                description: Some(CowStr::new_static(
-                                    "Type of content (e.g., 'video', 'article')",
-                                )),
+                                description: Some(
+                                    CowStr::new_static(
+                                        "Type of content (e.g., 'video', 'article')",
+                                    ),
+                                ),
                                 ..Default::default()
                             }),
                         );
@@ -824,9 +873,35 @@ fn lexicon_doc_network_cosmik_card() -> LexiconDoc<'static> {
     }
 }
 
+fn deserialize_note_content_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn deserialize_url_content_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
 pub mod url_content_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -945,11 +1020,27 @@ where
         }
     }
     /// Build the final struct with custom extra_data.
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UrlContent<S> {
+    pub fn build_with_data(
+        self,
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UrlContent<S> {
         UrlContent {
             metadata: self._fields.0,
             url: self._fields.1.unwrap(),
             extra_data: Some(extra_data),
         }
     }
+}
+
+fn deserialize_url_metadata_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }

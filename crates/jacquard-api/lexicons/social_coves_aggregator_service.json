@@ -1,0 +1,66 @@
+{
+  "lexicon": 1,
+  "id": "social.coves.aggregator.service",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Declaration of an aggregator service that can post to communities. Published in the aggregator's own repository. Similar to app.bsky.feed.generator and app.bsky.labeler.service.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "did",
+          "displayName",
+          "createdAt"
+        ],
+        "properties": {
+          "avatar": {
+            "type": "blob",
+            "description": "Avatar image for bot identity",
+            "accept": [
+              "image/png",
+              "image/jpeg",
+              "image/webp"
+            ],
+            "maxSize": 1000000
+          },
+          "configSchema": {
+            "type": "unknown",
+            "description": "JSON Schema describing config options for this aggregator. Communities use this to know what configuration fields are available."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what this aggregator does",
+            "maxLength": 3000,
+            "maxGraphemes": 300
+          },
+          "did": {
+            "type": "string",
+            "description": "DID of the aggregator service (must match repo DID)",
+            "format": "did"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Human-readable name (e.g., 'RSS News Aggregator')",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "maintainer": {
+            "type": "string",
+            "description": "DID of person/organization maintaining this aggregator",
+            "format": "did"
+          },
+          "sourceUrl": {
+            "type": "string",
+            "description": "URL to aggregator's source code (for transparency)",
+            "format": "uri"
+          }
+        }
+      }
+    }
+  }
+}

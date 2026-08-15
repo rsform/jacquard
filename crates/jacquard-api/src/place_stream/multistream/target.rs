@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,7 +26,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
 /// An external server for rebroadcasting a Streamplace stream
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -46,7 +46,12 @@ pub struct Target<S: BosStr = DefaultStr> {
     pub name: Option<S>,
     ///The rtmp:// or rtmps:// url of the target server.
     pub url: UriValue<S>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_target_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -119,9 +124,28 @@ impl<S: BosStr> LexiconSchema for Target<S> {
     }
 }
 
+fn deserialize_target_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod target_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,12 +204,7 @@ pub mod target_state {
 /// Builder for constructing an instance of this type.
 pub struct TargetBuilder<St: target_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<bool>,
-        Option<Datetime>,
-        Option<S>,
-        Option<UriValue<S>>,
-    ),
+    _fields: (Option<bool>, Option<Datetime>, Option<S>, Option<UriValue<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -325,10 +344,10 @@ where
 }
 
 fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("place.stream.multistream.target"),
@@ -337,16 +356,19 @@ fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "An external server for rebroadcasting a Streamplace stream",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "An external server for rebroadcasting a Streamplace stream",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("url"),
-                            SmolStr::new_static("active"),
-                            SmolStr::new_static("createdAt"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("url"), SmolStr::new_static("active"),
+                                SmolStr::new_static("createdAt")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -359,9 +381,9 @@ fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("createdAt"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "When this target was created.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("When this target was created."),
+                                    ),
                                     format: Some(LexStringFormat::Datetime),
                                     ..Default::default()
                                 }),
@@ -369,9 +391,9 @@ fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("name"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "A user-friendly name for this target.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("A user-friendly name for this target."),
+                                    ),
                                     max_length: Some(100usize),
                                     ..Default::default()
                                 }),
@@ -379,9 +401,11 @@ fn lexicon_doc_place_stream_multistream_target() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("url"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The rtmp:// or rtmps:// url of the target server.",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static(
+                                            "The rtmp:// or rtmps:// url of the target server.",
+                                        ),
+                                    ),
                                     format: Some(LexStringFormat::Uri),
                                     ..Default::default()
                                 }),

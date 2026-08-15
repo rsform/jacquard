@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{BosStr, CowStr, DefaultStr, FromStaticStr};
+use jacquard_common::{CowStr, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -24,10 +24,10 @@ use jacquard_derive::{IntoStatic, lexicon};
 use jacquard_lexicon::lexicon::LexiconDoc;
 use jacquard_lexicon::schema::LexiconSchema;
 
-use crate::media_ionosphere::Track;
 #[allow(unused_imports)]
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
-use serde::{Deserialize, Serialize};
+use serde::{Serialize, Deserialize};
+use crate::media_ionosphere::Track;
 /// Represents information about what was played
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -45,7 +45,12 @@ pub struct Log<S: BosStr = DefaultStr> {
     ///The programme this log is a part of
     #[serde(skip_serializing_if = "Option::is_none")]
     pub programme: Option<AtUri<S>>,
-    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    #[serde(
+        flatten,
+        default,
+        deserialize_with = "deserialize_log_extra_data",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -119,9 +124,28 @@ impl<S: BosStr> LexiconSchema for Log<S> {
     }
 }
 
+fn deserialize_log_extra_data<'de, S, D>(
+    deserializer: D,
+) -> Result<Option<BTreeMap<SmolStr, Data<S>>>, D::Error>
+where
+    S: BosStr + serde::Deserialize<'de>,
+    D: serde::Deserializer<'de>,
+{
+    let mut data = <Option<
+        BTreeMap<SmolStr, Data<S>>,
+    > as serde::Deserialize<'de>>::deserialize(deserializer)?;
+    if let Some(extra_data) = &mut data {
+        extra_data.remove("$type");
+        if extra_data.is_empty() {
+            data = None;
+        }
+    }
+    Ok(data)
+}
+
 pub mod log_state {
 
-    pub use crate::builder_types::{IsSet, IsUnset, Set, Unset};
+    pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
     #[allow(unused)]
     use ::core::marker::PhantomData;
     mod sealed {
@@ -180,12 +204,7 @@ pub mod log_state {
 /// Builder for constructing an instance of this type.
 pub struct LogBuilder<St: log_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (
-        Option<Datetime>,
-        Option<S>,
-        Option<Track<S>>,
-        Option<AtUri<S>>,
-    ),
+    _fields: (Option<Datetime>, Option<S>, Option<Track<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -269,7 +288,10 @@ where
     St::Item: log_state::IsUnset,
 {
     /// Set the `item` field (required)
-    pub fn item(mut self, value: impl Into<Track<S>>) -> LogBuilder<log_state::SetItem<St>, S> {
+    pub fn item(
+        mut self,
+        value: impl Into<Track<S>>,
+    ) -> LogBuilder<log_state::SetItem<St>, S> {
         self._fields.2 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
@@ -322,10 +344,10 @@ where
 }
 
 fn lexicon_doc_media_ionosphere_log() -> LexiconDoc<'static> {
-    use alloc::collections::BTreeMap;
     #[allow(unused_imports)]
     use jacquard_common::{CowStr, deps::smol_str::SmolStr, types::blob::MimeType};
     use jacquard_lexicon::lexicon::*;
+    use alloc::collections::BTreeMap;
     LexiconDoc {
         lexicon: Lexicon::Lexicon1,
         id: CowStr::new_static("media.ionosphere.log"),
@@ -334,16 +356,20 @@ fn lexicon_doc_media_ionosphere_log() -> LexiconDoc<'static> {
             map.insert(
                 SmolStr::new_static("main"),
                 LexUserType::Record(LexRecord {
-                    description: Some(CowStr::new_static(
-                        "Represents information about what was played",
-                    )),
+                    description: Some(
+                        CowStr::new_static(
+                            "Represents information about what was played",
+                        ),
+                    ),
                     key: Some(CowStr::new_static("tid")),
                     record: LexRecordRecord::Object(LexObject {
-                        required: Some(vec![
-                            SmolStr::new_static("ionosphere"),
-                            SmolStr::new_static("createdAt"),
-                            SmolStr::new_static("item"),
-                        ]),
+                        required: Some(
+                            vec![
+                                SmolStr::new_static("ionosphere"),
+                                SmolStr::new_static("createdAt"),
+                                SmolStr::new_static("item")
+                            ],
+                        ),
                         properties: {
                             #[allow(unused_mut)]
                             let mut map = BTreeMap::new();
@@ -365,16 +391,18 @@ fn lexicon_doc_media_ionosphere_log() -> LexiconDoc<'static> {
                             map.insert(
                                 SmolStr::new_static("item"),
                                 LexObjectProperty::Union(LexRefUnion {
-                                    refs: vec![CowStr::new_static("media.ionosphere.defs#track")],
+                                    refs: vec![
+                                        CowStr::new_static("media.ionosphere.defs#track")
+                                    ],
                                     ..Default::default()
                                 }),
                             );
                             map.insert(
                                 SmolStr::new_static("programme"),
                                 LexObjectProperty::String(LexString {
-                                    description: Some(CowStr::new_static(
-                                        "The programme this log is a part of",
-                                    )),
+                                    description: Some(
+                                        CowStr::new_static("The programme this log is a part of"),
+                                    ),
                                     format: Some(LexStringFormat::AtUri),
                                     ..Default::default()
                                 }),

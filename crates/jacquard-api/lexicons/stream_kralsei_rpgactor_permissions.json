@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "stream.kralsei.rpgactor.permissions",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "The Kralsei game",
+      "detail": "Are you serious?",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "actor.rpg.stats",
+            "equipment.rpg.item"
+          ]
+        },
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "lxm": [
+            "stream.kralsei.rpgactor.pushGameScores",
+            "stream.kralsei.rpgactor.checkPermissions"
+          ],
+          "inheritAud": true
+        }
+      ]
+    }
+  }
+}

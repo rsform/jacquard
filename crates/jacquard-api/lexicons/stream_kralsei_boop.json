@@ -1,0 +1,33 @@
+{
+  "lexicon": 1,
+  "id": "stream.kralsei.boop",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A boop interaction",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "character",
+          "createdAt"
+        ],
+        "properties": {
+          "character": {
+            "type": "string",
+            "description": "Character that got booped",
+            "knownValues": [
+              "kris",
+              "ralsei"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Time of interaction",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}
