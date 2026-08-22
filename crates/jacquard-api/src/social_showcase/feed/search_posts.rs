@@ -18,6 +18,89 @@ use serde::{Serialize, Deserialize};
 use crate::social_showcase::CollectionView;
 use crate::social_showcase::ItemView;
 use crate::social_showcase::ProfileView;
+/// Filter by content type
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchPostsType<S: BosStr = DefaultStr> {
+    Items,
+    Collections,
+    Profiles,
+    Other(S),
+}
+
+impl<S: BosStr> SearchPostsType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Items => "items",
+            Self::Collections => "collections",
+            Self::Profiles => "profiles",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "items" => Self::Items,
+            "collections" => Self::Collections,
+            "profiles" => Self::Profiles,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchPostsType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchPostsType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchPostsType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SearchPostsType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchPostsType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SearchPostsType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchPostsType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchPostsType::Items => SearchPostsType::Items,
+            SearchPostsType::Collections => SearchPostsType::Collections,
+            SearchPostsType::Profiles => SearchPostsType::Profiles,
+            SearchPostsType::Other(v) => SearchPostsType::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -32,7 +115,7 @@ pub struct SearchPosts<S: BosStr = DefaultStr> {
     pub q: S,
     /// (max length: 20)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub r#type: Option<S>,
+    pub r#type: Option<SearchPostsType<S>>,
 }
 
 
@@ -126,7 +209,7 @@ pub mod search_posts_state {
 /// Builder for constructing an instance of this type.
 pub struct SearchPostsBuilder<St: search_posts_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
+    _fields: (Option<S>, Option<i64>, Option<S>, Option<SearchPostsType<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -213,12 +296,12 @@ where
 
 impl<St: search_posts_state::State, S: BosStr> SearchPostsBuilder<St, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<SearchPostsType<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<S>) -> Self {
+    pub fn maybe_type(mut self, value: Option<SearchPostsType<S>>) -> Self {
         self._fields.3 = value;
         self
     }

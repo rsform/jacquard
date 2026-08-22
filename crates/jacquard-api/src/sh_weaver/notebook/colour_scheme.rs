@@ -41,7 +41,7 @@ pub struct ColourScheme<S: BosStr = DefaultStr> {
     ///Human-readable name for the colour scheme
     pub name: S,
     ///Whether this is a dark or light colour scheme
-    pub variant: S,
+    pub variant: ColourSchemeVariant<S>,
     #[serde(
         flatten,
         default,
@@ -94,6 +94,85 @@ pub struct ColourSchemeColours<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Whether this is a dark or light colour scheme
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ColourSchemeVariant<S: BosStr = DefaultStr> {
+    Dark,
+    Light,
+    Other(S),
+}
+
+impl<S: BosStr> ColourSchemeVariant<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Dark => "dark",
+            Self::Light => "light",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "dark" => Self::Dark,
+            "light" => Self::Light,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ColourSchemeVariant<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ColourSchemeVariant<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ColourSchemeVariant<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ColourSchemeVariant<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ColourSchemeVariant<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ColourSchemeVariant<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ColourSchemeVariant<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ColourSchemeVariant::Dark => ColourSchemeVariant::Dark,
+            ColourSchemeVariant::Light => ColourSchemeVariant::Light,
+            ColourSchemeVariant::Other(v) => ColourSchemeVariant::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -498,7 +577,7 @@ pub mod colour_scheme_state {
 /// Builder for constructing an instance of this type.
 pub struct ColourSchemeBuilder<St: colour_scheme_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<ColourSchemeColours<S>>, Option<S>, Option<S>),
+    _fields: (Option<ColourSchemeColours<S>>, Option<S>, Option<ColourSchemeVariant<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -584,7 +663,7 @@ where
     /// Set the `variant` field (required)
     pub fn variant(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<ColourSchemeVariant<S>>,
     ) -> ColourSchemeBuilder<colour_scheme_state::SetVariant<St>, S> {
         self._fields.2 = Option::Some(value.into());
         ColourSchemeBuilder {

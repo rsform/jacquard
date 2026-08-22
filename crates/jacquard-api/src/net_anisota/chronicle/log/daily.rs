@@ -249,6 +249,9 @@ pub struct PatternsData<S: BosStr = DefaultStr> {
     ///Half-hour slots with activity, as HH:MM strings (e.g. '09:00', '09:30'). Max 48 per day.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active_blocks: Option<Vec<S>>,
+    ///Longest gap in whole hours between notification checks on this day. Monotonic: only ever raised, never lowered. Capped at 48, matching the notification-patience curve's ceiling.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub longest_patience_hours: Option<i64>,
     ///XP awarded for offline time
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offline_xp_awarded: Option<i64>,
@@ -653,6 +656,24 @@ impl<S: BosStr> LexiconSchema for PatternsData<S> {
                     path: ValidationPath::from_field("active_blocks"),
                     max: 48usize,
                     actual: value.len(),
+                });
+            }
+        }
+        if let Some(ref value) = self.longest_patience_hours {
+            if *value > 48i64 {
+                return Err(ConstraintError::Maximum {
+                    path: ValidationPath::from_field("longest_patience_hours"),
+                    max: 48i64,
+                    actual: *value,
+                });
+            }
+        }
+        if let Some(ref value) = self.longest_patience_hours {
+            if *value < 0i64 {
+                return Err(ConstraintError::Minimum {
+                    path: ValidationPath::from_field("longest_patience_hours"),
+                    min: 0i64,
+                    actual: *value,
                 });
             }
         }
@@ -1294,6 +1315,14 @@ fn lexicon_doc_net_anisota_chronicle_log_daily() -> LexiconDoc<'static> {
                                     ..Default::default()
                                 }),
                                 max_length: Some(48usize),
+                                ..Default::default()
+                            }),
+                        );
+                        map.insert(
+                            SmolStr::new_static("longestPatienceHours"),
+                            LexObjectProperty::Integer(LexInteger {
+                                minimum: Some(0i64),
+                                maximum: Some(48i64),
                                 ..Default::default()
                             }),
                         );

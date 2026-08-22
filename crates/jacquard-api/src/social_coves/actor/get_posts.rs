@@ -17,6 +17,89 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::social_coves::feed::FeedViewPost;
+/// Filter for post types
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetPostsFilter<S: BosStr = DefaultStr> {
+    PostsWithReplies,
+    PostsNoReplies,
+    PostsWithMedia,
+    Other(S),
+}
+
+impl<S: BosStr> GetPostsFilter<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::PostsWithReplies => "posts-with-replies",
+            Self::PostsNoReplies => "posts-no-replies",
+            Self::PostsWithMedia => "posts-with-media",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "posts-with-replies" => Self::PostsWithReplies,
+            "posts-no-replies" => Self::PostsNoReplies,
+            "posts-with-media" => Self::PostsWithMedia,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetPostsFilter<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetPostsFilter<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetPostsFilter<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetPostsFilter<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetPostsFilter<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetPostsFilter<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetPostsFilter<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetPostsFilter::PostsWithReplies => GetPostsFilter::PostsWithReplies,
+            GetPostsFilter::PostsNoReplies => GetPostsFilter::PostsNoReplies,
+            GetPostsFilter::PostsWithMedia => GetPostsFilter::PostsWithMedia,
+            GetPostsFilter::Other(v) => GetPostsFilter::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -30,7 +113,7 @@ pub struct GetPosts<S: BosStr = DefaultStr> {
     /// Defaults to `"posts-with-replies"`. Max length: 64.
     #[serde(default = "_default_filter")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub filter: Option<S>,
+    pub filter: Option<GetPostsFilter<S>>,
     /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -119,8 +202,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostsRequest {
     type Response = GetPostsResponse;
 }
 
-fn _default_filter<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("posts-with-replies"))
+fn _default_filter<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetPostsFilter<S>,
+> {
+    Some(<GetPostsFilter<S>>::from_value(S::from_static("posts-with-replies")))
 }
 
 fn _default_limit() -> Option<i64> {
@@ -166,7 +251,7 @@ pub struct GetPostsBuilder<St: get_posts_state::State, S: BosStr = DefaultStr> {
         Option<AtIdentifier<S>>,
         Option<AtIdentifier<S>>,
         Option<S>,
-        Option<S>,
+        Option<GetPostsFilter<S>>,
         Option<i64>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -255,12 +340,12 @@ impl<St: get_posts_state::State, S: BosStr> GetPostsBuilder<St, S> {
 
 impl<St: get_posts_state::State, S: BosStr> GetPostsBuilder<St, S> {
     /// Set the `filter` field (optional)
-    pub fn filter(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn filter(mut self, value: impl Into<Option<GetPostsFilter<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `filter` field to an Option value (optional)
-    pub fn maybe_filter(mut self, value: Option<S>) -> Self {
+    pub fn maybe_filter(mut self, value: Option<GetPostsFilter<S>>) -> Self {
         self._fields.3 = value;
         self
     }

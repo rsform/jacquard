@@ -18,6 +18,84 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::graph::ListView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetListsPurposes<S: BosStr = DefaultStr> {
+    Modlist,
+    Curatelist,
+    Other(S),
+}
+
+impl<S: BosStr> GetListsPurposes<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Modlist => "modlist",
+            Self::Curatelist => "curatelist",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "modlist" => Self::Modlist,
+            "curatelist" => Self::Curatelist,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetListsPurposes<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetListsPurposes<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetListsPurposes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetListsPurposes<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetListsPurposes<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetListsPurposes<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetListsPurposes<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetListsPurposes::Modlist => GetListsPurposes::Modlist,
+            GetListsPurposes::Curatelist => GetListsPurposes::Curatelist,
+            GetListsPurposes::Other(v) => GetListsPurposes::Other(v.into_static()),
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetLists<S: BosStr = DefaultStr> {
@@ -29,7 +107,7 @@ pub struct GetLists<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub purposes: Option<Vec<S>>,
+    pub purposes: Option<Vec<GetListsPurposes<S>>>,
 }
 
 
@@ -110,7 +188,12 @@ pub mod get_lists_state {
 /// Builder for constructing an instance of this type.
 pub struct GetListsBuilder<St: get_lists_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<Vec<S>>),
+    _fields: (
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<i64>,
+        Option<Vec<GetListsPurposes<S>>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -197,12 +280,15 @@ impl<St: get_lists_state::State, S: BosStr> GetListsBuilder<St, S> {
 
 impl<St: get_lists_state::State, S: BosStr> GetListsBuilder<St, S> {
     /// Set the `purposes` field (optional)
-    pub fn purposes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn purposes(
+        mut self,
+        value: impl Into<Option<Vec<GetListsPurposes<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `purposes` field to an Option value (optional)
-    pub fn maybe_purposes(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_purposes(mut self, value: Option<Vec<GetListsPurposes<S>>>) -> Self {
         self._fields.3 = value;
         self
     }

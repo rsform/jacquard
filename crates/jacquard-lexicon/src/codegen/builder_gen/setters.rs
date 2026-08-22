@@ -237,7 +237,9 @@ fn get_field_rust_type(
         }
         BuilderSchema::Parameters(params) => {
             let field_type = &params.properties[field_name];
-            super::builder_struct::get_params_rust_type(codegen, field_type, resolved)
+            super::builder_struct::get_params_rust_type(
+                codegen, type_name, field_name, field_type, resolved,
+            )
         }
     }
 }

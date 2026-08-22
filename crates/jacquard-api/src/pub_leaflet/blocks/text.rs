@@ -29,7 +29,7 @@ pub struct Text<S: BosStr = DefaultStr> {
     pub facets: Option<Vec<Facet<S>>>,
     pub plaintext: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub text_size: Option<S>,
+    pub text_size: Option<TextTextSize<S>>,
     #[serde(
         flatten,
         default,
@@ -37,6 +37,88 @@ pub struct Text<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TextTextSize<S: BosStr = DefaultStr> {
+    Default,
+    Small,
+    Large,
+    Other(S),
+}
+
+impl<S: BosStr> TextTextSize<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Default => "default",
+            Self::Small => "small",
+            Self::Large => "large",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "default" => Self::Default,
+            "small" => Self::Small,
+            "large" => Self::Large,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for TextTextSize<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for TextTextSize<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for TextTextSize<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for TextTextSize<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for TextTextSize<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for TextTextSize<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = TextTextSize<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TextTextSize::Default => TextTextSize::Default,
+            TextTextSize::Small => TextTextSize::Small,
+            TextTextSize::Large => TextTextSize::Large,
+            TextTextSize::Other(v) => TextTextSize::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for Text<S> {

@@ -18,6 +18,96 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::get_contribution::ContributionView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListContributionsStatus<S: BosStr = DefaultStr> {
+    Pending,
+    Approved,
+    Denied,
+    NeedsRevision,
+    Other(S),
+}
+
+impl<S: BosStr> ListContributionsStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "pending",
+            Self::Approved => "approved",
+            Self::Denied => "denied",
+            Self::NeedsRevision => "needsRevision",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "pending" => Self::Pending,
+            "approved" => Self::Approved,
+            "denied" => Self::Denied,
+            "needsRevision" => Self::NeedsRevision,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListContributionsStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListContributionsStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListContributionsStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListContributionsStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListContributionsStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListContributionsStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListContributionsStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListContributionsStatus::Pending => ListContributionsStatus::Pending,
+            ListContributionsStatus::Approved => ListContributionsStatus::Approved,
+            ListContributionsStatus::Denied => ListContributionsStatus::Denied,
+            ListContributionsStatus::NeedsRevision => {
+                ListContributionsStatus::NeedsRevision
+            }
+            ListContributionsStatus::Other(v) => {
+                ListContributionsStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListContributions<S: BosStr = DefaultStr> {
@@ -30,7 +120,7 @@ pub struct ListContributions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<ListContributionsStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<AtUri<S>>,
 }
@@ -103,7 +193,13 @@ pub struct ListContributionsBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<S>, Option<i64>, Option<S>, Option<AtUri<S>>),
+    _fields: (
+        Option<Did<S>>,
+        Option<S>,
+        Option<i64>,
+        Option<ListContributionsStatus<S>>,
+        Option<AtUri<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -187,12 +283,15 @@ impl<St: list_contributions_state::State, S: BosStr> ListContributionsBuilder<St
 
 impl<St: list_contributions_state::State, S: BosStr> ListContributionsBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn status(
+        mut self,
+        value: impl Into<Option<ListContributionsStatus<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ListContributionsStatus<S>>) -> Self {
         self._fields.3 = value;
         self
     }

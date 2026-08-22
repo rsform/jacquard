@@ -36,7 +36,7 @@ pub struct GetEntry<S: BosStr = DefaultStr> {
 pub struct GetEntryOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_commit: Option<Commit<S>>,
-    pub mode: S,
+    pub mode: GetEntryOutputMode<S>,
     ///The file name
     pub name: S,
     pub oid: S,
@@ -47,6 +47,100 @@ pub struct GetEntryOutput<S: BosStr = DefaultStr> {
     pub submodule: Option<Submodule<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetEntryOutputMode<S: BosStr = DefaultStr> {
+    _0040000,
+    _0100644,
+    _0100664,
+    _0100755,
+    _0120000,
+    _0160000,
+    Other(S),
+}
+
+impl<S: BosStr> GetEntryOutputMode<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_0040000 => "0040000",
+            Self::_0100644 => "0100644",
+            Self::_0100664 => "0100664",
+            Self::_0100755 => "0100755",
+            Self::_0120000 => "0120000",
+            Self::_0160000 => "0160000",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "0040000" => Self::_0040000,
+            "0100644" => Self::_0100644,
+            "0100664" => Self::_0100664,
+            "0100755" => Self::_0100755,
+            "0120000" => Self::_0120000,
+            "0160000" => Self::_0160000,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetEntryOutputMode<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetEntryOutputMode<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetEntryOutputMode<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetEntryOutputMode<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetEntryOutputMode<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetEntryOutputMode<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetEntryOutputMode<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetEntryOutputMode::_0040000 => GetEntryOutputMode::_0040000,
+            GetEntryOutputMode::_0100644 => GetEntryOutputMode::_0100644,
+            GetEntryOutputMode::_0100664 => GetEntryOutputMode::_0100664,
+            GetEntryOutputMode::_0100755 => GetEntryOutputMode::_0100755,
+            GetEntryOutputMode::_0120000 => GetEntryOutputMode::_0120000,
+            GetEntryOutputMode::_0160000 => GetEntryOutputMode::_0160000,
+            GetEntryOutputMode::Other(v) => GetEntryOutputMode::Other(v.into_static()),
+        }
+    }
 }
 
 

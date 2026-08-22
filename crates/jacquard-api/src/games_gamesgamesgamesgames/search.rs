@@ -21,13 +21,327 @@ use crate::games_gamesgamesgamesgames::GameSummaryView;
 use crate::games_gamesgamesgamesgames::PlatformSummaryView;
 use crate::games_gamesgamesgamesgames::ProfileSummaryView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchApplicationTypes<S: BosStr = DefaultStr> {
+    Addon,
+    Bundle,
+    Dlc,
+    Episode,
+    ExpandedGame,
+    Expansion,
+    Fork,
+    Game,
+    Mod,
+    Pack,
+    Port,
+    Remake,
+    Remaster,
+    Season,
+    StandaloneExpansion,
+    Update,
+    Other(S),
+}
+
+impl<S: BosStr> SearchApplicationTypes<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Addon => "addon",
+            Self::Bundle => "bundle",
+            Self::Dlc => "dlc",
+            Self::Episode => "episode",
+            Self::ExpandedGame => "expandedGame",
+            Self::Expansion => "expansion",
+            Self::Fork => "fork",
+            Self::Game => "game",
+            Self::Mod => "mod",
+            Self::Pack => "pack",
+            Self::Port => "port",
+            Self::Remake => "remake",
+            Self::Remaster => "remaster",
+            Self::Season => "season",
+            Self::StandaloneExpansion => "standaloneExpansion",
+            Self::Update => "update",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "addon" => Self::Addon,
+            "bundle" => Self::Bundle,
+            "dlc" => Self::Dlc,
+            "episode" => Self::Episode,
+            "expandedGame" => Self::ExpandedGame,
+            "expansion" => Self::Expansion,
+            "fork" => Self::Fork,
+            "game" => Self::Game,
+            "mod" => Self::Mod,
+            "pack" => Self::Pack,
+            "port" => Self::Port,
+            "remake" => Self::Remake,
+            "remaster" => Self::Remaster,
+            "season" => Self::Season,
+            "standaloneExpansion" => Self::StandaloneExpansion,
+            "update" => Self::Update,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchApplicationTypes<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchApplicationTypes<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchApplicationTypes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SearchApplicationTypes<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchApplicationTypes<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SearchApplicationTypes<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchApplicationTypes<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchApplicationTypes::Addon => SearchApplicationTypes::Addon,
+            SearchApplicationTypes::Bundle => SearchApplicationTypes::Bundle,
+            SearchApplicationTypes::Dlc => SearchApplicationTypes::Dlc,
+            SearchApplicationTypes::Episode => SearchApplicationTypes::Episode,
+            SearchApplicationTypes::ExpandedGame => SearchApplicationTypes::ExpandedGame,
+            SearchApplicationTypes::Expansion => SearchApplicationTypes::Expansion,
+            SearchApplicationTypes::Fork => SearchApplicationTypes::Fork,
+            SearchApplicationTypes::Game => SearchApplicationTypes::Game,
+            SearchApplicationTypes::Mod => SearchApplicationTypes::Mod,
+            SearchApplicationTypes::Pack => SearchApplicationTypes::Pack,
+            SearchApplicationTypes::Port => SearchApplicationTypes::Port,
+            SearchApplicationTypes::Remake => SearchApplicationTypes::Remake,
+            SearchApplicationTypes::Remaster => SearchApplicationTypes::Remaster,
+            SearchApplicationTypes::Season => SearchApplicationTypes::Season,
+            SearchApplicationTypes::StandaloneExpansion => {
+                SearchApplicationTypes::StandaloneExpansion
+            }
+            SearchApplicationTypes::Update => SearchApplicationTypes::Update,
+            SearchApplicationTypes::Other(v) => {
+                SearchApplicationTypes::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchSort<S: BosStr = DefaultStr> {
+    NameAsc,
+    NameDesc,
+    PublishedAsc,
+    PublishedDesc,
+    Other(S),
+}
+
+impl<S: BosStr> SearchSort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::NameAsc => "name_asc",
+            Self::NameDesc => "name_desc",
+            Self::PublishedAsc => "published_asc",
+            Self::PublishedDesc => "published_desc",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "name_asc" => Self::NameAsc,
+            "name_desc" => Self::NameDesc,
+            "published_asc" => Self::PublishedAsc,
+            "published_desc" => Self::PublishedDesc,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchSort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchSort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchSort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SearchSort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchSort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SearchSort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchSort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchSort::NameAsc => SearchSort::NameAsc,
+            SearchSort::NameDesc => SearchSort::NameDesc,
+            SearchSort::PublishedAsc => SearchSort::PublishedAsc,
+            SearchSort::PublishedDesc => SearchSort::PublishedDesc,
+            SearchSort::Other(v) => SearchSort::Other(v.into_static()),
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchTypes<S: BosStr = DefaultStr> {
+    Game,
+    Profile,
+    Platform,
+    Collection,
+    Engine,
+    Other(S),
+}
+
+impl<S: BosStr> SearchTypes<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Game => "game",
+            Self::Profile => "profile",
+            Self::Platform => "platform",
+            Self::Collection => "collection",
+            Self::Engine => "engine",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "game" => Self::Game,
+            "profile" => Self::Profile,
+            "platform" => Self::Platform,
+            "collection" => Self::Collection,
+            "engine" => Self::Engine,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchTypes<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchTypes<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchTypes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SearchTypes<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchTypes<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SearchTypes<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchTypes<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchTypes::Game => SearchTypes::Game,
+            SearchTypes::Profile => SearchTypes::Profile,
+            SearchTypes::Platform => SearchTypes::Platform,
+            SearchTypes::Collection => SearchTypes::Collection,
+            SearchTypes::Engine => SearchTypes::Engine,
+            SearchTypes::Other(v) => SearchTypes::Other(v.into_static()),
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Search<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_ratings: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub application_types: Option<Vec<S>>,
+    pub application_types: Option<Vec<SearchApplicationTypes<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,11 +364,11 @@ pub struct Search<S: BosStr = DefaultStr> {
     pub player_perspectives: Option<Vec<S>>,
     pub q: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<SearchSort<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub themes: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub types: Option<Vec<S>>,
+    pub types: Option<Vec<SearchTypes<S>>>,
 }
 
 
@@ -165,7 +479,7 @@ pub struct SearchBuilder<St: search_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
-        Option<Vec<S>>,
+        Option<Vec<SearchApplicationTypes<S>>>,
         Option<S>,
         Option<Vec<S>>,
         Option<bool>,
@@ -174,9 +488,9 @@ pub struct SearchBuilder<St: search_state::State, S: BosStr = DefaultStr> {
         Option<Vec<S>>,
         Option<Vec<S>>,
         Option<S>,
-        Option<S>,
+        Option<SearchSort<S>>,
         Option<Vec<S>>,
-        Option<Vec<S>>,
+        Option<Vec<SearchTypes<S>>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -260,12 +574,18 @@ impl<St: search_state::State, S: BosStr> SearchBuilder<St, S> {
 
 impl<St: search_state::State, S: BosStr> SearchBuilder<St, S> {
     /// Set the `applicationTypes` field (optional)
-    pub fn application_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn application_types(
+        mut self,
+        value: impl Into<Option<Vec<SearchApplicationTypes<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `applicationTypes` field to an Option value (optional)
-    pub fn maybe_application_types(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_application_types(
+        mut self,
+        value: Option<Vec<SearchApplicationTypes<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -380,12 +700,12 @@ where
 
 impl<St: search_state::State, S: BosStr> SearchBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<SearchSort<S>>>) -> Self {
         self._fields.10 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<SearchSort<S>>) -> Self {
         self._fields.10 = value;
         self
     }
@@ -406,12 +726,12 @@ impl<St: search_state::State, S: BosStr> SearchBuilder<St, S> {
 
 impl<St: search_state::State, S: BosStr> SearchBuilder<St, S> {
     /// Set the `types` field (optional)
-    pub fn types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn types(mut self, value: impl Into<Option<Vec<SearchTypes<S>>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `types` field to an Option value (optional)
-    pub fn maybe_types(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_types(mut self, value: Option<Vec<SearchTypes<S>>>) -> Self {
         self._fields.12 = value;
         self
     }

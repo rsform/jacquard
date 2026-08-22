@@ -207,9 +207,15 @@ pub mod websocket;
 #[cfg(feature = "websocket")]
 pub mod jetstream;
 
+/// The `.jss` segment format: shared shapes (header, block index,
+/// event rows) and their decoders.
+#[cfg(feature = "jss")]
+pub mod jss;
+
 #[cfg(feature = "websocket")]
 pub use websocket::{
-    CloseCode, CloseFrame, WebSocketClient, WebSocketConnection, WsMessage, WsSink, WsStream,
+    CloseCode, CloseFrame, WebSocketClient, WebSocketConnection, WebSocketError, WsMessage,
+    WsSink, WsStream,
     WsText, tungstenite_client::TungsteniteClient,
 };
 

@@ -123,7 +123,59 @@ services:
       timeout: 3s
       retries: 30
 
+  # Jetstream v2 archive/live service under test. Official upstream image,
+  # digest-pinned by the lifecycle controller through the same registry
+  # resolution as the PDS providers (no local build).
+  #
+  # E2E_JETSTREAM_RELAY_URL is injected by the controller after the
+  # simulator's bridge IP is discovered; containers on the default bridge
+  # share no DNS, matching how the PDS providers are addressed.
+  e2e-jetstream:
+    image: ${E2E_JETSTREAM_IMAGE}
+    profiles: ["jetstream"]
+    network_mode: bridge
+    # Ephemeral fixture volume: root keeps ownership simple (the upstream
+    # image defaults to distroless nonroot, which cannot chown a fresh
+    # named volume). Nothing here outlives the run.
+    user: "0:0"
+    environment:
+      JETSTREAM_ADDR: "0.0.0.0:8080"
+      JETSTREAM_RELAY_URL: ${E2E_JETSTREAM_RELAY_URL}
+      # The simulator serves its own PLC directory; identity verification
+      # must resolve there, not against the real plc.directory.
+      JETSTREAM_PLC_URL: ${E2E_JETSTREAM_RELAY_URL}
+      JETSTREAM_DATA_DIR: /data
+      # Tiny archive: bounded backfill keeps segments small enough to assert
+      # exact seq bounds in scenarios.
+      JETSTREAM_MAX_BACKFILL_REPOS: "5"
+    volumes:
+      - jetstream-data:/data
+
+  # Upstream development simulator: deterministic (seeded) PLC + PDS +
+  # relay under one HTTP listener. Upstream publishes no simulator image,
+  # so the controller builds one from the same pinned source commit as the
+  # server release (e2e/Dockerfile.simulator); when upstream ships one, or
+  # if we publish our own, replacing E2E_JETSTREAM_SIM_IMAGE retires the
+  # local build. Scenarios beyond jetstream can reuse this simulated
+  # network (PLC, PDS, firehose) by adding services pointed at its IP.
+  e2e-simulator:
+    image: ${E2E_JETSTREAM_SIM_IMAGE}
+    profiles: ["jetstream"]
+    network_mode: bridge
+    user: "0:0"
+    entrypoint: ["/usr/local/bin/simulator", "serve"]
+    environment:
+      JETSTREAM_SIM_SEED: "42"
+      JETSTREAM_SIM_ACCOUNTS: "5"
+      JETSTREAM_SIM_INITIAL_RECORDS: "3"
+      JETSTREAM_SIM_COMMITS_PER_SEC: "20"
+      JETSTREAM_SIM_DATA_DIR: /data/simulator
+      JETSTREAM_SIM_RESET: "true"
+    volumes:
+      - jetstream-data:/data
+
 volumes:
   reference-data:
   tranquil-blobs:
   tranquil-db:
+  jetstream-data:

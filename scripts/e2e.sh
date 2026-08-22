@@ -42,7 +42,13 @@ case "$PROVIDER" in
     TAG="ghcr.io/bluesky-social/atproto:pds-spaces-alpha"
     OVERRIDE_VAR=JACQUARD_E2E_REFERENCE_DIGEST
     ;;
-  *) die "usage: scripts/e2e.sh <tranquil|reference> [--keep] [--digest <sha256:...>]" ;;
+  jetstream)
+    # Jetstream v2 server: official upstream GHCR image, resolved and pinned
+    # through the same digest path as the PDS providers below.
+    TAG="ghcr.io/bluesky-social/jetstream:v0.2.0"
+    OVERRIDE_VAR=JACQUARD_E2E_JETSTREAM_DIGEST
+    ;;
+  *) die "usage: scripts/e2e.sh <tranquil|reference|jetstream> [--keep] [--digest <sha256:...>]" ;;
 esac
 [ -n "$DIGEST_OVERRIDE" ] || DIGEST_OVERRIDE=${!OVERRIDE_VAR:-}
 
@@ -77,7 +83,7 @@ cleanup() {
       compose ps -a --no-trunc
       echo; compose config 2>/dev/null \
         | sed -E 's/(PASSWORD|SECRET|KEY|TOKEN)[=:][^,}" ]+/\1=<redacted>/gI'
-      for svc in tranquil-pds tranquil-db reference-pds e2e-dns; do
+      for svc in tranquil-pds tranquil-db reference-pds e2e-dns e2e-jetstream e2e-simulator; do
         compose logs --no-color --tail 500 "$svc" \
           > "$ARTIFACT_DIR/$svc.log" 2>&1 || true
       done
@@ -87,9 +93,9 @@ cleanup() {
   if [ $KEEP -eq 1 ]; then
     log "--keep: leaving resources for inspection (project $RUN_ID)"
   else
-    # `down` only removes services in enabled profiles; enable both so a
+    # `down` only removes services in enabled profiles; enable all so a
     # partial failure in one provider still tears everything down.
-    compose --profile tranquil --profile reference down -v --remove-orphans >/dev/null 2>&1 || true
+    compose --profile tranquil --profile reference --profile jetstream down -v --remove-orphans >/dev/null 2>&1 || true
   fi
   exit $rc
 }
@@ -139,6 +145,7 @@ echo "{\"tag\":\"$TAG\",\"effective_digest\":\"$EFFECTIVE_DIGEST\",\"effective_p
 case "$PROVIDER" in
   tranquil) IMAGE="atcr.io/tranquil.farm/tranquil-pds@$EFFECTIVE_DIGEST" ;;
   reference) IMAGE="ghcr.io/bluesky-social/atproto@$EFFECTIVE_DIGEST" ;;
+  jetstream) IMAGE="ghcr.io/bluesky-social/jetstream@$EFFECTIVE_DIGEST" ;;
 esac
 
 docker pull --platform "linux/$ARCH" "$IMAGE" >/dev/null 2>&1 || die "could not pull $IMAGE for linux/$ARCH"
@@ -147,6 +154,36 @@ case "$PULLED_REPO_DIGEST" in
   "$IMAGE") : ;;
   *) die "pulled image did not retain the requested digest: requested $IMAGE, got ${PULLED_REPO_DIGEST:-<none>}" ;;
 esac
+
+# ── jetstream simulator image ───────────────────────────────────────────────
+# Upstream publishes the server image but not the dev simulator binary, so
+# build it locally from the same pinned upstream source commit. The commit
+# is derived from the resolved server image (the release workflow stamps
+# it), keeping server and simulator on identical source.
+if [ "$PROVIDER" = jetstream ]; then
+  # The release workflow stamps the image with the short revision; expand it
+  # to the full commit for a reproducible source pin. Fallback is the v0.2.0
+  # full commit.
+  JETSTREAM_UPSTREAM_COMMIT=$(docker image inspect --format '{{index .Config.Labels "org.opencontainers.image.revision"}}' "$IMAGE" 2>/dev/null || true)
+  case "$JETSTREAM_UPSTREAM_COMMIT" in
+    ""|unknown|"289b032") JETSTREAM_UPSTREAM_COMMIT=289b0328c2e1a0ccf8c870cb45de0b2397de19fb ;;
+  esac
+  SIM_TAG="jacquard-e2e-simulator:${JETSTREAM_UPSTREAM_COMMIT:0:12}"
+  if ! docker image inspect "$SIM_TAG" >/dev/null 2>&1; then
+    log "building simulator image $SIM_TAG from upstream commit $JETSTREAM_UPSTREAM_COMMIT"
+    SIM_SRC="$REPO_ROOT/target/e2e/jetstream-src-$JETSTREAM_UPSTREAM_COMMIT"
+    if [ ! -d "$SIM_SRC" ]; then
+      mkdir -p "$(dirname "$SIM_SRC")"
+      curl -sL "https://github.com/bluesky-social/jetstream/archive/$JETSTREAM_UPSTREAM_COMMIT.tar.gz" \
+        | tar xz -C "$(dirname "$SIM_SRC")" \
+        && mv "$(dirname "$SIM_SRC")/jetstream-$JETSTREAM_UPSTREAM_COMMIT" "$SIM_SRC" \
+        || die "could not fetch upstream source at $JETSTREAM_UPSTREAM_COMMIT"
+    fi
+    docker build -q -f e2e/Dockerfile.simulator -t "$SIM_TAG" "$SIM_SRC" >"$ARTIFACT_DIR/simulator-build.log" 2>&1 \
+      || die "simulator image build failed; see $ARTIFACT_DIR/simulator-build.log"
+    rm -rf "$SIM_SRC"
+  fi
+fi
 
 # ── per-run TLS material ────────────────────────────────────────────────────
 HOSTS=(tranquil-identity.jacquard-e2e.test tranquil-member.jacquard-e2e.test
@@ -246,6 +283,11 @@ E2E_INGRESS_HTTP_PORT=$INGRESS_HTTP_PORT
 E2E_FIXTURE_ROOT=$FIXTURE_ROOT
 E2E_REFERENCE_IMAGE=$( [ "$PROVIDER" = reference ] && echo "$IMAGE" || echo "ghcr.io/bluesky-social/atproto@sha256:0000000000000000000000000000000000000000000000000000000000000000" )
 E2E_TRANQUIL_IMAGE=$( [ "$PROVIDER" = tranquil ] && echo "$IMAGE" || echo "atcr.io/tranquil.farm/tranquil-pds@sha256:0000000000000000000000000000000000000000000000000000000000000000" )
+# Jetstream profile images; the relay URL is rewritten after the simulator's
+# bridge IP is discovered (no shared DNS on the default bridge).
+E2E_JETSTREAM_IMAGE=$( [ "$PROVIDER" = jetstream ] && echo "$IMAGE" || echo "" )
+E2E_JETSTREAM_SIM_IMAGE=$( [ "$PROVIDER" = jetstream ] && echo "${SIM_TAG:-pending}" || echo "" )
+E2E_JETSTREAM_RELAY_URL=pending
 E2E_REFERENCE_ADMIN_PASSWORD=jacquard-e2e-$RUN_ID-admin
 E2E_REFERENCE_ROTATION_KEY=0000000000000000000000000000000000000000000000000000000000000001
 E2E_REFERENCE_JWT_SECRET=$(openssl rand -hex 24)
@@ -286,10 +328,13 @@ compose up -d --pull never e2e-dns e2e-ingress-proxy >/dev/null
 # discover their addresses, then rewrite the DNS config (hot-reloaded by
 # webproc) and bring up the provider with the discovered coordinates.
 svc_ip() {
-  # Profiled services are invisible to `compose ps` without --profile.
-  compose --profile tranquil --profile reference ps -q "$1" 2>/dev/null \
-    | head -1 \
-    | xargs -r docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' 2>/dev/null
+  # Enable only the active provider profile. Enabling every profile makes
+  # Compose validate unrelated services whose image placeholders are
+  # intentionally empty for this run.
+  local container
+  container=$(compose --profile "$PROVIDER" ps -q "$1" | head -1)
+  [ -n "$container" ] || return 1
+  docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$container"
 }
 DNS_IP=$(svc_ip e2e-dns)
 PROXY_IP=$(svc_ip e2e-ingress-proxy)
@@ -313,20 +358,38 @@ if [ "$PROVIDER" = tranquil ]; then
   [ -n "$DB_IP" ] || die "could not discover tranquil-db IP"
   sed -i.bak "s|^E2E_TRANQUIL_DATABASE_URL=.*|E2E_TRANQUIL_DATABASE_URL=postgres://tranquil:tranquil@$DB_IP:5432/tranquil|" "$FIXTURE_ROOT/compose.env"
   compose --profile tranquil up -d --pull never tranquil-pds >/dev/null
-else
+elif [ "$PROVIDER" = reference ]; then
   compose --profile reference up -d --pull never reference-pds >/dev/null
+else
+  # Simulator first; jetstream's relay URL is its discovered bridge IP.
+  compose --profile jetstream up -d --pull never e2e-simulator >/dev/null
+  SIM_IP=$(svc_ip e2e-simulator)
+  [ -n "$SIM_IP" ] || die "could not discover e2e-simulator IP"
+  sed -i.bak "s|^E2E_JETSTREAM_RELAY_URL=.*|E2E_JETSTREAM_RELAY_URL=http://$SIM_IP:7777|" "$FIXTURE_ROOT/compose.env"
+  compose --profile jetstream up -d --pull never e2e-jetstream >/dev/null
 fi
 
 # Readiness: poll the provider health endpoint. Tranquil is distroless (no
-# shell inside), so probe from the host over the bridge.
+# shell inside), so probe from the host over the bridge. Jetstream is also
+# distroless; its public listener answers /xrpc/_health like the PDSes and
+# the simulator serves plain HTTP on 7777.
 case "$PROVIDER" in
-  tranquil) PDS_SVC=tranquil-pds ;;
-  reference) PDS_SVC=reference-pds ;;
+  tranquil) PDS_SVC=tranquil-pds; PDS_PORT=3000 ;;
+  reference) PDS_SVC=reference-pds; PDS_PORT=3000 ;;
+  jetstream) PDS_SVC=e2e-jetstream; PDS_PORT=8080 ;;
 esac
+# Jetstream v2 has no /xrpc/_health endpoint; any HTTP response means the
+# listener is up, and the archive-ready loop below gates on real readiness.
+probe_ready() {
+  case "$PROVIDER" in
+    jetstream) curl -s -o /dev/null -m 2 "http://$1:$2/" >/dev/null 2>&1 ;;
+    *) curl -sf -m 2 "http://$1:$2/xrpc/_health" 2>/dev/null | grep -q version ;;
+  esac
+}
 ready=0
-for _ in $(seq 1 60); do
+for _ in $(seq 1 90); do
   PDS_IP_NOW=$(svc_ip "$PDS_SVC" 2>/dev/null || true)
-  if [ -n "$PDS_IP_NOW" ] && curl -sf -m 2 "http://$PDS_IP_NOW:3000/xrpc/_health" 2>/dev/null | grep -q version; then
+  if [ -n "$PDS_IP_NOW" ] && probe_ready "$PDS_IP_NOW" "$PDS_PORT"; then
     ready=1
     break
   fi
@@ -334,8 +397,73 @@ for _ in $(seq 1 60); do
 done
 [ "$ready" = 1 ] || die "provider $PROVIDER did not become healthy; logs retained in $ARTIFACT_DIR"
 
-PDS_IP=$(svc_ip "$(case "$PROVIDER" in tranquil) echo tranquil-pds ;; reference) echo reference-pds ;; esac)")
+PDS_IP=$(svc_ip "$PDS_SVC")
 [ -n "$PDS_IP" ] || die "could not inspect provider container IP"
+
+# Jetstream needs its archive populated before scenarios run: wait until the
+# simulator has bootstrapped and jetstream has sealed at least one segment.
+if [ "$PROVIDER" = jetstream ]; then
+  SIM_IP=$(svc_ip e2e-simulator)
+  [ -n "$SIM_IP" ] || die "could not discover e2e-simulator IP"
+  export JACQUARD_E2E_SIM_URL="http://$SIM_IP:7777"
+  SIM_READY=0
+  for _ in $(seq 1 60); do
+    # The simulator serves no index route; any HTTP response means the
+    # listener is up.
+    if curl -s -o /dev/null -m 2 "http://$SIM_IP:7777/" >/dev/null 2>&1; then
+      SIM_READY=1
+      break
+    fi
+    sleep 2
+  done
+  [ "$SIM_READY" = 1 ] || die "simulator did not become ready"
+  # planSnapshot returning a non-empty segments list means backfill has
+  # merged bootstrap repos into at least one sealed segment file.
+  ARCHIVE_READY=0
+  for _ in $(seq 1 120); do
+    segs=$(curl -sf -m 5 -X POST "http://$PDS_IP:8080/xrpc/network.bsky.jetstream.planSnapshot" \
+      -H 'content-type: application/json' -d '{}' 2>/dev/null | jq -r '.segments | length' 2>/dev/null || true)
+    if [ "${segs:-0}" -gt 0 ] 2>/dev/null; then
+      ARCHIVE_READY=1
+      break
+    fi
+    sleep 3
+  done
+  [ "$ARCHIVE_READY" = 1 ] || die "jetstream archive never produced a sealed segment"
+fi
+# Export non-secret coordinates and run this provider's scenario targets.
+run_scenarios() {
+  export JACQUARD_E2E_PROVIDER="$PROVIDER"
+  export JACQUARD_E2E_RUN_ID="$RUN_ID"
+  export JACQUARD_E2E_PROVIDER_URL="http://$PDS_IP:$PDS_PORT"
+  export JACQUARD_E2E_EFFECTIVE_DIGEST="$EFFECTIVE_DIGEST"
+  export JACQUARD_E2E_INGRESS_HTTP_PORT="$INGRESS_HTTP_PORT"
+  export JACQUARD_E2E_PROXY_IP="$PROXY_IP"
+  export JACQUARD_E2E_FIXTURE_ROOT="$FIXTURE_ROOT"
+  export JACQUARD_E2E_ARTIFACT_DIR="$ARTIFACT_DIR"
+
+  log "running scenarios for provider $PROVIDER (digest $EFFECTIVE_DIGEST)"
+  # Jetstream is not a PDS: only its own scenario target applies. The
+  # shared e2e targets assume repo/identity endpoints.
+  FILTER=""
+  if [ "$PROVIDER" = jetstream ]; then
+    FILTER="-E binary(jetstream_replay)"
+  fi
+  if cargo nextest run -p jacquard-e2e --features "e2e,$PROVIDER" $FILTER 2>&1 | tee "$ARTIFACT_DIR/nextest.log"; then
+    log "success: all scenarios passed for $PROVIDER"
+  else
+    rc=$?
+    log "scenario failure (rc=$rc); diagnostics in $ARTIFACT_DIR"
+    exit $rc
+  fi
+}
+
+if [ "$PROVIDER" = jetstream ]; then
+  # Jetstream scenarios talk directly to the provider container; the
+  # ingress proxy and fixture DNS serve the PDS providers only.
+  run_scenarios
+  exit 0
+fi
 write_dns_config "$PROXY_IP" "$PDS_IP"
 # dnsmasq only reads its config at startup; restart the sidecar to pick up
 # the discovered addresses. The container keeps its bridge IP.
@@ -378,23 +506,7 @@ for cid in $(compose ps -q 2>/dev/null); do
   docker inspect --format '{{.Image}} {{.Name}}' "$cid" >> "$ARTIFACT_DIR/container-images.txt"
 done
 
-# ── export non-secret coordinates and run scenarios ─────────────────────────
-# The host test process cannot use bridge DNS; address the PDS by its
-# container IP.
-export JACQUARD_E2E_PROVIDER="$PROVIDER"
-export JACQUARD_E2E_RUN_ID="$RUN_ID"
-export JACQUARD_E2E_PROVIDER_URL="http://$PDS_IP:3000"
-export JACQUARD_E2E_EFFECTIVE_DIGEST="$EFFECTIVE_DIGEST"
-export JACQUARD_E2E_INGRESS_HTTP_PORT="$INGRESS_HTTP_PORT"
-export JACQUARD_E2E_PROXY_IP="$PROXY_IP"
-export JACQUARD_E2E_FIXTURE_ROOT="$FIXTURE_ROOT"
-export JACQUARD_E2E_ARTIFACT_DIR="$ARTIFACT_DIR"
-
-log "running scenarios for provider $PROVIDER (digest $EFFECTIVE_DIGEST)"
-if cargo nextest run -p jacquard-e2e --features "e2e,$PROVIDER" 2>&1 | tee "$ARTIFACT_DIR/nextest.log"; then
-  log "success: all scenarios passed for $PROVIDER"
-else
-  rc=$?
-  log "scenario failure (rc=$rc); diagnostics in $ARTIFACT_DIR"
-  exit $rc
-fi
+# ── run scenarios ───────────────────────────────────────────────────────────
+# The host test process cannot use bridge DNS; scenarios address the
+# provider by its container IP (exported inside run_scenarios).
+run_scenarios

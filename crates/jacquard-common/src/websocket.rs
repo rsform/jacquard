@@ -4,8 +4,7 @@ use crate::CowStr;
 use crate::deps::fluent_uri::Uri;
 use crate::stream::StreamError;
 use alloc::boxed::Box;
-use alloc::string::String;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 use bytes::Bytes;
 use core::borrow::Borrow;
@@ -14,6 +13,77 @@ use core::future::Future;
 use core::ops::Deref;
 use core::pin::Pin;
 use n0_future::Stream;
+
+/// Maximum bytes of a rejected-upgrade response body retained in
+/// [`WebSocketError::HandshakeRejected`]. Bodies beyond this are truncated.
+const HANDSHAKE_BODY_LIMIT: usize = 64 * 1024;
+
+/// Error type for WebSocket operations.
+///
+/// Wraps transport failures and surfaces rejected upgrade handshakes as a
+/// structured variant, so protocol-level recovery information (e.g. the
+/// retention floor in a Jetstream `CursorTooOld` rejection) is inspectable
+/// instead of buried in an opaque transport error.
+#[derive(Debug, thiserror::Error)]
+pub enum WebSocketError {
+    /// The server rejected the WebSocket upgrade with an HTTP error status.
+    #[error("websocket handshake rejected with HTTP {}", .status)]
+    HandshakeRejected {
+        /// The HTTP status of the rejection response.
+        status: http::StatusCode,
+        /// Response headers (bounded set).
+        headers: Vec<(String, String)>,
+        /// Bounded response body. Truncated at 64 KiB; may be empty if the
+        /// platform could not capture it (wasm browser APIs expose no
+        /// rejection body).
+        body: Bytes,
+    },
+    /// Transport, TLS, or protocol failure.
+    #[error(transparent)]
+    Transport(Box<dyn core::error::Error + Send + Sync + 'static>),
+}
+
+impl WebSocketError {
+    /// Wrap an underlying client error as a transport failure.
+    pub fn transport<E>(err: E) -> Self
+    where
+        E: core::error::Error + Send + Sync + 'static,
+    {
+        Self::Transport(Box::new(err))
+    }
+}
+
+impl From<tokio_tungstenite_wasm::Error> for WebSocketError {
+    fn from(err: tokio_tungstenite_wasm::Error) -> Self {
+        classify_tungstenite_error(err)
+    }
+}
+
+/// Extract a handshake rejection from a tokio-tungstenite-wasm error, if
+/// present. Other errors pass through unchanged.
+pub(crate) fn classify_tungstenite_error(err: tokio_tungstenite_wasm::Error) -> WebSocketError {
+    match err {
+        tokio_tungstenite_wasm::Error::Http(response) => {
+            let status = response.status();
+            let headers = response
+                .headers()
+                .iter()
+                .filter_map(|(k, v)| {
+                    let v = core::str::from_utf8(v.as_bytes()).ok()?;
+                    Some((k.as_str().to_string(), v.to_string()))
+                })
+                .collect();
+            let mut body = response.into_body().unwrap_or_default();
+            body.truncate(HANDSHAKE_BODY_LIMIT);
+            WebSocketError::HandshakeRejected {
+                status,
+                headers,
+                body: Bytes::from(body),
+            }
+        }
+        other => WebSocketError::transport(other),
+    }
+}
 
 /// UTF-8 validated bytes for WebSocket text messages
 #[repr(transparent)]
@@ -193,16 +263,16 @@ impl From<CloseCode> for u16 {
 
 /// WebSocket close frame
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CloseFrame<'a> {
+pub struct CloseFrame {
     /// Close code
     pub code: CloseCode,
     /// Close reason text
-    pub reason: CowStr<'a>,
+    pub reason: WsText,
 }
 
-impl<'a> CloseFrame<'a> {
+impl CloseFrame {
     /// Create a new close frame
-    pub fn new(code: CloseCode, reason: impl Into<CowStr<'a>>) -> Self {
+    pub fn new(code: CloseCode, reason: impl Into<WsText>) -> Self {
         Self {
             code,
             reason: reason.into(),
@@ -218,7 +288,7 @@ pub enum WsMessage {
     /// Binary message
     Binary(Bytes),
     /// Close frame
-    Close(Option<CloseFrame<'static>>),
+    Close(Option<CloseFrame>),
 }
 
 impl WsMessage {
@@ -452,18 +522,36 @@ pub trait WebSocketClient: Sync {
         &self,
         uri: Uri<&str>,
     ) -> impl Future<Output = Result<WebSocketConnection, Self::Error>>;
-
-    /// Connect to a WebSocket endpoint with custom headers
+    /// Connect to a WebSocket endpoint with headers and subprotocols.
     ///
-    /// Default implementation ignores headers and calls `connect()`.
-    /// Override this method to support authentication headers for subscriptions.
-    fn connect_with_headers(
+    /// Protocols are sent via `Sec-WebSocket-Protocol` during the upgrade
+    /// handshake; on wasm they must be passed at construction (the browser
+    /// API has no post-construction header mechanism), so they never travel
+    /// through generic headers.
+    ///
+    /// Default implementation forwards to `connect()`, dropping both:
+    /// clients that do not override this cannot negotiate subprotocols or
+    /// send authentication headers, and servers may reject the upgrade.
+    fn connect_with_options(
         &self,
         uri: Uri<&str>,
-        _headers: Vec<(CowStr<'_>, CowStr<'_>)>,
+        _options: WebSocketConnectOptions<'_>,
     ) -> impl Future<Output = Result<WebSocketConnection, Self::Error>> {
         async move { self.connect(uri).await }
     }
+}
+
+/// Connection options carried through the WebSocket upgrade handshake.
+///
+/// The browser WebSocket API accepts subprotocols only at construction
+/// and offers no custom headers; transports backed by it ignore
+/// [`Self::headers`] and native implementations should forward them.
+#[derive(Debug, Clone, Default)]
+pub struct WebSocketConnectOptions<'a> {
+    /// Extra HTTP headers for the upgrade request.
+    pub headers: Vec<(CowStr<'a>, CowStr<'a>)>,
+    /// Subprotocols to offer via `Sec-WebSocket-Protocol`.
+    pub protocols: Vec<&'a str>,
 }
 
 /// WebSocket connection with bidirectional streams
@@ -519,7 +607,6 @@ impl fmt::Debug for WebSocketConnection {
 /// Concrete WebSocket client implementation using tokio-tungstenite-wasm
 pub mod tungstenite_client {
     use super::*;
-    use crate::IntoStatic;
     use futures::{SinkExt, StreamExt};
 
     /// WebSocket client backed by tokio-tungstenite-wasm
@@ -531,14 +618,12 @@ pub mod tungstenite_client {
         pub fn new() -> Self {
             Self
         }
-    }
 
-    impl WebSocketClient for TungsteniteClient {
-        type Error = tokio_tungstenite_wasm::Error;
-
-        async fn connect(&self, uri: Uri<&str>) -> Result<WebSocketConnection, Self::Error> {
-            let ws_stream = tokio_tungstenite_wasm::connect(uri.as_str()).await?;
-
+        /// Wrap a connected stream in a [`WebSocketConnection`].
+        fn wrap_stream(
+            &self,
+            ws_stream: tokio_tungstenite_wasm::WebSocketStream,
+        ) -> Result<WebSocketConnection, WebSocketError> {
             let (sink, stream) = ws_stream.split();
 
             // Convert tungstenite messages to our WsMessage
@@ -555,14 +640,44 @@ pub mod tungstenite_client {
             let rx = WsStream::new(rx_stream);
 
             // Convert our WsMessage to tungstenite messages
-            let tx_sink = sink.with(|msg: WsMessage| async move {
-                Ok::<_, tokio_tungstenite_wasm::Error>(msg.into())
-            });
+            let tx_sink =
+                sink.with(|msg: WsMessage| async move { Ok::<_, WebSocketError>(msg.into()) });
 
             let tx_sink_mapped = tx_sink.sink_map_err(|e| StreamError::transport(e));
             let tx = WsSink::new(tx_sink_mapped);
 
             Ok(WebSocketConnection::new(tx, rx))
+        }
+    }
+
+    impl WebSocketClient for TungsteniteClient {
+        type Error = WebSocketError;
+
+        async fn connect(&self, uri: Uri<&str>) -> Result<WebSocketConnection, Self::Error> {
+            let ws_stream = tokio_tungstenite_wasm::connect(uri.as_str())
+                .await
+                .map_err(classify_tungstenite_error)?;
+            self.wrap_stream(ws_stream)
+        }
+
+        async fn connect_with_options(
+            &self,
+            uri: Uri<&str>,
+            options: WebSocketConnectOptions<'_>,
+        ) -> Result<WebSocketConnection, Self::Error> {
+            let headers: Vec<(String, String)> = options
+                .headers
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect();
+            let ws_stream = tokio_tungstenite_wasm::connect_with_headers(
+                uri.as_str(),
+                &options.protocols,
+                &headers,
+            )
+            .await
+            .map_err(classify_tungstenite_error)?;
+            self.wrap_stream(ws_stream)
         }
     }
 
@@ -572,18 +687,22 @@ pub mod tungstenite_client {
         use tokio_tungstenite_wasm::Message;
 
         match msg {
-            Message::Text(vec) => {
-                // tokio-tungstenite-wasm Text contains Vec<u8> (UTF-8 validated)
-                let bytes = Bytes::from(vec);
+            Message::Text(text) => {
+                // Zero-copy: Utf8Bytes -> Bytes -> WsText, all re-wraps of the
+                // same UTF-8-validated buffer.
+                let bytes: Bytes = text.into();
                 Some(WsMessage::Text(unsafe {
                     WsText::from_bytes_unchecked(bytes)
                 }))
             }
-            Message::Binary(vec) => Some(WsMessage::Binary(Bytes::from(vec))),
+            Message::Binary(vec) => Some(WsMessage::Binary(Bytes::from_owner(vec))),
             Message::Close(frame) => {
                 let close_frame = frame.map(|f| {
                     let code = convert_close_code(f.code);
-                    CloseFrame::new(code, CowStr::from(f.reason.into_owned()))
+                    // Zero-copy: Utf8Bytes and WsText are both UTF-8-validated
+                    // wrappers over bytes::Bytes; re-wrap without touching data.
+                    let bytes: Bytes = f.reason.into();
+                    CloseFrame::new(code, unsafe { WsText::from_bytes_unchecked(bytes) })
                 });
                 Some(WsMessage::Close(close_frame))
             }
@@ -619,19 +738,27 @@ pub mod tungstenite_client {
 
             match msg {
                 WsMessage::Text(text) => {
-                    // tokio-tungstenite-wasm Text expects String
-                    let bytes = text.into_bytes();
-                    // Safe: WsText is already UTF-8 validated
-                    let string = unsafe { String::from_utf8_unchecked(bytes.to_vec()) };
-                    Message::Text(string)
+                    // Safe: WsText is already UTF-8 validated, so this cannot
+                    // fail and no copy is made — the buffer moves as-is.
+                    let utf8: tokio_tungstenite_wasm::Utf8Bytes = text
+                        .into_bytes()
+                        .try_into()
+                        .expect("WsText is UTF-8 validated");
+                    Message::Text(utf8)
                 }
-                WsMessage::Binary(bytes) => Message::Binary(bytes.to_vec()),
+                WsMessage::Binary(bytes) => Message::Binary(bytes),
                 WsMessage::Close(frame) => {
                     let close_frame = frame.map(|f| {
                         let code = u16::from(f.code).into();
+                        // Zero-copy: Bytes -> Utf8Bytes re-wrap (already
+                        // UTF-8 validated by WsText).
                         tokio_tungstenite_wasm::CloseFrame {
                             code,
-                            reason: f.reason.into_static().to_string().into(),
+                            reason: f
+                                .reason
+                                .into_bytes()
+                                .try_into()
+                                .expect("WsText is UTF-8 validated"),
                         }
                     });
                     Message::Close(close_frame)

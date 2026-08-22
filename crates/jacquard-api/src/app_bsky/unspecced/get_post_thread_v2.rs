@@ -30,6 +30,89 @@ use crate::app_bsky::unspecced::ThreadItemNoUnauthenticated;
 use crate::app_bsky::unspecced::ThreadItemNotFound;
 use crate::app_bsky::unspecced::ThreadItemPost;
 use crate::app_bsky::unspecced::get_post_thread_v2;
+/// Sorting for the thread replies.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetPostThreadV2Sort<S: BosStr = DefaultStr> {
+    Newest,
+    Oldest,
+    Top,
+    Other(S),
+}
+
+impl<S: BosStr> GetPostThreadV2Sort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Newest => "newest",
+            Self::Oldest => "oldest",
+            Self::Top => "top",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "newest" => Self::Newest,
+            "oldest" => Self::Oldest,
+            "top" => Self::Top,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetPostThreadV2Sort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetPostThreadV2Sort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetPostThreadV2Sort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetPostThreadV2Sort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetPostThreadV2Sort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetPostThreadV2Sort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetPostThreadV2Sort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetPostThreadV2Sort::Newest => GetPostThreadV2Sort::Newest,
+            GetPostThreadV2Sort::Oldest => GetPostThreadV2Sort::Oldest,
+            GetPostThreadV2Sort::Top => GetPostThreadV2Sort::Top,
+            GetPostThreadV2Sort::Other(v) => GetPostThreadV2Sort::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -50,7 +133,7 @@ pub struct GetPostThreadV2<S: BosStr = DefaultStr> {
     /// Defaults to `"oldest"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<GetPostThreadV2Sort<S>>,
 }
 
 
@@ -154,8 +237,10 @@ fn _default_branching_factor() -> Option<i64> {
     Some(10i64)
 }
 
-fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("oldest"))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetPostThreadV2Sort<S>,
+> {
+    Some(<GetPostThreadV2Sort<S>>::from_value(S::from_static("oldest")))
 }
 
 pub mod get_post_thread_v2_state {
@@ -196,7 +281,13 @@ pub struct GetPostThreadV2Builder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<bool>, Option<AtUri<S>>, Option<i64>, Option<i64>, Option<S>),
+    _fields: (
+        Option<bool>,
+        Option<AtUri<S>>,
+        Option<i64>,
+        Option<i64>,
+        Option<GetPostThreadV2Sort<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -296,12 +387,12 @@ impl<St: get_post_thread_v2_state::State, S: BosStr> GetPostThreadV2Builder<St, 
 
 impl<St: get_post_thread_v2_state::State, S: BosStr> GetPostThreadV2Builder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<GetPostThreadV2Sort<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<GetPostThreadV2Sort<S>>) -> Self {
         self._fields.4 = value;
         self
     }

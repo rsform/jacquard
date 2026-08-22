@@ -16,6 +16,186 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::social_coves::feed::FeedViewPost;
+/// Sort order for discover feed
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetDiscoverSort<S: BosStr = DefaultStr> {
+    Hot,
+    Top,
+    New,
+    Other(S),
+}
+
+impl<S: BosStr> GetDiscoverSort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hot => "hot",
+            Self::Top => "top",
+            Self::New => "new",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "hot" => Self::Hot,
+            "top" => Self::Top,
+            "new" => Self::New,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetDiscoverSort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetDiscoverSort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetDiscoverSort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetDiscoverSort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetDiscoverSort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetDiscoverSort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetDiscoverSort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetDiscoverSort::Hot => GetDiscoverSort::Hot,
+            GetDiscoverSort::Top => GetDiscoverSort::Top,
+            GetDiscoverSort::New => GetDiscoverSort::New,
+            GetDiscoverSort::Other(v) => GetDiscoverSort::Other(v.into_static()),
+        }
+    }
+}
+
+/// Timeframe for top sorting (only applies when sort=top)
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetDiscoverTimeframe<S: BosStr = DefaultStr> {
+    Hour,
+    Day,
+    Week,
+    Month,
+    Year,
+    All,
+    Other(S),
+}
+
+impl<S: BosStr> GetDiscoverTimeframe<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hour => "hour",
+            Self::Day => "day",
+            Self::Week => "week",
+            Self::Month => "month",
+            Self::Year => "year",
+            Self::All => "all",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "hour" => Self::Hour,
+            "day" => Self::Day,
+            "week" => Self::Week,
+            "month" => Self::Month,
+            "year" => Self::Year,
+            "all" => Self::All,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetDiscoverTimeframe<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetDiscoverTimeframe<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetDiscoverTimeframe<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetDiscoverTimeframe<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetDiscoverTimeframe<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetDiscoverTimeframe<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetDiscoverTimeframe<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetDiscoverTimeframe::Hour => GetDiscoverTimeframe::Hour,
+            GetDiscoverTimeframe::Day => GetDiscoverTimeframe::Day,
+            GetDiscoverTimeframe::Week => GetDiscoverTimeframe::Week,
+            GetDiscoverTimeframe::Month => GetDiscoverTimeframe::Month,
+            GetDiscoverTimeframe::Year => GetDiscoverTimeframe::Year,
+            GetDiscoverTimeframe::All => GetDiscoverTimeframe::All,
+            GetDiscoverTimeframe::Other(v) => {
+                GetDiscoverTimeframe::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -30,11 +210,11 @@ pub struct GetDiscover<S: BosStr = DefaultStr> {
     /// Defaults to `"hot"`. Max length: 64.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<GetDiscoverSort<S>>,
     /// Defaults to `"day"`. Max length: 64.
     #[serde(default = "_default_timeframe")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub timeframe: Option<S>,
+    pub timeframe: Option<GetDiscoverTimeframe<S>>,
 }
 
 
@@ -80,12 +260,16 @@ fn _default_limit() -> Option<i64> {
     Some(15i64)
 }
 
-fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("hot"))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetDiscoverSort<S>,
+> {
+    Some(<GetDiscoverSort<S>>::from_value(S::from_static("hot")))
 }
 
-fn _default_timeframe<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("day"))
+fn _default_timeframe<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetDiscoverTimeframe<S>,
+> {
+    Some(<GetDiscoverTimeframe<S>>::from_value(S::from_static("day")))
 }
 
 pub mod get_discover_state {
@@ -110,7 +294,12 @@ pub mod get_discover_state {
 /// Builder for constructing an instance of this type.
 pub struct GetDiscoverBuilder<St: get_discover_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<i64>,
+        Option<GetDiscoverSort<S>>,
+        Option<GetDiscoverTimeframe<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -178,12 +367,12 @@ impl<St: get_discover_state::State, S: BosStr> GetDiscoverBuilder<St, S> {
 
 impl<St: get_discover_state::State, S: BosStr> GetDiscoverBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<GetDiscoverSort<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<GetDiscoverSort<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -191,12 +380,15 @@ impl<St: get_discover_state::State, S: BosStr> GetDiscoverBuilder<St, S> {
 
 impl<St: get_discover_state::State, S: BosStr> GetDiscoverBuilder<St, S> {
     /// Set the `timeframe` field (optional)
-    pub fn timeframe(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn timeframe(
+        mut self,
+        value: impl Into<Option<GetDiscoverTimeframe<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `timeframe` field to an Option value (optional)
-    pub fn maybe_timeframe(mut self, value: Option<S>) -> Self {
+    pub fn maybe_timeframe(mut self, value: Option<GetDiscoverTimeframe<S>>) -> Self {
         self._fields.3 = value;
         self
     }

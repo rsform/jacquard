@@ -64,7 +64,9 @@ pub struct Job<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub next_run: Option<Datetime>,
     pub schedule: JobSchedule<S>,
+    /// Defaults to `"pending"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_job_status")]
     pub status: Option<JobStatus<S>>,
     #[serde(
         flatten,
@@ -632,6 +634,12 @@ where
 
 fn _default_job_failure_count() -> Option<i64> {
     Some(0i64)
+}
+
+fn _default_job_status<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    JobStatus<S>,
+> {
+    Some(<JobStatus<S>>::from_value(S::from_static("pending")))
 }
 
 pub mod job_state {

@@ -43,7 +43,8 @@ use serde::{Serialize, Deserialize};
 pub struct State<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub issue: AtUri<S>,
-    ///state of the issue
+    ///state of the issue  Defaults to `"sh.tangled.repo.issue.state.open"`.
+    #[serde(default = "_default_state_state")]
     pub state: StateState<S>,
     #[serde(
         flatten,
@@ -213,6 +214,10 @@ where
         }
     }
     Ok(data)
+}
+
+fn _default_state_state<S: FromStaticStr + BosStr>() -> StateState<S> {
+    <StateState<S>>::from_value(S::from_static("sh.tangled.repo.issue.state.open"))
 }
 
 pub mod state_state {

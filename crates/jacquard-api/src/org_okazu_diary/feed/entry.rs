@@ -61,8 +61,9 @@ pub struct Entry<S: BosStr = DefaultStr> {
     ///Reference to another `org.okazu-diary.feed.entry` record or an `org.okazu-diary.material.collectionItem` record from this entry is derived.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub via: Option<StrongRef<S>>,
-    ///Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.
+    ///Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_entry_visibility")]
     pub visibility: Option<EntryVisibility<S>>,
     #[serde(
         flatten,
@@ -274,6 +275,12 @@ where
 
 fn _default_entry_had_hiatus() -> Option<bool> {
     Some(false)
+}
+
+fn _default_entry_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    EntryVisibility<S>,
+> {
+    Some(<EntryVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod entry_state {

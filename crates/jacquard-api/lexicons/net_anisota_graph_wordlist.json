@@ -91,7 +91,7 @@
     },
     "schedule": {
       "type": "object",
-      "description": "A recurring active window. Days and time window combine: the list applies only on the listed days (absent/empty = every day) and only inside the time window (absent = all day). A window whose end is at or before its start wraps past midnight.",
+      "description": "A recurring active window. Days and time window combine: the list applies only on the listed days (absent/empty = every day) and only inside the time window (absent = all day). A window whose end is before its start wraps past midnight; equal start and end means no time bound (all day on the listed days).",
       "properties": {
         "days": {
           "type": "array",

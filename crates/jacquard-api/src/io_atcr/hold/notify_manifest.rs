@@ -89,8 +89,9 @@ pub struct NotifyManifest<S: BosStr = DefaultStr> {
     pub manifest: notify_manifest::ManifestInfo<S>,
     ///Manifest digest for building layer record AT-URIs
     pub manifest_digest: S,
-    ///Operation type (defaults to 'push' for backward compatibility)
+    ///Operation type (defaults to 'push' for backward compatibility)  Defaults to `"push"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_notify_manifest_operation")]
     pub operation: Option<NotifyManifestOperation<S>>,
     ///Image repository name
     pub repository: S,
@@ -807,6 +808,12 @@ where
         BTreeMap<SmolStr, Data<S>>,
     > as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn _default_notify_manifest_operation<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    NotifyManifestOperation<S>,
+> {
+    Some(<NotifyManifestOperation<S>>::from_value(S::from_static("push")))
 }
 
 pub mod notify_manifest_state {

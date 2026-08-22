@@ -143,9 +143,9 @@ pub struct SubscribeLabels {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubscribeLabelsMessage<S: BosStr = DefaultStr> {
-    #[serde(rename = "#labels")]
+    #[serde(rename = "com.atproto.label.subscribeLabels#labels")]
     Labels(Box<subscribe_labels::Labels<S>>),
-    #[serde(rename = "#info")]
+    #[serde(rename = "com.atproto.label.subscribeLabels#info")]
     Info(Box<subscribe_labels::Info<S>>),
 }
 

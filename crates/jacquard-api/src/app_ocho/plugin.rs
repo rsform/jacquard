@@ -174,10 +174,10 @@ pub struct ExpoClient<S: BosStr = DefaultStr> {
     pub new_arch_enabled: Option<bool>,
     ///The default orientation of the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub orientation: Option<S>,
+    pub orientation: Option<ExpoClientOrientation<S>>,
     ///The platforms supported by the app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub platforms: Option<Vec<S>>,
+    pub platforms: Option<Vec<ExpoClientPlatforms<S>>>,
     ///A list of plugins used by the app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub plugins: Option<Data<S>>,
@@ -205,6 +205,173 @@ pub struct ExpoClient<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The default orientation of the app.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpoClientOrientation<S: BosStr = DefaultStr> {
+    Portrait,
+    Landscape,
+    Default,
+    Other(S),
+}
+
+impl<S: BosStr> ExpoClientOrientation<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Portrait => "portrait",
+            Self::Landscape => "landscape",
+            Self::Default => "default",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "portrait" => Self::Portrait,
+            "landscape" => Self::Landscape,
+            "default" => Self::Default,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpoClientOrientation<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpoClientOrientation<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpoClientOrientation<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ExpoClientOrientation<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpoClientOrientation<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpoClientOrientation<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpoClientOrientation<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpoClientOrientation::Portrait => ExpoClientOrientation::Portrait,
+            ExpoClientOrientation::Landscape => ExpoClientOrientation::Landscape,
+            ExpoClientOrientation::Default => ExpoClientOrientation::Default,
+            ExpoClientOrientation::Other(v) => {
+                ExpoClientOrientation::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpoClientPlatforms<S: BosStr = DefaultStr> {
+    Ios,
+    Android,
+    Web,
+    Other(S),
+}
+
+impl<S: BosStr> ExpoClientPlatforms<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ios => "ios",
+            Self::Android => "android",
+            Self::Web => "web",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "ios" => Self::Ios,
+            "android" => Self::Android,
+            "web" => Self::Web,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpoClientPlatforms<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpoClientPlatforms<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpoClientPlatforms<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ExpoClientPlatforms<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpoClientPlatforms<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpoClientPlatforms<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpoClientPlatforms<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpoClientPlatforms::Ios => ExpoClientPlatforms::Ios,
+            ExpoClientPlatforms::Android => ExpoClientPlatforms::Android,
+            ExpoClientPlatforms::Web => ExpoClientPlatforms::Web,
+            ExpoClientPlatforms::Other(v) => ExpoClientPlatforms::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -317,7 +484,7 @@ pub type StringId<S = DefaultStr> = S;
 pub struct Web<S: BosStr = DefaultStr> {
     ///The bundler used for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub bundler: Option<S>,
+    pub bundler: Option<WebBundler<S>>,
     ///The URL to the favicon for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub favicon: Option<S>,
@@ -325,7 +492,7 @@ pub struct Web<S: BosStr = DefaultStr> {
     pub favicon_blob: Option<BlobRef<S>>,
     ///The output directory for the web app.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub output: Option<S>,
+    pub output: Option<WebOutput<S>>,
     #[serde(
         flatten,
         default,
@@ -333,6 +500,168 @@ pub struct Web<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The bundler used for the web app.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WebBundler<S: BosStr = DefaultStr> {
+    Webpack,
+    Metro,
+    Other(S),
+}
+
+impl<S: BosStr> WebBundler<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Webpack => "webpack",
+            Self::Metro => "metro",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "webpack" => Self::Webpack,
+            "metro" => Self::Metro,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WebBundler<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WebBundler<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WebBundler<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WebBundler<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WebBundler<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WebBundler<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WebBundler<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WebBundler::Webpack => WebBundler::Webpack,
+            WebBundler::Metro => WebBundler::Metro,
+            WebBundler::Other(v) => WebBundler::Other(v.into_static()),
+        }
+    }
+}
+
+/// The output directory for the web app.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WebOutput<S: BosStr = DefaultStr> {
+    Static,
+    Server,
+    Single,
+    Other(S),
+}
+
+impl<S: BosStr> WebOutput<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Static => "static",
+            Self::Server => "server",
+            Self::Single => "single",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "static" => Self::Static,
+            "server" => Self::Server,
+            "single" => Self::Single,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WebOutput<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WebOutput<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WebOutput<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WebOutput<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WebOutput<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WebOutput<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WebOutput<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WebOutput::Static => WebOutput::Static,
+            WebOutput::Server => WebOutput::Server,
+            WebOutput::Single => WebOutput::Single,
+            WebOutput::Other(v) => WebOutput::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for AdaptiveIcon<S> {

@@ -178,8 +178,9 @@ pub struct RoomSettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_room_settings_slow_mode_seconds")]
     pub slow_mode_seconds: Option<i64>,
-    ///Room discoverability. public = listed in directory, unlisted = link only, private = invite only.
+    ///Room discoverability. public = listed in directory, unlisted = link only, private = invite only.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_room_settings_visibility")]
     pub visibility: Option<RoomSettingsVisibility<S>>,
     #[serde(
         flatten,
@@ -874,13 +875,23 @@ fn _default_room_settings_slow_mode_seconds() -> Option<i64> {
     Some(0i64)
 }
 
+fn _default_room_settings_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    RoomSettingsVisibility<S>,
+> {
+    Some(<RoomSettingsVisibility<S>>::from_value(S::from_static("public")))
+}
+
 impl Default for RoomSettings {
     fn default() -> Self {
         Self {
             allowlist_enabled: Some(false),
             min_account_age_days: Some(0i64),
             slow_mode_seconds: Some(0i64),
-            visibility: None,
+            visibility: Some(
+                <RoomSettingsVisibility>::from_value(
+                    jacquard_common::DefaultStr::from_static("public"),
+                ),
+            ),
             extra_data: Default::default(),
         }
     }

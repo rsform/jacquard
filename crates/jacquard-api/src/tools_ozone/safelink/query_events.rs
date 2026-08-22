@@ -30,8 +30,9 @@ pub struct QueryEvents<S: BosStr = DefaultStr> {
     ///Filter by pattern type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pattern_type: Option<S>,
-    ///Sort direction
+    ///Sort direction  Defaults to `"desc"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_query_events_sort_direction")]
     pub sort_direction: Option<QueryEventsSortDirection<S>>,
     ///Filter by specific URLs or domains
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -168,4 +169,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
 
 fn _default_query_events_limit() -> Option<i64> {
     Some(50i64)
+}
+
+fn _default_query_events_sort_direction<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    QueryEventsSortDirection<S>,
+> {
+    Some(<QueryEventsSortDirection<S>>::from_value(S::from_static("desc")))
 }

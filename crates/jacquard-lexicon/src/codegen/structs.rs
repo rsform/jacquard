@@ -3,14 +3,16 @@ use crate::lexicon::{
     LexArrayItem, LexInteger, LexObject, LexObjectProperty, LexRecord, LexString,
 };
 use heck::ToSnakeCase;
-use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::{CowStr, deps::smol_str::SmolStr};
 use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::BTreeMap;
 
 use super::CodeGenerator;
 use super::prettify::GeneratedCode;
-use super::utils::{known_value_to_variant_name, make_ident, value_to_variant_name};
+use super::utils::{
+    known_value_to_variant_name, make_ident, string_enum_is_nameable, value_to_variant_name,
+};
 
 /// Enum variant kind for IntoStatic generation
 #[derive(Debug, Clone)]
@@ -84,12 +86,22 @@ impl<'c> CodeGenerator<'c> {
                                 resolved,
                             )?);
                         }
+                    } else if let LexArrayItem::String(s) = &array.items {
+                        if s.r#enum.is_some() || s.known_values.is_some() {
+                            let enum_name = self.generate_field_type_name(
+                                nsid,
+                                parent_type_name,
+                                field_name,
+                                "",
+                            );
+                            nested.push(self.generate_inline_string_enum(&enum_name, s, resolved)?);
+                        }
                     }
                 }
-                LexObjectProperty::String(s) if s.known_values.is_some() => {
+                LexObjectProperty::String(s) if s.known_values.is_some() || s.r#enum.is_some() => {
                     let enum_name =
                         self.generate_field_type_name(nsid, parent_type_name, field_name, "");
-                    nested.push(self.generate_inline_known_values_enum(&enum_name, s, resolved)?);
+                    nested.push(self.generate_inline_string_enum(&enum_name, s, resolved)?);
                 }
                 _ => {}
             }
@@ -119,7 +131,7 @@ impl<'c> CodeGenerator<'c> {
                 let (fields, default_fns) =
                     self.generate_object_fields(nsid, &type_name, obj, has_builder, resolved)?;
                 let doc = self.generate_doc_comment(record.description.as_ref());
-                let manual_default = self.generate_manual_default(&type_name, obj, resolved);
+                let manual_default = self.generate_manual_default(nsid, &type_name, obj, resolved);
 
                 let derive_attr = resolved.derive_standard();
                 let bosstr_path =
@@ -357,7 +369,7 @@ impl<'c> CodeGenerator<'c> {
         // 1. Manual impl if schema defaults cover all required fields.
         // 2. derive(Default) if heuristic says so (0 required, or all-string required).
         // 3. No Default otherwise.
-        let manual_default = self.generate_manual_default(&type_name, obj, resolved);
+        let manual_default = self.generate_manual_default(nsid, &type_name, obj, resolved);
         let use_derive_default = manual_default.is_none() && decision.has_default;
 
         let bosstr_path = resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
@@ -551,6 +563,7 @@ impl<'c> CodeGenerator<'c> {
 
         // Extract schema default and generate companion function + serde attr.
         let (default_doc, serde_default_attr, default_fn) = self.extract_field_default(
+            nsid,
             parent_type_name,
             field_name,
             field_type,
@@ -610,6 +623,7 @@ impl<'c> CodeGenerator<'c> {
     /// Returns (doc_suffix, serde_attr, companion_fn).
     fn extract_field_default(
         &self,
+        nsid: &str,
         parent_type_name: &str,
         field_name: &str,
         field_type: &LexObjectProperty<'static>,
@@ -669,7 +683,7 @@ impl<'c> CodeGenerator<'c> {
                     )
                 }
             }
-            LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
+            LexObjectProperty::String(s) if s.default.is_some() => {
                 let v = s.default.as_ref().unwrap().as_ref();
                 let doc = format!(" Defaults to `\"{}\"`.", v);
                 // The default function is generic over S: FromStaticStr.
@@ -677,7 +691,38 @@ impl<'c> CodeGenerator<'c> {
                 // and the serde(bound) on the struct ensures the bound is met.
                 let from_static_path =
                     resolved.external_type_tokens(&super::prettify::ExternalImport::FromStaticStr);
-                if is_optional {
+                if s.known_values.is_some() || s.r#enum.is_some() {
+                    // Enum-constrained field: the generated enum type has
+                    // this default as a known variant. The qualified-angle
+                    // form avoids syn misparsing the path in attribute
+                    // position.
+                    let enum_name =
+                        self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                    let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
+                    let bosstr_path =
+                        resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+                    if is_optional {
+                        (
+                            Some(doc),
+                            Some(serde_attr),
+                            Some(quote! {
+                                fn #fn_ident<S: #from_static_path + #bosstr_path>() -> ::core::option::Option<#enum_ident<S>> {
+                                    Some(<#enum_ident<S>>::from_value(S::from_static(#v)))
+                                }
+                            }),
+                        )
+                    } else {
+                        (
+                            Some(doc),
+                            Some(serde_attr),
+                            Some(quote! {
+                                fn #fn_ident<S: #from_static_path + #bosstr_path>() -> #enum_ident<S> {
+                                    <#enum_ident<S>>::from_value(S::from_static(#v))
+                                }
+                            }),
+                        )
+                    }
+                } else if is_optional {
                     (
                         Some(doc),
                         Some(serde_attr),
@@ -707,6 +752,7 @@ impl<'c> CodeGenerator<'c> {
     /// schema defaults. Optional fields default to `None` or `Some(schema_default)`.
     pub(super) fn generate_manual_default(
         &self,
+        nsid: &str,
         type_name: &str,
         obj: &LexObject<'static>,
         resolved: &super::prettify::ResolvedImports,
@@ -738,7 +784,14 @@ impl<'c> CodeGenerator<'c> {
                 let is_nullable = nullable.contains(field_name);
                 let is_optional = !is_required || is_nullable;
 
-                let value = self.schema_default_value(field_type, is_optional, resolved);
+                let value = self.schema_default_value(
+                    nsid,
+                    type_name,
+                    field_name,
+                    field_type,
+                    is_optional,
+                    resolved,
+                );
                 quote! { #field_ident: #value }
             })
             .collect();
@@ -760,6 +813,9 @@ impl<'c> CodeGenerator<'c> {
     /// Generate the default value expression for a field.
     fn schema_default_value(
         &self,
+        nsid: &str,
+        type_name: &str,
+        field_name: &str,
         field_type: &LexObjectProperty<'static>,
         is_optional: bool,
         resolved: &super::prettify::ResolvedImports,
@@ -773,10 +829,19 @@ impl<'c> CodeGenerator<'c> {
                 let v = i.default.unwrap();
                 Some(quote! { #v })
             }
-            LexObjectProperty::String(s) if s.default.is_some() && s.known_values.is_none() => {
+            LexObjectProperty::String(s) if s.default.is_some() => {
                 let v = s.default.as_ref().unwrap().as_ref();
-                let smolstr_path = resolved.type_path(&super::prettify::CommonType::SmolStr);
-                Some(quote! { #smolstr_path::from(#v) })
+                if s.known_values.is_some() || s.r#enum.is_some() {
+                    // Enum field: DefaultStr-backed enum via from_value.
+                    let enum_name = self.generate_field_type_name(nsid, type_name, field_name, "");
+                    let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
+                    Some(quote! {
+                        <#enum_ident>::from_value(jacquard_common :: DefaultStr :: from_static(#v))
+                    })
+                } else {
+                    let smolstr_path = resolved.type_path(&super::prettify::CommonType::SmolStr);
+                    Some(quote! { #smolstr_path::from(#v) })
+                }
             }
             _ => None,
         };
@@ -1029,6 +1094,81 @@ impl<'c> CodeGenerator<'c> {
     /// Generate enum for inline string property with known values.
     /// Unlike `generate_known_values_enum`, this takes the type name directly
     /// and uses fragment extraction for NSID#fragment values.
+    /// Generate an inline string enum from `enum` or `knownValues`
+    /// constraints (the two are equivalent for generation purposes).
+    ///
+    /// Falls back to a plain string type with associated value constants
+    /// when the values cannot be named as Rust variants (emoji,
+    /// punctuation-only) or would collide after naming.
+    pub(super) fn generate_inline_string_enum(
+        &self,
+        type_name: &str,
+        string: &LexString<'static>,
+        resolved: &super::prettify::ResolvedImports,
+    ) -> Result<GeneratedCode> {
+        if !string_enum_is_nameable(string) {
+            let values: Vec<CowStr<'static>> = string
+                .known_values
+                .clone()
+                .or_else(|| string.r#enum.clone())
+                .unwrap_or_default();
+            return self.generate_string_constants(type_name, string, &values);
+        }
+        let mut string = string.clone();
+        if string.known_values.is_none() {
+            string.known_values = string.r#enum.clone();
+        }
+        self.generate_inline_known_values_enum(type_name, &string, resolved)
+    }
+
+    /// Fallback for unnameable enum values: keep the field a plain string
+    /// type and emit the constrained values as associated constants.
+    fn generate_string_constants(
+        &self,
+        type_name: &str,
+        string: &LexString<'static>,
+        values: &[CowStr<'static>],
+    ) -> Result<GeneratedCode> {
+        use heck::ToShoutySnakeCase;
+
+        let doc = self.generate_doc_comment(string.description.as_ref());
+        // One nameable sibling (or the field name) anchors the module;
+        // constants are named from any nameable prefix of each value,
+        // else positional.
+        let mut consts = Vec::new();
+        for (i, v) in values.iter().enumerate() {
+            let base = known_value_to_variant_name(v.as_ref());
+            let name = if base.is_empty() || base == "Unknown" {
+                format!("Value{}", i + 1)
+            } else {
+                base
+            };
+            let const_ident =
+                syn::Ident::new(&name.to_shouty_snake_case(), proc_macro2::Span::call_site());
+            let value_str = v.as_ref();
+            consts.push(quote! {
+                #doc
+                pub const #const_ident: &'static str = #value_str;
+            });
+        }
+
+        let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
+        let type_def = quote! {
+            /// Constrained string values.
+            ///
+            /// The lexicon restricts this string to the constants below;
+            /// the type stays a plain string because the values are not
+            /// representable as Rust variants.
+            pub struct #ident;
+
+            impl #ident {
+                #(#consts)*
+            }
+        };
+
+        Ok(GeneratedCode::type_only(type_def))
+    }
+
     pub(super) fn generate_inline_known_values_enum(
         &self,
         type_name: &str,

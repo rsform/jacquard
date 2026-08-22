@@ -43,6 +43,85 @@ pub struct ListItem<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Sort direction by createdAt.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListCommentsOrder<S: BosStr = DefaultStr> {
+    Asc,
+    Desc,
+    Other(S),
+}
+
+impl<S: BosStr> ListCommentsOrder<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Asc => "asc",
+            Self::Desc => "desc",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "asc" => Self::Asc,
+            "desc" => Self::Desc,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListCommentsOrder<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListCommentsOrder<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListCommentsOrder<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListCommentsOrder<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListCommentsOrder<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListCommentsOrder<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListCommentsOrder<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListCommentsOrder::Asc => ListCommentsOrder::Asc,
+            ListCommentsOrder::Desc => ListCommentsOrder::Desc,
+            ListCommentsOrder::Other(v) => ListCommentsOrder::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -56,7 +135,7 @@ pub struct ListComments<S: BosStr = DefaultStr> {
     /// Defaults to `"desc"`.
     #[serde(default = "_default_order")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub order: Option<S>,
+    pub order: Option<ListCommentsOrder<S>>,
     pub subject: AtUri<S>,
 }
 
@@ -394,8 +473,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_order<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("desc"))
+fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    ListCommentsOrder<S>,
+> {
+    Some(<ListCommentsOrder<S>>::from_value(S::from_static("desc")))
 }
 
 pub mod list_comments_state {
@@ -433,7 +514,7 @@ pub mod list_comments_state {
 /// Builder for constructing an instance of this type.
 pub struct ListCommentsBuilder<St: list_comments_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>, Option<AtUri<S>>),
+    _fields: (Option<S>, Option<i64>, Option<ListCommentsOrder<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -501,12 +582,12 @@ impl<St: list_comments_state::State, S: BosStr> ListCommentsBuilder<St, S> {
 
 impl<St: list_comments_state::State, S: BosStr> ListCommentsBuilder<St, S> {
     /// Set the `order` field (optional)
-    pub fn order(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn order(mut self, value: impl Into<Option<ListCommentsOrder<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `order` field to an Option value (optional)
-    pub fn maybe_order(mut self, value: Option<S>) -> Self {
+    pub fn maybe_order(mut self, value: Option<ListCommentsOrder<S>>) -> Self {
         self._fields.2 = value;
         self
     }

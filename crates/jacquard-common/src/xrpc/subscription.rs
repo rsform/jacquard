@@ -13,22 +13,25 @@ use crate::deps::fluent_uri::{
 };
 use crate::error::DecodeError;
 use crate::stream::StreamError;
-use crate::websocket::{WebSocketClient, WebSocketConnection, WsSink, WsStream};
+use crate::websocket::{
+    WebSocketClient, WebSocketConnectOptions, WebSocketConnection, WsSink, WsStream,
+};
 use crate::{CowStr, Data, IntoStatic, RawData, WsMessage};
 use alloc::borrow::ToOwned;
 use alloc::string::String;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 use core::error::Error;
+use core::fmt;
 use core::future::Future;
 use core::marker::PhantomData;
+use core::str::FromStr;
 #[cfg(not(target_arch = "wasm32"))]
 use n0_future::stream::Boxed;
 #[cfg(target_arch = "wasm32")]
 use n0_future::stream::BoxedLocal as Boxed;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
-use smol_str::SmolStr;
 
 /// Encoding format for subscription messages
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,6 +56,11 @@ pub trait SubscriptionResp {
     /// Message encoding (JSON or DAG-CBOR)
     const ENCODING: MessageEncoding;
 
+    /// WebSocket subprotocol to request during the upgrade handshake
+    /// (e.g. Some("xrpc.v1.json") for network.bsky.jetstream.subscribeEvents).
+    /// Subscriptions without one negotiate no subprotocol.
+    const SUBPROTOCOL: Option<&'static str> = None;
+
     /// Message union type, parameterised on backing string type.
     type Message<S: BosStr>;
 
@@ -70,10 +78,57 @@ pub trait SubscriptionResp {
         Self::Message<S>: Deserialize<'de>,
     {
         match Self::ENCODING {
-            MessageEncoding::Json => serde_json::from_slice(bytes).map_err(DecodeError::from),
+            MessageEncoding::Json => {
+                if Self::SUBPROTOCOL == Some("xrpc.v1.json") {
+                    Self::decode_json_frame(bytes)?.ok_or_else(|| {
+                        DecodeError::UnknownEventType("unknown xrpc.v1.json envelope".into())
+                    })
+                } else {
+                    serde_json::from_slice(bytes).map_err(DecodeError::from)
+                }
+            }
             MessageEncoding::DagCbor => {
                 serde_ipld_dagcbor::from_slice(bytes).map_err(DecodeError::from)
             }
+        }
+    }
+
+    /// Decode an `xrpc.v1.json` frame (atproto proposal 0015):
+    /// `{"$type":"message","payload":{…union…}}`. The payload field
+    /// deserializes as this subscription's message union in the same
+    /// parse. Error frames surface as decode errors; the server closes
+    /// the stream after sending one.
+    fn decode_json_frame<'de, S>(bytes: &'de [u8]) -> Result<Option<Self::Message<S>>, DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+        Self::Message<S>: Deserialize<'de>,
+    {
+        #[derive(serde::Deserialize)]
+        #[serde(tag = "$type")]
+        enum Frame<'a, M> {
+            #[serde(rename = "message")]
+            Message { payload: M },
+            #[serde(rename = "error")]
+            Error {
+                #[serde(borrow)]
+                error: crate::CowStr<'a>,
+                #[serde(default, borrow)]
+                message: Option<crate::CowStr<'a>>,
+            },
+            #[serde(other)]
+            Unknown,
+        }
+
+        match serde_json::from_slice::<Frame<'de, Self::Message<S>>>(bytes)? {
+            Frame::Message { payload } => Ok(Some(payload)),
+            Frame::Error { error, message } => {
+                let detail = match message {
+                    Some(m) => format!("{error}: {m}"),
+                    None => error.to_string(),
+                };
+                Err(DecodeError::UnknownEventType(detail.into()))
+            }
+            Frame::Unknown => Ok(None),
         }
     }
 }
@@ -94,6 +149,10 @@ pub trait XrpcSubscription {
     /// Custom path override (e.g., "/subscribe" for Jetstream).
     /// If None, defaults to "/xrpc/{NSID}"
     const CUSTOM_PATH: Option<&'static str> = None;
+
+    /// WebSocket subprotocol to request during the upgrade handshake.
+    /// Mirrors [`SubscriptionResp::SUBPROTOCOL`] on the associated stream type.
+    const SUBPROTOCOL: Option<&'static str> = None;
 
     /// Stream response type (marker struct)
     type Stream: SubscriptionResp;
@@ -191,36 +250,90 @@ pub fn parse_event_header<'a>(bytes: &'a [u8]) -> Result<(EventHeader, &'a [u8])
     Ok((header, &bytes[position..]))
 }
 
-/// Decode JSON messages from a WebSocket stream
-pub fn decode_json_msg<S: SubscriptionResp>(
-    msg_result: Result<crate::websocket::WsMessage, StreamError>,
-) -> Option<Result<StreamMessage<SmolStr, S>, StreamError>>
+/// Decode JSON messages from a WebSocket stream, with an injected
+/// transform applied to binary frames first.
+///
+/// The transform is authoritative when it returns `Ok(Some(bytes))`: the
+/// returned immutable bytes are decoded directly and the static-dictionary/v1
+/// zstd path is skipped. `Ok(None)` declines the frame and falls through to
+/// the existing [`decode_json_msg`] behavior unchanged. `Err` is surfaced
+/// without attempting to reinterpret the original binary frame. This lets a
+/// caller that negotiated per-stream dictionary compression decode its frames
+/// without any of that logic living here.
+fn decode_json_bytes<'a, S: SubscriptionResp, Str>(
+    bytes: &'a [u8],
+) -> Option<Result<StreamMessage<Str, S>, StreamError>>
 where
-    StreamMessage<SmolStr, S>: DeserializeOwned,
+    StreamMessage<Str, S>: Deserialize<'a>,
+    Str: BosStr + Clone + FromStr + fmt::Debug + Deserialize<'a>,
+    <Str as FromStr>::Err: fmt::Debug,
+{
+    if S::SUBPROTOCOL == Some("xrpc.v1.json") {
+        match S::decode_json_frame::<Str>(bytes) {
+            Ok(Some(message)) => Some(Ok(message)),
+            Ok(None) => None,
+            Err(error) => Some(Err(StreamError::decode(error))),
+        }
+    } else {
+        Some(S::decode_message::<Str>(bytes).map_err(StreamError::decode))
+    }
+}
+
+/// Decode a JSON WebSocket message after applying a fallible binary transform.
+/// See [`SubscriptionStream::into_stream_with_binary_transform`].
+pub fn decode_json_msg_with<S, F, Str>(
+    msg_result: Result<crate::websocket::WsMessage, StreamError>,
+    transform: &F,
+) -> Option<Result<StreamMessage<Str, S>, StreamError>>
+where
+    S: SubscriptionResp,
+    F: Fn(&[u8]) -> Result<Option<crate::deps::bytes::Bytes>, StreamError>,
+    StreamMessage<Str, S>: DeserializeOwned,
+    Str: BosStr + Clone + FromStr + fmt::Debug + DeserializeOwned,
+    <Str as FromStr>::Err: fmt::Debug,
 {
     use crate::websocket::WsMessage;
 
     match msg_result {
-        Ok(WsMessage::Text(text)) => {
-            Some(S::decode_message::<SmolStr>(text.as_ref()).map_err(StreamError::decode))
-        }
+        Ok(WsMessage::Text(text)) => decode_json_bytes::<S, Str>(text.as_ref()),
+        Ok(WsMessage::Binary(bytes)) => match transform(&bytes) {
+            Ok(Some(transformed)) => decode_json_bytes::<S, Str>(&transformed),
+            Ok(None) => decode_json_msg::<S, Str>(Ok(WsMessage::Binary(bytes))),
+            Err(error) => Some(Err(error)),
+        },
+        Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
+        Err(e) => Some(Err(e)),
+    }
+}
+
+/// Decode JSON messages from a WebSocket stream
+pub fn decode_json_msg<S: SubscriptionResp, Str>(
+    msg_result: Result<crate::websocket::WsMessage, StreamError>,
+) -> Option<Result<StreamMessage<Str, S>, StreamError>>
+where
+    StreamMessage<Str, S>: DeserializeOwned,
+    Str: BosStr + Clone + FromStr + fmt::Debug + DeserializeOwned,
+    <Str as FromStr>::Err: fmt::Debug,
+{
+    use crate::websocket::WsMessage;
+
+    match msg_result {
+        Ok(WsMessage::Text(text)) => decode_json_bytes::<S, Str>(text.as_ref()),
         Ok(WsMessage::Binary(bytes)) => {
             #[cfg(feature = "zstd")]
             {
                 // Try to decompress with zstd first (Jetstream uses zstd compression)
                 match decompress_zstd(&bytes) {
-                    Ok(decompressed) => Some(
-                        S::decode_message::<SmolStr>(&decompressed).map_err(StreamError::decode),
-                    ),
+                    Ok(decompressed) => decode_json_bytes::<S, Str>(&decompressed),
                     Err(_) => {
                         // Not zstd-compressed, try direct decode
-                        Some(S::decode_message::<SmolStr>(&bytes).map_err(StreamError::decode))
+                        decode_json_bytes::<S, Str>(&bytes)
                     }
                 }
             }
             #[cfg(not(feature = "zstd"))]
             {
-                Some(S::decode_message::<SmolStr>(&bytes).map_err(StreamError::decode))
+                decode_json_bytes::<S, Str>(&bytes)
             }
         }
         Ok(WsMessage::Close(_)) => Some(Err(StreamError::closed())),
@@ -228,14 +341,19 @@ where
     }
 }
 
+/// The vendored zstd dictionary (id 1612007021) shipped for v1 Jetstream
+/// subscriptions. Jetstream v2 serves its own dictionary generation;
+/// comparing against this detects whether the vendored copy is still
+/// current.
+#[cfg(feature = "zstd")]
+pub static VENDORED_ZSTD_DICTIONARY: &[u8] = include_bytes!("../../zstd_dictionary");
+
 #[cfg(feature = "zstd")]
 fn decompress_zstd(bytes: &[u8]) -> Result<Vec<u8>, std::io::Error> {
-    use std::sync::OnceLock;
     use zstd::stream::decode_all;
 
-    static DICTIONARY: OnceLock<Vec<u8>> = OnceLock::new();
-
-    let dict = DICTIONARY.get_or_init(|| include_bytes!("../../zstd_dictionary").to_vec());
+    static DICTIONARY: std::sync::OnceLock<Vec<u8>> = std::sync::OnceLock::new();
+    let dict = DICTIONARY.get_or_init(|| VENDORED_ZSTD_DICTIONARY.to_vec());
 
     decode_all(std::io::Cursor::new(bytes)).or_else(|_| {
         // Try with dictionary
@@ -247,17 +365,19 @@ fn decompress_zstd(bytes: &[u8]) -> Result<Vec<u8>, std::io::Error> {
 }
 
 /// Decode CBOR messages from a WebSocket stream
-pub fn decode_cbor_msg<S: SubscriptionResp>(
+pub fn decode_cbor_msg<S: SubscriptionResp, Str>(
     msg_result: Result<crate::websocket::WsMessage, StreamError>,
-) -> Option<Result<StreamMessage<SmolStr, S>, StreamError>>
+) -> Option<Result<StreamMessage<Str, S>, StreamError>>
 where
-    StreamMessage<SmolStr, S>: DeserializeOwned,
+    StreamMessage<Str, S>: DeserializeOwned,
+    Str: BosStr + Clone + FromStr + fmt::Debug + DeserializeOwned,
+    <Str as FromStr>::Err: fmt::Debug,
 {
     use crate::websocket::WsMessage;
 
     match msg_result {
         Ok(WsMessage::Binary(bytes)) => {
-            Some(S::decode_message::<SmolStr>(&bytes).map_err(StreamError::decode))
+            Some(S::decode_message::<Str>(&bytes).map_err(StreamError::decode))
         }
         Ok(WsMessage::Text(_)) => Some(Err(StreamError::wrong_message_format(
             "expected binary frame for CBOR, got text",
@@ -355,14 +475,11 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
     ///
     /// Returns a tuple of (sender, typed message stream).
     /// Messages are decoded according to the subscription's ENCODING.
-    pub fn into_stream(
-        self,
-    ) -> (
-        WsSink,
-        Boxed<Result<StreamMessage<SmolStr, S>, StreamError>>,
-    )
+    pub fn into_stream<Str>(self) -> (WsSink, Boxed<Result<StreamMessage<Str, S>, StreamError>>)
     where
-        StreamMessage<SmolStr, S>: DeserializeOwned,
+        StreamMessage<Str, S>: DeserializeOwned,
+        Str: BosStr + Clone + FromStr + fmt::Debug + DeserializeOwned,
+        <Str as FromStr>::Err: fmt::Debug,
     {
         use n0_future::StreamExt as _;
 
@@ -372,11 +489,11 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         let stream = match S::ENCODING {
             MessageEncoding::Json => rx
                 .into_inner()
-                .filter_map(|msg| decode_json_msg::<S>(msg))
+                .filter_map(|msg| decode_json_msg::<S, Str>(msg))
                 .boxed(),
             MessageEncoding::DagCbor => rx
                 .into_inner()
-                .filter_map(|msg| decode_cbor_msg::<S>(msg))
+                .filter_map(|msg| decode_cbor_msg::<S, Str>(msg))
                 .boxed(),
         };
 
@@ -384,7 +501,57 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         let stream = match S::ENCODING {
             MessageEncoding::Json => rx
                 .into_inner()
-                .filter_map(|msg| decode_json_msg::<S>(msg))
+                .filter_map(|msg| decode_json_msg::<S, Str>(msg))
+                .boxed_local(),
+            MessageEncoding::DagCbor => rx
+                .into_inner()
+                .filter_map(|msg| decode_cbor_msg::<S, Str>(msg))
+                .boxed_local(),
+        };
+
+        (tx, stream)
+    }
+
+    /// Split the connection and decode messages into a typed stream,
+    /// with a per-stream transform applied to binary frames before the
+    /// standard decode path.
+    ///
+    /// `Ok(Some(bytes))` decodes the immutable transformed payload directly;
+    /// `Ok(None)` falls through to the existing binary-frame behavior, and an
+    /// error terminates that frame without reinterpretation. Use this for
+    /// subscriptions that negotiated per-stream dictionary compression; see
+    /// [`decode_json_msg_with`].
+    pub fn into_stream_with_binary_transform<F, Str>(
+        self,
+        transform: F,
+    ) -> (WsSink, Boxed<Result<StreamMessage<Str, S>, StreamError>>)
+    where
+        F: Fn(&[u8]) -> Result<Option<crate::deps::bytes::Bytes>, StreamError> + Send + 'static,
+        StreamMessage<Str, S>: DeserializeOwned,
+        Str: BosStr + Clone + FromStr + fmt::Debug + DeserializeOwned,
+        <Str as FromStr>::Err: fmt::Debug,
+    {
+        use n0_future::StreamExt as _;
+
+        let (tx, rx) = self.connection.split();
+
+        #[cfg(not(target_arch = "wasm32"))]
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => rx
+                .into_inner()
+                .filter_map(move |msg| decode_json_msg_with::<S, _, Str>(msg, &transform))
+                .boxed(),
+            MessageEncoding::DagCbor => rx
+                .into_inner()
+                .filter_map(|msg| decode_cbor_msg::<S, Str>(msg))
+                .boxed(),
+        };
+
+        #[cfg(target_arch = "wasm32")]
+        let stream = match S::ENCODING {
+            MessageEncoding::Json => rx
+                .into_inner()
+                .filter_map(move |msg| decode_json_msg_with::<S, _>(msg, &transform))
                 .boxed_local(),
             MessageEncoding::DagCbor => rx
                 .into_inner()
@@ -669,9 +836,11 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
     /// Replaces the internal WebSocket stream with one copy and returns a typed decoded
     /// stream. Both streams receive all messages. Useful for observing raw messages
     /// while also processing typed messages.
-    pub fn tee(&mut self) -> Boxed<Result<StreamMessage<SmolStr, S>, StreamError>>
+    pub fn tee<Str>(&mut self) -> Boxed<Result<StreamMessage<Str, S>, StreamError>>
     where
-        StreamMessage<SmolStr, S>: DeserializeOwned,
+        StreamMessage<Str, S>: DeserializeOwned,
+        Str: BosStr + Clone + FromStr + fmt::Debug + DeserializeOwned,
+        <Str as FromStr>::Err: fmt::Debug,
     {
         use n0_future::StreamExt as _;
 
@@ -686,11 +855,11 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         let stream = match S::ENCODING {
             MessageEncoding::Json => typed_rx_source
                 .into_inner()
-                .filter_map(|msg| decode_json_msg::<S>(msg))
+                .filter_map(|msg| decode_json_msg::<S, Str>(msg))
                 .boxed(),
             MessageEncoding::DagCbor => typed_rx_source
                 .into_inner()
-                .filter_map(|msg| decode_cbor_msg::<S>(msg))
+                .filter_map(|msg| decode_cbor_msg::<S, Str>(msg))
                 .boxed(),
         };
 
@@ -698,11 +867,11 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
         let stream = match S::ENCODING {
             MessageEncoding::Json => typed_rx_source
                 .into_inner()
-                .filter_map(|msg| decode_json_msg::<S>(msg))
+                .filter_map(|msg| decode_json_msg::<S, Str>(msg))
                 .boxed_local(),
             MessageEncoding::DagCbor => typed_rx_source
                 .into_inner()
-                .filter_map(|msg| decode_cbor_msg::<S>(msg))
+                .filter_map(|msg| decode_cbor_msg::<S, Str>(msg))
                 .boxed_local(),
         };
         stream
@@ -879,6 +1048,8 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
     ///
     /// Builds a WebSocket URI from the base, appends the NSID path,
     /// encodes query parameters from the subscription type, and connects.
+    /// If the subscription declares a subprotocol, it is negotiated during
+    /// the upgrade handshake via `Sec-WebSocket-Protocol`.
     /// Returns a typed SubscriptionStream that automatically decodes messages.
     pub async fn subscribe<Sub>(
         self,
@@ -891,9 +1062,14 @@ impl<'a, C: WebSocketClient> SubscriptionCall<'a, C> {
         let uri = build_subscription_uri(&self.base, Sub::NSID, Sub::CUSTOM_PATH, &query_params)
             .expect("subscription URI must be valid (base_uri + path always yields a valid URI)");
 
+        let protocol = <Sub::Stream as SubscriptionResp>::SUBPROTOCOL;
+        let options = WebSocketConnectOptions {
+            headers: self.opts.headers,
+            protocols: protocol.into_iter().collect(),
+        };
         let connection = self
             .client
-            .connect_with_headers(uri.borrow(), self.opts.headers)
+            .connect_with_options(uri.borrow(), options)
             .await?;
 
         Ok(SubscriptionStream::new(connection))
@@ -995,12 +1171,12 @@ impl<W: WebSocketClient> WebSocketClient for BasicSubscriptionClient<W> {
         self.client.connect(uri).await
     }
 
-    async fn connect_with_headers(
+    async fn connect_with_options(
         &self,
         uri: Uri<&str>,
-        headers: Vec<(CowStr<'_>, CowStr<'_>)>,
+        options: WebSocketConnectOptions<'_>,
     ) -> Result<WebSocketConnection, Self::Error> {
-        self.client.connect_with_headers(uri, headers).await
+        self.client.connect_with_options(uri, options).await
     }
 }
 
@@ -1104,6 +1280,268 @@ impl TungsteniteSubscriptionClient {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::deps::fluent_uri::Uri;
+    use crate::jetstream::JetstreamParams;
+    use crate::xrpc::{GenericError, MessageEncoding, SubscriptionResp};
+    use alloc::string::ToString;
+    use core::convert::Infallible;
+    use smol_str::SmolStr;
+
+    /// Minimal message type for decode tests: `{"n": <int>}`.
+    #[derive(Debug, serde::Deserialize)]
+    struct TestMsg {
+        n: i64,
+    }
+
+    struct TestMsgStream;
+
+    impl SubscriptionResp for TestMsgStream {
+        const NSID: &'static str = "test.msg";
+        const ENCODING: MessageEncoding = MessageEncoding::Json;
+        type Message<S: crate::BosStr> = TestMsg;
+        type Error = GenericError;
+    }
+
+    struct JsonFrameStream;
+
+    impl SubscriptionResp for JsonFrameStream {
+        const NSID: &'static str = "test.json.frame";
+        const ENCODING: MessageEncoding = MessageEncoding::Json;
+        const SUBPROTOCOL: Option<&'static str> = Some("xrpc.v1.json");
+        type Message<S: crate::BosStr> = TestMsg;
+        type Error = GenericError;
+    }
+
+    #[test]
+    fn xrpc_v1_json_decodes_message_envelope_once() {
+        let decoded =
+            JsonFrameStream::decode_message::<&str>(br#"{"$type":"message","payload":{"n":7}}"#)
+                .expect("message frame");
+        assert_eq!(decoded.n, 7);
+    }
+
+    #[test]
+    fn xrpc_v1_json_surfaces_error_envelope() {
+        let error = JsonFrameStream::decode_message::<&str>(
+            br#"{"$type":"error","error":"ConsumerTooSlow","message":"lagging"}"#,
+        )
+        .expect_err("error frame");
+        assert!(matches!(
+            error,
+            DecodeError::UnknownEventType(detail) if detail == "ConsumerTooSlow: lagging"
+        ));
+    }
+
+    #[test]
+    fn xrpc_v1_json_stream_skips_unknown_envelope_between_messages() {
+        use n0_future::StreamExt as _;
+
+        let frames = [
+            r#"{"$type":"message","payload":{"n":1}}"#,
+            r#"{"$type":"future","payload":{"n":2}}"#,
+            r#"{"$type":"message","payload":{"n":3}}"#,
+        ]
+        .into_iter()
+        .map(|frame| {
+            Ok(crate::websocket::WsMessage::Text(
+                crate::websocket::WsText::from(frame),
+            ))
+        });
+        let decoded = futures_lite::future::block_on(
+            n0_future::stream::iter(frames)
+                .filter_map(decode_json_msg::<JsonFrameStream, SmolStr>)
+                .collect::<Vec<_>>(),
+        );
+
+        assert_eq!(decoded.len(), 2);
+        assert_eq!(decoded[0].as_ref().expect("first").n, 1);
+        assert_eq!(decoded[1].as_ref().expect("second").n, 3);
+    }
+
+    #[test]
+    fn xrpc_v1_json_rejects_malformed_envelope() {
+        let error = JsonFrameStream::decode_message::<&str>(br#"{"$type":"message"}"#)
+            .expect_err("missing payload");
+        assert!(matches!(error, DecodeError::Json(_)));
+    }
+
+    #[test]
+    fn binary_transform_is_authoritative_when_it_accepts() {
+        // A binary frame the transform claims: its output is decoded
+        // directly, bypassing the static-dictionary path entirely.
+        let frame = crate::websocket::WsMessage::from(vec![0x01, 0x02]);
+        let result =
+            decode_json_msg_with::<TestMsgStream, _, SmolStr>(Ok(frame), &|_bytes: &[u8]| {
+                Ok(Some(crate::deps::bytes::Bytes::from_static(br#"{"n":7}"#)))
+            });
+        let decoded = result.expect("Some").expect("decodes");
+        assert_eq!(decoded.n, 7);
+    }
+
+    #[test]
+    fn binary_transform_error_is_preserved() {
+        let frame = crate::websocket::WsMessage::from(vec![0x01, 0x02]);
+        let result =
+            decode_json_msg_with::<TestMsgStream, _, SmolStr>(Ok(frame), &|_bytes: &[u8]| {
+                Err(StreamError::protocol("transform failed"))
+            });
+        let error = result.expect("Some").expect_err("transform error");
+        assert_eq!(error.kind(), &crate::stream::StreamErrorKind::Protocol);
+        assert_eq!(
+            error.source().expect("source").to_string(),
+            "transform failed"
+        );
+    }
+
+    #[test]
+    fn binary_transform_falls_through_when_it_declines() {
+        // Transform declines (None): the frame takes the existing
+        // decode_json_msg path. A plain-JSON binary frame still decodes,
+        // proving the v1 behavior is unchanged behind a declining
+        // transform.
+        let frame = crate::websocket::WsMessage::from(br#"{"n":9}"#.to_vec());
+        let result =
+            decode_json_msg_with::<TestMsgStream, _, SmolStr>(Ok(frame), &|_bytes: &[u8]| Ok(None));
+        let decoded = result.expect("Some").expect("decodes");
+        assert_eq!(decoded.n, 9);
+    }
+
+    /// Test-only client that records the handshake options it was given, so
+    /// tests can assert on what the subscription layer handed to the
+    /// WebSocket layer.
+    #[derive(Debug, Clone)]
+    struct HandshakeRecord {
+        protocols: Vec<String>,
+        headers: Vec<(String, String)>,
+    }
+
+    struct RecordingClient {
+        record: std::sync::Mutex<HandshakeRecord>,
+    }
+
+    impl RecordingClient {
+        fn new() -> Self {
+            Self {
+                record: std::sync::Mutex::new(HandshakeRecord {
+                    protocols: Vec::new(),
+                    headers: Vec::new(),
+                }),
+            }
+        }
+
+        fn observed(&self) -> HandshakeRecord {
+            self.record.lock().expect("test mutex").clone()
+        }
+    }
+
+    impl WebSocketClient for RecordingClient {
+        type Error = Infallible;
+
+        async fn connect(&self, _uri: Uri<&str>) -> Result<WebSocketConnection, Self::Error> {
+            unreachable!("tests assert on connect_with_* paths")
+        }
+
+        async fn connect_with_options(
+            &self,
+            _uri: Uri<&str>,
+            options: WebSocketConnectOptions<'_>,
+        ) -> Result<WebSocketConnection, Self::Error> {
+            *self.record.lock().expect("test mutex") = HandshakeRecord {
+                protocols: options.protocols.iter().map(|p| p.to_string()).collect(),
+                headers: options
+                    .headers
+                    .iter()
+                    .map(|(k, v)| (k.to_string(), v.to_string()))
+                    .collect(),
+            };
+            Ok(empty_connection())
+        }
+    }
+
+    fn empty_connection() -> WebSocketConnection {
+        // A sink that accepts and drops everything, paired with an empty
+        // stream. The subscribe path never touches either before the test
+        // asserts.
+        use futures::sink::SinkExt as _;
+        let sink = futures::sink::drain()
+            .sink_map_err(|_: std::convert::Infallible| StreamError::closed());
+        WebSocketConnection::new(WsSink::new(sink), WsStream::new(n0_future::stream::empty()))
+    }
+
+    /// AC.2: a subscription without a declared subprotocol must not send one.
+    #[test]
+    fn test_subscribe_repos_sends_no_protocol() {
+        let client = RecordingClient::new();
+        let base = Uri::parse("wss://bsky.social").unwrap().to_owned();
+
+        // JetstreamParams (v1) declares no subprotocol.
+        let params = JetstreamParams::<SmolStr> {
+            wanted_collections: None,
+            wanted_dids: None,
+            cursor: None,
+            max_message_size_bytes: None,
+            compress: None,
+            require_hello: None,
+        };
+        let _ = futures_lite::future::block_on(client.subscription(base).subscribe(&params));
+
+        let record = client.observed();
+        assert!(
+            record.protocols.is_empty(),
+            "subscriptions without a declared subprotocol must not negotiate one"
+        );
+    }
+
+    /// Minimal subscription declaring a subprotocol, mirroring what the
+    /// lexicon codegen emits for network.bsky.jetstream.subscribeEvents
+    /// (SUBPROTOCOL = Some("xrpc.v1.json")).
+    mod sub_protocol_sub {
+        use super::*;
+        use crate::xrpc::GenericError;
+
+        pub struct SubProtocolStream;
+
+        impl SubscriptionResp for SubProtocolStream {
+            const NSID: &'static str = "test.sub.protocol";
+            const ENCODING: MessageEncoding = MessageEncoding::Json;
+            const SUBPROTOCOL: Option<&'static str> = Some("xrpc.v1.json");
+
+            type Message<S: BosStr> = ();
+            type Error = GenericError;
+        }
+
+        #[derive(Debug, Clone, serde::Serialize)]
+        #[serde(rename_all = "camelCase")]
+        pub struct SubProtocolParams;
+
+        impl XrpcSubscription for SubProtocolParams {
+            const NSID: &'static str = "test.sub.protocol";
+            const ENCODING: MessageEncoding = MessageEncoding::Json;
+            type Stream = SubProtocolStream;
+        }
+    }
+
+    /// AC.2: a subscription declaring a subprotocol must request exactly it.
+    #[test]
+    fn test_subscribe_events_requests_xrpc_v1_json() {
+        use sub_protocol_sub::SubProtocolParams;
+
+        let client = RecordingClient::new();
+        let base = Uri::parse("wss://jetstream.example.com")
+            .unwrap()
+            .to_owned();
+
+        let _ =
+            futures_lite::future::block_on(client.subscription(base).subscribe(&SubProtocolParams));
+
+        let record = client.observed();
+        assert_eq!(
+            record.protocols,
+            vec!["xrpc.v1.json".to_string()],
+            "declared subprotocol must be requested at the upgrade"
+        );
+        assert!(record.headers.is_empty());
+    }
 
     /// Test uri-and-deps.AC3.1: Subscription URL construction with NSID path.
     ///

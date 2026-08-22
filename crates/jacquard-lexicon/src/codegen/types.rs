@@ -7,7 +7,9 @@ use quote::quote;
 
 use super::CodeGenerator;
 use super::prettify::{CommonType, ExternalImport, ResolvedImports};
-use super::utils::{join_module_path, join_path_parts, namespace_prefix, sanitize_name_cow};
+use super::utils::{
+    join_module_path, join_path_parts, namespace_prefix, sanitize_name_cow, string_enum_is_nameable,
+};
 
 impl<'c> CodeGenerator<'c> {
     /// Convert a property type to Rust type
@@ -23,12 +25,20 @@ impl<'c> CodeGenerator<'c> {
             LexObjectProperty::Boolean(_) => Ok(quote! { bool }),
             LexObjectProperty::Integer(_) => Ok(quote! { i64 }),
             LexObjectProperty::String(s) => {
-                // If string has known_values, use the generated enum type
-                if s.known_values.is_some() {
-                    let enum_name =
-                        self.generate_field_type_name(nsid, parent_type_name, field_name, "");
-                    let enum_ident = syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
-                    Ok(quote! { #enum_ident<S> })
+                // String fields constrained by knownValues or enum use
+                // the generated enum type — unless the values are not
+                // nameable as variants (constants fallback keeps the
+                // field a plain string).
+                if s.known_values.is_some() || s.r#enum.is_some() {
+                    if string_enum_is_nameable(s) {
+                        let enum_name =
+                            self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                        let enum_ident =
+                            syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
+                        Ok(quote! { #enum_ident<S> })
+                    } else {
+                        Ok(self.string_to_rust_type(s, resolved))
+                    }
                 } else {
                     Ok(self.string_to_rust_type(s, resolved))
                 }
@@ -67,6 +77,18 @@ impl<'c> CodeGenerator<'c> {
                             syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                         Ok(quote! { Vec<#union_ident<S>> })
                     }
+                } else if let LexArrayItem::String(s) = &array.items {
+                    // Array of enum-constrained strings: use the
+                    // generated enum item type when nameable.
+                    if string_enum_is_nameable(s) {
+                        let enum_name =
+                            self.generate_field_type_name(nsid, parent_type_name, field_name, "");
+                        let enum_ident =
+                            syn::Ident::new(&enum_name, proc_macro2::Span::call_site());
+                        return Ok(quote! { Vec<#enum_ident<S>> });
+                    }
+                    let item_type = self.array_item_to_rust_type(nsid, &array.items, resolved)?;
+                    Ok(quote! { Vec<#item_type> })
                 } else {
                     let item_type = self.array_item_to_rust_type(nsid, &array.items, resolved)?;
                     Ok(quote! { Vec<#item_type> })

@@ -44,7 +44,8 @@ use serde::{Serialize, Deserialize};
 pub struct Status<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub pull: AtUri<S>,
-    ///status of the pull request
+    ///status of the pull request  Defaults to `"sh.tangled.repo.pull.status.open"`.
+    #[serde(default = "_default_status_status")]
     pub status: StatusStatus<S>,
     #[serde(
         flatten,
@@ -220,6 +221,10 @@ where
         }
     }
     Ok(data)
+}
+
+fn _default_status_status<S: FromStaticStr + BosStr>() -> StatusStatus<S> {
+    <StatusStatus<S>>::from_value(S::from_static("sh.tangled.repo.pull.status.open"))
 }
 
 pub mod status_state {

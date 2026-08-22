@@ -134,14 +134,16 @@ pub struct Config<S: BosStr = DefaultStr> {
 pub struct ConfigRegion<S: BosStr = DefaultStr> {
     ///Verification methods permitted in this region in addition to the third-party (KWS) flow, which is always supported. `device` permits using the native on-device age APIs (e.g. Apple Declared Age Range, Google Play Age Signals).
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub additional_verification_methods: Option<Vec<S>>,
+    pub additional_verification_methods: Option<
+        Vec<ConfigRegionAdditionalVerificationMethods<S>>,
+    >,
     ///The ISO 3166-1 alpha-2 country code this configuration applies to.
     pub country_code: S,
     ///The minimum age (as a whole integer) required to use Bluesky in this region.
     pub min_access_age: i64,
     ///The platforms this configuration applies to. If omitted, the configuration applies to all platforms.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub platforms: Option<Vec<S>>,
+    pub platforms: Option<Vec<ConfigRegionPlatforms<S>>>,
     ///The ISO 3166-2 region code this configuration applies to. If omitted, the configuration applies to the entire country.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region_code: Option<S>,
@@ -154,6 +156,170 @@ pub struct ConfigRegion<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConfigRegionAdditionalVerificationMethods<S: BosStr = DefaultStr> {
+    Device,
+    Other(S),
+}
+
+impl<S: BosStr> ConfigRegionAdditionalVerificationMethods<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Device => "device",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "device" => Self::Device,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ConfigRegionAdditionalVerificationMethods<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ConfigRegionAdditionalVerificationMethods<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ConfigRegionAdditionalVerificationMethods<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ConfigRegionAdditionalVerificationMethods<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ConfigRegionAdditionalVerificationMethods<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic
+for ConfigRegionAdditionalVerificationMethods<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ConfigRegionAdditionalVerificationMethods<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ConfigRegionAdditionalVerificationMethods::Device => {
+                ConfigRegionAdditionalVerificationMethods::Device
+            }
+            ConfigRegionAdditionalVerificationMethods::Other(v) => {
+                ConfigRegionAdditionalVerificationMethods::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConfigRegionPlatforms<S: BosStr = DefaultStr> {
+    Web,
+    Ios,
+    Android,
+    Other(S),
+}
+
+impl<S: BosStr> ConfigRegionPlatforms<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Web => "web",
+            Self::Ios => "ios",
+            Self::Android => "android",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "web" => Self::Web,
+            "ios" => Self::Ios,
+            "android" => Self::Android,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ConfigRegionPlatforms<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ConfigRegionPlatforms<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ConfigRegionPlatforms<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ConfigRegionPlatforms<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ConfigRegionPlatforms<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ConfigRegionPlatforms<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ConfigRegionPlatforms<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ConfigRegionPlatforms::Web => ConfigRegionPlatforms::Web,
+            ConfigRegionPlatforms::Ios => ConfigRegionPlatforms::Ios,
+            ConfigRegionPlatforms::Android => ConfigRegionPlatforms::Android,
+            ConfigRegionPlatforms::Other(v) => {
+                ConfigRegionPlatforms::Other(v.into_static())
+            }
+        }
+    }
 }
 
 
@@ -1650,10 +1816,10 @@ pub mod config_region_state {
 pub struct ConfigRegionBuilder<St: config_region_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<Vec<S>>,
+        Option<Vec<ConfigRegionAdditionalVerificationMethods<S>>>,
         Option<S>,
         Option<i64>,
-        Option<Vec<S>>,
+        Option<Vec<ConfigRegionPlatforms<S>>>,
         Option<S>,
         Option<Vec<ConfigRegionRulesItem<S>>>,
     ),
@@ -1700,7 +1866,7 @@ impl<St: config_region_state::State, S: BosStr> ConfigRegionBuilder<St, S> {
     /// Set the `additionalVerificationMethods` field (optional)
     pub fn additional_verification_methods(
         mut self,
-        value: impl Into<Option<Vec<S>>>,
+        value: impl Into<Option<Vec<ConfigRegionAdditionalVerificationMethods<S>>>>,
     ) -> Self {
         self._fields.0 = value.into();
         self
@@ -1708,7 +1874,7 @@ impl<St: config_region_state::State, S: BosStr> ConfigRegionBuilder<St, S> {
     /// Set the `additionalVerificationMethods` field to an Option value (optional)
     pub fn maybe_additional_verification_methods(
         mut self,
-        value: Option<Vec<S>>,
+        value: Option<Vec<ConfigRegionAdditionalVerificationMethods<S>>>,
     ) -> Self {
         self._fields.0 = value;
         self
@@ -1755,12 +1921,18 @@ where
 
 impl<St: config_region_state::State, S: BosStr> ConfigRegionBuilder<St, S> {
     /// Set the `platforms` field (optional)
-    pub fn platforms(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn platforms(
+        mut self,
+        value: impl Into<Option<Vec<ConfigRegionPlatforms<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `platforms` field to an Option value (optional)
-    pub fn maybe_platforms(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_platforms(
+        mut self,
+        value: Option<Vec<ConfigRegionPlatforms<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }

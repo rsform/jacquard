@@ -64,7 +64,7 @@ pub struct Game<S: BosStr = DefaultStr> {
     pub default_component: RecordKey<Rkey<S>>,
     ///An array of usable input methods for the game. Optional if the game only has one input method or doesn't separate leaderboards by method.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub input_methods: Option<Vec<S>>,
+    pub input_methods: Option<Vec<GameInputMethods<S>>>,
     ///The obtainable judgments during gameplay.
     pub judgments: Vec<Indexable<S>>,
     ///The logo of the game, for display in UI.
@@ -72,7 +72,7 @@ pub struct Game<S: BosStr = DefaultStr> {
     pub logo: Option<BlobRef<S>>,
     ///An array of playable game modes with different gameplay configurations. Optional if the game only has one mode.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub modes: Option<Vec<S>>,
+    pub modes: Option<Vec<GameModes<S>>>,
     ///The human-readable name of the game, for display in UI.
     pub name: Data<S>,
     ///All the components of a score in the game, including grades, lamps, EX score, and whatever other constructs are used.
@@ -84,6 +84,168 @@ pub struct Game<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Can be tokens or raw strings.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GameInputMethods<S: BosStr = DefaultStr> {
+    DevTsunagiteKeyboard,
+    DevTsunagiteGamepad,
+    Other(S),
+}
+
+impl<S: BosStr> GameInputMethods<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::DevTsunagiteKeyboard => "dev.tsunagite.keyboard",
+            Self::DevTsunagiteGamepad => "dev.tsunagite.gamepad",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "dev.tsunagite.keyboard" => Self::DevTsunagiteKeyboard,
+            "dev.tsunagite.gamepad" => Self::DevTsunagiteGamepad,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GameInputMethods<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GameInputMethods<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GameInputMethods<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GameInputMethods<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GameInputMethods<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GameInputMethods<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GameInputMethods<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GameInputMethods::DevTsunagiteKeyboard => {
+                GameInputMethods::DevTsunagiteKeyboard
+            }
+            GameInputMethods::DevTsunagiteGamepad => {
+                GameInputMethods::DevTsunagiteGamepad
+            }
+            GameInputMethods::Other(v) => GameInputMethods::Other(v.into_static()),
+        }
+    }
+}
+
+/// Can be tokens or raw strings.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GameModes<S: BosStr = DefaultStr> {
+    DevTsunagiteSingles,
+    DevTsunagiteDoubles,
+    Other(S),
+}
+
+impl<S: BosStr> GameModes<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::DevTsunagiteSingles => "dev.tsunagite.singles",
+            Self::DevTsunagiteDoubles => "dev.tsunagite.doubles",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "dev.tsunagite.singles" => Self::DevTsunagiteSingles,
+            "dev.tsunagite.doubles" => Self::DevTsunagiteDoubles,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GameModes<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GameModes<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GameModes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GameModes<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GameModes<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GameModes<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GameModes<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GameModes::DevTsunagiteSingles => GameModes::DevTsunagiteSingles,
+            GameModes::DevTsunagiteDoubles => GameModes::DevTsunagiteDoubles,
+            GameModes::Other(v) => GameModes::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -1046,10 +1208,10 @@ pub struct GameBuilder<St: game_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RecordKey<Rkey<S>>>,
-        Option<Vec<S>>,
+        Option<Vec<GameInputMethods<S>>>,
         Option<Vec<Indexable<S>>>,
         Option<BlobRef<S>>,
-        Option<Vec<S>>,
+        Option<Vec<GameModes<S>>>,
         Option<Data<S>>,
         Option<Vec<GameScoreComponentsItem<S>>>,
     ),
@@ -1113,12 +1275,18 @@ where
 
 impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `inputMethods` field (optional)
-    pub fn input_methods(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn input_methods(
+        mut self,
+        value: impl Into<Option<Vec<GameInputMethods<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `inputMethods` field to an Option value (optional)
-    pub fn maybe_input_methods(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_input_methods(
+        mut self,
+        value: Option<Vec<GameInputMethods<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -1158,12 +1326,12 @@ impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
 
 impl<St: game_state::State, S: BosStr> GameBuilder<St, S> {
     /// Set the `modes` field (optional)
-    pub fn modes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn modes(mut self, value: impl Into<Option<Vec<GameModes<S>>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `modes` field to an Option value (optional)
-    pub fn maybe_modes(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_modes(mut self, value: Option<Vec<GameModes<S>>>) -> Self {
         self._fields.4 = value;
         self
     }

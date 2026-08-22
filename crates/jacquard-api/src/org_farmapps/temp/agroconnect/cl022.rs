@@ -62,7 +62,7 @@ pub struct Cl022<S: BosStr = DefaultStr> {
     pub p2o5: Option<i64>,
     ///Fertlizer type
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub r#type: Option<S>,
+    pub r#type: Option<Cl022Type<S>>,
     ///Unit
     #[serde(skip_serializing_if = "Option::is_none")]
     pub unit: Option<S>,
@@ -76,6 +76,85 @@ pub struct Cl022<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Fertlizer type
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Cl022Type<S: BosStr = DefaultStr> {
+    Organic,
+    Inorganic,
+    Other(S),
+}
+
+impl<S: BosStr> Cl022Type<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Organic => "Organic",
+            Self::Inorganic => "Inorganic",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "Organic" => Self::Organic,
+            "Inorganic" => Self::Inorganic,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for Cl022Type<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for Cl022Type<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for Cl022Type<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Cl022Type<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for Cl022Type<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for Cl022Type<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Cl022Type<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            Cl022Type::Organic => Cl022Type::Organic,
+            Cl022Type::Inorganic => Cl022Type::Inorganic,
+            Cl022Type::Other(v) => Cl022Type::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -248,7 +327,7 @@ pub struct Cl022Builder<St: cl022_state::State, S: BosStr = DefaultStr> {
         Option<i64>,
         Option<i64>,
         Option<i64>,
-        Option<S>,
+        Option<Cl022Type<S>>,
         Option<S>,
         Option<Datetime>,
     ),
@@ -409,12 +488,12 @@ impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
 
 impl<St: cl022_state::State, S: BosStr> Cl022Builder<St, S> {
     /// Set the `type` field (optional)
-    pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn r#type(mut self, value: impl Into<Option<Cl022Type<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `type` field to an Option value (optional)
-    pub fn maybe_type(mut self, value: Option<S>) -> Self {
+    pub fn maybe_type(mut self, value: Option<Cl022Type<S>>) -> Self {
         self._fields.8 = value;
         self
     }

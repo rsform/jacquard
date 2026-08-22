@@ -123,7 +123,7 @@ pub struct RedeemedAssignment<S: BosStr = DefaultStr> {
     ///Plan ID
     pub plan_id: S,
     ///Plan assignment status
-    pub status: S,
+    pub status: RedeemedAssignmentStatus<S>,
     #[serde(
         flatten,
         default,
@@ -131,6 +131,92 @@ pub struct RedeemedAssignment<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Plan assignment status
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RedeemedAssignmentStatus<S: BosStr = DefaultStr> {
+    Active,
+    Expired,
+    Cancelled,
+    Other(S),
+}
+
+impl<S: BosStr> RedeemedAssignmentStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "ACTIVE",
+            Self::Expired => "EXPIRED",
+            Self::Cancelled => "CANCELLED",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "ACTIVE" => Self::Active,
+            "EXPIRED" => Self::Expired,
+            "CANCELLED" => Self::Cancelled,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for RedeemedAssignmentStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for RedeemedAssignmentStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for RedeemedAssignmentStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for RedeemedAssignmentStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for RedeemedAssignmentStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for RedeemedAssignmentStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RedeemedAssignmentStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RedeemedAssignmentStatus::Active => RedeemedAssignmentStatus::Active,
+            RedeemedAssignmentStatus::Expired => RedeemedAssignmentStatus::Expired,
+            RedeemedAssignmentStatus::Cancelled => RedeemedAssignmentStatus::Cancelled,
+            RedeemedAssignmentStatus::Other(v) => {
+                RedeemedAssignmentStatus::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /** Response marker for the `app.chronosky.plan.redeemTicket` procedure.
@@ -324,7 +410,13 @@ pub struct RedeemedAssignmentBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<Datetime>, Option<S>, Option<S>, Option<S>),
+    _fields: (
+        Option<Datetime>,
+        Option<Datetime>,
+        Option<S>,
+        Option<S>,
+        Option<RedeemedAssignmentStatus<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -451,7 +543,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<RedeemedAssignmentStatus<S>>,
     ) -> RedeemedAssignmentBuilder<redeemed_assignment_state::SetStatus<St>, S> {
         self._fields.4 = Option::Some(value.into());
         RedeemedAssignmentBuilder {

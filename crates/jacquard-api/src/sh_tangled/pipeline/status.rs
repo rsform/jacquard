@@ -47,7 +47,7 @@ pub struct Status<S: BosStr = DefaultStr> {
     ///ATURI of the pipeline
     pub pipeline: AtUri<S>,
     ///status of the workflow
-    pub status: S,
+    pub status: StatusStatus<S>,
     ///name of the workflow within this pipeline
     pub workflow: AtUri<S>,
     #[serde(
@@ -57,6 +57,101 @@ pub struct Status<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// status of the workflow
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StatusStatus<S: BosStr = DefaultStr> {
+    Pending,
+    Running,
+    Failed,
+    Timeout,
+    Cancelled,
+    Success,
+    Other(S),
+}
+
+impl<S: BosStr> StatusStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "pending",
+            Self::Running => "running",
+            Self::Failed => "failed",
+            Self::Timeout => "timeout",
+            Self::Cancelled => "cancelled",
+            Self::Success => "success",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "pending" => Self::Pending,
+            "running" => Self::Running,
+            "failed" => Self::Failed,
+            "timeout" => Self::Timeout,
+            "cancelled" => Self::Cancelled,
+            "success" => Self::Success,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for StatusStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for StatusStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for StatusStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for StatusStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for StatusStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for StatusStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = StatusStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StatusStatus::Pending => StatusStatus::Pending,
+            StatusStatus::Running => StatusStatus::Running,
+            StatusStatus::Failed => StatusStatus::Failed,
+            StatusStatus::Timeout => StatusStatus::Timeout,
+            StatusStatus::Cancelled => StatusStatus::Cancelled,
+            StatusStatus::Success => StatusStatus::Success,
+            StatusStatus::Other(v) => StatusStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -219,7 +314,7 @@ pub struct StatusBuilder<St: status_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<i64>,
         Option<AtUri<S>>,
-        Option<S>,
+        Option<StatusStatus<S>>,
         Option<AtUri<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -333,7 +428,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<StatusStatus<S>>,
     ) -> StatusBuilder<status_state::SetStatus<St>, S> {
         self._fields.4 = Option::Some(value.into());
         StatusBuilder {

@@ -48,6 +48,23 @@ pub struct Reaction<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Constrained string values.
+///
+/// The lexicon restricts this string to the constants below;
+/// the type stays a plain string because the values are not
+/// representable as Rust variants.
+pub struct ReactionReaction;
+impl ReactionReaction {
+    pub const VALUE1: &'static str = "👍";
+    pub const VALUE2: &'static str = "👎";
+    pub const VALUE3: &'static str = "😆";
+    pub const VALUE4: &'static str = "🎉";
+    pub const VALUE5: &'static str = "🫤";
+    pub const VALUE6: &'static str = "❤\u{fe0f}";
+    pub const VALUE7: &'static str = "🚀";
+    pub const VALUE8: &'static str = "👀";
+}
+
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]

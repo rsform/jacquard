@@ -38,7 +38,7 @@ pub struct AchievementCheckData<S: BosStr = DefaultStr> {
     pub check_duration: Option<i64>,
     ///Type of achievement check performed
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub check_type: Option<S>,
+    pub check_type: Option<AchievementCheckDataCheckType<S>>,
     ///Number of claimable achievements found
     #[serde(skip_serializing_if = "Option::is_none")]
     pub claimable_found: Option<i64>,
@@ -60,6 +60,92 @@ pub struct AchievementCheckData<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Type of achievement check performed
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AchievementCheckDataCheckType<S: BosStr = DefaultStr> {
+    ManualCheck,
+    ManualClaimAll,
+    Other(S),
+}
+
+impl<S: BosStr> AchievementCheckDataCheckType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ManualCheck => "manual_check",
+            Self::ManualClaimAll => "manual_claim_all",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "manual_check" => Self::ManualCheck,
+            "manual_claim_all" => Self::ManualClaimAll,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for AchievementCheckDataCheckType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for AchievementCheckDataCheckType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for AchievementCheckDataCheckType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for AchievementCheckDataCheckType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for AchievementCheckDataCheckType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for AchievementCheckDataCheckType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AchievementCheckDataCheckType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AchievementCheckDataCheckType::ManualCheck => {
+                AchievementCheckDataCheckType::ManualCheck
+            }
+            AchievementCheckDataCheckType::ManualClaimAll => {
+                AchievementCheckDataCheckType::ManualClaimAll
+            }
+            AchievementCheckDataCheckType::Other(v) => {
+                AchievementCheckDataCheckType::Other(v.into_static())
+            }
+        }
+    }
+}
+
 /// Details about item/specimen collection
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
@@ -73,7 +159,7 @@ pub struct CollectionData<S: BosStr = DefaultStr> {
     pub inventory_record_uri: Option<S>,
     ///How the item was obtained
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub method: Option<S>,
+    pub method: Option<CollectionDataMethod<S>>,
     ///URI of the created specimen record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specimen_record_uri: Option<S>,
@@ -93,6 +179,99 @@ pub struct CollectionData<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// How the item was obtained
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CollectionDataMethod<S: BosStr = DefaultStr> {
+    GameCard,
+    DailyReward,
+    Quest,
+    Trade,
+    Crafted,
+    Other(S),
+}
+
+impl<S: BosStr> CollectionDataMethod<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::GameCard => "game_card",
+            Self::DailyReward => "daily_reward",
+            Self::Quest => "quest",
+            Self::Trade => "trade",
+            Self::Crafted => "crafted",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "game_card" => Self::GameCard,
+            "daily_reward" => Self::DailyReward,
+            "quest" => Self::Quest,
+            "trade" => Self::Trade,
+            "crafted" => Self::Crafted,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CollectionDataMethod<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CollectionDataMethod<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CollectionDataMethod<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CollectionDataMethod<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CollectionDataMethod<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CollectionDataMethod<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CollectionDataMethod<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CollectionDataMethod::GameCard => CollectionDataMethod::GameCard,
+            CollectionDataMethod::DailyReward => CollectionDataMethod::DailyReward,
+            CollectionDataMethod::Quest => CollectionDataMethod::Quest,
+            CollectionDataMethod::Trade => CollectionDataMethod::Trade,
+            CollectionDataMethod::Crafted => CollectionDataMethod::Crafted,
+            CollectionDataMethod::Other(v) => {
+                CollectionDataMethod::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Details about daily rewards claim
@@ -153,7 +332,7 @@ pub struct FeedContext<S: BosStr = DefaultStr> {
 pub struct GameCardData<S: BosStr = DefaultStr> {
     ///Type of game card
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub card_type: Option<S>,
+    pub card_type: Option<GameCardDataCardType<S>>,
     ///Unique identifier for the game card
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_uri: Option<S>,
@@ -171,7 +350,7 @@ pub struct GameCardData<S: BosStr = DefaultStr> {
     pub quantity: Option<i64>,
     ///Rarity of the item/specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rarity: Option<S>,
+    pub rarity: Option<GameCardDataRarity<S>>,
     #[serde(
         flatten,
         default,
@@ -179,6 +358,186 @@ pub struct GameCardData<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Type of game card
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GameCardDataCardType<S: BosStr = DefaultStr> {
+    Item,
+    Specimen,
+    Other(S),
+}
+
+impl<S: BosStr> GameCardDataCardType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Item => "item",
+            Self::Specimen => "specimen",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "item" => Self::Item,
+            "specimen" => Self::Specimen,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GameCardDataCardType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GameCardDataCardType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GameCardDataCardType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GameCardDataCardType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GameCardDataCardType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GameCardDataCardType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GameCardDataCardType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GameCardDataCardType::Item => GameCardDataCardType::Item,
+            GameCardDataCardType::Specimen => GameCardDataCardType::Specimen,
+            GameCardDataCardType::Other(v) => {
+                GameCardDataCardType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Rarity of the item/specimen
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GameCardDataRarity<S: BosStr = DefaultStr> {
+    VeryCommon,
+    Common,
+    Uncommon,
+    Rare,
+    VeryRare,
+    Epic,
+    Legendary,
+    Other(S),
+}
+
+impl<S: BosStr> GameCardDataRarity<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::VeryCommon => "veryCommon",
+            Self::Common => "common",
+            Self::Uncommon => "uncommon",
+            Self::Rare => "rare",
+            Self::VeryRare => "veryRare",
+            Self::Epic => "epic",
+            Self::Legendary => "legendary",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "veryCommon" => Self::VeryCommon,
+            "common" => Self::Common,
+            "uncommon" => Self::Uncommon,
+            "rare" => Self::Rare,
+            "veryRare" => Self::VeryRare,
+            "epic" => Self::Epic,
+            "legendary" => Self::Legendary,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GameCardDataRarity<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GameCardDataRarity<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GameCardDataRarity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GameCardDataRarity<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GameCardDataRarity<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GameCardDataRarity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GameCardDataRarity<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GameCardDataRarity::VeryCommon => GameCardDataRarity::VeryCommon,
+            GameCardDataRarity::Common => GameCardDataRarity::Common,
+            GameCardDataRarity::Uncommon => GameCardDataRarity::Uncommon,
+            GameCardDataRarity::Rare => GameCardDataRarity::Rare,
+            GameCardDataRarity::VeryRare => GameCardDataRarity::VeryRare,
+            GameCardDataRarity::Epic => GameCardDataRarity::Epic,
+            GameCardDataRarity::Legendary => GameCardDataRarity::Legendary,
+            GameCardDataRarity::Other(v) => GameCardDataRarity::Other(v.into_static()),
+        }
+    }
 }
 
 /// Details about item usage
@@ -230,7 +589,7 @@ pub struct Log<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub daily_rewards_data: Option<log::DailyRewardsData<S>>,
     ///Type of event being logged
-    pub event_type: S,
+    pub event_type: LogEventType<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_context: Option<log::FeedContext<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -262,6 +621,117 @@ pub struct Log<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Type of event being logged
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LogEventType<S: BosStr = DefaultStr> {
+    FeedLoaded,
+    GameCardsGenerated,
+    ItemCollected,
+    SpecimenCollected,
+    DailyRewardsClaimed,
+    ItemUsed,
+    StaminaDepleted,
+    LevelUp,
+    SessionStarted,
+    AchievementCheck,
+    Other(S),
+}
+
+impl<S: BosStr> LogEventType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::FeedLoaded => "feed_loaded",
+            Self::GameCardsGenerated => "game_cards_generated",
+            Self::ItemCollected => "item_collected",
+            Self::SpecimenCollected => "specimen_collected",
+            Self::DailyRewardsClaimed => "daily_rewards_claimed",
+            Self::ItemUsed => "item_used",
+            Self::StaminaDepleted => "stamina_depleted",
+            Self::LevelUp => "level_up",
+            Self::SessionStarted => "session_started",
+            Self::AchievementCheck => "achievement_check",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "feed_loaded" => Self::FeedLoaded,
+            "game_cards_generated" => Self::GameCardsGenerated,
+            "item_collected" => Self::ItemCollected,
+            "specimen_collected" => Self::SpecimenCollected,
+            "daily_rewards_claimed" => Self::DailyRewardsClaimed,
+            "item_used" => Self::ItemUsed,
+            "stamina_depleted" => Self::StaminaDepleted,
+            "level_up" => Self::LevelUp,
+            "session_started" => Self::SessionStarted,
+            "achievement_check" => Self::AchievementCheck,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for LogEventType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for LogEventType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for LogEventType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for LogEventType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for LogEventType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for LogEventType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = LogEventType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LogEventType::FeedLoaded => LogEventType::FeedLoaded,
+            LogEventType::GameCardsGenerated => LogEventType::GameCardsGenerated,
+            LogEventType::ItemCollected => LogEventType::ItemCollected,
+            LogEventType::SpecimenCollected => LogEventType::SpecimenCollected,
+            LogEventType::DailyRewardsClaimed => LogEventType::DailyRewardsClaimed,
+            LogEventType::ItemUsed => LogEventType::ItemUsed,
+            LogEventType::StaminaDepleted => LogEventType::StaminaDepleted,
+            LogEventType::LevelUp => LogEventType::LevelUp,
+            LogEventType::SessionStarted => LogEventType::SessionStarted,
+            LogEventType::AchievementCheck => LogEventType::AchievementCheck,
+            LogEventType::Other(v) => LogEventType::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1428,7 +1898,7 @@ pub struct LogBuilder<St: log_state::State, S: BosStr = DefaultStr> {
         Option<log::CollectionData<S>>,
         Option<Datetime>,
         Option<log::DailyRewardsData<S>>,
-        Option<S>,
+        Option<LogEventType<S>>,
         Option<log::FeedContext<S>>,
         Option<log::GameCardData<S>>,
         Option<S>,
@@ -1589,7 +2059,7 @@ where
     /// Set the `eventType` field (required)
     pub fn event_type(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<LogEventType<S>>,
     ) -> LogBuilder<log_state::SetEventType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         LogBuilder {

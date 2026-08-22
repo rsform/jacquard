@@ -245,9 +245,11 @@ async fn permissioned_record_roundtrip(
     // Negative: a tampered DPoP proof (wrong ath) must be rejected while the
     // record still exists, so a record-not-found response cannot mask an auth
     // failure.
+    // DPoP binds to the public protected-resource origin, not the internal
+    // bridge address used by FixtureTransport to reach the container.
     let url = format!(
-        "{}/xrpc/com.atproto.space.getRecord",
-        stack.context.coordinates.provider_url.trim_end_matches('/')
+        "https://pds.{}.jacquard-e2e.test/xrpc/com.atproto.space.getRecord",
+        stack.context.provider.name()
     );
     let wrong_ath = jacquard_oauth::dpop::build_dpop_proof(
         &dpop.jwk,
@@ -289,11 +291,22 @@ async fn permissioned_record_roundtrip(
     if response.status().is_success() {
         return Err("tampered DPoP proof was accepted by getRecord".to_string());
     }
-    assert_eq!(
+    if !matches!(
         response.status(),
-        http::StatusCode::BAD_REQUEST,
-        "tampered DPoP proof returned an unexpected status"
-    );
+        http::StatusCode::BAD_REQUEST | http::StatusCode::UNAUTHORIZED
+    ) {
+        return Err(format!(
+            "tampered DPoP proof returned unexpected status {}",
+            response.status()
+        ));
+    }
+    let body: serde_json::Value = serde_json::from_slice(response.body())
+        .map_err(|e| format!("decode tampered DPoP rejection: {e}"))?;
+    if body.get("error").and_then(serde_json::Value::as_str) != Some("BadDpopProof") {
+        return Err(format!(
+            "tampered DPoP proof returned unexpected body: {body}"
+        ));
+    }
 
     // Delete, then the session read must yield the typed RecordNotFound.
     session

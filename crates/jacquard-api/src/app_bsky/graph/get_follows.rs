@@ -18,6 +18,84 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetFollowsSort<S: BosStr = DefaultStr> {
+    Latest,
+    Top,
+    Other(S),
+}
+
+impl<S: BosStr> GetFollowsSort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Latest => "latest",
+            Self::Top => "top",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "latest" => Self::Latest,
+            "top" => Self::Top,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetFollowsSort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetFollowsSort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetFollowsSort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetFollowsSort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetFollowsSort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetFollowsSort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetFollowsSort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetFollowsSort::Latest => GetFollowsSort::Latest,
+            GetFollowsSort::Top => GetFollowsSort::Top,
+            GetFollowsSort::Other(v) => GetFollowsSort::Other(v.into_static()),
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetFollows<S: BosStr = DefaultStr> {
@@ -29,7 +107,7 @@ pub struct GetFollows<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<GetFollowsSort<S>>,
 }
 
 
@@ -111,7 +189,12 @@ pub mod get_follows_state {
 /// Builder for constructing an instance of this type.
 pub struct GetFollowsBuilder<St: get_follows_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<S>),
+    _fields: (
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<i64>,
+        Option<GetFollowsSort<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -198,12 +281,12 @@ impl<St: get_follows_state::State, S: BosStr> GetFollowsBuilder<St, S> {
 
 impl<St: get_follows_state::State, S: BosStr> GetFollowsBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<GetFollowsSort<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<GetFollowsSort<S>>) -> Self {
         self._fields.3 = value;
         self
     }

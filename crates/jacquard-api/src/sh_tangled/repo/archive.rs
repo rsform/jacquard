@@ -16,6 +16,97 @@ use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
+/// Archive format
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ArchiveFormat<S: BosStr = DefaultStr> {
+    Tar,
+    Zip,
+    TarGz,
+    TarBz2,
+    TarXz,
+    Other(S),
+}
+
+impl<S: BosStr> ArchiveFormat<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Tar => "tar",
+            Self::Zip => "zip",
+            Self::TarGz => "tar.gz",
+            Self::TarBz2 => "tar.bz2",
+            Self::TarXz => "tar.xz",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "tar" => Self::Tar,
+            "zip" => Self::Zip,
+            "tar.gz" => Self::TarGz,
+            "tar.bz2" => Self::TarBz2,
+            "tar.xz" => Self::TarXz,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ArchiveFormat<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ArchiveFormat<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ArchiveFormat<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ArchiveFormat<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ArchiveFormat<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ArchiveFormat<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ArchiveFormat<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ArchiveFormat::Tar => ArchiveFormat::Tar,
+            ArchiveFormat::Zip => ArchiveFormat::Zip,
+            ArchiveFormat::TarGz => ArchiveFormat::TarGz,
+            ArchiveFormat::TarBz2 => ArchiveFormat::TarBz2,
+            ArchiveFormat::TarXz => ArchiveFormat::TarXz,
+            ArchiveFormat::Other(v) => ArchiveFormat::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -23,7 +114,7 @@ pub struct Archive<S: BosStr = DefaultStr> {
     /// Defaults to `"tar.gz"`.
     #[serde(default = "_default_format")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub format: Option<S>,
+    pub format: Option<ArchiveFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub prefix: Option<S>,
     pub r#ref: S,
@@ -158,8 +249,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for ArchiveRequest {
     type Response = ArchiveResponse;
 }
 
-fn _default_format<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("tar.gz"))
+fn _default_format<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    ArchiveFormat<S>,
+> {
+    Some(<ArchiveFormat<S>>::from_value(S::from_static("tar.gz")))
 }
 
 pub mod archive_state {
@@ -209,7 +302,7 @@ pub mod archive_state {
 /// Builder for constructing an instance of this type.
 pub struct ArchiveBuilder<St: archive_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<S>, Option<S>),
+    _fields: (Option<ArchiveFormat<S>>, Option<S>, Option<S>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -251,12 +344,12 @@ impl<S: BosStr> ArchiveBuilder<archive_state::Empty, S> {
 
 impl<St: archive_state::State, S: BosStr> ArchiveBuilder<St, S> {
     /// Set the `format` field (optional)
-    pub fn format(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn format(mut self, value: impl Into<Option<ArchiveFormat<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `format` field to an Option value (optional)
-    pub fn maybe_format(mut self, value: Option<S>) -> Self {
+    pub fn maybe_format(mut self, value: Option<ArchiveFormat<S>>) -> Self {
         self._fields.0 = value;
         self
     }

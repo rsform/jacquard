@@ -130,7 +130,7 @@ pub struct Pair<S: BosStr = DefaultStr> {
 pub struct PullRequestTriggerData<S: BosStr = DefaultStr> {
     ///the pull request lifecycle action that produced this trigger
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub action: Option<S>,
+    pub action: Option<PullRequestTriggerDataAction<S>>,
     ///AT-URI of the sh.tangled.repo.pull record this run belongs to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pull: Option<AtUri<S>>,
@@ -144,6 +144,104 @@ pub struct PullRequestTriggerData<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// the pull request lifecycle action that produced this trigger
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PullRequestTriggerDataAction<S: BosStr = DefaultStr> {
+    Opened,
+    Reopened,
+    Closed,
+    Merged,
+    Synchronize,
+    Other(S),
+}
+
+impl<S: BosStr> PullRequestTriggerDataAction<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Opened => "opened",
+            Self::Reopened => "reopened",
+            Self::Closed => "closed",
+            Self::Merged => "merged",
+            Self::Synchronize => "synchronize",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "opened" => Self::Opened,
+            "reopened" => Self::Reopened,
+            "closed" => Self::Closed,
+            "merged" => Self::Merged,
+            "synchronize" => Self::Synchronize,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for PullRequestTriggerDataAction<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for PullRequestTriggerDataAction<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for PullRequestTriggerDataAction<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for PullRequestTriggerDataAction<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for PullRequestTriggerDataAction<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for PullRequestTriggerDataAction<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PullRequestTriggerDataAction<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PullRequestTriggerDataAction::Opened => PullRequestTriggerDataAction::Opened,
+            PullRequestTriggerDataAction::Reopened => {
+                PullRequestTriggerDataAction::Reopened
+            }
+            PullRequestTriggerDataAction::Closed => PullRequestTriggerDataAction::Closed,
+            PullRequestTriggerDataAction::Merged => PullRequestTriggerDataAction::Merged,
+            PullRequestTriggerDataAction::Synchronize => {
+                PullRequestTriggerDataAction::Synchronize
+            }
+            PullRequestTriggerDataAction::Other(v) => {
+                PullRequestTriggerDataAction::Other(v.into_static())
+            }
+        }
+    }
 }
 
 
@@ -166,7 +264,7 @@ pub struct PushTriggerData<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TriggerMetadata<S: BosStr = DefaultStr> {
-    pub kind: S,
+    pub kind: TriggerMetadataKind<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub manual: Option<pipeline::ManualTriggerData<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -184,6 +282,88 @@ pub struct TriggerMetadata<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TriggerMetadataKind<S: BosStr = DefaultStr> {
+    Push,
+    PullRequest,
+    Manual,
+    Other(S),
+}
+
+impl<S: BosStr> TriggerMetadataKind<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Push => "push",
+            Self::PullRequest => "pull_request",
+            Self::Manual => "manual",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "push" => Self::Push,
+            "pull_request" => Self::PullRequest,
+            "manual" => Self::Manual,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for TriggerMetadataKind<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for TriggerMetadataKind<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for TriggerMetadataKind<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for TriggerMetadataKind<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for TriggerMetadataKind<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for TriggerMetadataKind<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = TriggerMetadataKind<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TriggerMetadataKind::Push => TriggerMetadataKind::Push,
+            TriggerMetadataKind::PullRequest => TriggerMetadataKind::PullRequest,
+            TriggerMetadataKind::Manual => TriggerMetadataKind::Manual,
+            TriggerMetadataKind::Other(v) => TriggerMetadataKind::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -1415,7 +1595,7 @@ pub struct TriggerMetadataBuilder<
 > {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<S>,
+        Option<TriggerMetadataKind<S>>,
         Option<pipeline::ManualTriggerData<S>>,
         Option<pipeline::PullRequestTriggerData<S>>,
         Option<pipeline::PushTriggerData<S>>,
@@ -1469,7 +1649,7 @@ where
     /// Set the `kind` field (required)
     pub fn kind(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<TriggerMetadataKind<S>>,
     ) -> TriggerMetadataBuilder<trigger_metadata_state::SetKind<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TriggerMetadataBuilder {

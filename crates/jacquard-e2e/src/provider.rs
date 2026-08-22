@@ -14,6 +14,10 @@ pub const TRANQUIL_IDENTITY_DID: &str = "did:web:localhost.jacquard-e2e.test";
 
 pub const TRANQUIL_MEMBER_DID: &str = "did:web:localhost.jacquard-e2e.test:member";
 
+/// Simulator-seeded repo DID. The jetstream simulator backfills a fixed
+/// synthetic firehose; this DID appears in its sealed segments.
+pub const JETSTREAM_SEED_DID: &str = "did:plc:simulator.jacquard-e2e.test";
+
 /// Service DID used by the Tranquil proxy scenario. Its document is served by
 /// the native ingress and names the generated endpoint fragment.
 pub const TRANQUIL_SERVICE_DID: &str = "did:web:localhost.jacquard-e2e.test:service";
@@ -25,6 +29,10 @@ pub enum Provider {
     Tranquil,
     /// Reference PDS spaces-alpha (`ghcr.io/bluesky-social/atproto:pds-spaces-alpha`).
     Reference,
+    /// Jetstream v2 server with a simulator-seeded archive. Not a PDS:
+    /// scenarios exercise the jetstream client surface (plan, segments,
+    /// live subscription) rather than repo operations.
+    Jetstream,
 }
 
 impl Provider {
@@ -34,6 +42,7 @@ impl Provider {
         match self {
             Self::Tranquil => "tranquil",
             Self::Reference => "reference",
+            Self::Jetstream => "jetstream",
         }
     }
 
@@ -42,6 +51,7 @@ impl Provider {
         match name {
             "tranquil" => Some(Self::Tranquil),
             "reference" => Some(Self::Reference),
+            "jetstream" => Some(Self::Jetstream),
             _ => None,
         }
     }
@@ -63,6 +73,14 @@ impl Provider {
                 handle: "primary.reference.jacquard-e2e.test",
                 email: "primary@reference.jacquard-e2e.test",
             },
+            // Jetstream is not a PDS: no fixture account exists. The
+            // identity satisfies the context shape; jetstream scenarios
+            // use the simulator-seeded DIDs instead.
+            Self::Jetstream => FixtureIdentity {
+                did: "did:web:jetstream.jacquard-e2e.test",
+                handle: "jetstream.jacquard-e2e.test",
+                email: "jetstream@jacquard-e2e.test",
+            },
         }
     }
 
@@ -79,6 +97,11 @@ impl Provider {
                 did: "did:web:reference-member.jacquard-e2e.test",
                 handle: "member.reference.jacquard-e2e.test",
                 email: "member@reference.jacquard-e2e.test",
+            },
+            Self::Jetstream => FixtureIdentity {
+                did: "did:web:jetstream.jacquard-e2e.test",
+                handle: "jetstream.jacquard-e2e.test",
+                email: "jetstream@jacquard-e2e.test",
             },
         }
     }

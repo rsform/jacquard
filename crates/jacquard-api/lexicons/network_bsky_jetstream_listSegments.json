@@ -1,0 +1,97 @@
+{
+  "lexicon": 1,
+  "id": "network.bsky.jetstream.listSegments",
+  "defs": {
+    "main": {
+      "type": "query",
+      "description": "Enumerate sealed segment files available for download, in ascending index order.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string",
+            "description": "Opaque pagination cursor from a previous response."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum number of segment file names to return.",
+            "default": 100,
+            "minimum": 1,
+            "maximum": 1000
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "segments"
+          ],
+          "properties": {
+            "cursor": {
+              "type": "string"
+            },
+            "segments": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#segment"
+              }
+            }
+          }
+        }
+      }
+    },
+    "segment": {
+      "type": "object",
+      "required": [
+        "name",
+        "index",
+        "sizeBytes",
+        "checksum",
+        "eventCount",
+        "minSeq",
+        "maxSeq",
+        "minWitnessedAt",
+        "maxWitnessedAt"
+      ],
+      "properties": {
+        "checksum": {
+          "type": "string",
+          "description": "Segment-format xxh3 metadata checksum as 16-char hex; equals the getSegment ETag."
+        },
+        "eventCount": {
+          "type": "integer",
+          "description": "Number of events in the segment."
+        },
+        "index": {
+          "type": "integer",
+          "description": "Zero-based segment index."
+        },
+        "maxSeq": {
+          "type": "integer"
+        },
+        "maxWitnessedAt": {
+          "type": "integer",
+          "description": "Latest witnessed-at, unix microseconds."
+        },
+        "minSeq": {
+          "type": "integer"
+        },
+        "minWitnessedAt": {
+          "type": "integer",
+          "description": "Earliest witnessed-at, unix microseconds."
+        },
+        "name": {
+          "type": "string",
+          "description": "Segment filename; pass to getSegment."
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "description": "File size in bytes."
+        }
+      }
+    }
+  }
+}

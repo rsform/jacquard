@@ -78,7 +78,9 @@ pub struct PublicationGetRecordOutput<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Preferences<S: BosStr = DefaultStr> {
+    /// Defaults to `"rtl"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_preferences_prev_next_direction")]
     pub prev_next_direction: Option<PreferencesPrevNextDirection<S>>,
     /// Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -928,6 +930,12 @@ where
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
 }
 
+fn _default_preferences_prev_next_direction<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    PreferencesPrevNextDirection<S>,
+> {
+    Some(<PreferencesPrevNextDirection<S>>::from_value(S::from_static("rtl")))
+}
+
 fn _default_preferences_show_comments() -> Option<bool> {
     Some(true)
 }
@@ -955,7 +963,11 @@ fn _default_preferences_show_recommends() -> Option<bool> {
 impl Default for Preferences {
     fn default() -> Self {
         Self {
-            prev_next_direction: None,
+            prev_next_direction: Some(
+                <PreferencesPrevNextDirection>::from_value(
+                    jacquard_common::DefaultStr::from_static("rtl"),
+                ),
+            ),
             show_comments: Some(true),
             show_first_last: Some(false),
             show_in_discover: Some(true),

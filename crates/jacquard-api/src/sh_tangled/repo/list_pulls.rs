@@ -25,6 +25,168 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::repo::list_pulls;
+/// Sort direction by createdAt.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListPullsOrder<S: BosStr = DefaultStr> {
+    Asc,
+    Desc,
+    Other(S),
+}
+
+impl<S: BosStr> ListPullsOrder<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Asc => "asc",
+            Self::Desc => "desc",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "asc" => Self::Asc,
+            "desc" => Self::Desc,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListPullsOrder<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListPullsOrder<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListPullsOrder<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListPullsOrder<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListPullsOrder<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListPullsOrder<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListPullsOrder<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListPullsOrder::Asc => ListPullsOrder::Asc,
+            ListPullsOrder::Desc => ListPullsOrder::Desc,
+            ListPullsOrder::Other(v) => ListPullsOrder::Other(v.into_static()),
+        }
+    }
+}
+
+/// Restrict to pulls whose latest derived status matches.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListPullsStatus<S: BosStr = DefaultStr> {
+    Open,
+    Closed,
+    Merged,
+    Other(S),
+}
+
+impl<S: BosStr> ListPullsStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Open => "open",
+            Self::Closed => "closed",
+            Self::Merged => "merged",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "open" => Self::Open,
+            "closed" => Self::Closed,
+            "merged" => Self::Merged,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListPullsStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListPullsStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListPullsStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListPullsStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListPullsStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListPullsStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListPullsStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListPullsStatus::Open => ListPullsStatus::Open,
+            ListPullsStatus::Closed => ListPullsStatus::Closed,
+            ListPullsStatus::Merged => ListPullsStatus::Merged,
+            ListPullsStatus::Other(v) => ListPullsStatus::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -40,9 +202,9 @@ pub struct ListPulls<S: BosStr = DefaultStr> {
     /// Defaults to `"desc"`.
     #[serde(default = "_default_order")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub order: Option<S>,
+    pub order: Option<ListPullsOrder<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<ListPullsStatus<S>>,
     pub subject: Did<S>,
 }
 
@@ -222,8 +384,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_order<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("desc"))
+fn _default_order<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    ListPullsOrder<S>,
+> {
+    Some(<ListPullsOrder<S>>::from_value(S::from_static("desc")))
 }
 
 pub mod list_pulls_state {
@@ -265,8 +429,8 @@ pub struct ListPullsBuilder<St: list_pulls_state::State, S: BosStr = DefaultStr>
         Option<Did<S>>,
         Option<S>,
         Option<i64>,
-        Option<S>,
-        Option<S>,
+        Option<ListPullsOrder<S>>,
+        Option<ListPullsStatus<S>>,
         Option<Did<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -349,12 +513,12 @@ impl<St: list_pulls_state::State, S: BosStr> ListPullsBuilder<St, S> {
 
 impl<St: list_pulls_state::State, S: BosStr> ListPullsBuilder<St, S> {
     /// Set the `order` field (optional)
-    pub fn order(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn order(mut self, value: impl Into<Option<ListPullsOrder<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `order` field to an Option value (optional)
-    pub fn maybe_order(mut self, value: Option<S>) -> Self {
+    pub fn maybe_order(mut self, value: Option<ListPullsOrder<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -362,12 +526,12 @@ impl<St: list_pulls_state::State, S: BosStr> ListPullsBuilder<St, S> {
 
 impl<St: list_pulls_state::State, S: BosStr> ListPullsBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ListPullsStatus<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ListPullsStatus<S>>) -> Self {
         self._fields.4 = value;
         self
     }

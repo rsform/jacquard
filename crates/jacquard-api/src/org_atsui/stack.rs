@@ -20,18 +20,21 @@ use crate::at_inlay::Response;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Stack<S: BosStr = DefaultStr> {
-    ///Cross-axis alignment of children.
+    ///Cross-axis alignment of children.  Defaults to `"stretch"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_stack_align")]
     pub align: Option<StackAlign<S>>,
     pub children: Data<S>,
-    ///Space between children.
+    ///Space between children.  Defaults to `"medium"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_stack_gap")]
     pub gap: Option<StackGap<S>>,
     ///Whether this container has inset padding. The theme controls the amount.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inset: Option<bool>,
-    ///Main-axis distribution of children.
+    ///Main-axis distribution of children.  Defaults to `"start"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_stack_justify")]
     pub justify: Option<StackJustify<S>>,
     ///Whether the container has an opaque background.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -347,6 +350,24 @@ impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     );
     type Request<S: BosStr> = Stack<S>;
     type Response = StackResponse;
+}
+
+fn _default_stack_align<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    StackAlign<S>,
+> {
+    Some(<StackAlign<S>>::from_value(S::from_static("stretch")))
+}
+
+fn _default_stack_gap<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    StackGap<S>,
+> {
+    Some(<StackGap<S>>::from_value(S::from_static("medium")))
+}
+
+fn _default_stack_justify<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    StackJustify<S>,
+> {
+    Some(<StackJustify<S>>::from_value(S::from_static("start")))
 }
 
 pub mod stack_state {

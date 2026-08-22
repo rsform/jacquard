@@ -91,7 +91,7 @@ pub struct SubscribeRepos {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubscribeReposMessage<S: BosStr = DefaultStr> {
-    #[serde(rename = "#identity")]
+    #[serde(rename = "sh.tangled.knot.subscribeRepos#identity")]
     Identity(Box<subscribe_repos::Identity<S>>),
     #[serde(rename = "sh.tangled.git.refUpdate")]
     RefUpdate(Box<RefUpdate<S>>),

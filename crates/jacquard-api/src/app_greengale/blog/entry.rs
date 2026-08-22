@@ -61,7 +61,7 @@ pub struct Entry<S: BosStr = DefaultStr> {
     ///Controls who can view this entry  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_entry_visibility")]
-    pub visibility: Option<S>,
+    pub visibility: Option<EntryVisibility<S>>,
     #[serde(
         flatten,
         default,
@@ -69,6 +69,89 @@ pub struct Entry<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Controls who can view this entry
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EntryVisibility<S: BosStr = DefaultStr> {
+    Public,
+    Url,
+    Author,
+    Other(S),
+}
+
+impl<S: BosStr> EntryVisibility<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Url => "url",
+            Self::Author => "author",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "public" => Self::Public,
+            "url" => Self::Url,
+            "author" => Self::Author,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for EntryVisibility<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for EntryVisibility<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for EntryVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EntryVisibility<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for EntryVisibility<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for EntryVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EntryVisibility<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EntryVisibility::Public => EntryVisibility::Public,
+            EntryVisibility::Url => EntryVisibility::Url,
+            EntryVisibility::Author => EntryVisibility::Author,
+            EntryVisibility::Other(v) => EntryVisibility::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -194,8 +277,10 @@ fn _default_entry_latex() -> Option<bool> {
     Some(false)
 }
 
-fn _default_entry_visibility<S: FromStaticStr>() -> ::core::option::Option<S> {
-    Some(S::from_static("public"))
+fn _default_entry_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    EntryVisibility<S>,
+> {
+    Some(<EntryVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod entry_state {
@@ -242,7 +327,7 @@ pub struct EntryBuilder<St: entry_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<Theme<S>>,
         Option<S>,
-        Option<S>,
+        Option<EntryVisibility<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -395,12 +480,12 @@ impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
 
 impl<St: entry_state::State, S: BosStr> EntryBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<EntryVisibility<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<S>) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<EntryVisibility<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -422,7 +507,7 @@ where
             subtitle: self._fields.5,
             theme: self._fields.6,
             title: self._fields.7,
-            visibility: self._fields.8.or_else(|| Some(S::from_static("public"))),
+            visibility: self._fields.8,
             extra_data: Default::default(),
         }
     }
@@ -437,7 +522,7 @@ where
             subtitle: self._fields.5,
             theme: self._fields.6,
             title: self._fields.7,
-            visibility: self._fields.8.or_else(|| Some(S::from_static("public"))),
+            visibility: self._fields.8,
             extra_data: Some(extra_data),
         }
     }

@@ -18,13 +18,318 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameSummaryView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListGamesApplicationTypes<S: BosStr = DefaultStr> {
+    Addon,
+    Bundle,
+    Dlc,
+    Episode,
+    ExpandedGame,
+    Expansion,
+    Fork,
+    Game,
+    Mod,
+    Pack,
+    Port,
+    Remake,
+    Remaster,
+    Season,
+    StandaloneExpansion,
+    Update,
+    Other(S),
+}
+
+impl<S: BosStr> ListGamesApplicationTypes<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Addon => "addon",
+            Self::Bundle => "bundle",
+            Self::Dlc => "dlc",
+            Self::Episode => "episode",
+            Self::ExpandedGame => "expandedGame",
+            Self::Expansion => "expansion",
+            Self::Fork => "fork",
+            Self::Game => "game",
+            Self::Mod => "mod",
+            Self::Pack => "pack",
+            Self::Port => "port",
+            Self::Remake => "remake",
+            Self::Remaster => "remaster",
+            Self::Season => "season",
+            Self::StandaloneExpansion => "standaloneExpansion",
+            Self::Update => "update",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "addon" => Self::Addon,
+            "bundle" => Self::Bundle,
+            "dlc" => Self::Dlc,
+            "episode" => Self::Episode,
+            "expandedGame" => Self::ExpandedGame,
+            "expansion" => Self::Expansion,
+            "fork" => Self::Fork,
+            "game" => Self::Game,
+            "mod" => Self::Mod,
+            "pack" => Self::Pack,
+            "port" => Self::Port,
+            "remake" => Self::Remake,
+            "remaster" => Self::Remaster,
+            "season" => Self::Season,
+            "standaloneExpansion" => Self::StandaloneExpansion,
+            "update" => Self::Update,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListGamesApplicationTypes<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListGamesApplicationTypes<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListGamesApplicationTypes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ListGamesApplicationTypes<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListGamesApplicationTypes<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListGamesApplicationTypes<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListGamesApplicationTypes<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListGamesApplicationTypes::Addon => ListGamesApplicationTypes::Addon,
+            ListGamesApplicationTypes::Bundle => ListGamesApplicationTypes::Bundle,
+            ListGamesApplicationTypes::Dlc => ListGamesApplicationTypes::Dlc,
+            ListGamesApplicationTypes::Episode => ListGamesApplicationTypes::Episode,
+            ListGamesApplicationTypes::ExpandedGame => {
+                ListGamesApplicationTypes::ExpandedGame
+            }
+            ListGamesApplicationTypes::Expansion => ListGamesApplicationTypes::Expansion,
+            ListGamesApplicationTypes::Fork => ListGamesApplicationTypes::Fork,
+            ListGamesApplicationTypes::Game => ListGamesApplicationTypes::Game,
+            ListGamesApplicationTypes::Mod => ListGamesApplicationTypes::Mod,
+            ListGamesApplicationTypes::Pack => ListGamesApplicationTypes::Pack,
+            ListGamesApplicationTypes::Port => ListGamesApplicationTypes::Port,
+            ListGamesApplicationTypes::Remake => ListGamesApplicationTypes::Remake,
+            ListGamesApplicationTypes::Remaster => ListGamesApplicationTypes::Remaster,
+            ListGamesApplicationTypes::Season => ListGamesApplicationTypes::Season,
+            ListGamesApplicationTypes::StandaloneExpansion => {
+                ListGamesApplicationTypes::StandaloneExpansion
+            }
+            ListGamesApplicationTypes::Update => ListGamesApplicationTypes::Update,
+            ListGamesApplicationTypes::Other(v) => {
+                ListGamesApplicationTypes::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Field to sort by. Constrained because the value reaches an ORDER BY clause, which cannot be parameterised.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListGamesSort<S: BosStr = DefaultStr> {
+    IndexedAt,
+    CreatedAt,
+    Name,
+    Other(S),
+}
+
+impl<S: BosStr> ListGamesSort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::IndexedAt => "indexed_at",
+            Self::CreatedAt => "createdAt",
+            Self::Name => "name",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "indexed_at" => Self::IndexedAt,
+            "createdAt" => Self::CreatedAt,
+            "name" => Self::Name,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListGamesSort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListGamesSort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListGamesSort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListGamesSort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListGamesSort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListGamesSort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListGamesSort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListGamesSort::IndexedAt => ListGamesSort::IndexedAt,
+            ListGamesSort::CreatedAt => ListGamesSort::CreatedAt,
+            ListGamesSort::Name => ListGamesSort::Name,
+            ListGamesSort::Other(v) => ListGamesSort::Other(v.into_static()),
+        }
+    }
+}
+
+/// Sort direction.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListGamesSortDirection<S: BosStr = DefaultStr> {
+    Asc,
+    Desc,
+    Other(S),
+}
+
+impl<S: BosStr> ListGamesSortDirection<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Asc => "asc",
+            Self::Desc => "desc",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "asc" => Self::Asc,
+            "desc" => Self::Desc,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListGamesSortDirection<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListGamesSortDirection<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListGamesSortDirection<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListGamesSortDirection<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListGamesSortDirection<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListGamesSortDirection<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListGamesSortDirection<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListGamesSortDirection::Asc => ListGamesSortDirection::Asc,
+            ListGamesSortDirection::Desc => ListGamesSortDirection::Desc,
+            ListGamesSortDirection::Other(v) => {
+                ListGamesSortDirection::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListGames<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_ratings: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub application_types: Option<Vec<S>>,
+    pub application_types: Option<Vec<ListGamesApplicationTypes<S>>>,
     /// (max length: 256)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -55,11 +360,11 @@ pub struct ListGames<S: BosStr = DefaultStr> {
     /// Defaults to `"indexed_at"`. Max length: 64.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<ListGamesSort<S>>,
     /// Defaults to `"desc"`. Max length: 64.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort_direction: Option<S>,
+    pub sort_direction: Option<ListGamesSortDirection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub themes: Option<Vec<S>>,
 }
@@ -119,12 +424,16 @@ fn _default_limit() -> Option<i64> {
     Some(20i64)
 }
 
-fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("indexed_at"))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    ListGamesSort<S>,
+> {
+    Some(<ListGamesSort<S>>::from_value(S::from_static("indexed_at")))
 }
 
-fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("desc"))
+fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    ListGamesSortDirection<S>,
+> {
+    Some(<ListGamesSortDirection<S>>::from_value(S::from_static("desc")))
 }
 
 pub mod list_games_state {
@@ -151,7 +460,7 @@ pub struct ListGamesBuilder<St: list_games_state::State, S: BosStr = DefaultStr>
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
-        Option<Vec<S>>,
+        Option<Vec<ListGamesApplicationTypes<S>>>,
         Option<S>,
         Option<Did<S>>,
         Option<Vec<S>>,
@@ -161,8 +470,8 @@ pub struct ListGamesBuilder<St: list_games_state::State, S: BosStr = DefaultStr>
         Option<i64>,
         Option<Vec<S>>,
         Option<Vec<S>>,
-        Option<S>,
-        Option<S>,
+        Option<ListGamesSort<S>>,
+        Option<ListGamesSortDirection<S>>,
         Option<Vec<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -249,12 +558,18 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `applicationTypes` field (optional)
-    pub fn application_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn application_types(
+        mut self,
+        value: impl Into<Option<Vec<ListGamesApplicationTypes<S>>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `applicationTypes` field to an Option value (optional)
-    pub fn maybe_application_types(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_application_types(
+        mut self,
+        value: Option<Vec<ListGamesApplicationTypes<S>>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -379,12 +694,12 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<ListGamesSort<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<ListGamesSort<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -392,12 +707,18 @@ impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
 
 impl<St: list_games_state::State, S: BosStr> ListGamesBuilder<St, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort_direction(
+        mut self,
+        value: impl Into<Option<ListGamesSortDirection<S>>>,
+    ) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort_direction(
+        mut self,
+        value: Option<ListGamesSortDirection<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }

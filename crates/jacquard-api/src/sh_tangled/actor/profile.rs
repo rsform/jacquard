@@ -61,7 +61,7 @@ pub struct Profile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pronouns: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub stats: Option<Vec<S>>,
+    pub stats: Option<Vec<ProfileStats<S>>>,
     #[serde(
         flatten,
         default,
@@ -69,6 +69,105 @@ pub struct Profile<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Vanity stats.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileStats<S: BosStr = DefaultStr> {
+    MergedPullRequestCount,
+    ClosedPullRequestCount,
+    OpenPullRequestCount,
+    OpenIssueCount,
+    ClosedIssueCount,
+    RepositoryCount,
+    StarCount,
+    Other(S),
+}
+
+impl<S: BosStr> ProfileStats<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::MergedPullRequestCount => "merged-pull-request-count",
+            Self::ClosedPullRequestCount => "closed-pull-request-count",
+            Self::OpenPullRequestCount => "open-pull-request-count",
+            Self::OpenIssueCount => "open-issue-count",
+            Self::ClosedIssueCount => "closed-issue-count",
+            Self::RepositoryCount => "repository-count",
+            Self::StarCount => "star-count",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "merged-pull-request-count" => Self::MergedPullRequestCount,
+            "closed-pull-request-count" => Self::ClosedPullRequestCount,
+            "open-pull-request-count" => Self::OpenPullRequestCount,
+            "open-issue-count" => Self::OpenIssueCount,
+            "closed-issue-count" => Self::ClosedIssueCount,
+            "repository-count" => Self::RepositoryCount,
+            "star-count" => Self::StarCount,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ProfileStats<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ProfileStats<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ProfileStats<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProfileStats<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ProfileStats<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ProfileStats<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ProfileStats<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileStats::MergedPullRequestCount => ProfileStats::MergedPullRequestCount,
+            ProfileStats::ClosedPullRequestCount => ProfileStats::ClosedPullRequestCount,
+            ProfileStats::OpenPullRequestCount => ProfileStats::OpenPullRequestCount,
+            ProfileStats::OpenIssueCount => ProfileStats::OpenIssueCount,
+            ProfileStats::ClosedIssueCount => ProfileStats::ClosedIssueCount,
+            ProfileStats::RepositoryCount => ProfileStats::RepositoryCount,
+            ProfileStats::StarCount => ProfileStats::StarCount,
+            ProfileStats::Other(v) => ProfileStats::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -357,7 +456,7 @@ pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
         Option<Vec<S>>,
         Option<Handle<S>>,
         Option<S>,
-        Option<Vec<S>>,
+        Option<Vec<ProfileStats<S>>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -510,12 +609,12 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `stats` field (optional)
-    pub fn stats(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn stats(mut self, value: impl Into<Option<Vec<ProfileStats<S>>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
-    pub fn maybe_stats(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_stats(mut self, value: Option<Vec<ProfileStats<S>>>) -> Self {
         self._fields.8 = value;
         self
     }

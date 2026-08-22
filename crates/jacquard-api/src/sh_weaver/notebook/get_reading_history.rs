@@ -27,6 +27,99 @@ use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
 use crate::sh_weaver::notebook::ReadingProgress;
 use crate::sh_weaver::notebook::get_reading_history;
+/// Filter by reading status.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetReadingHistoryStatus<S: BosStr = DefaultStr> {
+    Reading,
+    Finished,
+    Abandoned,
+    WantToRead,
+    All,
+    Other(S),
+}
+
+impl<S: BosStr> GetReadingHistoryStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Reading => "reading",
+            Self::Finished => "finished",
+            Self::Abandoned => "abandoned",
+            Self::WantToRead => "want-to-read",
+            Self::All => "all",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "reading" => Self::Reading,
+            "finished" => Self::Finished,
+            "abandoned" => Self::Abandoned,
+            "want-to-read" => Self::WantToRead,
+            "all" => Self::All,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetReadingHistoryStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetReadingHistoryStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetReadingHistoryStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetReadingHistoryStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetReadingHistoryStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetReadingHistoryStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetReadingHistoryStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetReadingHistoryStatus::Reading => GetReadingHistoryStatus::Reading,
+            GetReadingHistoryStatus::Finished => GetReadingHistoryStatus::Finished,
+            GetReadingHistoryStatus::Abandoned => GetReadingHistoryStatus::Abandoned,
+            GetReadingHistoryStatus::WantToRead => GetReadingHistoryStatus::WantToRead,
+            GetReadingHistoryStatus::All => GetReadingHistoryStatus::All,
+            GetReadingHistoryStatus::Other(v) => {
+                GetReadingHistoryStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -40,7 +133,7 @@ pub struct GetReadingHistory<S: BosStr = DefaultStr> {
     /// Defaults to `"all"`.
     #[serde(default = "_default_status")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<GetReadingHistoryStatus<S>>,
 }
 
 
@@ -119,8 +212,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_status<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("all"))
+fn _default_status<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetReadingHistoryStatus<S>,
+> {
+    Some(<GetReadingHistoryStatus<S>>::from_value(S::from_static("all")))
 }
 
 pub mod get_reading_history_state {
@@ -148,7 +243,7 @@ pub struct GetReadingHistoryBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>),
+    _fields: (Option<S>, Option<i64>, Option<GetReadingHistoryStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -219,12 +314,15 @@ impl<St: get_reading_history_state::State, S: BosStr> GetReadingHistoryBuilder<S
 
 impl<St: get_reading_history_state::State, S: BosStr> GetReadingHistoryBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn status(
+        mut self,
+        value: impl Into<Option<GetReadingHistoryStatus<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_status(mut self, value: Option<GetReadingHistoryStatus<S>>) -> Self {
         self._fields.2 = value;
         self
     }

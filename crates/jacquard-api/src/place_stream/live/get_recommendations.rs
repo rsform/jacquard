@@ -32,7 +32,7 @@ pub struct LivestreamRecommendation<S: BosStr = DefaultStr> {
     ///The DID of the recommended streamer
     pub did: Did<S>,
     ///Source of the recommendation
-    pub source: S,
+    pub source: LivestreamRecommendationSource<S>,
     #[serde(
         flatten,
         default,
@@ -40,6 +40,96 @@ pub struct LivestreamRecommendation<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Source of the recommendation
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LivestreamRecommendationSource<S: BosStr = DefaultStr> {
+    Streamer,
+    Follows,
+    Host,
+    Other(S),
+}
+
+impl<S: BosStr> LivestreamRecommendationSource<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Streamer => "streamer",
+            Self::Follows => "follows",
+            Self::Host => "host",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "streamer" => Self::Streamer,
+            "follows" => Self::Follows,
+            "host" => Self::Host,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for LivestreamRecommendationSource<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for LivestreamRecommendationSource<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for LivestreamRecommendationSource<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for LivestreamRecommendationSource<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for LivestreamRecommendationSource<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for LivestreamRecommendationSource<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = LivestreamRecommendationSource<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LivestreamRecommendationSource::Streamer => {
+                LivestreamRecommendationSource::Streamer
+            }
+            LivestreamRecommendationSource::Follows => {
+                LivestreamRecommendationSource::Follows
+            }
+            LivestreamRecommendationSource::Host => LivestreamRecommendationSource::Host,
+            LivestreamRecommendationSource::Other(v) => {
+                LivestreamRecommendationSource::Other(v.into_static())
+            }
+        }
+    }
 }
 
 
@@ -168,7 +258,7 @@ pub struct LivestreamRecommendationBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<S>),
+    _fields: (Option<Did<S>>, Option<LivestreamRecommendationSource<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -249,7 +339,7 @@ where
     /// Set the `source` field (required)
     pub fn source(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<LivestreamRecommendationSource<S>>,
     ) -> LivestreamRecommendationBuilder<
         livestream_recommendation_state::SetSource<St>,
         S,

@@ -42,9 +42,9 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::social_coves::embed::external::ExternalRecord;
 use crate::social_coves::embed::images::Images;
 use crate::social_coves::embed::video::Video;
-use crate::social_coves::community::post;
+use crate::social_coves::community;
+use crate::social_coves::embed;
 use crate::social_coves::embed::external;
-use crate::social_coves::embed::post;
 /// Aggregate vote counts asserted by the bridge for content federated from an origin platform (e.g. Lemmy). These supplement, and are kept separate from, native atproto votes.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -79,7 +79,7 @@ pub struct Post<S: BosStr = DefaultStr> {
     pub author: Did<S>,
     ///Bridge-asserted aggregate of origin-platform votes for federated/bridged content. Set by the bridge that materialized this record; absent for natively-authored posts.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub bridged_stats: Option<post::BridgedStats<S>>,
+    pub bridged_stats: Option<community::post::BridgedStats<S>>,
     ///DID of the community this was posted to
     pub community: Did<S>,
     ///Post content - supports rich text via facets
@@ -132,7 +132,7 @@ pub enum PostEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "social.coves.embed.external")]
     External(Box<ExternalRecord<S>>),
     #[serde(rename = "social.coves.embed.post")]
-    Post(Box<post::Post<S>>),
+    Post(Box<embed::post::Post<S>>),
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -206,13 +206,13 @@ pub struct BlockedCommunity<S: BosStr = DefaultStr> {
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct BlockedPost<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub author: Option<post::BlockedAuthor<S>>,
+    pub author: Option<community::post::BlockedAuthor<S>>,
     pub blocked: bool,
     ///What caused the block: viewer blocked author, viewer blocked community, or post was removed by moderators
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blocked_by: Option<BlockedPostBlockedBy<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub community: Option<post::BlockedCommunity<S>>,
+    pub community: Option<community::post::BlockedCommunity<S>>,
     pub uri: AtUri<S>,
     #[serde(
         flatten,
@@ -371,9 +371,9 @@ pub struct PostStats<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PostView<S: BosStr = DefaultStr> {
-    pub author: post::AuthorView<S>,
+    pub author: community::post::AuthorView<S>,
     pub cid: Cid<S>,
-    pub community: post::CommunityRef<S>,
+    pub community: community::post::CommunityRef<S>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edited_at: Option<Datetime>,
@@ -387,10 +387,10 @@ pub struct PostView<S: BosStr = DefaultStr> {
     ///The actual post record (text, image, video, etc.)
     pub record: Data<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub stats: Option<post::PostStats<S>>,
+    pub stats: Option<community::post::PostStats<S>>,
     pub uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub viewer: Option<post::ViewerState<S>>,
+    pub viewer: Option<community::post::ViewerState<S>>,
     #[serde(
         flatten,
         default,
@@ -414,9 +414,9 @@ pub enum PostViewEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "social.coves.embed.external#view")]
     ExternalView(Box<external::View<S>>),
     #[serde(rename = "social.coves.embed.post")]
-    Post(Box<post::Post<S>>),
+    Post(Box<embed::post::Post<S>>),
     #[serde(rename = "social.coves.embed.post#view")]
-    PostView(Box<post::View<S>>),
+    PostView(Box<embed::post::View<S>>),
 }
 
 
@@ -1516,7 +1516,7 @@ pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
-        Option<post::BridgedStats<S>>,
+        Option<community::post::BridgedStats<S>>,
         Option<Did<S>>,
         Option<S>,
         Option<Datetime>,
@@ -1619,13 +1619,16 @@ impl<St: post_state::State, S: BosStr> PostBuilder<St, S> {
     /// Set the `bridgedStats` field (optional)
     pub fn bridged_stats(
         mut self,
-        value: impl Into<Option<post::BridgedStats<S>>>,
+        value: impl Into<Option<community::post::BridgedStats<S>>>,
     ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `bridgedStats` field to an Option value (optional)
-    pub fn maybe_bridged_stats(mut self, value: Option<post::BridgedStats<S>>) -> Self {
+    pub fn maybe_bridged_stats(
+        mut self,
+        value: Option<community::post::BridgedStats<S>>,
+    ) -> Self {
         self._fields.1 = value;
         self
     }
@@ -2883,10 +2886,10 @@ pub mod blocked_post_state {
 pub struct BlockedPostBuilder<St: blocked_post_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<post::BlockedAuthor<S>>,
+        Option<community::post::BlockedAuthor<S>>,
         Option<bool>,
         Option<BlockedPostBlockedBy<S>>,
-        Option<post::BlockedCommunity<S>>,
+        Option<community::post::BlockedCommunity<S>>,
         Option<AtUri<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -2930,12 +2933,18 @@ impl<S: BosStr> BlockedPostBuilder<blocked_post_state::Empty, S> {
 
 impl<St: blocked_post_state::State, S: BosStr> BlockedPostBuilder<St, S> {
     /// Set the `author` field (optional)
-    pub fn author(mut self, value: impl Into<Option<post::BlockedAuthor<S>>>) -> Self {
+    pub fn author(
+        mut self,
+        value: impl Into<Option<community::post::BlockedAuthor<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `author` field to an Option value (optional)
-    pub fn maybe_author(mut self, value: Option<post::BlockedAuthor<S>>) -> Self {
+    pub fn maybe_author(
+        mut self,
+        value: Option<community::post::BlockedAuthor<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -2980,13 +2989,16 @@ impl<St: blocked_post_state::State, S: BosStr> BlockedPostBuilder<St, S> {
     /// Set the `community` field (optional)
     pub fn community(
         mut self,
-        value: impl Into<Option<post::BlockedCommunity<S>>>,
+        value: impl Into<Option<community::post::BlockedCommunity<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `community` field to an Option value (optional)
-    pub fn maybe_community(mut self, value: Option<post::BlockedCommunity<S>>) -> Self {
+    pub fn maybe_community(
+        mut self,
+        value: Option<community::post::BlockedCommunity<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -3831,18 +3843,18 @@ pub mod post_view_state {
 pub struct PostViewBuilder<St: post_view_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<post::AuthorView<S>>,
+        Option<community::post::AuthorView<S>>,
         Option<Cid<S>>,
-        Option<post::CommunityRef<S>>,
+        Option<community::post::CommunityRef<S>>,
         Option<Datetime>,
         Option<Datetime>,
         Option<PostViewEmbed<S>>,
         Option<Datetime>,
         Option<Language>,
         Option<Data<S>>,
-        Option<post::PostStats<S>>,
+        Option<community::post::PostStats<S>>,
         Option<AtUri<S>>,
-        Option<post::ViewerState<S>>,
+        Option<community::post::ViewerState<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -3917,7 +3929,7 @@ where
     /// Set the `author` field (required)
     pub fn author(
         mut self,
-        value: impl Into<post::AuthorView<S>>,
+        value: impl Into<community::post::AuthorView<S>>,
     ) -> PostViewBuilder<post_view_state::SetAuthor<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PostViewBuilder {
@@ -3955,7 +3967,7 @@ where
     /// Set the `community` field (required)
     pub fn community(
         mut self,
-        value: impl Into<post::CommunityRef<S>>,
+        value: impl Into<community::post::CommunityRef<S>>,
     ) -> PostViewBuilder<post_view_state::SetCommunity<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PostViewBuilder {
@@ -4064,12 +4076,15 @@ where
 
 impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
     /// Set the `stats` field (optional)
-    pub fn stats(mut self, value: impl Into<Option<post::PostStats<S>>>) -> Self {
+    pub fn stats(
+        mut self,
+        value: impl Into<Option<community::post::PostStats<S>>>,
+    ) -> Self {
         self._fields.9 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
-    pub fn maybe_stats(mut self, value: Option<post::PostStats<S>>) -> Self {
+    pub fn maybe_stats(mut self, value: Option<community::post::PostStats<S>>) -> Self {
         self._fields.9 = value;
         self
     }
@@ -4096,12 +4111,18 @@ where
 
 impl<St: post_view_state::State, S: BosStr> PostViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<post::ViewerState<S>>>) -> Self {
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<community::post::ViewerState<S>>>,
+    ) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<post::ViewerState<S>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<community::post::ViewerState<S>>,
+    ) -> Self {
         self._fields.11 = value;
         self
     }

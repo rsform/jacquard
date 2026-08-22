@@ -68,7 +68,7 @@ pub struct BlobOutput<S: BosStr = DefaultStr> {
     pub content: Option<S>,
     ///Content encoding
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub encoding: Option<S>,
+    pub encoding: Option<BlobOutputEncoding<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub file_too_large: Option<bool>,
     ///Whether the file is binary
@@ -91,6 +91,85 @@ pub struct BlobOutput<S: BosStr = DefaultStr> {
     pub submodule: Option<blob::Submodule<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Content encoding
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BlobOutputEncoding<S: BosStr = DefaultStr> {
+    Utf8,
+    Base64,
+    Other(S),
+}
+
+impl<S: BosStr> BlobOutputEncoding<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Utf8 => "utf-8",
+            Self::Base64 => "base64",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "utf-8" => Self::Utf8,
+            "base64" => Self::Base64,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for BlobOutputEncoding<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for BlobOutputEncoding<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for BlobOutputEncoding<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for BlobOutputEncoding<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for BlobOutputEncoding<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for BlobOutputEncoding<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = BlobOutputEncoding<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BlobOutputEncoding::Utf8 => BlobOutputEncoding::Utf8,
+            BlobOutputEncoding::Base64 => BlobOutputEncoding::Base64,
+            BlobOutputEncoding::Other(v) => BlobOutputEncoding::Other(v.into_static()),
+        }
+    }
 }
 
 

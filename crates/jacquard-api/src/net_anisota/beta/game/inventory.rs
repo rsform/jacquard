@@ -69,10 +69,10 @@ pub struct Inventory<S: BosStr = DefaultStr> {
     pub quantity: i64,
     ///Rarity level of the item
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rarity: Option<S>,
+    pub rarity: Option<InventoryRarity<S>>,
     ///How the item was acquired
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub source: Option<S>,
+    pub source: Option<InventorySource<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_details: Option<inventory::SourceDetails<S>>,
     ///Whether this item can be stacked with others of the same type
@@ -85,6 +85,204 @@ pub struct Inventory<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Rarity level of the item
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum InventoryRarity<S: BosStr = DefaultStr> {
+    VeryCommon,
+    Common,
+    Uncommon,
+    Rare,
+    VeryRare,
+    Epic,
+    Legendary,
+    Other(S),
+}
+
+impl<S: BosStr> InventoryRarity<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::VeryCommon => "veryCommon",
+            Self::Common => "common",
+            Self::Uncommon => "uncommon",
+            Self::Rare => "rare",
+            Self::VeryRare => "veryRare",
+            Self::Epic => "epic",
+            Self::Legendary => "legendary",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "veryCommon" => Self::VeryCommon,
+            "common" => Self::Common,
+            "uncommon" => Self::Uncommon,
+            "rare" => Self::Rare,
+            "veryRare" => Self::VeryRare,
+            "epic" => Self::Epic,
+            "legendary" => Self::Legendary,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for InventoryRarity<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for InventoryRarity<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for InventoryRarity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for InventoryRarity<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for InventoryRarity<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for InventoryRarity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = InventoryRarity<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            InventoryRarity::VeryCommon => InventoryRarity::VeryCommon,
+            InventoryRarity::Common => InventoryRarity::Common,
+            InventoryRarity::Uncommon => InventoryRarity::Uncommon,
+            InventoryRarity::Rare => InventoryRarity::Rare,
+            InventoryRarity::VeryRare => InventoryRarity::VeryRare,
+            InventoryRarity::Epic => InventoryRarity::Epic,
+            InventoryRarity::Legendary => InventoryRarity::Legendary,
+            InventoryRarity::Other(v) => InventoryRarity::Other(v.into_static()),
+        }
+    }
+}
+
+/// How the item was acquired
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum InventorySource<S: BosStr = DefaultStr> {
+    DailyReward,
+    GameCard,
+    Quest,
+    Trade,
+    Crafted,
+    Found,
+    Purchased,
+    Other(S),
+}
+
+impl<S: BosStr> InventorySource<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::DailyReward => "daily_reward",
+            Self::GameCard => "game_card",
+            Self::Quest => "quest",
+            Self::Trade => "trade",
+            Self::Crafted => "crafted",
+            Self::Found => "found",
+            Self::Purchased => "purchased",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "daily_reward" => Self::DailyReward,
+            "game_card" => Self::GameCard,
+            "quest" => Self::Quest,
+            "trade" => Self::Trade,
+            "crafted" => Self::Crafted,
+            "found" => Self::Found,
+            "purchased" => Self::Purchased,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for InventorySource<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for InventorySource<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for InventorySource<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for InventorySource<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for InventorySource<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for InventorySource<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = InventorySource<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            InventorySource::DailyReward => InventorySource::DailyReward,
+            InventorySource::GameCard => InventorySource::GameCard,
+            InventorySource::Quest => InventorySource::Quest,
+            InventorySource::Trade => InventorySource::Trade,
+            InventorySource::Crafted => InventorySource::Crafted,
+            InventorySource::Found => InventorySource::Found,
+            InventorySource::Purchased => InventorySource::Purchased,
+            InventorySource::Other(v) => InventorySource::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -351,8 +549,8 @@ pub struct InventoryBuilder<St: inventory_state::State, S: BosStr = DefaultStr> 
         Option<i64>,
         Option<Data<S>>,
         Option<i64>,
-        Option<S>,
-        Option<S>,
+        Option<InventoryRarity<S>>,
+        Option<InventorySource<S>>,
         Option<inventory::SourceDetails<S>>,
         Option<bool>,
     ),
@@ -596,12 +794,12 @@ where
 
 impl<St: inventory_state::State, S: BosStr> InventoryBuilder<St, S> {
     /// Set the `rarity` field (optional)
-    pub fn rarity(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn rarity(mut self, value: impl Into<Option<InventoryRarity<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `rarity` field to an Option value (optional)
-    pub fn maybe_rarity(mut self, value: Option<S>) -> Self {
+    pub fn maybe_rarity(mut self, value: Option<InventoryRarity<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -609,12 +807,12 @@ impl<St: inventory_state::State, S: BosStr> InventoryBuilder<St, S> {
 
 impl<St: inventory_state::State, S: BosStr> InventoryBuilder<St, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<InventorySource<S>>>) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<S>) -> Self {
+    pub fn maybe_source(mut self, value: Option<InventorySource<S>>) -> Self {
         self._fields.12 = value;
         self
     }

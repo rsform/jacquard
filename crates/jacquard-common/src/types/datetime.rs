@@ -133,6 +133,18 @@ impl Datetime {
     pub fn timestamp_micros(&self) -> i64 {
         self.dt.timestamp_micros()
     }
+
+    /// Constructs a new Lexicon timestamp from microseconds since the Unix
+    /// epoch (UTC).
+    ///
+    /// The inverse of [`Self::timestamp_micros`]. Returns `None` when the
+    /// value is outside the representable range.
+    pub fn from_timestamp_micros(micros: i64) -> Option<Self> {
+        use chrono::TimeZone as _;
+        let dt: chrono::DateTime<chrono::FixedOffset> =
+            chrono::Utc.timestamp_micros(micros).single()?.into();
+        Some(Self::new(dt))
+    }
 }
 
 impl FromStr for Datetime {

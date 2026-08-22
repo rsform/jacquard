@@ -41,7 +41,7 @@ pub struct Achievement<S: BosStr = DefaultStr> {
     ///Unique identifier for the achievement (e.g., 'followers-1000', 'level-10')
     pub achievement_id: S,
     ///Category of the achievement
-    pub category: S,
+    pub category: AchievementCategory<S>,
     ///Description of what was accomplished
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -52,7 +52,7 @@ pub struct Achievement<S: BosStr = DefaultStr> {
     pub name: S,
     ///Rarity tier of the achievement
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rarity: Option<S>,
+    pub rarity: Option<AchievementRarity<S>>,
     pub signature: achievement::Signature<S>,
     ///Tier or milestone value (e.g., 1000 for followers-1000, 10 for level-10)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -72,6 +72,184 @@ pub struct Achievement<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Category of the achievement
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AchievementCategory<S: BosStr = DefaultStr> {
+    Followers,
+    Level,
+    Social,
+    Collection,
+    Other(S),
+}
+
+impl<S: BosStr> AchievementCategory<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Followers => "followers",
+            Self::Level => "level",
+            Self::Social => "social",
+            Self::Collection => "collection",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "followers" => Self::Followers,
+            "level" => Self::Level,
+            "social" => Self::Social,
+            "collection" => Self::Collection,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for AchievementCategory<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for AchievementCategory<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for AchievementCategory<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AchievementCategory<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for AchievementCategory<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for AchievementCategory<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AchievementCategory<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AchievementCategory::Followers => AchievementCategory::Followers,
+            AchievementCategory::Level => AchievementCategory::Level,
+            AchievementCategory::Social => AchievementCategory::Social,
+            AchievementCategory::Collection => AchievementCategory::Collection,
+            AchievementCategory::Other(v) => AchievementCategory::Other(v.into_static()),
+        }
+    }
+}
+
+/// Rarity tier of the achievement
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AchievementRarity<S: BosStr = DefaultStr> {
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Legendary,
+    Other(S),
+}
+
+impl<S: BosStr> AchievementRarity<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Common => "common",
+            Self::Uncommon => "uncommon",
+            Self::Rare => "rare",
+            Self::Epic => "epic",
+            Self::Legendary => "legendary",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "common" => Self::Common,
+            "uncommon" => Self::Uncommon,
+            "rare" => Self::Rare,
+            "epic" => Self::Epic,
+            "legendary" => Self::Legendary,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for AchievementRarity<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for AchievementRarity<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for AchievementRarity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AchievementRarity<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for AchievementRarity<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for AchievementRarity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AchievementRarity<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AchievementRarity::Common => AchievementRarity::Common,
+            AchievementRarity::Uncommon => AchievementRarity::Uncommon,
+            AchievementRarity::Rare => AchievementRarity::Rare,
+            AchievementRarity::Epic => AchievementRarity::Epic,
+            AchievementRarity::Legendary => AchievementRarity::Legendary,
+            AchievementRarity::Other(v) => AchievementRarity::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -334,11 +512,11 @@ pub struct AchievementBuilder<St: achievement_state::State, S: BosStr = DefaultS
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
-        Option<S>,
+        Option<AchievementCategory<S>>,
         Option<S>,
         Option<Data<S>>,
         Option<S>,
-        Option<S>,
+        Option<AchievementRarity<S>>,
         Option<achievement::Signature<S>>,
         Option<i64>,
         Option<Datetime>,
@@ -411,7 +589,7 @@ where
     /// Set the `category` field (required)
     pub fn category(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<AchievementCategory<S>>,
     ) -> AchievementBuilder<achievement_state::SetCategory<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AchievementBuilder {
@@ -469,12 +647,12 @@ where
 
 impl<St: achievement_state::State, S: BosStr> AchievementBuilder<St, S> {
     /// Set the `rarity` field (optional)
-    pub fn rarity(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn rarity(mut self, value: impl Into<Option<AchievementRarity<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `rarity` field to an Option value (optional)
-    pub fn maybe_rarity(mut self, value: Option<S>) -> Self {
+    pub fn maybe_rarity(mut self, value: Option<AchievementRarity<S>>) -> Self {
         self._fields.5 = value;
         self
     }

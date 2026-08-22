@@ -27,8 +27,9 @@ pub struct Avatar<S: BosStr = DefaultStr> {
     ///Pull the avatar up by half its own height, overlapping the element above.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lift: Option<bool>,
-    ///Size token.
+    ///Size token.  Defaults to `"medium"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_avatar_size")]
     pub size: Option<AvatarSize<S>>,
     ///Blob ref for the image.
     pub src: Data<S>,
@@ -163,6 +164,12 @@ impl jacquard_common::xrpc::XrpcEndpoint for AvatarRequest {
     );
     type Request<S: BosStr> = Avatar<S>;
     type Response = AvatarResponse;
+}
+
+fn _default_avatar_size<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    AvatarSize<S>,
+> {
+    Some(<AvatarSize<S>>::from_value(S::from_static("medium")))
 }
 
 pub mod avatar_state {

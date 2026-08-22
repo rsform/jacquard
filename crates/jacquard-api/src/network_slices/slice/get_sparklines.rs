@@ -32,15 +32,189 @@ pub struct GetSparklines<S: BosStr = DefaultStr> {
     ///Time range to fetch data for  Defaults to `"24h"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_sparklines_duration")]
-    pub duration: Option<S>,
+    pub duration: Option<GetSparklinesDuration<S>>,
     ///Time interval for data points  Defaults to `"hour"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_sparklines_interval")]
-    pub interval: Option<S>,
+    pub interval: Option<GetSparklinesInterval<S>>,
     ///Array of slice AT-URIs to get sparkline data for
     pub slices: Vec<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Time range to fetch data for
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetSparklinesDuration<S: BosStr = DefaultStr> {
+    _1h,
+    _24h,
+    _7d,
+    _30d,
+    Other(S),
+}
+
+impl<S: BosStr> GetSparklinesDuration<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_1h => "1h",
+            Self::_24h => "24h",
+            Self::_7d => "7d",
+            Self::_30d => "30d",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "1h" => Self::_1h,
+            "24h" => Self::_24h,
+            "7d" => Self::_7d,
+            "30d" => Self::_30d,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetSparklinesDuration<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetSparklinesDuration<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetSparklinesDuration<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetSparklinesDuration<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetSparklinesDuration<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetSparklinesDuration<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetSparklinesDuration<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetSparklinesDuration::_1h => GetSparklinesDuration::_1h,
+            GetSparklinesDuration::_24h => GetSparklinesDuration::_24h,
+            GetSparklinesDuration::_7d => GetSparklinesDuration::_7d,
+            GetSparklinesDuration::_30d => GetSparklinesDuration::_30d,
+            GetSparklinesDuration::Other(v) => {
+                GetSparklinesDuration::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Time interval for data points
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetSparklinesInterval<S: BosStr = DefaultStr> {
+    Minute,
+    Hour,
+    Day,
+    Other(S),
+}
+
+impl<S: BosStr> GetSparklinesInterval<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Minute => "minute",
+            Self::Hour => "hour",
+            Self::Day => "day",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "minute" => Self::Minute,
+            "hour" => Self::Hour,
+            "day" => Self::Day,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetSparklinesInterval<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetSparklinesInterval<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetSparklinesInterval<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetSparklinesInterval<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetSparklinesInterval<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetSparklinesInterval<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetSparklinesInterval<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetSparklinesInterval::Minute => GetSparklinesInterval::Minute,
+            GetSparklinesInterval::Hour => GetSparklinesInterval::Hour,
+            GetSparklinesInterval::Day => GetSparklinesInterval::Day,
+            GetSparklinesInterval::Other(v) => {
+                GetSparklinesInterval::Other(v.into_static())
+            }
+        }
+    }
 }
 
 
@@ -117,12 +291,16 @@ impl<S: BosStr> LexiconSchema for SparklineEntry<S> {
     }
 }
 
-fn _default_get_sparklines_duration<S: FromStaticStr>() -> ::core::option::Option<S> {
-    Some(S::from_static("24h"))
+fn _default_get_sparklines_duration<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    GetSparklinesDuration<S>,
+> {
+    Some(<GetSparklinesDuration<S>>::from_value(S::from_static("24h")))
 }
 
-fn _default_get_sparklines_interval<S: FromStaticStr>() -> ::core::option::Option<S> {
-    Some(S::from_static("hour"))
+fn _default_get_sparklines_interval<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    GetSparklinesInterval<S>,
+> {
+    Some(<GetSparklinesInterval<S>>::from_value(S::from_static("hour")))
 }
 
 pub mod get_sparklines_state {
@@ -163,7 +341,11 @@ pub struct GetSparklinesBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<Vec<S>>),
+    _fields: (
+        Option<GetSparklinesDuration<S>>,
+        Option<GetSparklinesInterval<S>>,
+        Option<Vec<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -205,12 +387,15 @@ impl<S: BosStr> GetSparklinesBuilder<get_sparklines_state::Empty, S> {
 
 impl<St: get_sparklines_state::State, S: BosStr> GetSparklinesBuilder<St, S> {
     /// Set the `duration` field (optional)
-    pub fn duration(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn duration(
+        mut self,
+        value: impl Into<Option<GetSparklinesDuration<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `duration` field to an Option value (optional)
-    pub fn maybe_duration(mut self, value: Option<S>) -> Self {
+    pub fn maybe_duration(mut self, value: Option<GetSparklinesDuration<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -218,12 +403,15 @@ impl<St: get_sparklines_state::State, S: BosStr> GetSparklinesBuilder<St, S> {
 
 impl<St: get_sparklines_state::State, S: BosStr> GetSparklinesBuilder<St, S> {
     /// Set the `interval` field (optional)
-    pub fn interval(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn interval(
+        mut self,
+        value: impl Into<Option<GetSparklinesInterval<S>>>,
+    ) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `interval` field to an Option value (optional)
-    pub fn maybe_interval(mut self, value: Option<S>) -> Self {
+    pub fn maybe_interval(mut self, value: Option<GetSparklinesInterval<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -256,8 +444,8 @@ where
     /// Build the final struct.
     pub fn build(self) -> GetSparklines<S> {
         GetSparklines {
-            duration: self._fields.0.or_else(|| Some(S::from_static("24h"))),
-            interval: self._fields.1.or_else(|| Some(S::from_static("hour"))),
+            duration: self._fields.0,
+            interval: self._fields.1,
             slices: self._fields.2.unwrap(),
             extra_data: Default::default(),
         }
@@ -268,8 +456,8 @@ where
         extra_data: BTreeMap<SmolStr, Data<S>>,
     ) -> GetSparklines<S> {
         GetSparklines {
-            duration: self._fields.0.or_else(|| Some(S::from_static("24h"))),
-            interval: self._fields.1.or_else(|| Some(S::from_static("hour"))),
+            duration: self._fields.0,
+            interval: self._fields.1,
             slices: self._fields.2.unwrap(),
             extra_data: Some(extra_data),
         }

@@ -16,6 +16,91 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::fm_teal::alpha::stats::ReleaseView;
+/// Time period for top releases
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetTopReleasesPeriod<S: BosStr = DefaultStr> {
+    All,
+    _30days,
+    _7days,
+    Other(S),
+}
+
+impl<S: BosStr> GetTopReleasesPeriod<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::All => "all",
+            Self::_30days => "30days",
+            Self::_7days => "7days",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "all" => Self::All,
+            "30days" => Self::_30days,
+            "7days" => Self::_7days,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetTopReleasesPeriod<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetTopReleasesPeriod<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetTopReleasesPeriod<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetTopReleasesPeriod<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetTopReleasesPeriod<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetTopReleasesPeriod<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetTopReleasesPeriod<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetTopReleasesPeriod::All => GetTopReleasesPeriod::All,
+            GetTopReleasesPeriod::_30days => GetTopReleasesPeriod::_30days,
+            GetTopReleasesPeriod::_7days => GetTopReleasesPeriod::_7days,
+            GetTopReleasesPeriod::Other(v) => {
+                GetTopReleasesPeriod::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -29,7 +114,7 @@ pub struct GetTopReleases<S: BosStr = DefaultStr> {
     /// Defaults to `"all"`.
     #[serde(default = "_default_period")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub period: Option<S>,
+    pub period: Option<GetTopReleasesPeriod<S>>,
 }
 
 
@@ -76,8 +161,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_period<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("all"))
+fn _default_period<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetTopReleasesPeriod<S>,
+> {
+    Some(<GetTopReleasesPeriod<S>>::from_value(S::from_static("all")))
 }
 
 pub mod get_top_releases_state {
@@ -105,7 +192,7 @@ pub struct GetTopReleasesBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>),
+    _fields: (Option<S>, Option<i64>, Option<GetTopReleasesPeriod<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -173,12 +260,12 @@ impl<St: get_top_releases_state::State, S: BosStr> GetTopReleasesBuilder<St, S> 
 
 impl<St: get_top_releases_state::State, S: BosStr> GetTopReleasesBuilder<St, S> {
     /// Set the `period` field (optional)
-    pub fn period(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn period(mut self, value: impl Into<Option<GetTopReleasesPeriod<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `period` field to an Option value (optional)
-    pub fn maybe_period(mut self, value: Option<S>) -> Self {
+    pub fn maybe_period(mut self, value: Option<GetTopReleasesPeriod<S>>) -> Self {
         self._fields.2 = value;
         self
     }

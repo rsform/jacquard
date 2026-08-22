@@ -3,6 +3,8 @@ use jacquard_common::CowStr;
 use proc_macro2::TokenStream;
 use quote::quote;
 
+use crate::lexicon::LexString;
+
 /// Rust keywords that need escaping with r# prefix in module paths
 const RUST_KEYWORDS: &[&str] = &[
     "as", "break", "const", "continue", "crate", "else", "enum", "extern", "false", "fn", "for",
@@ -47,6 +49,19 @@ pub(super) fn known_value_to_variant_name(value: &str) -> String {
         value
     };
     value_to_variant_name(name_part)
+}
+
+/// Whether every constrained value yields a unique, non-empty variant
+/// name (the condition for generating an enum rather than constants).
+pub(super) fn string_enum_is_nameable(string: &LexString<'_>) -> bool {
+    let values = string.known_values.as_ref().or(string.r#enum.as_ref());
+    let Some(values) = values else {
+        return false;
+    };
+    let mut seen = std::collections::HashSet::new();
+    values
+        .iter()
+        .all(|v| seen.insert(known_value_to_variant_name(v.as_ref())))
 }
 
 /// Check if a string is already a valid identifier (alphanumeric + underscore, not starting with digit)

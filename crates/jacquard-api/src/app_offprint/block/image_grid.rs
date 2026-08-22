@@ -51,7 +51,7 @@ pub struct GridImage<S: BosStr = DefaultStr> {
 pub struct ImageGrid<S: BosStr = DefaultStr> {
     ///Aspect ratio mode
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub aspect_ratio: Option<S>,
+    pub aspect_ratio: Option<ImageGridAspectRatio<S>>,
     ///Grid caption
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<S>,
@@ -67,6 +67,95 @@ pub struct ImageGrid<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Aspect ratio mode
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ImageGridAspectRatio<S: BosStr = DefaultStr> {
+    Landscape,
+    Portrait,
+    Square,
+    Mosaic,
+    Other(S),
+}
+
+impl<S: BosStr> ImageGridAspectRatio<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Landscape => "landscape",
+            Self::Portrait => "portrait",
+            Self::Square => "square",
+            Self::Mosaic => "mosaic",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "landscape" => Self::Landscape,
+            "portrait" => Self::Portrait,
+            "square" => Self::Square,
+            "mosaic" => Self::Mosaic,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ImageGridAspectRatio<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ImageGridAspectRatio<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ImageGridAspectRatio<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ImageGridAspectRatio<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ImageGridAspectRatio<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ImageGridAspectRatio<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ImageGridAspectRatio<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ImageGridAspectRatio::Landscape => ImageGridAspectRatio::Landscape,
+            ImageGridAspectRatio::Portrait => ImageGridAspectRatio::Portrait,
+            ImageGridAspectRatio::Square => ImageGridAspectRatio::Square,
+            ImageGridAspectRatio::Mosaic => ImageGridAspectRatio::Mosaic,
+            ImageGridAspectRatio::Other(v) => {
+                ImageGridAspectRatio::Other(v.into_static())
+            }
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for GridImage<S> {
@@ -346,7 +435,12 @@ pub mod image_grid_state {
 /// Builder for constructing an instance of this type.
 pub struct ImageGridBuilder<St: image_grid_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<i64>, Option<Vec<image_grid::GridImage<S>>>),
+    _fields: (
+        Option<ImageGridAspectRatio<S>>,
+        Option<S>,
+        Option<i64>,
+        Option<Vec<image_grid::GridImage<S>>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -388,12 +482,15 @@ impl<S: BosStr> ImageGridBuilder<image_grid_state::Empty, S> {
 
 impl<St: image_grid_state::State, S: BosStr> ImageGridBuilder<St, S> {
     /// Set the `aspectRatio` field (optional)
-    pub fn aspect_ratio(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn aspect_ratio(
+        mut self,
+        value: impl Into<Option<ImageGridAspectRatio<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `aspectRatio` field to an Option value (optional)
-    pub fn maybe_aspect_ratio(mut self, value: Option<S>) -> Self {
+    pub fn maybe_aspect_ratio(mut self, value: Option<ImageGridAspectRatio<S>>) -> Self {
         self._fields.0 = value;
         self
     }

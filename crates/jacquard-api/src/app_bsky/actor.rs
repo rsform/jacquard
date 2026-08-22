@@ -366,8 +366,9 @@ pub struct LiveEventPreferences<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct MutedWord<S: BosStr = DefaultStr> {
-    ///Groups of users to apply the muted word to. If undefined, applies to all users.
+    ///Groups of users to apply the muted word to. If undefined, applies to all users.  Defaults to `"all"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_muted_word_actor_target")]
     pub actor_target: Option<MutedWordActorTarget<S>>,
     ///The date and time at which the muted word will expire and no longer be applied.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -5284,6 +5285,12 @@ where
         BTreeMap<SmolStr, Data<S>>,
     > as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn _default_muted_word_actor_target<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    MutedWordActorTarget<S>,
+> {
+    Some(<MutedWordActorTarget<S>>::from_value(S::from_static("all")))
 }
 
 pub mod muted_word_state {

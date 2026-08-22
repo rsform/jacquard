@@ -16,6 +16,176 @@ use jacquard_common::types::string::Language;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
+/// Sorting method
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListSort<S: BosStr = DefaultStr> {
+    Popular,
+    Active,
+    New,
+    Alphabetical,
+    Other(S),
+}
+
+impl<S: BosStr> ListSort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Popular => "popular",
+            Self::Active => "active",
+            Self::New => "new",
+            Self::Alphabetical => "alphabetical",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "popular" => Self::Popular,
+            "active" => Self::Active,
+            "new" => Self::New,
+            "alphabetical" => Self::Alphabetical,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListSort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListSort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListSort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListSort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListSort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListSort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListSort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListSort::Popular => ListSort::Popular,
+            ListSort::Active => ListSort::Active,
+            ListSort::New => ListSort::New,
+            ListSort::Alphabetical => ListSort::Alphabetical,
+            ListSort::Other(v) => ListSort::Other(v.into_static()),
+        }
+    }
+}
+
+/// Filter communities by visibility level
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListVisibility<S: BosStr = DefaultStr> {
+    Public,
+    Unlisted,
+    Private,
+    Other(S),
+}
+
+impl<S: BosStr> ListVisibility<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Unlisted => "unlisted",
+            Self::Private => "private",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "public" => Self::Public,
+            "unlisted" => Self::Unlisted,
+            "private" => Self::Private,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListVisibility<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListVisibility<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListVisibility<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListVisibility<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListVisibility<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListVisibility::Public => ListVisibility::Public,
+            ListVisibility::Unlisted => ListVisibility::Unlisted,
+            ListVisibility::Private => ListVisibility::Private,
+            ListVisibility::Other(v) => ListVisibility::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -35,12 +205,12 @@ pub struct List<S: BosStr = DefaultStr> {
     /// Defaults to `"popular"`. Max length: 64.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<ListSort<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subscribed: Option<bool>,
     /// (max length: 64)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub visibility: Option<S>,
+    pub visibility: Option<ListVisibility<S>>,
 }
 
 
@@ -86,8 +256,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("popular"))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    ListSort<S>,
+> {
+    Some(<ListSort<S>>::from_value(S::from_static("popular")))
 }
 
 pub mod list_state {
@@ -117,9 +289,9 @@ pub struct ListBuilder<St: list_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<Language>,
         Option<i64>,
-        Option<S>,
+        Option<ListSort<S>>,
         Option<bool>,
-        Option<S>,
+        Option<ListVisibility<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -214,12 +386,12 @@ impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
 
 impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<ListSort<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<ListSort<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -240,12 +412,12 @@ impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
 
 impl<St: list_state::State, S: BosStr> ListBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn visibility(mut self, value: impl Into<Option<ListVisibility<S>>>) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<S>) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<ListVisibility<S>>) -> Self {
         self._fields.6 = value;
         self
     }

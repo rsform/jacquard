@@ -31,7 +31,7 @@ use serde::{Serialize, Deserialize};
 pub struct WebEmbed<S: BosStr = DefaultStr> {
     ///Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub alignment: Option<S>,
+    pub alignment: Option<WebEmbedAlignment<S>>,
     ///Page description/excerpt
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -65,6 +65,89 @@ pub struct WebEmbed<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Horizontal alignment
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WebEmbedAlignment<S: BosStr = DefaultStr> {
+    Left,
+    Center,
+    Right,
+    Other(S),
+}
+
+impl<S: BosStr> WebEmbedAlignment<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Left => "left",
+            Self::Center => "center",
+            Self::Right => "right",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "left" => Self::Left,
+            "center" => Self::Center,
+            "right" => Self::Right,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WebEmbedAlignment<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WebEmbedAlignment<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WebEmbedAlignment<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WebEmbedAlignment<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WebEmbedAlignment<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WebEmbedAlignment<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WebEmbedAlignment<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WebEmbedAlignment::Left => WebEmbedAlignment::Left,
+            WebEmbedAlignment::Center => WebEmbedAlignment::Center,
+            WebEmbedAlignment::Right => WebEmbedAlignment::Right,
+            WebEmbedAlignment::Other(v) => WebEmbedAlignment::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for WebEmbed<S> {
@@ -223,7 +306,7 @@ pub mod web_embed_state {
 pub struct WebEmbedBuilder<St: web_embed_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<S>,
+        Option<WebEmbedAlignment<S>>,
         Option<S>,
         Option<i64>,
         Option<UriValue<S>>,
@@ -275,12 +358,12 @@ impl<S: BosStr> WebEmbedBuilder<web_embed_state::Empty, S> {
 
 impl<St: web_embed_state::State, S: BosStr> WebEmbedBuilder<St, S> {
     /// Set the `alignment` field (optional)
-    pub fn alignment(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn alignment(mut self, value: impl Into<Option<WebEmbedAlignment<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(mut self, value: Option<S>) -> Self {
+    pub fn maybe_alignment(mut self, value: Option<WebEmbedAlignment<S>>) -> Self {
         self._fields.0 = value;
         self
     }

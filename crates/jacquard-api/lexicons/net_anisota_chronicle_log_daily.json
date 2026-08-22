@@ -272,6 +272,12 @@
           },
           "maxLength": 48
         },
+        "longestPatienceHours": {
+          "type": "integer",
+          "description": "Longest gap in whole hours between notification checks on this day. Monotonic: only ever raised, never lowered. Capped at 48, matching the notification-patience curve's ceiling.",
+          "minimum": 0,
+          "maximum": 48
+        },
         "offlineXPAwarded": {
           "type": "integer",
           "description": "XP awarded for offline time",

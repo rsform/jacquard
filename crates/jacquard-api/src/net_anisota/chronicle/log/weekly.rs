@@ -112,7 +112,7 @@ pub struct Weekly<S: BosStr = DefaultStr> {
     pub patterns: Option<weekly::WeeklyPatterns<S>>,
     pub signature: weekly::ChronicleSignature<S>,
     ///Whether this week is still being updated or has been finalized
-    pub status: S,
+    pub status: WeeklyStatus<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub trends: Option<weekly::TrendData<S>>,
     ///AT URIs of containing logs (monthly, yearly) this week belongs to
@@ -127,6 +127,85 @@ pub struct Weekly<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Whether this week is still being updated or has been finalized
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WeeklyStatus<S: BosStr = DefaultStr> {
+    Active,
+    Finalized,
+    Other(S),
+}
+
+impl<S: BosStr> WeeklyStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "active",
+            Self::Finalized => "finalized",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "active" => Self::Active,
+            "finalized" => Self::Finalized,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WeeklyStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WeeklyStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WeeklyStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WeeklyStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WeeklyStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WeeklyStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WeeklyStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WeeklyStatus::Active => WeeklyStatus::Active,
+            WeeklyStatus::Finalized => WeeklyStatus::Finalized,
+            WeeklyStatus::Other(v) => WeeklyStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1431,7 +1510,7 @@ pub struct WeeklyBuilder<St: weekly_state::State, S: BosStr = DefaultStr> {
         Option<Vec<S>>,
         Option<weekly::WeeklyPatterns<S>>,
         Option<weekly::ChronicleSignature<S>>,
-        Option<S>,
+        Option<WeeklyStatus<S>>,
         Option<weekly::TrendData<S>>,
         Option<Vec<S>>,
         Option<S>,
@@ -1634,7 +1713,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<WeeklyStatus<S>>,
     ) -> WeeklyBuilder<weekly_state::SetStatus<St>, S> {
         self._fields.8 = Option::Some(value.into());
         WeeklyBuilder {

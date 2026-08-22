@@ -87,6 +87,8 @@ rand_core = { version = "0.6.4", default-features = false, features = [
     "alloc",
 ] }
 sha2 = "0.10"
+xxhash-rust = { version = "0.8", default-features = false, features = ["xxh3"] }
+zstd = { version = "0.13", default-features = false }
 
 # Time
 chrono = { version = "0.4", default-features = false, features = ["serde"] }

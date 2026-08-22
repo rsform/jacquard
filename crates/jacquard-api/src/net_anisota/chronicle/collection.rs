@@ -88,14 +88,14 @@ pub struct Collection<S: BosStr = DefaultStr> {
     pub quantity: i64,
     ///Rarity level of the specimen
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rarity: Option<S>,
+    pub rarity: Option<CollectionRarity<S>>,
     ///Scientific name of the specimen
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scientific_name: Option<S>,
     pub signature: collection::ChronicleSignature<S>,
     ///How the specimen was acquired
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub source: Option<S>,
+    pub source: Option<CollectionSource<S>>,
     ///Additional details about acquisition
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_details: Option<Data<S>>,
@@ -109,7 +109,7 @@ pub struct Collection<S: BosStr = DefaultStr> {
     pub specimen_id: S,
     ///Collection status
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<CollectionStatus<S>>,
     ///When the record was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
@@ -120,6 +120,271 @@ pub struct Collection<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Rarity level of the specimen
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CollectionRarity<S: BosStr = DefaultStr> {
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Legendary,
+    Other(S),
+}
+
+impl<S: BosStr> CollectionRarity<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Common => "common",
+            Self::Uncommon => "uncommon",
+            Self::Rare => "rare",
+            Self::Epic => "epic",
+            Self::Legendary => "legendary",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "common" => Self::Common,
+            "uncommon" => Self::Uncommon,
+            "rare" => Self::Rare,
+            "epic" => Self::Epic,
+            "legendary" => Self::Legendary,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CollectionRarity<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CollectionRarity<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CollectionRarity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CollectionRarity<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CollectionRarity<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CollectionRarity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CollectionRarity<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CollectionRarity::Common => CollectionRarity::Common,
+            CollectionRarity::Uncommon => CollectionRarity::Uncommon,
+            CollectionRarity::Rare => CollectionRarity::Rare,
+            CollectionRarity::Epic => CollectionRarity::Epic,
+            CollectionRarity::Legendary => CollectionRarity::Legendary,
+            CollectionRarity::Other(v) => CollectionRarity::Other(v.into_static()),
+        }
+    }
+}
+
+/// How the specimen was acquired
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CollectionSource<S: BosStr = DefaultStr> {
+    GameCard,
+    FieldObservation,
+    Trade,
+    Quest,
+    Research,
+    Expedition,
+    Other(S),
+}
+
+impl<S: BosStr> CollectionSource<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::GameCard => "game_card",
+            Self::FieldObservation => "field_observation",
+            Self::Trade => "trade",
+            Self::Quest => "quest",
+            Self::Research => "research",
+            Self::Expedition => "expedition",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "game_card" => Self::GameCard,
+            "field_observation" => Self::FieldObservation,
+            "trade" => Self::Trade,
+            "quest" => Self::Quest,
+            "research" => Self::Research,
+            "expedition" => Self::Expedition,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CollectionSource<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CollectionSource<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CollectionSource<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CollectionSource<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CollectionSource<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CollectionSource<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CollectionSource<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CollectionSource::GameCard => CollectionSource::GameCard,
+            CollectionSource::FieldObservation => CollectionSource::FieldObservation,
+            CollectionSource::Trade => CollectionSource::Trade,
+            CollectionSource::Quest => CollectionSource::Quest,
+            CollectionSource::Research => CollectionSource::Research,
+            CollectionSource::Expedition => CollectionSource::Expedition,
+            CollectionSource::Other(v) => CollectionSource::Other(v.into_static()),
+        }
+    }
+}
+
+/// Collection status
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CollectionStatus<S: BosStr = DefaultStr> {
+    Seen,
+    Collected,
+    Other(S),
+}
+
+impl<S: BosStr> CollectionStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Seen => "seen",
+            Self::Collected => "collected",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "seen" => Self::Seen,
+            "collected" => Self::Collected,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CollectionStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CollectionStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CollectionStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CollectionStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CollectionStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CollectionStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CollectionStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CollectionStatus::Seen => CollectionStatus::Seen,
+            CollectionStatus::Collected => CollectionStatus::Collected,
+            CollectionStatus::Other(v) => CollectionStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -978,15 +1243,15 @@ pub struct CollectionBuilder<St: collection_state::State, S: BosStr = DefaultStr
         Option<Datetime>,
         Option<S>,
         Option<i64>,
-        Option<S>,
+        Option<CollectionRarity<S>>,
         Option<S>,
         Option<collection::ChronicleSignature<S>>,
-        Option<S>,
+        Option<CollectionSource<S>>,
         Option<Data<S>>,
         Option<S>,
         Option<Data<S>>,
         Option<S>,
-        Option<S>,
+        Option<CollectionStatus<S>>,
         Option<Datetime>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -1184,12 +1449,12 @@ where
 
 impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `rarity` field (optional)
-    pub fn rarity(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn rarity(mut self, value: impl Into<Option<CollectionRarity<S>>>) -> Self {
         self._fields.8 = value.into();
         self
     }
     /// Set the `rarity` field to an Option value (optional)
-    pub fn maybe_rarity(mut self, value: Option<S>) -> Self {
+    pub fn maybe_rarity(mut self, value: Option<CollectionRarity<S>>) -> Self {
         self._fields.8 = value;
         self
     }
@@ -1229,12 +1494,12 @@ where
 
 impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `source` field (optional)
-    pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn source(mut self, value: impl Into<Option<CollectionSource<S>>>) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `source` field to an Option value (optional)
-    pub fn maybe_source(mut self, value: Option<S>) -> Self {
+    pub fn maybe_source(mut self, value: Option<CollectionSource<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -1300,12 +1565,12 @@ where
 
 impl<St: collection_state::State, S: BosStr> CollectionBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<CollectionStatus<S>>>) -> Self {
         self._fields.16 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_status(mut self, value: Option<CollectionStatus<S>>) -> Self {
         self._fields.16 = value;
         self
     }

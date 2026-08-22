@@ -37,9 +37,99 @@ pub struct CreateQueue<S: BosStr = DefaultStr> {
     pub report_types: Option<Vec<S>>,
     ///Subject types this queue accepts
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subject_types: Option<Vec<S>>,
+    pub subject_types: Option<Vec<CreateQueueSubjectTypes<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CreateQueueSubjectTypes<S: BosStr = DefaultStr> {
+    Account,
+    Record,
+    Message,
+    Conversation,
+    Other(S),
+}
+
+impl<S: BosStr> CreateQueueSubjectTypes<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Account => "account",
+            Self::Record => "record",
+            Self::Message => "message",
+            Self::Conversation => "conversation",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "account" => Self::Account,
+            "record" => Self::Record,
+            "message" => Self::Message,
+            "conversation" => Self::Conversation,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CreateQueueSubjectTypes<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CreateQueueSubjectTypes<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CreateQueueSubjectTypes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CreateQueueSubjectTypes<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CreateQueueSubjectTypes<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CreateQueueSubjectTypes<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CreateQueueSubjectTypes<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateQueueSubjectTypes::Account => CreateQueueSubjectTypes::Account,
+            CreateQueueSubjectTypes::Record => CreateQueueSubjectTypes::Record,
+            CreateQueueSubjectTypes::Message => CreateQueueSubjectTypes::Message,
+            CreateQueueSubjectTypes::Conversation => {
+                CreateQueueSubjectTypes::Conversation
+            }
+            CreateQueueSubjectTypes::Other(v) => {
+                CreateQueueSubjectTypes::Other(v.into_static())
+            }
+        }
+    }
 }
 
 

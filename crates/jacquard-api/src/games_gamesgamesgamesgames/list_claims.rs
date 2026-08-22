@@ -17,6 +17,88 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::get_claim::ClaimView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListClaimsStatus<S: BosStr = DefaultStr> {
+    Pending,
+    Approved,
+    Denied,
+    Other(S),
+}
+
+impl<S: BosStr> ListClaimsStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "pending",
+            Self::Approved => "approved",
+            Self::Denied => "denied",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "pending" => Self::Pending,
+            "approved" => Self::Approved,
+            "denied" => Self::Denied,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListClaimsStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListClaimsStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListClaimsStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListClaimsStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListClaimsStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListClaimsStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListClaimsStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListClaimsStatus::Pending => ListClaimsStatus::Pending,
+            ListClaimsStatus::Approved => ListClaimsStatus::Approved,
+            ListClaimsStatus::Denied => ListClaimsStatus::Denied,
+            ListClaimsStatus::Other(v) => ListClaimsStatus::Other(v.into_static()),
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListClaims<S: BosStr = DefaultStr> {
@@ -27,7 +109,7 @@ pub struct ListClaims<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<ListClaimsStatus<S>>,
 }
 
 
@@ -95,7 +177,7 @@ pub mod list_claims_state {
 /// Builder for constructing an instance of this type.
 pub struct ListClaimsBuilder<St: list_claims_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>),
+    _fields: (Option<S>, Option<i64>, Option<ListClaimsStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -163,12 +245,12 @@ impl<St: list_claims_state::State, S: BosStr> ListClaimsBuilder<St, S> {
 
 impl<St: list_claims_state::State, S: BosStr> ListClaimsBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ListClaimsStatus<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ListClaimsStatus<S>>) -> Self {
         self._fields.2 = value;
         self
     }

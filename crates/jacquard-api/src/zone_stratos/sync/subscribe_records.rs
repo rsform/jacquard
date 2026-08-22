@@ -269,11 +269,11 @@ pub struct SubscribeRecords<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubscribeRecordsMessage<S: BosStr = DefaultStr> {
-    #[serde(rename = "#commit")]
+    #[serde(rename = "zone.stratos.sync.subscribeRecords#commit")]
     Commit(Box<subscribe_records::Commit<S>>),
-    #[serde(rename = "#enrollment")]
+    #[serde(rename = "zone.stratos.sync.subscribeRecords#enrollment")]
     Enrollment(Box<subscribe_records::Enrollment<S>>),
-    #[serde(rename = "#info")]
+    #[serde(rename = "zone.stratos.sync.subscribeRecords#info")]
     Info(Box<subscribe_records::Info<S>>),
 }
 

@@ -1,0 +1,45 @@
+# Builds the upstream jetstream development simulator (cmd/simulator): a
+# deterministic fake atproto network (PLC + PDS + relay) under one HTTP
+# listener.
+#
+# Upstream publishes the jetstream server image to GHCR but not the
+# simulator binary, so this image is built locally by the e2e lifecycle
+# controller from the same pinned upstream source commit as the server
+# release. If upstream (or a jacquard publish) ships a simulator image,
+# set E2E_JETSTREAM_SIM_IMAGE to it and this build becomes unused.
+#
+# Build context: the extracted upstream source tarball at the commit
+# recorded in scripts/e2e.sh (JETSTREAM_UPSTREAM_COMMIT).
+
+FROM --platform=$BUILDPLATFORM golang:1.26.6-bookworm AS build
+
+WORKDIR /src
+
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go mod download
+
+COPY . .
+
+ENV CGO_ENABLED=0
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
+    go build \
+      -trimpath \
+      -buildvcs=false \
+      -ldflags "-extldflags=-static" \
+      -o /out/simulator \
+      ./cmd/simulator
+
+FROM gcr.io/distroless/static-debian12:nonroot AS runtime
+
+COPY --from=build /out/simulator /usr/local/bin/simulator
+
+EXPOSE 7777
+
+USER 0:0
+
+ENTRYPOINT ["/usr/local/bin/simulator"]
+CMD ["serve"]

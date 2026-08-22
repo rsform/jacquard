@@ -82,7 +82,7 @@ pub struct ProviderResult<S: BosStr = DefaultStr> {
     #[serde(default = "_default_provider_result_market_region")]
     pub market_region: S,
     ///The streaming platform provider.
-    pub provider: S,
+    pub provider: ProviderResultProvider<S>,
     ///Official title of the track or album as listed in the provider's catalog.
     pub title: S,
     ///Direct web link to the track or album on the provider's platform.
@@ -94,6 +94,91 @@ pub struct ProviderResult<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The streaming platform provider.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProviderResultProvider<S: BosStr = DefaultStr> {
+    AppleMusic,
+    Spotify,
+    Tidal,
+    Other(S),
+}
+
+impl<S: BosStr> ProviderResultProvider<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AppleMusic => "appleMusic",
+            Self::Spotify => "spotify",
+            Self::Tidal => "tidal",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "appleMusic" => Self::AppleMusic,
+            "spotify" => Self::Spotify,
+            "tidal" => Self::Tidal,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ProviderResultProvider<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ProviderResultProvider<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ProviderResultProvider<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProviderResultProvider<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ProviderResultProvider<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ProviderResultProvider<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ProviderResultProvider<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProviderResultProvider::AppleMusic => ProviderResultProvider::AppleMusic,
+            ProviderResultProvider::Spotify => ProviderResultProvider::Spotify,
+            ProviderResultProvider::Tidal => ProviderResultProvider::Tidal,
+            ProviderResultProvider::Other(v) => {
+                ProviderResultProvider::Other(v.into_static())
+            }
+        }
+    }
 }
 
 impl<S: BosStr> Lookup<S> {
@@ -716,7 +801,7 @@ pub struct ProviderResultBuilder<
         Option<S>,
         Option<bool>,
         Option<S>,
-        Option<S>,
+        Option<ProviderResultProvider<S>>,
         Option<S>,
         Option<UriValue<S>>,
     ),
@@ -844,7 +929,7 @@ where
     /// Set the `provider` field (required)
     pub fn provider(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<ProviderResultProvider<S>>,
     ) -> ProviderResultBuilder<provider_result_state::SetProvider<St>, S> {
         self._fields.5 = Option::Some(value.into());
         ProviderResultBuilder {

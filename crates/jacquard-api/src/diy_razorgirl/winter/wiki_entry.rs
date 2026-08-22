@@ -44,7 +44,9 @@ pub struct WikiEntry<S: BosStr = DefaultStr> {
     pub last_updated: Datetime,
     ///URL-safe identifier for [[slug]] linking
     pub slug: S,
+    /// Defaults to `"stable"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_wiki_entry_status")]
     pub status: Option<WikiEntryStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub summary: Option<S>,
@@ -283,6 +285,12 @@ where
         }
     }
     Ok(data)
+}
+
+fn _default_wiki_entry_status<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    WikiEntryStatus<S>,
+> {
+    Some(<WikiEntryStatus<S>>::from_value(S::from_static("stable")))
 }
 
 pub mod wiki_entry_state {

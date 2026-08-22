@@ -45,7 +45,7 @@ pub struct Layer<S: BosStr = DefaultStr> {
     ///The name of the site
     pub name: S,
     ///The type of the layer
-    pub r#type: S,
+    pub r#type: LayerType<S>,
     ///The URI of the layer
     pub uri: UriValue<S>,
     #[serde(
@@ -55,6 +55,105 @@ pub struct Layer<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The type of the layer
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LayerType<S: BosStr = DefaultStr> {
+    GeojsonPoints,
+    GeojsonPointsTrees,
+    GeojsonLine,
+    Choropleth,
+    ChoroplethShannon,
+    RasterTif,
+    TmsTile,
+    Other(S),
+}
+
+impl<S: BosStr> LayerType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::GeojsonPoints => "geojson_points",
+            Self::GeojsonPointsTrees => "geojson_points_trees",
+            Self::GeojsonLine => "geojson_line",
+            Self::Choropleth => "choropleth",
+            Self::ChoroplethShannon => "choropleth_shannon",
+            Self::RasterTif => "raster_tif",
+            Self::TmsTile => "tms_tile",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "geojson_points" => Self::GeojsonPoints,
+            "geojson_points_trees" => Self::GeojsonPointsTrees,
+            "geojson_line" => Self::GeojsonLine,
+            "choropleth" => Self::Choropleth,
+            "choropleth_shannon" => Self::ChoroplethShannon,
+            "raster_tif" => Self::RasterTif,
+            "tms_tile" => Self::TmsTile,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for LayerType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for LayerType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for LayerType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for LayerType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for LayerType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for LayerType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = LayerType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LayerType::GeojsonPoints => LayerType::GeojsonPoints,
+            LayerType::GeojsonPointsTrees => LayerType::GeojsonPointsTrees,
+            LayerType::GeojsonLine => LayerType::GeojsonLine,
+            LayerType::Choropleth => LayerType::Choropleth,
+            LayerType::ChoroplethShannon => LayerType::ChoroplethShannon,
+            LayerType::RasterTif => LayerType::RasterTif,
+            LayerType::TmsTile => LayerType::TmsTile,
+            LayerType::Other(v) => LayerType::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -212,7 +311,13 @@ pub mod layer_state {
 /// Builder for constructing an instance of this type.
 pub struct LayerBuilder<St: layer_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<S>, Option<S>, Option<UriValue<S>>),
+    _fields: (
+        Option<Datetime>,
+        Option<S>,
+        Option<S>,
+        Option<LayerType<S>>,
+        Option<UriValue<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -311,7 +416,7 @@ where
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<LayerType<S>>,
     ) -> LayerBuilder<layer_state::SetType<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LayerBuilder {

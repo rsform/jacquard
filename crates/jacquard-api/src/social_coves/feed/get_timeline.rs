@@ -16,6 +16,186 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::social_coves::feed::FeedViewPost;
+/// Sort order for timeline feed
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetTimelineSort<S: BosStr = DefaultStr> {
+    Hot,
+    Top,
+    New,
+    Other(S),
+}
+
+impl<S: BosStr> GetTimelineSort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hot => "hot",
+            Self::Top => "top",
+            Self::New => "new",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "hot" => Self::Hot,
+            "top" => Self::Top,
+            "new" => Self::New,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetTimelineSort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetTimelineSort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetTimelineSort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetTimelineSort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetTimelineSort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetTimelineSort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetTimelineSort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetTimelineSort::Hot => GetTimelineSort::Hot,
+            GetTimelineSort::Top => GetTimelineSort::Top,
+            GetTimelineSort::New => GetTimelineSort::New,
+            GetTimelineSort::Other(v) => GetTimelineSort::Other(v.into_static()),
+        }
+    }
+}
+
+/// Timeframe for top sorting (only applies when sort=top)
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetTimelineTimeframe<S: BosStr = DefaultStr> {
+    Hour,
+    Day,
+    Week,
+    Month,
+    Year,
+    All,
+    Other(S),
+}
+
+impl<S: BosStr> GetTimelineTimeframe<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hour => "hour",
+            Self::Day => "day",
+            Self::Week => "week",
+            Self::Month => "month",
+            Self::Year => "year",
+            Self::All => "all",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "hour" => Self::Hour,
+            "day" => Self::Day,
+            "week" => Self::Week,
+            "month" => Self::Month,
+            "year" => Self::Year,
+            "all" => Self::All,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetTimelineTimeframe<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetTimelineTimeframe<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetTimelineTimeframe<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetTimelineTimeframe<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetTimelineTimeframe<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetTimelineTimeframe<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetTimelineTimeframe<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetTimelineTimeframe::Hour => GetTimelineTimeframe::Hour,
+            GetTimelineTimeframe::Day => GetTimelineTimeframe::Day,
+            GetTimelineTimeframe::Week => GetTimelineTimeframe::Week,
+            GetTimelineTimeframe::Month => GetTimelineTimeframe::Month,
+            GetTimelineTimeframe::Year => GetTimelineTimeframe::Year,
+            GetTimelineTimeframe::All => GetTimelineTimeframe::All,
+            GetTimelineTimeframe::Other(v) => {
+                GetTimelineTimeframe::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -30,11 +210,11 @@ pub struct GetTimeline<S: BosStr = DefaultStr> {
     /// Defaults to `"hot"`. Max length: 64.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<GetTimelineSort<S>>,
     /// Defaults to `"day"`. Max length: 64.
     #[serde(default = "_default_timeframe")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub timeframe: Option<S>,
+    pub timeframe: Option<GetTimelineTimeframe<S>>,
 }
 
 
@@ -80,12 +260,16 @@ fn _default_limit() -> Option<i64> {
     Some(15i64)
 }
 
-fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("hot"))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetTimelineSort<S>,
+> {
+    Some(<GetTimelineSort<S>>::from_value(S::from_static("hot")))
 }
 
-fn _default_timeframe<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("day"))
+fn _default_timeframe<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetTimelineTimeframe<S>,
+> {
+    Some(<GetTimelineTimeframe<S>>::from_value(S::from_static("day")))
 }
 
 pub mod get_timeline_state {
@@ -110,7 +294,12 @@ pub mod get_timeline_state {
 /// Builder for constructing an instance of this type.
 pub struct GetTimelineBuilder<St: get_timeline_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<i64>,
+        Option<GetTimelineSort<S>>,
+        Option<GetTimelineTimeframe<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -178,12 +367,12 @@ impl<St: get_timeline_state::State, S: BosStr> GetTimelineBuilder<St, S> {
 
 impl<St: get_timeline_state::State, S: BosStr> GetTimelineBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<GetTimelineSort<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<GetTimelineSort<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -191,12 +380,15 @@ impl<St: get_timeline_state::State, S: BosStr> GetTimelineBuilder<St, S> {
 
 impl<St: get_timeline_state::State, S: BosStr> GetTimelineBuilder<St, S> {
     /// Set the `timeframe` field (optional)
-    pub fn timeframe(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn timeframe(
+        mut self,
+        value: impl Into<Option<GetTimelineTimeframe<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `timeframe` field to an Option value (optional)
-    pub fn maybe_timeframe(mut self, value: Option<S>) -> Self {
+    pub fn maybe_timeframe(mut self, value: Option<GetTimelineTimeframe<S>>) -> Self {
         self._fields.3 = value;
         self
     }

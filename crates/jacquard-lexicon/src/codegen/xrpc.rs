@@ -251,6 +251,7 @@ impl<'c> CodeGenerator<'c> {
         let subscription_impl = self.generate_xrpc_subscription_impl(
             nsid,
             &type_base,
+            sub.subprotocol.as_deref(),
             has_params,
             params_has_lifetime,
             has_message,
@@ -296,7 +297,17 @@ impl<'c> CodeGenerator<'c> {
                 let union_variants = ctx.build_simple_union_variants(&union.refs, |ref_str| {
                     self.ref_to_rust_type(ref_str, resolved)
                 })?;
-                let variants = super::union_codegen::generate_variant_tokens(&union_variants);
+                let json_union_variants = union_variants
+                    .iter()
+                    .cloned()
+                    .map(|mut variant| {
+                        if variant.ref_str.starts_with('#') {
+                            variant.ref_str = format!("{nsid}{}", variant.ref_str);
+                        }
+                        variant
+                    })
+                    .collect::<Vec<_>>();
+                let variants = super::union_codegen::generate_variant_tokens(&json_union_variants);
 
                 // Generate decode arms for framed decoding
                 let decode_arms: Vec<_> = union_variants
@@ -506,9 +517,47 @@ impl<'c> CodeGenerator<'c> {
         p: &crate::lexicon::LexXrpcParameters<'static>,
         resolved: &super::prettify::ResolvedImports,
     ) -> Result<super::prettify::SubGeneratorOutput> {
+        use crate::lexicon::{LexPrimitiveArrayItem, LexXrpcParametersProperty};
+
         let required = p.required.as_ref().map(|r| r.as_slice()).unwrap_or(&[]);
         let mut fields = Vec::new();
         let mut default_fns = Vec::new();
+
+        // String params constrained by `enum`/`knownValues` (scalar or
+        // array items) get a generated enum instead of an untyped string.
+        let mut nested_enums: Vec<TokenStream> = Vec::new();
+        let mut param_enum_types: std::collections::HashMap<&str, TokenStream> =
+            std::collections::HashMap::new();
+        for (field_name, field_type) in &p.properties {
+            let enum_string = match field_type {
+                LexXrpcParametersProperty::String(s)
+                    if s.r#enum.is_some() || s.known_values.is_some() =>
+                {
+                    Some(s)
+                }
+                LexXrpcParametersProperty::Array(arr) => match &arr.items {
+                    LexPrimitiveArrayItem::String(s)
+                        if s.r#enum.is_some() || s.known_values.is_some() =>
+                    {
+                        Some(s)
+                    }
+                    _ => None,
+                },
+                _ => None,
+            };
+            let Some(s) = enum_string else { continue };
+            let field_str: &str = field_name.as_ref();
+            let enum_name = format!("{}{}", ident, field_str.to_pascal_case());
+            let mut values = s.clone();
+            if values.known_values.is_none() {
+                values.known_values = values.r#enum.clone();
+            }
+            let generated =
+                self.generate_inline_known_values_enum(&enum_name, &values, resolved)?;
+            nested_enums.push(generated.type_defs);
+            let enum_ident = make_ident(&enum_name);
+            param_enum_types.insert(field_name, quote! { #enum_ident<S> });
+        }
 
         for (field_name, field_type) in &p.properties {
             let is_required = required.contains(field_name);
@@ -518,6 +567,7 @@ impl<'c> CodeGenerator<'c> {
                 field_type,
                 is_required,
                 resolved,
+                &param_enum_types,
             )?;
             fields.push(field_tokens);
             if let Some(fn_def) = default_fn {
@@ -584,7 +634,10 @@ impl<'c> CodeGenerator<'c> {
         let builder = ctx.generate();
 
         Ok(super::prettify::SubGeneratorOutput {
-            type_def: struct_def,
+            type_def: quote! {
+                #(#nested_enums)*
+                #struct_def
+            },
             default_fns: quote! { #(#default_fns)* },
             builder,
         })
@@ -874,6 +927,7 @@ impl<'c> CodeGenerator<'c> {
         field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
         is_required: bool,
         resolved: &super::prettify::ResolvedImports,
+        param_enum_types: &std::collections::HashMap<&str, TokenStream>,
     ) -> Result<TokenStream> {
         use crate::lexicon::LexXrpcParametersProperty;
 
@@ -883,10 +937,13 @@ impl<'c> CodeGenerator<'c> {
         let (rust_type, _needs_type_param) = match field_type {
             LexXrpcParametersProperty::Boolean(_) => (quote! { bool }, false),
             LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false),
-            LexXrpcParametersProperty::String(s) => (
-                self.string_to_rust_type(s, resolved),
-                self.string_needs_type_param(s),
-            ),
+            LexXrpcParametersProperty::String(s) => {
+                let ty = param_enum_types
+                    .get(field_name)
+                    .cloned()
+                    .unwrap_or_else(|| self.string_to_rust_type(s, resolved));
+                (ty, self.string_needs_type_param(s))
+            }
             LexXrpcParametersProperty::Unknown(_) => (data_type.clone(), true),
             LexXrpcParametersProperty::Array(arr) => {
                 let needs_type_param = match &arr.items {
@@ -900,9 +957,10 @@ impl<'c> CodeGenerator<'c> {
                 let item_type = match &arr.items {
                     crate::lexicon::LexPrimitiveArrayItem::Boolean(_) => quote! { bool },
                     crate::lexicon::LexPrimitiveArrayItem::Integer(_) => quote! { i64 },
-                    crate::lexicon::LexPrimitiveArrayItem::String(s) => {
-                        self.string_to_rust_type(s, resolved)
-                    }
+                    crate::lexicon::LexPrimitiveArrayItem::String(s) => param_enum_types
+                        .get(field_name)
+                        .cloned()
+                        .unwrap_or_else(|| self.string_to_rust_type(s, resolved)),
                     crate::lexicon::LexPrimitiveArrayItem::Unknown(_) => data_type.clone(),
                 };
                 (quote! { Vec<#item_type> }, needs_type_param)
@@ -937,13 +995,20 @@ impl<'c> CodeGenerator<'c> {
         field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
         is_required: bool,
         resolved: &super::prettify::ResolvedImports,
+        param_enum_types: &std::collections::HashMap<&str, TokenStream>,
     ) -> Result<(TokenStream, Option<TokenStream>)> {
         use crate::lexicon::LexXrpcParametersProperty;
         use heck::ToSnakeCase;
 
         // Get base field.
-        let base_field =
-            self.generate_param_field(nsid, field_name, field_type, is_required, resolved)?;
+        let base_field = self.generate_param_field(
+            nsid,
+            field_name,
+            field_type,
+            is_required,
+            resolved,
+            param_enum_types,
+        )?;
 
         // Generate default function and attribute for required fields with defaults
         // For optional fields, just add doc comments
@@ -1042,14 +1107,28 @@ impl<'c> CodeGenerator<'c> {
                     }
                     let fn_name = format!("_default_{}", field_name.to_snake_case());
                     let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
-                    (
-                        Some(parts.join(" ")),
-                        Some(quote! { #[serde(default = #fn_name)] }),
-                        Some(quote! {
+                    let default_fn = match param_enum_types.get(field_name) {
+                        Some(enum_type) => {
+                            let opt_enum = resolved.option_type(enum_type.clone());
+                            // The qualified-angle form is required: in
+                            // statement position syn reads
+                            // `Enum<S>::from_value` as a comparison chain.
+                            Some(quote! {
+                                fn #fn_ident<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> #opt_enum {
+                                    Some(<#enum_type>::from_value(S::from_static(#v)))
+                                }
+                            })
+                        }
+                        None => Some(quote! {
                             fn #fn_ident<S: jacquard_common::FromStaticStr>() -> Option<S> {
                                 Some(S::from_static(#v))
                             }
                         }),
+                    };
+                    (
+                        Some(parts.join(" ")),
+                        Some(quote! { #[serde(default = #fn_name)] }),
+                        default_fn,
                     )
                 }
                 // Optional fields without defaults: doc comments only.
@@ -1459,6 +1538,7 @@ impl<'c> CodeGenerator<'c> {
         &self,
         nsid: &str,
         type_base: &str,
+        subprotocol: Option<&str>,
         has_params: bool,
         params_has_lifetime: bool,
         has_message: bool,
@@ -1501,6 +1581,14 @@ impl<'c> CodeGenerator<'c> {
             quote! { jacquard_common::xrpc::MessageEncoding::Json }
         };
 
+        let subprotocol_const = match subprotocol {
+            Some(proto) => {
+                let proto_lit = proc_macro2::Literal::string(proto);
+                quote! { const SUBPROTOCOL: Option<&'static str> = Some(#proto_lit); }
+            }
+            None => quote! {},
+        };
+
         // Generate SubscriptionResp impl
         // For DAG-CBOR subscriptions, override decode_message to use framed decoding
         let decode_message_override = if is_dag_cbor && has_message {
@@ -1531,6 +1619,7 @@ impl<'c> CodeGenerator<'c> {
             impl jacquard_common::xrpc::SubscriptionResp for #stream_ident {
                 const NSID: &'static str = #nsid;
                 const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
+                #subprotocol_const
 
                 type Message<S: #bosstr_path> = #message_type;
                 type Error = #error_type;
@@ -1562,6 +1651,7 @@ impl<'c> CodeGenerator<'c> {
                 impl jacquard_common::xrpc::XrpcSubscription for #marker {
                     const NSID: &'static str = #nsid;
                     const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
+                    #subprotocol_const
 
                     type Stream = #stream_ident;
                 }
@@ -1606,6 +1696,7 @@ impl<'c> CodeGenerator<'c> {
             impl #impl_generics jacquard_common::xrpc::XrpcSubscription for #impl_target {
                 const NSID: &'static str = #nsid;
                 const ENCODING: jacquard_common::xrpc::MessageEncoding = #encoding;
+                #subprotocol_const
 
                 type Stream = #stream_ident;
             }

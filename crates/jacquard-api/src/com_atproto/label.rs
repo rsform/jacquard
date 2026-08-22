@@ -178,8 +178,9 @@ pub struct LabelValueDefinition<S: BosStr = DefaultStr> {
     pub adult_only: Option<bool>,
     ///What should this label hide in the UI, if applied? 'content' hides all of the target; 'media' hides the images/video/audio; 'none' hides nothing.
     pub blurs: LabelValueDefinitionBlurs<S>,
-    ///The default setting for this label.
+    ///The default setting for this label.  Defaults to `"warn"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_label_value_definition_default_setting")]
     pub default_setting: Option<LabelValueDefinitionDefaultSetting<S>>,
     ///The value of the label being defined. Must only include lowercase ascii and the '-' character ([a-z-]+).
     pub identifier: S,
@@ -1350,6 +1351,12 @@ where
         BTreeMap<SmolStr, Data<S>>,
     > as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn _default_label_value_definition_default_setting<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    LabelValueDefinitionDefaultSetting<S>,
+> {
+    Some(<LabelValueDefinitionDefaultSetting<S>>::from_value(S::from_static("warn")))
 }
 
 pub mod label_value_definition_state {

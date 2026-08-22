@@ -35,12 +35,107 @@ pub struct ListScheduledActions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub starts_after: Option<Datetime>,
     ///Filter actions by status
-    pub statuses: Vec<S>,
+    pub statuses: Vec<ListScheduledActionsStatuses<S>>,
     ///Filter actions for specific DID subjects
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subjects: Option<Vec<Did<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListScheduledActionsStatuses<S: BosStr = DefaultStr> {
+    Pending,
+    Executed,
+    Cancelled,
+    Failed,
+    Other(S),
+}
+
+impl<S: BosStr> ListScheduledActionsStatuses<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "pending",
+            Self::Executed => "executed",
+            Self::Cancelled => "cancelled",
+            Self::Failed => "failed",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "pending" => Self::Pending,
+            "executed" => Self::Executed,
+            "cancelled" => Self::Cancelled,
+            "failed" => Self::Failed,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListScheduledActionsStatuses<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListScheduledActionsStatuses<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListScheduledActionsStatuses<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ListScheduledActionsStatuses<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListScheduledActionsStatuses<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListScheduledActionsStatuses<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListScheduledActionsStatuses<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListScheduledActionsStatuses::Pending => {
+                ListScheduledActionsStatuses::Pending
+            }
+            ListScheduledActionsStatuses::Executed => {
+                ListScheduledActionsStatuses::Executed
+            }
+            ListScheduledActionsStatuses::Cancelled => {
+                ListScheduledActionsStatuses::Cancelled
+            }
+            ListScheduledActionsStatuses::Failed => ListScheduledActionsStatuses::Failed,
+            ListScheduledActionsStatuses::Other(v) => {
+                ListScheduledActionsStatuses::Other(v.into_static())
+            }
+        }
+    }
 }
 
 
@@ -134,7 +229,7 @@ pub struct ListScheduledActionsBuilder<
         Option<Datetime>,
         Option<i64>,
         Option<Datetime>,
-        Option<Vec<S>>,
+        Option<Vec<ListScheduledActionsStatuses<S>>>,
         Option<Vec<Did<S>>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -254,7 +349,7 @@ where
     /// Set the `statuses` field (required)
     pub fn statuses(
         mut self,
-        value: impl Into<Vec<S>>,
+        value: impl Into<Vec<ListScheduledActionsStatuses<S>>>,
     ) -> ListScheduledActionsBuilder<list_scheduled_actions_state::SetStatuses<St>, S> {
         self._fields.4 = Option::Some(value.into());
         ListScheduledActionsBuilder {

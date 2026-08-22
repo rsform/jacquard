@@ -17,12 +17,95 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_ocho::plugin::Manifest;
+/// The platform for which to retrieve the plugin manifest
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetManifestPlatform<S: BosStr = DefaultStr> {
+    Ios,
+    Android,
+    Web,
+    Other(S),
+}
+
+impl<S: BosStr> GetManifestPlatform<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ios => "ios",
+            Self::Android => "android",
+            Self::Web => "web",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "ios" => Self::Ios,
+            "android" => Self::Android,
+            "web" => Self::Web,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetManifestPlatform<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetManifestPlatform<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetManifestPlatform<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetManifestPlatform<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetManifestPlatform<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetManifestPlatform<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetManifestPlatform<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetManifestPlatform::Ios => GetManifestPlatform::Ios,
+            GetManifestPlatform::Android => GetManifestPlatform::Android,
+            GetManifestPlatform::Web => GetManifestPlatform::Web,
+            GetManifestPlatform::Other(v) => GetManifestPlatform::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetManifest<S: BosStr = DefaultStr> {
     pub did: Did<S>,
-    pub platform: S,
+    pub platform: GetManifestPlatform<S>,
 }
 
 
@@ -110,7 +193,7 @@ pub mod get_manifest_state {
 /// Builder for constructing an instance of this type.
 pub struct GetManifestBuilder<St: get_manifest_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<S>),
+    _fields: (Option<Did<S>>, Option<GetManifestPlatform<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -177,7 +260,7 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<GetManifestPlatform<S>>,
     ) -> GetManifestBuilder<get_manifest_state::SetPlatform<St>, S> {
         self._fields.1 = Option::Some(value.into());
         GetManifestBuilder {

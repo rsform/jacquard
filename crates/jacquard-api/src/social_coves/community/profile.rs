@@ -44,7 +44,7 @@ pub struct Profile<S: BosStr = DefaultStr> {
     pub banner: Option<BlobRef<S>>,
     ///Required content warnings for this community
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub content_warnings: Option<Vec<S>>,
+    pub content_warnings: Option<Vec<ProfileContentWarnings<S>>>,
     pub created_at: Datetime,
     ///DID of the user who created this community
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,13 +61,15 @@ pub struct Profile<S: BosStr = DefaultStr> {
     ///DID of the instance hosting this community
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hosted_by: Option<Did<S>>,
-    ///Type of moderation system (moderator=traditional moderator team, sortition=community tribunal)
+    ///Type of moderation system (moderator=traditional moderator team, sortition=community tribunal)  Defaults to `"moderator"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_profile_moderation_type")]
     pub moderation_type: Option<ProfileModerationType<S>>,
     ///Short community name (local part of handle). Must be a valid DNS label: ASCII letters, digits, and hyphens only.
     pub name: S,
-    ///Community visibility level
+    ///Community visibility level  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_profile_visibility")]
     pub visibility: Option<ProfileVisibility<S>>,
     #[serde(
         flatten,
@@ -76,6 +78,90 @@ pub struct Profile<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProfileContentWarnings<S: BosStr = DefaultStr> {
+    Nsfw,
+    Violence,
+    Spoilers,
+    Other(S),
+}
+
+impl<S: BosStr> ProfileContentWarnings<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Nsfw => "nsfw",
+            Self::Violence => "violence",
+            Self::Spoilers => "spoilers",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "nsfw" => Self::Nsfw,
+            "violence" => Self::Violence,
+            "spoilers" => Self::Spoilers,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ProfileContentWarnings<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ProfileContentWarnings<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ProfileContentWarnings<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProfileContentWarnings<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ProfileContentWarnings<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ProfileContentWarnings<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ProfileContentWarnings<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProfileContentWarnings::Nsfw => ProfileContentWarnings::Nsfw,
+            ProfileContentWarnings::Violence => ProfileContentWarnings::Violence,
+            ProfileContentWarnings::Spoilers => ProfileContentWarnings::Spoilers,
+            ProfileContentWarnings::Other(v) => {
+                ProfileContentWarnings::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Type of moderation system (moderator=traditional moderator team, sortition=community tribunal)
@@ -489,6 +575,18 @@ where
     Ok(data)
 }
 
+fn _default_profile_moderation_type<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ProfileModerationType<S>,
+> {
+    Some(<ProfileModerationType<S>>::from_value(S::from_static("moderator")))
+}
+
+fn _default_profile_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ProfileVisibility<S>,
+> {
+    Some(<ProfileVisibility<S>>::from_value(S::from_static("public")))
+}
+
 pub mod profile_state {
 
     pub use crate::builder_types::{Set, Unset, IsSet, IsUnset};
@@ -539,7 +637,7 @@ pub struct ProfileBuilder<St: profile_state::State, S: BosStr = DefaultStr> {
     _fields: (
         Option<BlobRef<S>>,
         Option<BlobRef<S>>,
-        Option<Vec<S>>,
+        Option<Vec<ProfileContentWarnings<S>>>,
         Option<Datetime>,
         Option<Did<S>>,
         Option<S>,
@@ -643,12 +741,18 @@ impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
 
 impl<St: profile_state::State, S: BosStr> ProfileBuilder<St, S> {
     /// Set the `contentWarnings` field (optional)
-    pub fn content_warnings(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn content_warnings(
+        mut self,
+        value: impl Into<Option<Vec<ProfileContentWarnings<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `contentWarnings` field to an Option value (optional)
-    pub fn maybe_content_warnings(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_content_warnings(
+        mut self,
+        value: Option<Vec<ProfileContentWarnings<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }

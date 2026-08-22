@@ -86,7 +86,7 @@ impl core::fmt::Display for Language {
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ContentWarnings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub warnings: Option<Vec<S>>,
+    pub warnings: Option<Vec<ContentWarningsWarnings<S>>>,
     #[serde(
         flatten,
         default,
@@ -94,6 +94,130 @@ pub struct ContentWarnings<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ContentWarningsWarnings<S: BosStr = DefaultStr> {
+    Death,
+    DrugUse,
+    FantasyViolence,
+    FlashingLights,
+    Language,
+    Nudity,
+    Pii,
+    Sexuality,
+    Suffering,
+    Violence,
+    Other(S),
+}
+
+impl<S: BosStr> ContentWarningsWarnings<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Death => "place.stream.metadata.contentWarnings#death",
+            Self::DrugUse => "place.stream.metadata.contentWarnings#drugUse",
+            Self::FantasyViolence => {
+                "place.stream.metadata.contentWarnings#fantasyViolence"
+            }
+            Self::FlashingLights => {
+                "place.stream.metadata.contentWarnings#flashingLights"
+            }
+            Self::Language => "place.stream.metadata.contentWarnings#language",
+            Self::Nudity => "place.stream.metadata.contentWarnings#nudity",
+            Self::Pii => "place.stream.metadata.contentWarnings#PII",
+            Self::Sexuality => "place.stream.metadata.contentWarnings#sexuality",
+            Self::Suffering => "place.stream.metadata.contentWarnings#suffering",
+            Self::Violence => "place.stream.metadata.contentWarnings#violence",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "place.stream.metadata.contentWarnings#death" => Self::Death,
+            "place.stream.metadata.contentWarnings#drugUse" => Self::DrugUse,
+            "place.stream.metadata.contentWarnings#fantasyViolence" => {
+                Self::FantasyViolence
+            }
+            "place.stream.metadata.contentWarnings#flashingLights" => {
+                Self::FlashingLights
+            }
+            "place.stream.metadata.contentWarnings#language" => Self::Language,
+            "place.stream.metadata.contentWarnings#nudity" => Self::Nudity,
+            "place.stream.metadata.contentWarnings#PII" => Self::Pii,
+            "place.stream.metadata.contentWarnings#sexuality" => Self::Sexuality,
+            "place.stream.metadata.contentWarnings#suffering" => Self::Suffering,
+            "place.stream.metadata.contentWarnings#violence" => Self::Violence,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ContentWarningsWarnings<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ContentWarningsWarnings<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ContentWarningsWarnings<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContentWarningsWarnings<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ContentWarningsWarnings<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ContentWarningsWarnings<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ContentWarningsWarnings<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ContentWarningsWarnings::Death => ContentWarningsWarnings::Death,
+            ContentWarningsWarnings::DrugUse => ContentWarningsWarnings::DrugUse,
+            ContentWarningsWarnings::FantasyViolence => {
+                ContentWarningsWarnings::FantasyViolence
+            }
+            ContentWarningsWarnings::FlashingLights => {
+                ContentWarningsWarnings::FlashingLights
+            }
+            ContentWarningsWarnings::Language => ContentWarningsWarnings::Language,
+            ContentWarningsWarnings::Nudity => ContentWarningsWarnings::Nudity,
+            ContentWarningsWarnings::Pii => ContentWarningsWarnings::Pii,
+            ContentWarningsWarnings::Sexuality => ContentWarningsWarnings::Sexuality,
+            ContentWarningsWarnings::Suffering => ContentWarningsWarnings::Suffering,
+            ContentWarningsWarnings::Violence => ContentWarningsWarnings::Violence,
+            ContentWarningsWarnings::Other(v) => {
+                ContentWarningsWarnings::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// The content could be perceived as offensive due to nudity.

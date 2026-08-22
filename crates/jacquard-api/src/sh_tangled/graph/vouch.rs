@@ -42,7 +42,7 @@ pub struct Vouch<S: BosStr = DefaultStr> {
     pub evidences: Option<Vec<AtUri<S>>>,
     ///Whether this user is being vouched for or denounced  Defaults to `"vouch"`.
     #[serde(default = "_default_vouch_kind")]
-    pub kind: S,
+    pub kind: VouchKind<S>,
     ///The reason for this vouch/denouncement
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<S>,
@@ -53,6 +53,85 @@ pub struct Vouch<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Whether this user is being vouched for or denounced
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VouchKind<S: BosStr = DefaultStr> {
+    Vouch,
+    Denounce,
+    Other(S),
+}
+
+impl<S: BosStr> VouchKind<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Vouch => "vouch",
+            Self::Denounce => "denounce",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "vouch" => Self::Vouch,
+            "denounce" => Self::Denounce,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for VouchKind<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for VouchKind<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for VouchKind<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VouchKind<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for VouchKind<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for VouchKind<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VouchKind<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VouchKind::Vouch => VouchKind::Vouch,
+            VouchKind::Denounce => VouchKind::Denounce,
+            VouchKind::Other(v) => VouchKind::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -165,8 +244,8 @@ where
     Ok(data)
 }
 
-fn _default_vouch_kind<S: FromStaticStr>() -> S {
-    S::from_static("vouch")
+fn _default_vouch_kind<S: FromStaticStr + BosStr>() -> VouchKind<S> {
+    <VouchKind<S>>::from_value(S::from_static("vouch"))
 }
 
 pub mod vouch_state {
@@ -216,7 +295,7 @@ pub mod vouch_state {
 /// Builder for constructing an instance of this type.
 pub struct VouchBuilder<St: vouch_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<Vec<AtUri<S>>>, Option<S>, Option<S>),
+    _fields: (Option<Datetime>, Option<Vec<AtUri<S>>>, Option<VouchKind<S>>, Option<S>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -296,7 +375,7 @@ where
     /// Set the `kind` field (required)
     pub fn kind(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<VouchKind<S>>,
     ) -> VouchBuilder<vouch_state::SetKind<St>, S> {
         self._fields.2 = Option::Some(value.into());
         VouchBuilder {

@@ -165,7 +165,7 @@ fn generate_field_declarations(
                 }
                 BuilderSchema::Parameters(params) => {
                     let field_type = &params.properties[field_name_str];
-                    get_params_rust_type(codegen, field_type, &resolved)
+                    get_params_rust_type(codegen, type_name, field_name_str, field_type, &resolved)
                 }
             };
 
@@ -188,26 +188,44 @@ fn generate_field_declarations(
     }
 }
 
-/// Get Rust type for XRPC parameter property
+/// Get Rust type for XRPC parameter property. Enum-constrained strings
+/// (scalar or array items) use the parameter enum generated alongside the
+/// params struct, named `{TypeName}{FieldPascal}`.
 pub(super) fn get_params_rust_type(
     codegen: &crate::codegen::CodeGenerator,
+    type_name: &str,
+    field_name: &str,
     field_type: &crate::lexicon::LexXrpcParametersProperty<'static>,
     resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     use crate::codegen::prettify::CommonType;
     use crate::lexicon::LexXrpcParametersProperty;
+    use heck::ToPascalCase;
+
+    let enum_type = |s: &crate::lexicon::LexString| -> Option<TokenStream> {
+        if s.r#enum.is_none() && s.known_values.is_none() {
+            return None;
+        }
+        let enum_ident = syn::Ident::new(
+            &format!("{}{}", type_name, field_name.to_pascal_case()),
+            proc_macro2::Span::call_site(),
+        );
+        Some(quote! { #enum_ident<S> })
+    };
 
     match field_type {
         LexXrpcParametersProperty::Boolean(_) => quote! { bool },
         LexXrpcParametersProperty::Integer(_) => quote! { i64 },
-        LexXrpcParametersProperty::String(s) => codegen.string_to_rust_type(s, resolved),
+        LexXrpcParametersProperty::String(s) => {
+            enum_type(s).unwrap_or_else(|| codegen.string_to_rust_type(s, resolved))
+        }
         LexXrpcParametersProperty::Unknown(_) => resolved.type_tokens(&CommonType::Data),
         LexXrpcParametersProperty::Array(arr) => {
             let item_type = match &arr.items {
                 crate::lexicon::LexPrimitiveArrayItem::Boolean(_) => quote! { bool },
                 crate::lexicon::LexPrimitiveArrayItem::Integer(_) => quote! { i64 },
                 crate::lexicon::LexPrimitiveArrayItem::String(s) => {
-                    codegen.string_to_rust_type(s, resolved)
+                    enum_type(s).unwrap_or_else(|| codegen.string_to_rust_type(s, resolved))
                 }
                 crate::lexicon::LexPrimitiveArrayItem::Unknown(_) => {
                     resolved.type_tokens(&CommonType::Data)

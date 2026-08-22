@@ -39,7 +39,7 @@ When fetching a private record from the hidden repository, the server will check
 
 Of course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.
 */
-    pub name: S,
+    pub name: StrategyName<S>,
     #[serde(
         flatten,
         default,
@@ -47,6 +47,121 @@ Of course, many of these strategies depend on the specifics of `app.bsky.graph.f
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The name that identifies the strategy. The following strategies are supported:
+/// 1. `nobody` - Only the author
+/// 2. `author-follows` - Accounts the author follows
+/// 3. `following-author` - Accounts following the author
+/// 4. `mutuals` - Accounts that both the author follows and are following the author
+/// 5. `mentioned` - The author, along with any accounts "mentioned", including in-text or via reply/embed/etc. links
+/// 6. `threadgate` - Uses the public post's existing `app.bsky.feed.threadgate` record to determine visibility
+/// 7. `circle` - Implementation-defined, generally a configurable per-author list of accounts
+/// 8. `inherit` - Implementation-defined, generally used for replies, allows the set of accounts that the parent record allows, plus the author of the reply record
+///
+/// When fetching a private record from the hidden repository, the server will check the record's strategy, and if the requesting account is not allowed, the server will act as if the record does not exist.
+///
+/// Of course, many of these strategies depend on the specifics of `app.bsky.graph.follow` / `app.bsky.feed.post` or similar implementation-defined records. You might need to write some code to get support for non-bsky apps.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StrategyName<S: BosStr = DefaultStr> {
+    Nobody,
+    AuthorFollows,
+    FollowingAuthor,
+    Mutuals,
+    Threadgate,
+    Mentioned,
+    Circle,
+    Inherit,
+    Other(S),
+}
+
+impl<S: BosStr> StrategyName<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Nobody => "nobody",
+            Self::AuthorFollows => "author-follows",
+            Self::FollowingAuthor => "following-author",
+            Self::Mutuals => "mutuals",
+            Self::Threadgate => "threadgate",
+            Self::Mentioned => "mentioned",
+            Self::Circle => "circle",
+            Self::Inherit => "inherit",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "nobody" => Self::Nobody,
+            "author-follows" => Self::AuthorFollows,
+            "following-author" => Self::FollowingAuthor,
+            "mutuals" => Self::Mutuals,
+            "threadgate" => Self::Threadgate,
+            "mentioned" => Self::Mentioned,
+            "circle" => Self::Circle,
+            "inherit" => Self::Inherit,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for StrategyName<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for StrategyName<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for StrategyName<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for StrategyName<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for StrategyName<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for StrategyName<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = StrategyName<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StrategyName::Nobody => StrategyName::Nobody,
+            StrategyName::AuthorFollows => StrategyName::AuthorFollows,
+            StrategyName::FollowingAuthor => StrategyName::FollowingAuthor,
+            StrategyName::Mutuals => StrategyName::Mutuals,
+            StrategyName::Threadgate => StrategyName::Threadgate,
+            StrategyName::Mentioned => StrategyName::Mentioned,
+            StrategyName::Circle => StrategyName::Circle,
+            StrategyName::Inherit => StrategyName::Inherit,
+            StrategyName::Other(v) => StrategyName::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for Strategy<S> {

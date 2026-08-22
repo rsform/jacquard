@@ -1,0 +1,35 @@
+{
+  "lexicon": 1,
+  "id": "test.sub.protocol",
+  "defs": {
+    "main": {
+      "type": "subscription",
+      "description": "Subscribe with a WebSocket subprotocol",
+      "subprotocol": "xrpc.v1.json",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "integer",
+            "description": "Resume position"
+          }
+        }
+      },
+      "message": {
+        "schema": {
+          "type": "union",
+          "refs": ["#commit"]
+        }
+      }
+    },
+    "commit": {
+      "type": "object",
+      "required": ["seq"],
+      "properties": {
+        "seq": {
+          "type": "integer"
+        }
+      }
+    }
+  }
+}

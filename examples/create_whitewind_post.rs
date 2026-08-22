@@ -1,5 +1,5 @@
 use clap::Parser;
-use jacquard::api::com_whtwnd::blog::entry::Entry;
+use jacquard::api::com_whtwnd::blog::entry::{Entry, EntryVisibility};
 use jacquard::client::{Agent, AgentSessionExt, FileAuthStore};
 use jacquard::common::session::SessionHint;
 use jacquard::oauth::client::OAuthClient;
@@ -64,7 +64,7 @@ async fn main() -> miette::Result<()> {
         subtitle: args.subtitle,
         content: args.content,
         created_at: Some(Datetime::now()),
-        visibility: Some(String::from("url")), // "url" = public with link, "author" = public on profile
+        visibility: Some(EntryVisibility::Url), // public with link ("author" = public on profile)
         theme: None,
         ogp: None,
         blobs: None,

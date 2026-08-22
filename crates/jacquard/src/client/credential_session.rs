@@ -22,7 +22,7 @@ use jacquard_common::xrpc::XrpcSubscription;
 #[cfg(feature = "websocket")]
 use jacquard_common::{
     CowStr,
-    websocket::{WebSocketClient, WebSocketConnection},
+    websocket::{WebSocketClient, WebSocketConnectOptions, WebSocketConnection},
 };
 use jacquard_identity::resolver::{
     DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
@@ -1040,12 +1040,12 @@ where
         self.ws_client.connect(uri).await
     }
 
-    async fn connect_with_headers(
+    async fn connect_with_options(
         &self,
         uri: Uri<&str>,
-        headers: Vec<(CowStr<'_>, CowStr<'_>)>,
+        options: WebSocketConnectOptions<'_>,
     ) -> Result<WebSocketConnection, Self::Error> {
-        self.ws_client.connect_with_headers(uri, headers).await
+        self.ws_client.connect_with_options(uri, options).await
     }
 }
 

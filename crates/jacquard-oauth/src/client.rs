@@ -41,7 +41,7 @@ use jacquard_identity::lexicon_resolver::LexiconSchemaResolver;
 use jacquard_common::deps::fluent_uri::pct_enc::{EStr, encoder::Query};
 
 #[cfg(feature = "websocket")]
-use jacquard_common::websocket::{WebSocketClient, WebSocketConnection};
+use jacquard_common::websocket::{WebSocketClient, WebSocketConnectOptions, WebSocketConnection};
 #[cfg(feature = "websocket")]
 use jacquard_common::xrpc::XrpcSubscription;
 use jacquard_identity::{
@@ -1632,12 +1632,12 @@ where
         self.ws_client.connect(uri).await
     }
 
-    async fn connect_with_headers(
+    async fn connect_with_options(
         &self,
         uri: Uri<&str>,
-        headers: Vec<(CowStr<'_>, CowStr<'_>)>,
+        options: WebSocketConnectOptions<'_>,
     ) -> std::result::Result<WebSocketConnection, Self::Error> {
-        self.ws_client.connect_with_headers(uri, headers).await
+        self.ws_client.connect_with_options(uri, options).await
     }
 }
 

@@ -18,6 +18,88 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::ci::pipeline::Pipeline;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryPipelinesKinds<S: BosStr = DefaultStr> {
+    Push,
+    PullRequest,
+    Manual,
+    Other(S),
+}
+
+impl<S: BosStr> QueryPipelinesKinds<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Push => "push",
+            Self::PullRequest => "pull_request",
+            Self::Manual => "manual",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "push" => Self::Push,
+            "pull_request" => Self::PullRequest,
+            "manual" => Self::Manual,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryPipelinesKinds<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryPipelinesKinds<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryPipelinesKinds<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryPipelinesKinds<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryPipelinesKinds<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryPipelinesKinds<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryPipelinesKinds<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryPipelinesKinds::Push => QueryPipelinesKinds::Push,
+            QueryPipelinesKinds::PullRequest => QueryPipelinesKinds::PullRequest,
+            QueryPipelinesKinds::Manual => QueryPipelinesKinds::Manual,
+            QueryPipelinesKinds::Other(v) => QueryPipelinesKinds::Other(v.into_static()),
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryPipelines<S: BosStr = DefaultStr> {
@@ -26,7 +108,7 @@ pub struct QueryPipelines<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub kinds: Option<Vec<S>>,
+    pub kinds: Option<Vec<QueryPipelinesKinds<S>>>,
     /// Defaults to `50`. Min: 1. Max: 250.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -160,7 +242,13 @@ pub struct QueryPipelinesBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<S>>, Option<S>, Option<Vec<S>>, Option<i64>, Option<Did<S>>),
+    _fields: (
+        Option<Vec<S>>,
+        Option<S>,
+        Option<Vec<QueryPipelinesKinds<S>>>,
+        Option<i64>,
+        Option<Did<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -228,12 +316,15 @@ impl<St: query_pipelines_state::State, S: BosStr> QueryPipelinesBuilder<St, S> {
 
 impl<St: query_pipelines_state::State, S: BosStr> QueryPipelinesBuilder<St, S> {
     /// Set the `kinds` field (optional)
-    pub fn kinds(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn kinds(
+        mut self,
+        value: impl Into<Option<Vec<QueryPipelinesKinds<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `kinds` field to an Option value (optional)
-    pub fn maybe_kinds(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_kinds(mut self, value: Option<Vec<QueryPipelinesKinds<S>>>) -> Self {
         self._fields.2 = value;
         self
     }

@@ -24,7 +24,7 @@ pub struct SubscribeSegments<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubscribeSegmentsMessage<S: BosStr = DefaultStr> {
-    #[serde(rename = "#segment")]
+    #[serde(rename = "place.stream.live.subscribeSegments#segment")]
     Segment(Box<subscribe_segments::Segment>),
 }
 

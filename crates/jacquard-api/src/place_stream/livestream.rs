@@ -220,7 +220,7 @@ pub struct TeleportArrival<S: BosStr = DefaultStr> {
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct TeleportCanceled<S: BosStr = DefaultStr> {
     ///Why this teleport was canceled
-    pub reason: S,
+    pub reason: TeleportCanceledReason<S>,
     ///The URI of the teleport record that was canceled
     pub teleport_uri: AtUri<S>,
     #[serde(
@@ -230,6 +230,91 @@ pub struct TeleportCanceled<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Why this teleport was canceled
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TeleportCanceledReason<S: BosStr = DefaultStr> {
+    Deleted,
+    Denied,
+    Expired,
+    Other(S),
+}
+
+impl<S: BosStr> TeleportCanceledReason<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Deleted => "deleted",
+            Self::Denied => "denied",
+            Self::Expired => "expired",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "deleted" => Self::Deleted,
+            "denied" => Self::Denied,
+            "expired" => Self::Expired,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for TeleportCanceledReason<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for TeleportCanceledReason<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for TeleportCanceledReason<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for TeleportCanceledReason<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for TeleportCanceledReason<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for TeleportCanceledReason<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = TeleportCanceledReason<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TeleportCanceledReason::Deleted => TeleportCanceledReason::Deleted,
+            TeleportCanceledReason::Denied => TeleportCanceledReason::Denied,
+            TeleportCanceledReason::Expired => TeleportCanceledReason::Expired,
+            TeleportCanceledReason::Other(v) => {
+                TeleportCanceledReason::Other(v.into_static())
+            }
+        }
+    }
 }
 
 
@@ -2060,7 +2145,7 @@ pub struct TeleportCanceledBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<AtUri<S>>),
+    _fields: (Option<TeleportCanceledReason<S>>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -2108,7 +2193,7 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<TeleportCanceledReason<S>>,
     ) -> TeleportCanceledBuilder<teleport_canceled_state::SetReason<St>, S> {
         self._fields.0 = Option::Some(value.into());
         TeleportCanceledBuilder {

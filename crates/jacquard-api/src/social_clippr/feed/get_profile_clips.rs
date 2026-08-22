@@ -17,6 +17,91 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::social_clippr::feed::ClipView;
+/// What types to include in response
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetProfileClipsFilter<S: BosStr = DefaultStr> {
+    AllClips,
+    TaggedClips,
+    UntaggedClips,
+    Other(S),
+}
+
+impl<S: BosStr> GetProfileClipsFilter<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AllClips => "all_clips",
+            Self::TaggedClips => "tagged_clips",
+            Self::UntaggedClips => "untagged_clips",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "all_clips" => Self::AllClips,
+            "tagged_clips" => Self::TaggedClips,
+            "untagged_clips" => Self::UntaggedClips,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetProfileClipsFilter<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetProfileClipsFilter<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetProfileClipsFilter<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetProfileClipsFilter<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetProfileClipsFilter<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetProfileClipsFilter<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetProfileClipsFilter<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetProfileClipsFilter::AllClips => GetProfileClipsFilter::AllClips,
+            GetProfileClipsFilter::TaggedClips => GetProfileClipsFilter::TaggedClips,
+            GetProfileClipsFilter::UntaggedClips => GetProfileClipsFilter::UntaggedClips,
+            GetProfileClipsFilter::Other(v) => {
+                GetProfileClipsFilter::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -27,7 +112,7 @@ pub struct GetProfileClips<S: BosStr = DefaultStr> {
     /// Defaults to `"all_clips"`.
     #[serde(default = "_default_filter")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub filter: Option<S>,
+    pub filter: Option<GetProfileClipsFilter<S>>,
     /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -73,8 +158,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetProfileClipsRequest {
     type Response = GetProfileClipsResponse;
 }
 
-fn _default_filter<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("all_clips"))
+fn _default_filter<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetProfileClipsFilter<S>,
+> {
+    Some(<GetProfileClipsFilter<S>>::from_value(S::from_static("all_clips")))
 }
 
 fn _default_limit() -> Option<i64> {
@@ -119,7 +206,12 @@ pub struct GetProfileClipsBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<S>, Option<i64>),
+    _fields: (
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<GetProfileClipsFilter<S>>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -193,12 +285,12 @@ impl<St: get_profile_clips_state::State, S: BosStr> GetProfileClipsBuilder<St, S
 
 impl<St: get_profile_clips_state::State, S: BosStr> GetProfileClipsBuilder<St, S> {
     /// Set the `filter` field (optional)
-    pub fn filter(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn filter(mut self, value: impl Into<Option<GetProfileClipsFilter<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `filter` field to an Option value (optional)
-    pub fn maybe_filter(mut self, value: Option<S>) -> Self {
+    pub fn maybe_filter(mut self, value: Option<GetProfileClipsFilter<S>>) -> Self {
         self._fields.2 = value;
         self
     }

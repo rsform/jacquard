@@ -58,6 +58,8 @@ impl core::fmt::Display for Interested {
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Rsvp<S: BosStr = DefaultStr> {
+    /// Defaults to `"community.lexicon.calendar.rsvp#going"`.
+    #[serde(default = "_default_rsvp_status")]
     pub status: RsvpStatus<S>,
     pub subject: StrongRef<S>,
     #[serde(
@@ -237,6 +239,10 @@ where
         }
     }
     Ok(data)
+}
+
+fn _default_rsvp_status<S: FromStaticStr + BosStr>() -> RsvpStatus<S> {
+    <RsvpStatus<S>>::from_value(S::from_static("community.lexicon.calendar.rsvp#going"))
 }
 
 pub mod rsvp_state {

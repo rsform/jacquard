@@ -388,7 +388,7 @@ mod tests {
             .expect("failed to load lexicons");
 
         assert!(!corpus.is_empty());
-        assert_eq!(corpus.len(), 17); // 10 original + 7 new edge case fixtures
+        assert_eq!(corpus.len(), 18); // 10 original + 7 edge case fixtures + subprotocol fixture
 
         // Check that we loaded the expected lexicons
         assert!(corpus.get("app.bsky.feed.post").is_some());

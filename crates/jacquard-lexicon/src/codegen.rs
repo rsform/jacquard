@@ -394,6 +394,26 @@ mod tests {
     use super::*;
 
     #[test]
+    fn probe_get_author_feed_parses() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+        let doc = match corpus.get("app.bsky.feed.getAuthorFeed") {
+            Some(d) => d,
+            None => return, // fixture corpus lacks it; full runs cover it
+        };
+        let def = doc.defs.get("main").expect("main def");
+        let resolved = codegen.default_resolved_imports();
+        let generated = codegen
+            .generate_def("app.bsky.feed.getAuthorFeed", "main", def, &resolved)
+            .expect("generate");
+        let tokens = generated.into_tokens();
+        if let Err(e) = syn::parse2::<syn::File>(tokens.clone()) {
+            panic!("parse failed: {e}");
+        }
+    }
+
+    #[test]
     fn test_generate_record() {
         let corpus =
             LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
@@ -659,6 +679,55 @@ mod tests {
         assert!(formatted.contains("Commit"));
         assert!(formatted.contains("Identity"));
         assert!(formatted.contains("Account"));
+        assert!(
+            formatted.contains(r##"#[serde(rename = "com.atproto.sync.subscribeRepos#commit")]"##)
+        );
+        assert!(formatted.contains(r##""#commit" =>"##));
+        // No subprotocol declared: the const must not appear at all
+        assert!(!formatted.contains("SUBPROTOCOL"));
+    }
+
+    #[test]
+    fn lexicon_parse_subscription_with_subprotocol() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let doc = corpus.get("test.sub.protocol").expect("get sub.protocol");
+        let def = doc.defs.get("main").expect("get main def");
+
+        let LexUserType::XrpcSubscription(sub) = def else {
+            panic!("expected subscription def");
+        };
+        assert_eq!(
+            sub.subprotocol.as_deref(),
+            Some("xrpc.v1.json"),
+            "subprotocol field must round-trip through lexicon parsing"
+        );
+    }
+
+    #[test]
+    fn codegen_emits_subprotocol_const() {
+        let corpus =
+            LexiconCorpus::load_from_dir("tests/fixtures/test_lexicons").expect("load corpus");
+        let codegen = CodeGenerator::new(&corpus, "jacquard_api");
+
+        let doc = corpus.get("test.sub.protocol").expect("get sub.protocol");
+        let def = doc.defs.get("main").expect("get main def");
+        let resolved = codegen.default_resolved_imports();
+
+        let generated = codegen
+            .generate_def("test.sub.protocol", "main", def, &resolved)
+            .expect("generate");
+        let tokens = generated.into_tokens();
+
+        let file: syn::File = syn::parse2(tokens).expect("parse tokens");
+        let formatted = prettyplease::unparse(&file);
+
+        assert!(
+            formatted
+                .contains(r#"const SUBPROTOCOL: Option<&'static str> = Some("xrpc.v1.json");"#),
+            "generated code must carry the declared subprotocol, got:\n{}",
+            formatted
+        );
     }
 
     // #[test]
@@ -913,5 +982,20 @@ mod tests {
         // Optional fields should use Option<T>
         assert!(formatted.contains("optional_cid"));
         assert!(formatted.contains("Option<"));
+    }
+}
+
+#[cfg(test)]
+mod probe2 {
+    #[test]
+    fn nested_generics_parse() {
+        let rt: proc_macro2::TokenStream = quote::quote! { GetAuthorFeedFilter<S> };
+        let t: proc_macro2::TokenStream = quote::quote! {
+            pub fn filter(mut self, value: impl Into<Option<#rt>>) -> Self { self }
+        };
+        match syn::parse2::<syn::File>(t) {
+            Ok(_) => println!("OK"),
+            Err(e) => panic!("FAIL: {e}"),
+        }
     }
 }

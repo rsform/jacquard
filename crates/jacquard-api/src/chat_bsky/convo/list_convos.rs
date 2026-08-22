@@ -16,6 +16,325 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::ConvoView;
+/// Filter by conversation kind.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListConvosKind<S: BosStr = DefaultStr> {
+    Direct,
+    Group,
+    Other(S),
+}
+
+impl<S: BosStr> ListConvosKind<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Direct => "direct",
+            Self::Group => "group",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "direct" => Self::Direct,
+            "group" => Self::Group,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListConvosKind<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListConvosKind<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListConvosKind<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListConvosKind<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListConvosKind<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListConvosKind<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListConvosKind<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListConvosKind::Direct => ListConvosKind::Direct,
+            ListConvosKind::Group => ListConvosKind::Group,
+            ListConvosKind::Other(v) => ListConvosKind::Other(v.into_static()),
+        }
+    }
+}
+
+/// Filter by conversation lock status. Values follow chat.bsky.convo.defs#convoLockStatus.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListConvosLockStatus<S: BosStr = DefaultStr> {
+    Unlocked,
+    Locked,
+    LockedPermanently,
+    Other(S),
+}
+
+impl<S: BosStr> ListConvosLockStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Unlocked => "unlocked",
+            Self::Locked => "locked",
+            Self::LockedPermanently => "locked-permanently",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "unlocked" => Self::Unlocked,
+            "locked" => Self::Locked,
+            "locked-permanently" => Self::LockedPermanently,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListConvosLockStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListConvosLockStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListConvosLockStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListConvosLockStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListConvosLockStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListConvosLockStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListConvosLockStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListConvosLockStatus::Unlocked => ListConvosLockStatus::Unlocked,
+            ListConvosLockStatus::Locked => ListConvosLockStatus::Locked,
+            ListConvosLockStatus::LockedPermanently => {
+                ListConvosLockStatus::LockedPermanently
+            }
+            ListConvosLockStatus::Other(v) => {
+                ListConvosLockStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListConvosReadState<S: BosStr = DefaultStr> {
+    Unread,
+    Other(S),
+}
+
+impl<S: BosStr> ListConvosReadState<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Unread => "unread",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "unread" => Self::Unread,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListConvosReadState<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListConvosReadState<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListConvosReadState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListConvosReadState<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListConvosReadState<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListConvosReadState<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListConvosReadState<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListConvosReadState::Unread => ListConvosReadState::Unread,
+            ListConvosReadState::Other(v) => ListConvosReadState::Other(v.into_static()),
+        }
+    }
+}
+
+/// Filter convos by their status. It is discouraged to call with "request" and preferred to call chat.bsky.convo.listConvoRequests, which also includes group join requests made by the user.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListConvosStatus<S: BosStr = DefaultStr> {
+    Request,
+    Accepted,
+    Other(S),
+}
+
+impl<S: BosStr> ListConvosStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Request => "request",
+            Self::Accepted => "accepted",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "request" => Self::Request,
+            "accepted" => Self::Accepted,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListConvosStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListConvosStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListConvosStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListConvosStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListConvosStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListConvosStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListConvosStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListConvosStatus::Request => ListConvosStatus::Request,
+            ListConvosStatus::Accepted => ListConvosStatus::Accepted,
+            ListConvosStatus::Other(v) => ListConvosStatus::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -23,17 +342,17 @@ pub struct ListConvos<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub kind: Option<S>,
+    pub kind: Option<ListConvosKind<S>>,
     /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub lock_status: Option<S>,
+    pub lock_status: Option<ListConvosLockStatus<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub read_state: Option<S>,
+    pub read_state: Option<ListConvosReadState<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<ListConvosStatus<S>>,
 }
 
 
@@ -101,7 +420,14 @@ pub mod list_convos_state {
 /// Builder for constructing an instance of this type.
 pub struct ListConvosBuilder<St: list_convos_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<i64>, Option<S>, Option<S>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<ListConvosKind<S>>,
+        Option<i64>,
+        Option<ListConvosLockStatus<S>>,
+        Option<ListConvosReadState<S>>,
+        Option<ListConvosStatus<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -156,12 +482,12 @@ impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
 
 impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `kind` field (optional)
-    pub fn kind(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn kind(mut self, value: impl Into<Option<ListConvosKind<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `kind` field to an Option value (optional)
-    pub fn maybe_kind(mut self, value: Option<S>) -> Self {
+    pub fn maybe_kind(mut self, value: Option<ListConvosKind<S>>) -> Self {
         self._fields.1 = value;
         self
     }
@@ -182,12 +508,15 @@ impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
 
 impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `lockStatus` field (optional)
-    pub fn lock_status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn lock_status(
+        mut self,
+        value: impl Into<Option<ListConvosLockStatus<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `lockStatus` field to an Option value (optional)
-    pub fn maybe_lock_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_lock_status(mut self, value: Option<ListConvosLockStatus<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -195,12 +524,15 @@ impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
 
 impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `readState` field (optional)
-    pub fn read_state(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn read_state(
+        mut self,
+        value: impl Into<Option<ListConvosReadState<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `readState` field to an Option value (optional)
-    pub fn maybe_read_state(mut self, value: Option<S>) -> Self {
+    pub fn maybe_read_state(mut self, value: Option<ListConvosReadState<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -208,12 +540,12 @@ impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
 
 impl<St: list_convos_state::State, S: BosStr> ListConvosBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ListConvosStatus<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ListConvosStatus<S>>) -> Self {
         self._fields.5 = value;
         self
     }

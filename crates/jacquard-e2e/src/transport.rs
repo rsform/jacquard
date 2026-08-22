@@ -189,3 +189,132 @@ impl HttpClient for FixtureTransport {
             .map_err(|e| FixtureTransportError::InvalidRequest(e.to_string()))
     }
 }
+
+#[cfg(feature = "e2e")]
+impl jacquard_common::http_client::HttpClientExt for FixtureTransport {
+    async fn send_http_streaming(
+        &self,
+        request: HttpRequest<Vec<u8>>,
+    ) -> Result<HttpResponse<jacquard_common::stream::ByteStream>, Self::Error> {
+        use jacquard_common::stream::{ByteStream, StreamError};
+        use n0_future::TryStreamExt as _;
+        let uri = request.uri().clone();
+        self.allowlist.check(&uri)?;
+
+        let method = reqwest::Method::from_bytes(request.method().as_str().as_bytes())
+            .map_err(|e| FixtureTransportError::InvalidRequest(e.to_string()))?;
+        let url = uri
+            .to_string()
+            .parse::<reqwest::Url>()
+            .map_err(|e| FixtureTransportError::InvalidRequest(e.to_string()))?;
+
+        let (parts, body) = request.into_parts();
+        let mut headers = reqwest::header::HeaderMap::new();
+        for (name, value) in &parts.headers {
+            let Ok(name) = reqwest::header::HeaderName::from_bytes(name.as_str().as_bytes()) else {
+                continue;
+            };
+            if let Ok(value) = reqwest::header::HeaderValue::from_bytes(value.as_bytes()) {
+                headers.insert(name, value);
+            }
+        }
+
+        let response = self
+            .client
+            .request(method, url)
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        let status = response.status();
+        if status.is_redirection() {
+            let location = response
+                .headers()
+                .get(reqwest::header::LOCATION)
+                .and_then(|v| v.to_str().ok())
+                .unwrap_or_default()
+                .to_string();
+            return Err(FixtureTransportError::DisallowedRedirect { location });
+        }
+
+        let mut builder = HttpResponse::builder().status(status.as_u16());
+        for (name, value) in response.headers() {
+            builder = builder.header(name.as_str(), value.as_bytes());
+        }
+        let stream = response
+            .bytes_stream()
+            .map_err(|e| StreamError::transport(FixtureTransportError::Reqwest(e)));
+        let response = builder
+            .body(ByteStream::new(Box::pin(stream)))
+            .map_err(|e| FixtureTransportError::InvalidRequest(e.to_string()))?;
+        Ok(response)
+    }
+
+    async fn send_http_bidirectional<S>(
+        &self,
+        parts: http::request::Parts,
+        body: S,
+    ) -> Result<HttpResponse<jacquard_common::stream::ByteStream>, Self::Error>
+    where
+        S: n0_future::Stream<Item = Result<jacquard::deps::bytes::Bytes, jacquard_common::stream::StreamError>>
+            + Send
+            + 'static,
+    {
+        use jacquard_common::stream::{ByteStream, StreamError};
+        use n0_future::TryStreamExt as _;
+        let uri = parts.uri.clone();
+        self.allowlist.check(&uri)?;
+
+        let method = reqwest::Method::from_bytes(parts.method.as_str().as_bytes())
+            .map_err(|e| FixtureTransportError::InvalidRequest(e.to_string()))?;
+        let url = uri
+            .to_string()
+            .parse::<reqwest::Url>()
+            .map_err(|e| FixtureTransportError::InvalidRequest(e.to_string()))?;
+
+        let mut headers = reqwest::header::HeaderMap::new();
+        for (name, value) in &parts.headers {
+            let Ok(name) = reqwest::header::HeaderName::from_bytes(name.as_str().as_bytes()) else {
+                continue;
+            };
+            if let Ok(value) = reqwest::header::HeaderValue::from_bytes(value.as_bytes()) {
+                headers.insert(name, value);
+            }
+        }
+
+        let body = reqwest::Body::wrap_stream(
+            body.map_err(|e| FixtureTransportError::InvalidRequest(e.to_string())),
+        );
+        let response = self
+            .client
+            .request(method, url)
+            .headers(headers)
+            .body(body)
+            .send()
+            .await?;
+
+        let status = response.status();
+        if status.is_redirection() {
+            let location = response
+                .headers()
+                .get(reqwest::header::LOCATION)
+                .and_then(|v| v.to_str().ok())
+                .unwrap_or_default()
+                .to_string();
+            return Err(FixtureTransportError::DisallowedRedirect { location });
+        }
+
+        let mut builder = HttpResponse::builder().status(status.as_u16());
+        for (name, value) in response.headers() {
+            builder = builder.header(name.as_str(), value.as_bytes());
+        }
+        let stream = response
+            .bytes_stream()
+            .map_err(|e| StreamError::transport(FixtureTransportError::Reqwest(e)));
+        let response = builder
+            .body(ByteStream::new(Box::pin(stream)))
+            .map_err(|e| FixtureTransportError::InvalidRequest(e.to_string()))?;
+        Ok(response)
+    }
+}

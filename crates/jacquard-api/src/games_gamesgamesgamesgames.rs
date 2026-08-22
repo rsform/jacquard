@@ -1354,7 +1354,7 @@ pub struct MediaItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub locale: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub media_type: Option<S>,
+    pub media_type: Option<MediaItemMediaType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1366,6 +1366,184 @@ pub struct MediaItem<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MediaItemMediaType<S: BosStr = DefaultStr> {
+    AccoladesTrailer,
+    AnnouncementTrailer,
+    Artwork,
+    CinematicTrailer,
+    ConceptArt,
+    Cover,
+    CoverAlt,
+    CoverHistorical,
+    CoverSquare,
+    Cutscene,
+    DevDiary,
+    GameplayImage,
+    GameplayTrailer,
+    Icon,
+    Infographic,
+    Intro,
+    KeyArt,
+    KeyArtLogo,
+    LaunchTrailer,
+    LogoBlack,
+    LogoColor,
+    LogoWhite,
+    ReleaseDateTrailer,
+    Screenshot,
+    Teaser,
+    Trailer,
+    Other(S),
+}
+
+impl<S: BosStr> MediaItemMediaType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AccoladesTrailer => "accoladesTrailer",
+            Self::AnnouncementTrailer => "announcementTrailer",
+            Self::Artwork => "artwork",
+            Self::CinematicTrailer => "cinematicTrailer",
+            Self::ConceptArt => "conceptArt",
+            Self::Cover => "cover",
+            Self::CoverAlt => "coverAlt",
+            Self::CoverHistorical => "coverHistorical",
+            Self::CoverSquare => "coverSquare",
+            Self::Cutscene => "cutscene",
+            Self::DevDiary => "devDiary",
+            Self::GameplayImage => "gameplayImage",
+            Self::GameplayTrailer => "gameplayTrailer",
+            Self::Icon => "icon",
+            Self::Infographic => "infographic",
+            Self::Intro => "intro",
+            Self::KeyArt => "keyArt",
+            Self::KeyArtLogo => "keyArtLogo",
+            Self::LaunchTrailer => "launchTrailer",
+            Self::LogoBlack => "logoBlack",
+            Self::LogoColor => "logoColor",
+            Self::LogoWhite => "logoWhite",
+            Self::ReleaseDateTrailer => "releaseDateTrailer",
+            Self::Screenshot => "screenshot",
+            Self::Teaser => "teaser",
+            Self::Trailer => "trailer",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "accoladesTrailer" => Self::AccoladesTrailer,
+            "announcementTrailer" => Self::AnnouncementTrailer,
+            "artwork" => Self::Artwork,
+            "cinematicTrailer" => Self::CinematicTrailer,
+            "conceptArt" => Self::ConceptArt,
+            "cover" => Self::Cover,
+            "coverAlt" => Self::CoverAlt,
+            "coverHistorical" => Self::CoverHistorical,
+            "coverSquare" => Self::CoverSquare,
+            "cutscene" => Self::Cutscene,
+            "devDiary" => Self::DevDiary,
+            "gameplayImage" => Self::GameplayImage,
+            "gameplayTrailer" => Self::GameplayTrailer,
+            "icon" => Self::Icon,
+            "infographic" => Self::Infographic,
+            "intro" => Self::Intro,
+            "keyArt" => Self::KeyArt,
+            "keyArtLogo" => Self::KeyArtLogo,
+            "launchTrailer" => Self::LaunchTrailer,
+            "logoBlack" => Self::LogoBlack,
+            "logoColor" => Self::LogoColor,
+            "logoWhite" => Self::LogoWhite,
+            "releaseDateTrailer" => Self::ReleaseDateTrailer,
+            "screenshot" => Self::Screenshot,
+            "teaser" => Self::Teaser,
+            "trailer" => Self::Trailer,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for MediaItemMediaType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for MediaItemMediaType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for MediaItemMediaType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MediaItemMediaType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for MediaItemMediaType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for MediaItemMediaType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MediaItemMediaType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MediaItemMediaType::AccoladesTrailer => MediaItemMediaType::AccoladesTrailer,
+            MediaItemMediaType::AnnouncementTrailer => {
+                MediaItemMediaType::AnnouncementTrailer
+            }
+            MediaItemMediaType::Artwork => MediaItemMediaType::Artwork,
+            MediaItemMediaType::CinematicTrailer => MediaItemMediaType::CinematicTrailer,
+            MediaItemMediaType::ConceptArt => MediaItemMediaType::ConceptArt,
+            MediaItemMediaType::Cover => MediaItemMediaType::Cover,
+            MediaItemMediaType::CoverAlt => MediaItemMediaType::CoverAlt,
+            MediaItemMediaType::CoverHistorical => MediaItemMediaType::CoverHistorical,
+            MediaItemMediaType::CoverSquare => MediaItemMediaType::CoverSquare,
+            MediaItemMediaType::Cutscene => MediaItemMediaType::Cutscene,
+            MediaItemMediaType::DevDiary => MediaItemMediaType::DevDiary,
+            MediaItemMediaType::GameplayImage => MediaItemMediaType::GameplayImage,
+            MediaItemMediaType::GameplayTrailer => MediaItemMediaType::GameplayTrailer,
+            MediaItemMediaType::Icon => MediaItemMediaType::Icon,
+            MediaItemMediaType::Infographic => MediaItemMediaType::Infographic,
+            MediaItemMediaType::Intro => MediaItemMediaType::Intro,
+            MediaItemMediaType::KeyArt => MediaItemMediaType::KeyArt,
+            MediaItemMediaType::KeyArtLogo => MediaItemMediaType::KeyArtLogo,
+            MediaItemMediaType::LaunchTrailer => MediaItemMediaType::LaunchTrailer,
+            MediaItemMediaType::LogoBlack => MediaItemMediaType::LogoBlack,
+            MediaItemMediaType::LogoColor => MediaItemMediaType::LogoColor,
+            MediaItemMediaType::LogoWhite => MediaItemMediaType::LogoWhite,
+            MediaItemMediaType::ReleaseDateTrailer => {
+                MediaItemMediaType::ReleaseDateTrailer
+            }
+            MediaItemMediaType::Screenshot => MediaItemMediaType::Screenshot,
+            MediaItemMediaType::Teaser => MediaItemMediaType::Teaser,
+            MediaItemMediaType::Trailer => MediaItemMediaType::Trailer,
+            MediaItemMediaType::Other(v) => MediaItemMediaType::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -1746,7 +1924,7 @@ where
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct PlatformFeatures<S: BosStr = DefaultStr> {
-    pub features: Vec<S>,
+    pub features: Vec<PlatformFeaturesFeatures<S>>,
     pub platform: PlatformFeaturesPlatform<S>,
     #[serde(
         flatten,
@@ -1755,6 +1933,231 @@ pub struct PlatformFeatures<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PlatformFeaturesFeatures<S: BosStr = DefaultStr> {
+    Achievements,
+    CloudSaves,
+    ControllerSupport,
+    ControllerSupportFull,
+    Coop,
+    CoopLan,
+    CoopOnline,
+    CrossPlatformMultiplayer,
+    FamilySharing,
+    InAppPurchases,
+    Leaderboards,
+    LevelEditor,
+    ModdingSupport,
+    MultiPlayer,
+    MultiPlayerLan,
+    MultiPlayerOnline,
+    Pvp,
+    PvpLan,
+    PvpOnline,
+    RemotePlayPhone,
+    RemotePlayTablet,
+    RemotePlayTv,
+    RemotePlayTogether,
+    SinglePlayer,
+    SteamTradingCards,
+    SteamWorkshop,
+    TrackingAndManagement,
+    VrSupport,
+    Other(S),
+}
+
+impl<S: BosStr> PlatformFeaturesFeatures<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Achievements => "achievements",
+            Self::CloudSaves => "cloudSaves",
+            Self::ControllerSupport => "controllerSupport",
+            Self::ControllerSupportFull => "controllerSupportFull",
+            Self::Coop => "coop",
+            Self::CoopLan => "coopLan",
+            Self::CoopOnline => "coopOnline",
+            Self::CrossPlatformMultiplayer => "crossPlatformMultiplayer",
+            Self::FamilySharing => "familySharing",
+            Self::InAppPurchases => "inAppPurchases",
+            Self::Leaderboards => "leaderboards",
+            Self::LevelEditor => "levelEditor",
+            Self::ModdingSupport => "moddingSupport",
+            Self::MultiPlayer => "multiPlayer",
+            Self::MultiPlayerLan => "multiPlayerLan",
+            Self::MultiPlayerOnline => "multiPlayerOnline",
+            Self::Pvp => "pvp",
+            Self::PvpLan => "pvpLan",
+            Self::PvpOnline => "pvpOnline",
+            Self::RemotePlayPhone => "remotePlayPhone",
+            Self::RemotePlayTablet => "remotePlayTablet",
+            Self::RemotePlayTv => "remotePlayTV",
+            Self::RemotePlayTogether => "remotePlayTogether",
+            Self::SinglePlayer => "singlePlayer",
+            Self::SteamTradingCards => "steamTradingCards",
+            Self::SteamWorkshop => "steamWorkshop",
+            Self::TrackingAndManagement => "trackingAndManagement",
+            Self::VrSupport => "vrSupport",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "achievements" => Self::Achievements,
+            "cloudSaves" => Self::CloudSaves,
+            "controllerSupport" => Self::ControllerSupport,
+            "controllerSupportFull" => Self::ControllerSupportFull,
+            "coop" => Self::Coop,
+            "coopLan" => Self::CoopLan,
+            "coopOnline" => Self::CoopOnline,
+            "crossPlatformMultiplayer" => Self::CrossPlatformMultiplayer,
+            "familySharing" => Self::FamilySharing,
+            "inAppPurchases" => Self::InAppPurchases,
+            "leaderboards" => Self::Leaderboards,
+            "levelEditor" => Self::LevelEditor,
+            "moddingSupport" => Self::ModdingSupport,
+            "multiPlayer" => Self::MultiPlayer,
+            "multiPlayerLan" => Self::MultiPlayerLan,
+            "multiPlayerOnline" => Self::MultiPlayerOnline,
+            "pvp" => Self::Pvp,
+            "pvpLan" => Self::PvpLan,
+            "pvpOnline" => Self::PvpOnline,
+            "remotePlayPhone" => Self::RemotePlayPhone,
+            "remotePlayTablet" => Self::RemotePlayTablet,
+            "remotePlayTV" => Self::RemotePlayTv,
+            "remotePlayTogether" => Self::RemotePlayTogether,
+            "singlePlayer" => Self::SinglePlayer,
+            "steamTradingCards" => Self::SteamTradingCards,
+            "steamWorkshop" => Self::SteamWorkshop,
+            "trackingAndManagement" => Self::TrackingAndManagement,
+            "vrSupport" => Self::VrSupport,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for PlatformFeaturesFeatures<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for PlatformFeaturesFeatures<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for PlatformFeaturesFeatures<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for PlatformFeaturesFeatures<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for PlatformFeaturesFeatures<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for PlatformFeaturesFeatures<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PlatformFeaturesFeatures<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PlatformFeaturesFeatures::Achievements => {
+                PlatformFeaturesFeatures::Achievements
+            }
+            PlatformFeaturesFeatures::CloudSaves => PlatformFeaturesFeatures::CloudSaves,
+            PlatformFeaturesFeatures::ControllerSupport => {
+                PlatformFeaturesFeatures::ControllerSupport
+            }
+            PlatformFeaturesFeatures::ControllerSupportFull => {
+                PlatformFeaturesFeatures::ControllerSupportFull
+            }
+            PlatformFeaturesFeatures::Coop => PlatformFeaturesFeatures::Coop,
+            PlatformFeaturesFeatures::CoopLan => PlatformFeaturesFeatures::CoopLan,
+            PlatformFeaturesFeatures::CoopOnline => PlatformFeaturesFeatures::CoopOnline,
+            PlatformFeaturesFeatures::CrossPlatformMultiplayer => {
+                PlatformFeaturesFeatures::CrossPlatformMultiplayer
+            }
+            PlatformFeaturesFeatures::FamilySharing => {
+                PlatformFeaturesFeatures::FamilySharing
+            }
+            PlatformFeaturesFeatures::InAppPurchases => {
+                PlatformFeaturesFeatures::InAppPurchases
+            }
+            PlatformFeaturesFeatures::Leaderboards => {
+                PlatformFeaturesFeatures::Leaderboards
+            }
+            PlatformFeaturesFeatures::LevelEditor => {
+                PlatformFeaturesFeatures::LevelEditor
+            }
+            PlatformFeaturesFeatures::ModdingSupport => {
+                PlatformFeaturesFeatures::ModdingSupport
+            }
+            PlatformFeaturesFeatures::MultiPlayer => {
+                PlatformFeaturesFeatures::MultiPlayer
+            }
+            PlatformFeaturesFeatures::MultiPlayerLan => {
+                PlatformFeaturesFeatures::MultiPlayerLan
+            }
+            PlatformFeaturesFeatures::MultiPlayerOnline => {
+                PlatformFeaturesFeatures::MultiPlayerOnline
+            }
+            PlatformFeaturesFeatures::Pvp => PlatformFeaturesFeatures::Pvp,
+            PlatformFeaturesFeatures::PvpLan => PlatformFeaturesFeatures::PvpLan,
+            PlatformFeaturesFeatures::PvpOnline => PlatformFeaturesFeatures::PvpOnline,
+            PlatformFeaturesFeatures::RemotePlayPhone => {
+                PlatformFeaturesFeatures::RemotePlayPhone
+            }
+            PlatformFeaturesFeatures::RemotePlayTablet => {
+                PlatformFeaturesFeatures::RemotePlayTablet
+            }
+            PlatformFeaturesFeatures::RemotePlayTv => {
+                PlatformFeaturesFeatures::RemotePlayTv
+            }
+            PlatformFeaturesFeatures::RemotePlayTogether => {
+                PlatformFeaturesFeatures::RemotePlayTogether
+            }
+            PlatformFeaturesFeatures::SinglePlayer => {
+                PlatformFeaturesFeatures::SinglePlayer
+            }
+            PlatformFeaturesFeatures::SteamTradingCards => {
+                PlatformFeaturesFeatures::SteamTradingCards
+            }
+            PlatformFeaturesFeatures::SteamWorkshop => {
+                PlatformFeaturesFeatures::SteamWorkshop
+            }
+            PlatformFeaturesFeatures::TrackingAndManagement => {
+                PlatformFeaturesFeatures::TrackingAndManagement
+            }
+            PlatformFeaturesFeatures::VrSupport => PlatformFeaturesFeatures::VrSupport,
+            PlatformFeaturesFeatures::Other(v) => {
+                PlatformFeaturesFeatures::Other(v.into_static())
+            }
+        }
+    }
 }
 
 
@@ -2140,7 +2543,7 @@ pub struct ReleaseDate<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub released_at: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub released_at_format: Option<S>,
+    pub released_at_format: Option<ReleaseDateReleasedAtFormat<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<ReleaseDateStatus<S>>,
     #[serde(
@@ -2258,6 +2661,113 @@ where
             ReleaseDateRegion::Korea => ReleaseDateRegion::Korea,
             ReleaseDateRegion::Brazil => ReleaseDateRegion::Brazil,
             ReleaseDateRegion::Other(v) => ReleaseDateRegion::Other(v.into_static()),
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ReleaseDateReleasedAtFormat<S: BosStr = DefaultStr> {
+    YyyyMmDd,
+    YyyyMm,
+    YyyyQ1,
+    YyyyQ2,
+    YyyyQ3,
+    YyyyQ4,
+    Yyyy,
+    Tbd,
+    Other(S),
+}
+
+impl<S: BosStr> ReleaseDateReleasedAtFormat<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::YyyyMmDd => "YYYY-MM-DD",
+            Self::YyyyMm => "YYYY-MM",
+            Self::YyyyQ1 => "YYYY-Q1",
+            Self::YyyyQ2 => "YYYY-Q2",
+            Self::YyyyQ3 => "YYYY-Q3",
+            Self::YyyyQ4 => "YYYY-Q4",
+            Self::Yyyy => "YYYY",
+            Self::Tbd => "TBD",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "YYYY-MM-DD" => Self::YyyyMmDd,
+            "YYYY-MM" => Self::YyyyMm,
+            "YYYY-Q1" => Self::YyyyQ1,
+            "YYYY-Q2" => Self::YyyyQ2,
+            "YYYY-Q3" => Self::YyyyQ3,
+            "YYYY-Q4" => Self::YyyyQ4,
+            "YYYY" => Self::Yyyy,
+            "TBD" => Self::Tbd,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ReleaseDateReleasedAtFormat<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ReleaseDateReleasedAtFormat<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ReleaseDateReleasedAtFormat<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ReleaseDateReleasedAtFormat<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ReleaseDateReleasedAtFormat<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ReleaseDateReleasedAtFormat<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReleaseDateReleasedAtFormat<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ReleaseDateReleasedAtFormat::YyyyMmDd => {
+                ReleaseDateReleasedAtFormat::YyyyMmDd
+            }
+            ReleaseDateReleasedAtFormat::YyyyMm => ReleaseDateReleasedAtFormat::YyyyMm,
+            ReleaseDateReleasedAtFormat::YyyyQ1 => ReleaseDateReleasedAtFormat::YyyyQ1,
+            ReleaseDateReleasedAtFormat::YyyyQ2 => ReleaseDateReleasedAtFormat::YyyyQ2,
+            ReleaseDateReleasedAtFormat::YyyyQ3 => ReleaseDateReleasedAtFormat::YyyyQ3,
+            ReleaseDateReleasedAtFormat::YyyyQ4 => ReleaseDateReleasedAtFormat::YyyyQ4,
+            ReleaseDateReleasedAtFormat::Yyyy => ReleaseDateReleasedAtFormat::Yyyy,
+            ReleaseDateReleasedAtFormat::Tbd => ReleaseDateReleasedAtFormat::Tbd,
+            ReleaseDateReleasedAtFormat::Other(v) => {
+                ReleaseDateReleasedAtFormat::Other(v.into_static())
+            }
         }
     }
 }
@@ -10959,7 +11469,10 @@ pub struct PlatformFeaturesBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<S>>, Option<PlatformFeaturesPlatform<S>>),
+    _fields: (
+        Option<Vec<PlatformFeaturesFeatures<S>>>,
+        Option<PlatformFeaturesPlatform<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -11007,7 +11520,7 @@ where
     /// Set the `features` field (required)
     pub fn features(
         mut self,
-        value: impl Into<Vec<S>>,
+        value: impl Into<Vec<PlatformFeaturesFeatures<S>>>,
     ) -> PlatformFeaturesBuilder<platform_features_state::SetFeatures<St>, S> {
         self._fields.0 = Option::Some(value.into());
         PlatformFeaturesBuilder {

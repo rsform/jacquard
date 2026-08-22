@@ -65,7 +65,7 @@ pub struct ChronicleSignature<S: BosStr = DefaultStr> {
 )]
 pub struct Milestone<S: BosStr = DefaultStr> {
     ///Category of the milestone
-    pub category: S,
+    pub category: MilestoneCategory<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub context: Option<milestone::MilestoneContext<S>>,
     ///When the milestone record was created
@@ -83,7 +83,7 @@ pub struct Milestone<S: BosStr = DefaultStr> {
     pub name: Option<S>,
     ///Rarity tier of the milestone
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rarity: Option<S>,
+    pub rarity: Option<MilestoneRarity<S>>,
     pub signature: milestone::ChronicleSignature<S>,
     ///Tier or threshold value (e.g. 50 for level-50)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -100,6 +100,192 @@ pub struct Milestone<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Category of the milestone
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MilestoneCategory<S: BosStr = DefaultStr> {
+    Level,
+    Social,
+    Collection,
+    Patterns,
+    Special,
+    Expedition,
+    Other(S),
+}
+
+impl<S: BosStr> MilestoneCategory<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Level => "level",
+            Self::Social => "social",
+            Self::Collection => "collection",
+            Self::Patterns => "patterns",
+            Self::Special => "special",
+            Self::Expedition => "expedition",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "level" => Self::Level,
+            "social" => Self::Social,
+            "collection" => Self::Collection,
+            "patterns" => Self::Patterns,
+            "special" => Self::Special,
+            "expedition" => Self::Expedition,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for MilestoneCategory<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for MilestoneCategory<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for MilestoneCategory<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MilestoneCategory<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for MilestoneCategory<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for MilestoneCategory<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MilestoneCategory<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MilestoneCategory::Level => MilestoneCategory::Level,
+            MilestoneCategory::Social => MilestoneCategory::Social,
+            MilestoneCategory::Collection => MilestoneCategory::Collection,
+            MilestoneCategory::Patterns => MilestoneCategory::Patterns,
+            MilestoneCategory::Special => MilestoneCategory::Special,
+            MilestoneCategory::Expedition => MilestoneCategory::Expedition,
+            MilestoneCategory::Other(v) => MilestoneCategory::Other(v.into_static()),
+        }
+    }
+}
+
+/// Rarity tier of the milestone
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MilestoneRarity<S: BosStr = DefaultStr> {
+    Common,
+    Uncommon,
+    Rare,
+    Epic,
+    Legendary,
+    Other(S),
+}
+
+impl<S: BosStr> MilestoneRarity<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Common => "common",
+            Self::Uncommon => "uncommon",
+            Self::Rare => "rare",
+            Self::Epic => "epic",
+            Self::Legendary => "legendary",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "common" => Self::Common,
+            "uncommon" => Self::Uncommon,
+            "rare" => Self::Rare,
+            "epic" => Self::Epic,
+            "legendary" => Self::Legendary,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for MilestoneRarity<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for MilestoneRarity<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for MilestoneRarity<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MilestoneRarity<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for MilestoneRarity<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for MilestoneRarity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MilestoneRarity<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MilestoneRarity::Common => MilestoneRarity::Common,
+            MilestoneRarity::Uncommon => MilestoneRarity::Uncommon,
+            MilestoneRarity::Rare => MilestoneRarity::Rare,
+            MilestoneRarity::Epic => MilestoneRarity::Epic,
+            MilestoneRarity::Legendary => MilestoneRarity::Legendary,
+            MilestoneRarity::Other(v) => MilestoneRarity::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1017,14 +1203,14 @@ pub mod milestone_state {
 pub struct MilestoneBuilder<St: milestone_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<S>,
+        Option<MilestoneCategory<S>>,
         Option<milestone::MilestoneContext<S>>,
         Option<Datetime>,
         Option<S>,
         Option<S>,
         Option<S>,
         Option<S>,
-        Option<S>,
+        Option<MilestoneRarity<S>>,
         Option<milestone::ChronicleSignature<S>>,
         Option<i64>,
         Option<Datetime>,
@@ -1103,7 +1289,7 @@ where
     /// Set the `category` field (required)
     pub fn category(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<MilestoneCategory<S>>,
     ) -> MilestoneBuilder<milestone_state::SetCategory<St>, S> {
         self._fields.0 = Option::Some(value.into());
         MilestoneBuilder {
@@ -1212,12 +1398,12 @@ impl<St: milestone_state::State, S: BosStr> MilestoneBuilder<St, S> {
 
 impl<St: milestone_state::State, S: BosStr> MilestoneBuilder<St, S> {
     /// Set the `rarity` field (optional)
-    pub fn rarity(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn rarity(mut self, value: impl Into<Option<MilestoneRarity<S>>>) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `rarity` field to an Option value (optional)
-    pub fn maybe_rarity(mut self, value: Option<S>) -> Self {
+    pub fn maybe_rarity(mut self, value: Option<MilestoneRarity<S>>) -> Self {
         self._fields.7 = value;
         self
     }

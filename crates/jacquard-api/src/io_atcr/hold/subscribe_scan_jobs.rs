@@ -39,9 +39,9 @@ pub struct SubscribeScanJobs {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubscribeScanJobsMessage<S: BosStr = DefaultStr> {
-    #[serde(rename = "#scanJob")]
+    #[serde(rename = "io.atcr.hold.subscribeScanJobs#scanJob")]
     ScanJob(Box<subscribe_scan_jobs::ScanJob<S>>),
-    #[serde(rename = "#scanResult")]
+    #[serde(rename = "io.atcr.hold.subscribeScanJobs#scanResult")]
     ScanResult(Box<subscribe_scan_jobs::ScanResult<S>>),
 }
 

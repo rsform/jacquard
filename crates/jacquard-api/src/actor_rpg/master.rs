@@ -43,8 +43,9 @@ pub struct Master<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///DID of the player this record validates
     pub player: Did<S>,
-    ///What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
+    ///What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match  Defaults to `"full"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_master_snapshot_scope")]
     pub snapshot_scope: Option<MasterSnapshotScope<S>>,
     ///CID of the approved sprite blob (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -245,6 +246,12 @@ where
         }
     }
     Ok(data)
+}
+
+fn _default_master_snapshot_scope<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    MasterSnapshotScope<S>,
+> {
+    Some(<MasterSnapshotScope<S>>::from_value(S::from_static("full")))
 }
 
 pub mod master_state {

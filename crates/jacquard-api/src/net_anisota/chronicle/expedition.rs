@@ -68,16 +68,16 @@ pub struct ExpeditionConditions<S: BosStr = DefaultStr> {
     pub biome: Option<S>,
     ///Time-of-day light condition at expedition start
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub light_level: Option<S>,
+    pub light_level: Option<ExpeditionConditionsLightLevel<S>>,
     ///Moon phase condition (nighttime only)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub moon_phase: Option<S>,
+    pub moon_phase: Option<ExpeditionConditionsMoonPhase<S>>,
     ///User fatigue state at expedition start
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_state: Option<S>,
+    pub user_state: Option<ExpeditionConditionsUserState<S>>,
     ///Weather condition during expedition
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub weather: Option<S>,
+    pub weather: Option<ExpeditionConditionsWeather<S>>,
     #[serde(
         flatten,
         default,
@@ -85,6 +85,396 @@ pub struct ExpeditionConditions<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Time-of-day light condition at expedition start
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpeditionConditionsLightLevel<S: BosStr = DefaultStr> {
+    Dawn,
+    Morning,
+    Midday,
+    Afternoon,
+    Dusk,
+    Night,
+    Deepnight,
+    Other(S),
+}
+
+impl<S: BosStr> ExpeditionConditionsLightLevel<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Dawn => "dawn",
+            Self::Morning => "morning",
+            Self::Midday => "midday",
+            Self::Afternoon => "afternoon",
+            Self::Dusk => "dusk",
+            Self::Night => "night",
+            Self::Deepnight => "deepnight",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "dawn" => Self::Dawn,
+            "morning" => Self::Morning,
+            "midday" => Self::Midday,
+            "afternoon" => Self::Afternoon,
+            "dusk" => Self::Dusk,
+            "night" => Self::Night,
+            "deepnight" => Self::Deepnight,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpeditionConditionsLightLevel<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpeditionConditionsLightLevel<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpeditionConditionsLightLevel<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ExpeditionConditionsLightLevel<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpeditionConditionsLightLevel<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpeditionConditionsLightLevel<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpeditionConditionsLightLevel<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpeditionConditionsLightLevel::Dawn => ExpeditionConditionsLightLevel::Dawn,
+            ExpeditionConditionsLightLevel::Morning => {
+                ExpeditionConditionsLightLevel::Morning
+            }
+            ExpeditionConditionsLightLevel::Midday => {
+                ExpeditionConditionsLightLevel::Midday
+            }
+            ExpeditionConditionsLightLevel::Afternoon => {
+                ExpeditionConditionsLightLevel::Afternoon
+            }
+            ExpeditionConditionsLightLevel::Dusk => ExpeditionConditionsLightLevel::Dusk,
+            ExpeditionConditionsLightLevel::Night => {
+                ExpeditionConditionsLightLevel::Night
+            }
+            ExpeditionConditionsLightLevel::Deepnight => {
+                ExpeditionConditionsLightLevel::Deepnight
+            }
+            ExpeditionConditionsLightLevel::Other(v) => {
+                ExpeditionConditionsLightLevel::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Moon phase condition (nighttime only)
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpeditionConditionsMoonPhase<S: BosStr = DefaultStr> {
+    FullMoon,
+    NewMoon,
+    Other(S),
+}
+
+impl<S: BosStr> ExpeditionConditionsMoonPhase<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::FullMoon => "full_moon",
+            Self::NewMoon => "new_moon",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "full_moon" => Self::FullMoon,
+            "new_moon" => Self::NewMoon,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpeditionConditionsMoonPhase<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpeditionConditionsMoonPhase<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpeditionConditionsMoonPhase<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ExpeditionConditionsMoonPhase<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpeditionConditionsMoonPhase<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpeditionConditionsMoonPhase<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpeditionConditionsMoonPhase<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpeditionConditionsMoonPhase::FullMoon => {
+                ExpeditionConditionsMoonPhase::FullMoon
+            }
+            ExpeditionConditionsMoonPhase::NewMoon => {
+                ExpeditionConditionsMoonPhase::NewMoon
+            }
+            ExpeditionConditionsMoonPhase::Other(v) => {
+                ExpeditionConditionsMoonPhase::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// User fatigue state at expedition start
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpeditionConditionsUserState<S: BosStr = DefaultStr> {
+    WellRested,
+    Tired,
+    Exhausted,
+    FirstExpedition,
+    Other(S),
+}
+
+impl<S: BosStr> ExpeditionConditionsUserState<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::WellRested => "well_rested",
+            Self::Tired => "tired",
+            Self::Exhausted => "exhausted",
+            Self::FirstExpedition => "first_expedition",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "well_rested" => Self::WellRested,
+            "tired" => Self::Tired,
+            "exhausted" => Self::Exhausted,
+            "first_expedition" => Self::FirstExpedition,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpeditionConditionsUserState<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpeditionConditionsUserState<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpeditionConditionsUserState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ExpeditionConditionsUserState<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpeditionConditionsUserState<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpeditionConditionsUserState<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpeditionConditionsUserState<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpeditionConditionsUserState::WellRested => {
+                ExpeditionConditionsUserState::WellRested
+            }
+            ExpeditionConditionsUserState::Tired => ExpeditionConditionsUserState::Tired,
+            ExpeditionConditionsUserState::Exhausted => {
+                ExpeditionConditionsUserState::Exhausted
+            }
+            ExpeditionConditionsUserState::FirstExpedition => {
+                ExpeditionConditionsUserState::FirstExpedition
+            }
+            ExpeditionConditionsUserState::Other(v) => {
+                ExpeditionConditionsUserState::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Weather condition during expedition
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpeditionConditionsWeather<S: BosStr = DefaultStr> {
+    Clear,
+    Overcast,
+    Rainy,
+    Stormy,
+    Foggy,
+    Other(S),
+}
+
+impl<S: BosStr> ExpeditionConditionsWeather<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Clear => "clear",
+            Self::Overcast => "overcast",
+            Self::Rainy => "rainy",
+            Self::Stormy => "stormy",
+            Self::Foggy => "foggy",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "clear" => Self::Clear,
+            "overcast" => Self::Overcast,
+            "rainy" => Self::Rainy,
+            "stormy" => Self::Stormy,
+            "foggy" => Self::Foggy,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpeditionConditionsWeather<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpeditionConditionsWeather<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpeditionConditionsWeather<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ExpeditionConditionsWeather<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpeditionConditionsWeather<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpeditionConditionsWeather<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpeditionConditionsWeather<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpeditionConditionsWeather::Clear => ExpeditionConditionsWeather::Clear,
+            ExpeditionConditionsWeather::Overcast => {
+                ExpeditionConditionsWeather::Overcast
+            }
+            ExpeditionConditionsWeather::Rainy => ExpeditionConditionsWeather::Rainy,
+            ExpeditionConditionsWeather::Stormy => ExpeditionConditionsWeather::Stormy,
+            ExpeditionConditionsWeather::Foggy => ExpeditionConditionsWeather::Foggy,
+            ExpeditionConditionsWeather::Other(v) => {
+                ExpeditionConditionsWeather::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// What was found/gathered during the expedition
@@ -165,7 +555,7 @@ pub struct ExpeditionLight<S: BosStr = DefaultStr> {
     pub regenerated: Option<i64>,
     ///Light status at start of expedition
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<ExpeditionLightStatus<S>>,
     #[serde(
         flatten,
         default,
@@ -173,6 +563,119 @@ pub struct ExpeditionLight<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Light status at start of expedition
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpeditionLightStatus<S: BosStr = DefaultStr> {
+    Bright,
+    Steady,
+    Dim,
+    Flickering,
+    Dying,
+    FullCharge,
+    Charged,
+    Low,
+    Critical,
+    Dead,
+    Other(S),
+}
+
+impl<S: BosStr> ExpeditionLightStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Bright => "bright",
+            Self::Steady => "steady",
+            Self::Dim => "dim",
+            Self::Flickering => "flickering",
+            Self::Dying => "dying",
+            Self::FullCharge => "fullCharge",
+            Self::Charged => "charged",
+            Self::Low => "low",
+            Self::Critical => "critical",
+            Self::Dead => "dead",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "bright" => Self::Bright,
+            "steady" => Self::Steady,
+            "dim" => Self::Dim,
+            "flickering" => Self::Flickering,
+            "dying" => Self::Dying,
+            "fullCharge" => Self::FullCharge,
+            "charged" => Self::Charged,
+            "low" => Self::Low,
+            "critical" => Self::Critical,
+            "dead" => Self::Dead,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpeditionLightStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpeditionLightStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpeditionLightStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ExpeditionLightStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpeditionLightStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpeditionLightStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpeditionLightStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpeditionLightStatus::Bright => ExpeditionLightStatus::Bright,
+            ExpeditionLightStatus::Steady => ExpeditionLightStatus::Steady,
+            ExpeditionLightStatus::Dim => ExpeditionLightStatus::Dim,
+            ExpeditionLightStatus::Flickering => ExpeditionLightStatus::Flickering,
+            ExpeditionLightStatus::Dying => ExpeditionLightStatus::Dying,
+            ExpeditionLightStatus::FullCharge => ExpeditionLightStatus::FullCharge,
+            ExpeditionLightStatus::Charged => ExpeditionLightStatus::Charged,
+            ExpeditionLightStatus::Low => ExpeditionLightStatus::Low,
+            ExpeditionLightStatus::Critical => ExpeditionLightStatus::Critical,
+            ExpeditionLightStatus::Dead => ExpeditionLightStatus::Dead,
+            ExpeditionLightStatus::Other(v) => {
+                ExpeditionLightStatus::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Light state at heartbeat time
@@ -243,7 +746,7 @@ pub struct HeartbeatProgress<S: BosStr = DefaultStr> {
 pub struct Expedition<S: BosStr = DefaultStr> {
     ///Reason for abandonment (only set if status is 'abandoned')
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub abandon_reason: Option<S>,
+    pub abandon_reason: Option<ExpeditionAbandonReason<S>>,
     ///Active exploring time in milliseconds (excludes camp rest time)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active_duration: Option<i64>,
@@ -277,7 +780,7 @@ pub struct Expedition<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<Datetime>,
     ///Current expedition status
-    pub status: S,
+    pub status: ExpeditionStatus<S>,
     ///When the record was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
@@ -288,6 +791,188 @@ pub struct Expedition<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Reason for abandonment (only set if status is 'abandoned')
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpeditionAbandonReason<S: BosStr = DefaultStr> {
+    LightDepleted,
+    UserAbandoned,
+    AppCrash,
+    ForceClose,
+    AutoAbandonedStale,
+    Other(S),
+}
+
+impl<S: BosStr> ExpeditionAbandonReason<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::LightDepleted => "light_depleted",
+            Self::UserAbandoned => "user_abandoned",
+            Self::AppCrash => "app_crash",
+            Self::ForceClose => "force_close",
+            Self::AutoAbandonedStale => "auto_abandoned_stale",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "light_depleted" => Self::LightDepleted,
+            "user_abandoned" => Self::UserAbandoned,
+            "app_crash" => Self::AppCrash,
+            "force_close" => Self::ForceClose,
+            "auto_abandoned_stale" => Self::AutoAbandonedStale,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpeditionAbandonReason<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpeditionAbandonReason<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpeditionAbandonReason<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ExpeditionAbandonReason<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpeditionAbandonReason<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpeditionAbandonReason<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpeditionAbandonReason<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpeditionAbandonReason::LightDepleted => {
+                ExpeditionAbandonReason::LightDepleted
+            }
+            ExpeditionAbandonReason::UserAbandoned => {
+                ExpeditionAbandonReason::UserAbandoned
+            }
+            ExpeditionAbandonReason::AppCrash => ExpeditionAbandonReason::AppCrash,
+            ExpeditionAbandonReason::ForceClose => ExpeditionAbandonReason::ForceClose,
+            ExpeditionAbandonReason::AutoAbandonedStale => {
+                ExpeditionAbandonReason::AutoAbandonedStale
+            }
+            ExpeditionAbandonReason::Other(v) => {
+                ExpeditionAbandonReason::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Current expedition status
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExpeditionStatus<S: BosStr = DefaultStr> {
+    Active,
+    Completed,
+    Abandoned,
+    Other(S),
+}
+
+impl<S: BosStr> ExpeditionStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "active",
+            Self::Completed => "completed",
+            Self::Abandoned => "abandoned",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "active" => Self::Active,
+            "completed" => Self::Completed,
+            "abandoned" => Self::Abandoned,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ExpeditionStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ExpeditionStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ExpeditionStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ExpeditionStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ExpeditionStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ExpeditionStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExpeditionStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ExpeditionStatus::Active => ExpeditionStatus::Active,
+            ExpeditionStatus::Completed => ExpeditionStatus::Completed,
+            ExpeditionStatus::Abandoned => ExpeditionStatus::Abandoned,
+            ExpeditionStatus::Other(v) => ExpeditionStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1737,7 +2422,7 @@ pub mod expedition_state {
 pub struct ExpeditionBuilder<St: expedition_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<S>,
+        Option<ExpeditionAbandonReason<S>>,
         Option<i64>,
         Option<i64>,
         Option<Datetime>,
@@ -1751,7 +2436,7 @@ pub struct ExpeditionBuilder<St: expedition_state::State, S: BosStr = DefaultStr
         Option<i64>,
         Option<expedition::ChronicleSignature<S>>,
         Option<Datetime>,
-        Option<S>,
+        Option<ExpeditionStatus<S>>,
         Option<Datetime>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -1829,12 +2514,18 @@ impl<S: BosStr> ExpeditionBuilder<expedition_state::Empty, S> {
 
 impl<St: expedition_state::State, S: BosStr> ExpeditionBuilder<St, S> {
     /// Set the `abandonReason` field (optional)
-    pub fn abandon_reason(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn abandon_reason(
+        mut self,
+        value: impl Into<Option<ExpeditionAbandonReason<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `abandonReason` field to an Option value (optional)
-    pub fn maybe_abandon_reason(mut self, value: Option<S>) -> Self {
+    pub fn maybe_abandon_reason(
+        mut self,
+        value: Option<ExpeditionAbandonReason<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -2050,7 +2741,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<ExpeditionStatus<S>>,
     ) -> ExpeditionBuilder<expedition_state::SetStatus<St>, S> {
         self._fields.14 = Option::Some(value.into());
         ExpeditionBuilder {

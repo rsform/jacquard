@@ -43,7 +43,7 @@ test-feature FEATURE *ARGS:
 # Check that jacquard-common compiles for wasm32
 check-wasm:
     cargo build --target wasm32-unknown-unknown -p jacquard-common --features websocket,reqwest-client
-    cargo build --target wasm32-unknown-unknown -p jacquard --no-default-features --features api_bluesky,streaming
+    cargo build --target wasm32-unknown-unknown -p jacquard --no-default-features --features api_bluesky,streaming,zstd
 
 # Run 'cargo run' on the project
 run *ARGS:
@@ -116,14 +116,11 @@ example NAME *ARGS:
 # part of ordinary `cargo nextest run`). Requires Docker with rootful bridge
 # networking. Tranquil needs `docker login atcr.io` first.
 e2e:
-    #!/usr/bin/env bash
-    set -e
-    ./scripts/e2e.sh tranquil
-    ./scripts/e2e.sh reference
+    nix develop .#e2e -c bash -euc './scripts/e2e.sh tranquil; ./scripts/e2e.sh reference; ./scripts/e2e.sh jetstream'
 
-# Run the e2e harness against one provider: tranquil or reference
+# Run the e2e harness against one provider: tranquil, reference, or jetstream
 e2e-provider PROVIDER *ARGS:
-    ./scripts/e2e.sh {{ PROVIDER }} {{ ARGS }}
+    nix develop .#e2e -c ./scripts/e2e.sh {{ PROVIDER }} {{ ARGS }}
 
 # Show the retained diagnostics bundle for an e2e run
 e2e-logs RUN_ID:

@@ -376,6 +376,10 @@ pub enum LexXrpcSubscriptionParameter<'s> {
 pub struct LexXrpcSubscription<'s> {
     #[serde(borrow)]
     pub description: Option<CowStr<'s>>,
+    /// WebSocket subprotocol to negotiate during the upgrade handshake
+    /// (e.g. "xrpc.v1.json" for network.bsky.jetstream.subscribeEvents).
+    #[serde(borrow)]
+    pub subprotocol: Option<CowStr<'s>>,
     pub parameters: Option<LexXrpcSubscriptionParameter<'s>>,
     pub message: Option<LexXrpcSubscriptionMessage<'s>>,
     pub infos: Option<Vec<LexXrpcError<'s>>>,
@@ -989,6 +993,7 @@ impl IntoStatic for LexXrpcSubscription<'_> {
     fn into_static(self) -> Self::Output {
         LexXrpcSubscription {
             description: self.description.into_static(),
+            subprotocol: self.subprotocol.into_static(),
             parameters: self.parameters.into_static(),
             message: self.message.into_static(),
             infos: self.infos.into_static(),

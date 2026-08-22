@@ -38,7 +38,8 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileViewDetailed;
 use crate::com_atproto::label::Label;
 use crate::com_atproto::repo::strong_ref::StrongRef;
-use crate::sh_weaver::actor;
+use crate::app_bsky;
+use crate::sh_weaver;
 /// A single author in a Weaver notebook.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -75,7 +76,7 @@ pub struct ProfileDataView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notebook_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub viewer: Option<actor::ViewerState<S>>,
+    pub viewer: Option<sh_weaver::actor::ViewerState<S>>,
     #[serde(
         flatten,
         default,
@@ -91,11 +92,11 @@ pub struct ProfileDataView<S: BosStr = DefaultStr> {
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ProfileDataViewInner<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.actor.defs#profileView")]
-    ProfileView(Box<actor::ProfileView<S>>),
+    ProfileView(Box<sh_weaver::actor::ProfileView<S>>),
     #[serde(rename = "app.bsky.actor.defs#profileViewDetailed")]
     ProfileViewDetailed(Box<ProfileViewDetailed<S>>),
     #[serde(rename = "sh.weaver.actor.defs#tangledProfileView")]
-    TangledProfileView(Box<actor::TangledProfileView<S>>),
+    TangledProfileView(Box<sh_weaver::actor::TangledProfileView<S>>),
 }
 
 
@@ -108,7 +109,7 @@ pub struct ProfileDataViewBasic<S: BosStr = DefaultStr> {
     pub following_count: Option<i64>,
     pub inner: ProfileDataViewBasicInner<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub viewer: Option<actor::ViewerStateBasic<S>>,
+    pub viewer: Option<sh_weaver::actor::ViewerStateBasic<S>>,
     #[serde(
         flatten,
         default,
@@ -124,11 +125,11 @@ pub struct ProfileDataViewBasic<S: BosStr = DefaultStr> {
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum ProfileDataViewBasicInner<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.actor.defs#profileViewBasic")]
-    ProfileViewBasic(Box<crate::sh_weaver::actor::ProfileViewBasic<S>>),
+    ProfileViewBasic(Box<sh_weaver::actor::ProfileViewBasic<S>>),
     #[serde(rename = "app.bsky.actor.defs#profileViewBasic")]
-    BskyProfileViewBasic(Box<crate::app_bsky::actor::ProfileViewBasic<S>>),
+    BskyProfileViewBasic(Box<app_bsky::actor::ProfileViewBasic<S>>),
     #[serde(rename = "sh.weaver.actor.defs#tangledProfileView")]
-    TangledProfileView(Box<actor::TangledProfileView<S>>),
+    TangledProfileView(Box<sh_weaver::actor::TangledProfileView<S>>),
 }
 
 
@@ -161,10 +162,10 @@ pub struct ProfileView<S: BosStr = DefaultStr> {
     pub location: Option<S>,
     ///Notebooks or other records pinned for display.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pinned: Option<actor::PinnedList<S>>,
+    pub pinned: Option<sh_weaver::actor::PinnedList<S>>,
     ///Pronouns to use in user-generated content.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pronouns: Option<actor::PronounsList<S>>,
+    pub pronouns: Option<sh_weaver::actor::PronounsList<S>>,
     ///Include link to this account on stream.place.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub streamplace: Option<bool>,
@@ -202,7 +203,7 @@ pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     pub labels: Option<Vec<Label<S>>>,
     ///Pronouns to use in user-generated content.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pronouns: Option<actor::PronounsList<S>>,
+    pub pronouns: Option<sh_weaver::actor::PronounsList<S>>,
     #[serde(
         flatten,
         default,
@@ -252,7 +253,7 @@ pub struct TangledProfileView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pinned_repositories: Option<Vec<AtUri<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub stats: Option<Vec<S>>,
+    pub stats: Option<Vec<TangledProfileViewStats<S>>>,
     #[serde(
         flatten,
         default,
@@ -260,6 +261,115 @@ pub struct TangledProfileView<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Vanity stats.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum TangledProfileViewStats<S: BosStr = DefaultStr> {
+    MergedPullRequestCount,
+    ClosedPullRequestCount,
+    OpenPullRequestCount,
+    OpenIssueCount,
+    ClosedIssueCount,
+    RepositoryCount,
+    Other(S),
+}
+
+impl<S: BosStr> TangledProfileViewStats<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::MergedPullRequestCount => "merged-pull-request-count",
+            Self::ClosedPullRequestCount => "closed-pull-request-count",
+            Self::OpenPullRequestCount => "open-pull-request-count",
+            Self::OpenIssueCount => "open-issue-count",
+            Self::ClosedIssueCount => "closed-issue-count",
+            Self::RepositoryCount => "repository-count",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "merged-pull-request-count" => Self::MergedPullRequestCount,
+            "closed-pull-request-count" => Self::ClosedPullRequestCount,
+            "open-pull-request-count" => Self::OpenPullRequestCount,
+            "open-issue-count" => Self::OpenIssueCount,
+            "closed-issue-count" => Self::ClosedIssueCount,
+            "repository-count" => Self::RepositoryCount,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for TangledProfileViewStats<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for TangledProfileViewStats<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for TangledProfileViewStats<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for TangledProfileViewStats<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for TangledProfileViewStats<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for TangledProfileViewStats<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = TangledProfileViewStats<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            TangledProfileViewStats::MergedPullRequestCount => {
+                TangledProfileViewStats::MergedPullRequestCount
+            }
+            TangledProfileViewStats::ClosedPullRequestCount => {
+                TangledProfileViewStats::ClosedPullRequestCount
+            }
+            TangledProfileViewStats::OpenPullRequestCount => {
+                TangledProfileViewStats::OpenPullRequestCount
+            }
+            TangledProfileViewStats::OpenIssueCount => {
+                TangledProfileViewStats::OpenIssueCount
+            }
+            TangledProfileViewStats::ClosedIssueCount => {
+                TangledProfileViewStats::ClosedIssueCount
+            }
+            TangledProfileViewStats::RepositoryCount => {
+                TangledProfileViewStats::RepositoryCount
+            }
+            TangledProfileViewStats::Other(v) => {
+                TangledProfileViewStats::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Viewer's relationship state with an actor (detailed version).
@@ -282,7 +392,7 @@ pub struct ViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub muted: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subscribed_notebooks: Option<Vec<actor::SubscribedNotebook<S>>>,
+    pub subscribed_notebooks: Option<Vec<sh_weaver::actor::SubscribedNotebook<S>>>,
     #[serde(
         flatten,
         default,
@@ -1619,7 +1729,7 @@ pub struct ProfileDataViewBuilder<
         Option<i64>,
         Option<ProfileDataViewInner<S>>,
         Option<i64>,
-        Option<actor::ViewerState<S>>,
+        Option<sh_weaver::actor::ViewerState<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -1746,12 +1856,18 @@ impl<St: profile_data_view_state::State, S: BosStr> ProfileDataViewBuilder<St, S
 
 impl<St: profile_data_view_state::State, S: BosStr> ProfileDataViewBuilder<St, S> {
     /// Set the `viewer` field (optional)
-    pub fn viewer(mut self, value: impl Into<Option<actor::ViewerState<S>>>) -> Self {
+    pub fn viewer(
+        mut self,
+        value: impl Into<Option<sh_weaver::actor::ViewerState<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<actor::ViewerState<S>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<sh_weaver::actor::ViewerState<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }
@@ -1848,7 +1964,7 @@ pub struct ProfileDataViewBasicBuilder<
         Option<i64>,
         Option<i64>,
         Option<ProfileDataViewBasicInner<S>>,
-        Option<actor::ViewerStateBasic<S>>,
+        Option<sh_weaver::actor::ViewerStateBasic<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -1953,13 +2069,16 @@ impl<
     /// Set the `viewer` field (optional)
     pub fn viewer(
         mut self,
-        value: impl Into<Option<actor::ViewerStateBasic<S>>>,
+        value: impl Into<Option<sh_weaver::actor::ViewerStateBasic<S>>>,
     ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `viewer` field to an Option value (optional)
-    pub fn maybe_viewer(mut self, value: Option<actor::ViewerStateBasic<S>>) -> Self {
+    pub fn maybe_viewer(
+        mut self,
+        value: Option<sh_weaver::actor::ViewerStateBasic<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }
@@ -2068,8 +2187,8 @@ pub struct ProfileViewBuilder<St: profile_view_state::State, S: BosStr = Default
         Option<Vec<Label<S>>>,
         Option<Vec<UriValue<S>>>,
         Option<S>,
-        Option<actor::PinnedList<S>>,
-        Option<actor::PronounsList<S>>,
+        Option<sh_weaver::actor::PinnedList<S>>,
+        Option<sh_weaver::actor::PronounsList<S>>,
         Option<bool>,
         Option<i64>,
         Option<i64>,
@@ -2322,12 +2441,18 @@ impl<St: profile_view_state::State, S: BosStr> ProfileViewBuilder<St, S> {
 
 impl<St: profile_view_state::State, S: BosStr> ProfileViewBuilder<St, S> {
     /// Set the `pinned` field (optional)
-    pub fn pinned(mut self, value: impl Into<Option<actor::PinnedList<S>>>) -> Self {
+    pub fn pinned(
+        mut self,
+        value: impl Into<Option<sh_weaver::actor::PinnedList<S>>>,
+    ) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `pinned` field to an Option value (optional)
-    pub fn maybe_pinned(mut self, value: Option<actor::PinnedList<S>>) -> Self {
+    pub fn maybe_pinned(
+        mut self,
+        value: Option<sh_weaver::actor::PinnedList<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }
@@ -2335,12 +2460,18 @@ impl<St: profile_view_state::State, S: BosStr> ProfileViewBuilder<St, S> {
 
 impl<St: profile_view_state::State, S: BosStr> ProfileViewBuilder<St, S> {
     /// Set the `pronouns` field (optional)
-    pub fn pronouns(mut self, value: impl Into<Option<actor::PronounsList<S>>>) -> Self {
+    pub fn pronouns(
+        mut self,
+        value: impl Into<Option<sh_weaver::actor::PronounsList<S>>>,
+    ) -> Self {
         self._fields.13 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
-    pub fn maybe_pronouns(mut self, value: Option<actor::PronounsList<S>>) -> Self {
+    pub fn maybe_pronouns(
+        mut self,
+        value: Option<sh_weaver::actor::PronounsList<S>>,
+    ) -> Self {
         self._fields.13 = value;
         self
     }
@@ -2528,7 +2659,7 @@ pub struct ProfileViewBasicBuilder<
         Option<Handle<S>>,
         Option<Datetime>,
         Option<Vec<Label<S>>>,
-        Option<actor::PronounsList<S>>,
+        Option<sh_weaver::actor::PronounsList<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -2677,12 +2808,18 @@ impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St,
 
 impl<St: profile_view_basic_state::State, S: BosStr> ProfileViewBasicBuilder<St, S> {
     /// Set the `pronouns` field (optional)
-    pub fn pronouns(mut self, value: impl Into<Option<actor::PronounsList<S>>>) -> Self {
+    pub fn pronouns(
+        mut self,
+        value: impl Into<Option<sh_weaver::actor::PronounsList<S>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `pronouns` field to an Option value (optional)
-    pub fn maybe_pronouns(mut self, value: Option<actor::PronounsList<S>>) -> Self {
+    pub fn maybe_pronouns(
+        mut self,
+        value: Option<sh_weaver::actor::PronounsList<S>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }
@@ -2979,7 +3116,7 @@ pub struct TangledProfileViewBuilder<
         Option<Vec<UriValue<S>>>,
         Option<S>,
         Option<Vec<AtUri<S>>>,
-        Option<Vec<S>>,
+        Option<Vec<TangledProfileViewStats<S>>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -3137,12 +3274,18 @@ impl<St: tangled_profile_view_state::State, S: BosStr> TangledProfileViewBuilder
 
 impl<St: tangled_profile_view_state::State, S: BosStr> TangledProfileViewBuilder<St, S> {
     /// Set the `stats` field (optional)
-    pub fn stats(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn stats(
+        mut self,
+        value: impl Into<Option<Vec<TangledProfileViewStats<S>>>>,
+    ) -> Self {
         self._fields.7 = value.into();
         self
     }
     /// Set the `stats` field to an Option value (optional)
-    pub fn maybe_stats(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_stats(
+        mut self,
+        value: Option<Vec<TangledProfileViewStats<S>>>,
+    ) -> Self {
         self._fields.7 = value;
         self
     }

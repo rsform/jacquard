@@ -175,7 +175,7 @@ pub struct Walk<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub started_at: Option<Datetime>,
     ///Current walk status. A walk is 'active' while open and 'completed' once it closes; there is no 'abandoned' state because a walk never fails.
-    pub status: S,
+    pub status: WalkStatus<S>,
     ///When the record was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
@@ -186,6 +186,85 @@ pub struct Walk<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Current walk status. A walk is 'active' while open and 'completed' once it closes; there is no 'abandoned' state because a walk never fails.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WalkStatus<S: BosStr = DefaultStr> {
+    Active,
+    Completed,
+    Other(S),
+}
+
+impl<S: BosStr> WalkStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "active",
+            Self::Completed => "completed",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "active" => Self::Active,
+            "completed" => Self::Completed,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WalkStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WalkStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WalkStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WalkStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WalkStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WalkStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WalkStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WalkStatus::Active => WalkStatus::Active,
+            WalkStatus::Completed => WalkStatus::Completed,
+            WalkStatus::Other(v) => WalkStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -209,16 +288,16 @@ pub struct WalkConditions<S: BosStr = DefaultStr> {
     pub biome: Option<S>,
     ///Time-of-day light condition at walk start
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub light_level: Option<S>,
+    pub light_level: Option<WalkConditionsLightLevel<S>>,
     ///Moon phase condition (nighttime only)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub moon_phase: Option<S>,
+    pub moon_phase: Option<WalkConditionsMoonPhase<S>>,
     ///User fatigue state at walk start
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_state: Option<S>,
+    pub user_state: Option<WalkConditionsUserState<S>>,
     ///Weather condition during the walk
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub weather: Option<S>,
+    pub weather: Option<WalkConditionsWeather<S>>,
     #[serde(
         flatten,
         default,
@@ -226,6 +305,373 @@ pub struct WalkConditions<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Time-of-day light condition at walk start
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WalkConditionsLightLevel<S: BosStr = DefaultStr> {
+    Dawn,
+    Morning,
+    Midday,
+    Afternoon,
+    Dusk,
+    Night,
+    Deepnight,
+    Other(S),
+}
+
+impl<S: BosStr> WalkConditionsLightLevel<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Dawn => "dawn",
+            Self::Morning => "morning",
+            Self::Midday => "midday",
+            Self::Afternoon => "afternoon",
+            Self::Dusk => "dusk",
+            Self::Night => "night",
+            Self::Deepnight => "deepnight",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "dawn" => Self::Dawn,
+            "morning" => Self::Morning,
+            "midday" => Self::Midday,
+            "afternoon" => Self::Afternoon,
+            "dusk" => Self::Dusk,
+            "night" => Self::Night,
+            "deepnight" => Self::Deepnight,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WalkConditionsLightLevel<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WalkConditionsLightLevel<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WalkConditionsLightLevel<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for WalkConditionsLightLevel<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WalkConditionsLightLevel<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WalkConditionsLightLevel<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WalkConditionsLightLevel<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WalkConditionsLightLevel::Dawn => WalkConditionsLightLevel::Dawn,
+            WalkConditionsLightLevel::Morning => WalkConditionsLightLevel::Morning,
+            WalkConditionsLightLevel::Midday => WalkConditionsLightLevel::Midday,
+            WalkConditionsLightLevel::Afternoon => WalkConditionsLightLevel::Afternoon,
+            WalkConditionsLightLevel::Dusk => WalkConditionsLightLevel::Dusk,
+            WalkConditionsLightLevel::Night => WalkConditionsLightLevel::Night,
+            WalkConditionsLightLevel::Deepnight => WalkConditionsLightLevel::Deepnight,
+            WalkConditionsLightLevel::Other(v) => {
+                WalkConditionsLightLevel::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Moon phase condition (nighttime only)
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WalkConditionsMoonPhase<S: BosStr = DefaultStr> {
+    FullMoon,
+    NewMoon,
+    Other(S),
+}
+
+impl<S: BosStr> WalkConditionsMoonPhase<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::FullMoon => "full_moon",
+            Self::NewMoon => "new_moon",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "full_moon" => Self::FullMoon,
+            "new_moon" => Self::NewMoon,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WalkConditionsMoonPhase<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WalkConditionsMoonPhase<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WalkConditionsMoonPhase<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WalkConditionsMoonPhase<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WalkConditionsMoonPhase<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WalkConditionsMoonPhase<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WalkConditionsMoonPhase<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WalkConditionsMoonPhase::FullMoon => WalkConditionsMoonPhase::FullMoon,
+            WalkConditionsMoonPhase::NewMoon => WalkConditionsMoonPhase::NewMoon,
+            WalkConditionsMoonPhase::Other(v) => {
+                WalkConditionsMoonPhase::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// User fatigue state at walk start
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WalkConditionsUserState<S: BosStr = DefaultStr> {
+    WellRested,
+    Tired,
+    Exhausted,
+    FirstExpedition,
+    Other(S),
+}
+
+impl<S: BosStr> WalkConditionsUserState<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::WellRested => "well_rested",
+            Self::Tired => "tired",
+            Self::Exhausted => "exhausted",
+            Self::FirstExpedition => "first_expedition",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "well_rested" => Self::WellRested,
+            "tired" => Self::Tired,
+            "exhausted" => Self::Exhausted,
+            "first_expedition" => Self::FirstExpedition,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WalkConditionsUserState<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WalkConditionsUserState<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WalkConditionsUserState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WalkConditionsUserState<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WalkConditionsUserState<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WalkConditionsUserState<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WalkConditionsUserState<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WalkConditionsUserState::WellRested => WalkConditionsUserState::WellRested,
+            WalkConditionsUserState::Tired => WalkConditionsUserState::Tired,
+            WalkConditionsUserState::Exhausted => WalkConditionsUserState::Exhausted,
+            WalkConditionsUserState::FirstExpedition => {
+                WalkConditionsUserState::FirstExpedition
+            }
+            WalkConditionsUserState::Other(v) => {
+                WalkConditionsUserState::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Weather condition during the walk
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WalkConditionsWeather<S: BosStr = DefaultStr> {
+    Clear,
+    Overcast,
+    Rainy,
+    Stormy,
+    Foggy,
+    Other(S),
+}
+
+impl<S: BosStr> WalkConditionsWeather<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Clear => "clear",
+            Self::Overcast => "overcast",
+            Self::Rainy => "rainy",
+            Self::Stormy => "stormy",
+            Self::Foggy => "foggy",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "clear" => Self::Clear,
+            "overcast" => Self::Overcast,
+            "rainy" => Self::Rainy,
+            "stormy" => Self::Stormy,
+            "foggy" => Self::Foggy,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WalkConditionsWeather<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WalkConditionsWeather<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WalkConditionsWeather<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WalkConditionsWeather<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WalkConditionsWeather<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WalkConditionsWeather<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WalkConditionsWeather<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WalkConditionsWeather::Clear => WalkConditionsWeather::Clear,
+            WalkConditionsWeather::Overcast => WalkConditionsWeather::Overcast,
+            WalkConditionsWeather::Rainy => WalkConditionsWeather::Rainy,
+            WalkConditionsWeather::Stormy => WalkConditionsWeather::Stormy,
+            WalkConditionsWeather::Foggy => WalkConditionsWeather::Foggy,
+            WalkConditionsWeather::Other(v) => {
+                WalkConditionsWeather::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Cross-client activity during the walk window that did NOT happen in anisota: the PDS scan of app.bsky posts/likes/reposts in the walk window minus the in-app per-device summed totals, floored at 0 per field. Because likes and reposts carry no client marker this is a subtraction estimate, so the elsewhere panel labels it 'at least'. This block NEVER earns XP or findings; it is data for the panel only. Optional; unset when there was no elsewhere activity or the scan was unavailable.
@@ -336,7 +782,7 @@ pub struct WalkLight<S: BosStr = DefaultStr> {
     pub regenerated: Option<i64>,
     ///Light status at start of the walk
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<WalkLightStatus<S>>,
     #[serde(
         flatten,
         default,
@@ -344,6 +790,117 @@ pub struct WalkLight<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Light status at start of the walk
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WalkLightStatus<S: BosStr = DefaultStr> {
+    Bright,
+    Steady,
+    Dim,
+    Flickering,
+    Dying,
+    FullCharge,
+    Charged,
+    Low,
+    Critical,
+    Dead,
+    Other(S),
+}
+
+impl<S: BosStr> WalkLightStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Bright => "bright",
+            Self::Steady => "steady",
+            Self::Dim => "dim",
+            Self::Flickering => "flickering",
+            Self::Dying => "dying",
+            Self::FullCharge => "fullCharge",
+            Self::Charged => "charged",
+            Self::Low => "low",
+            Self::Critical => "critical",
+            Self::Dead => "dead",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "bright" => Self::Bright,
+            "steady" => Self::Steady,
+            "dim" => Self::Dim,
+            "flickering" => Self::Flickering,
+            "dying" => Self::Dying,
+            "fullCharge" => Self::FullCharge,
+            "charged" => Self::Charged,
+            "low" => Self::Low,
+            "critical" => Self::Critical,
+            "dead" => Self::Dead,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WalkLightStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WalkLightStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WalkLightStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WalkLightStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WalkLightStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WalkLightStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WalkLightStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WalkLightStatus::Bright => WalkLightStatus::Bright,
+            WalkLightStatus::Steady => WalkLightStatus::Steady,
+            WalkLightStatus::Dim => WalkLightStatus::Dim,
+            WalkLightStatus::Flickering => WalkLightStatus::Flickering,
+            WalkLightStatus::Dying => WalkLightStatus::Dying,
+            WalkLightStatus::FullCharge => WalkLightStatus::FullCharge,
+            WalkLightStatus::Charged => WalkLightStatus::Charged,
+            WalkLightStatus::Low => WalkLightStatus::Low,
+            WalkLightStatus::Critical => WalkLightStatus::Critical,
+            WalkLightStatus::Dead => WalkLightStatus::Dead,
+            WalkLightStatus::Other(v) => WalkLightStatus::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> Walk<S> {
@@ -1908,7 +2465,7 @@ pub struct WalkBuilder<St: walk_state::State, S: BosStr = DefaultStr> {
         Option<i64>,
         Option<walk::ChronicleSignature<S>>,
         Option<Datetime>,
-        Option<S>,
+        Option<WalkStatus<S>>,
         Option<Datetime>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -2198,7 +2755,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<WalkStatus<S>>,
     ) -> WalkBuilder<walk_state::SetStatus<St>, S> {
         self._fields.14 = Option::Some(value.into());
         WalkBuilder {

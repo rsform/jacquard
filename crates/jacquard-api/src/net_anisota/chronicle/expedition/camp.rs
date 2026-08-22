@@ -35,10 +35,10 @@ use crate::net_anisota::chronicle::expedition::camp;
 pub struct CampConditions<S: BosStr = DefaultStr> {
     ///Time-of-day light condition when camp was made
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub light_level: Option<S>,
+    pub light_level: Option<CampConditionsLightLevel<S>>,
     ///Weather condition when camp was made
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub weather: Option<S>,
+    pub weather: Option<CampConditionsWeather<S>>,
     #[serde(
         flatten,
         default,
@@ -46,6 +46,201 @@ pub struct CampConditions<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Time-of-day light condition when camp was made
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CampConditionsLightLevel<S: BosStr = DefaultStr> {
+    Dawn,
+    Morning,
+    Midday,
+    Afternoon,
+    Dusk,
+    Night,
+    Deepnight,
+    Other(S),
+}
+
+impl<S: BosStr> CampConditionsLightLevel<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Dawn => "dawn",
+            Self::Morning => "morning",
+            Self::Midday => "midday",
+            Self::Afternoon => "afternoon",
+            Self::Dusk => "dusk",
+            Self::Night => "night",
+            Self::Deepnight => "deepnight",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "dawn" => Self::Dawn,
+            "morning" => Self::Morning,
+            "midday" => Self::Midday,
+            "afternoon" => Self::Afternoon,
+            "dusk" => Self::Dusk,
+            "night" => Self::Night,
+            "deepnight" => Self::Deepnight,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CampConditionsLightLevel<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CampConditionsLightLevel<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CampConditionsLightLevel<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for CampConditionsLightLevel<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CampConditionsLightLevel<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CampConditionsLightLevel<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CampConditionsLightLevel<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CampConditionsLightLevel::Dawn => CampConditionsLightLevel::Dawn,
+            CampConditionsLightLevel::Morning => CampConditionsLightLevel::Morning,
+            CampConditionsLightLevel::Midday => CampConditionsLightLevel::Midday,
+            CampConditionsLightLevel::Afternoon => CampConditionsLightLevel::Afternoon,
+            CampConditionsLightLevel::Dusk => CampConditionsLightLevel::Dusk,
+            CampConditionsLightLevel::Night => CampConditionsLightLevel::Night,
+            CampConditionsLightLevel::Deepnight => CampConditionsLightLevel::Deepnight,
+            CampConditionsLightLevel::Other(v) => {
+                CampConditionsLightLevel::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Weather condition when camp was made
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CampConditionsWeather<S: BosStr = DefaultStr> {
+    Clear,
+    Overcast,
+    Rainy,
+    Stormy,
+    Foggy,
+    Other(S),
+}
+
+impl<S: BosStr> CampConditionsWeather<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Clear => "clear",
+            Self::Overcast => "overcast",
+            Self::Rainy => "rainy",
+            Self::Stormy => "stormy",
+            Self::Foggy => "foggy",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "clear" => Self::Clear,
+            "overcast" => Self::Overcast,
+            "rainy" => Self::Rainy,
+            "stormy" => Self::Stormy,
+            "foggy" => Self::Foggy,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CampConditionsWeather<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CampConditionsWeather<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CampConditionsWeather<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CampConditionsWeather<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CampConditionsWeather<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CampConditionsWeather<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CampConditionsWeather<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CampConditionsWeather::Clear => CampConditionsWeather::Clear,
+            CampConditionsWeather::Overcast => CampConditionsWeather::Overcast,
+            CampConditionsWeather::Rainy => CampConditionsWeather::Rainy,
+            CampConditionsWeather::Stormy => CampConditionsWeather::Stormy,
+            CampConditionsWeather::Foggy => CampConditionsWeather::Foggy,
+            CampConditionsWeather::Other(v) => {
+                CampConditionsWeather::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Light levels at camp start/end
@@ -127,10 +322,10 @@ pub struct Camp<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub light: Option<camp::CampLight<S>>,
     ///Why camp was made
-    pub reason: S,
+    pub reason: CampReason<S>,
     pub signature: camp::ChronicleSignature<S>,
     ///Whether the camp is currently active or has been broken
-    pub status: S,
+    pub status: CampStatus<S>,
     ///When the record was last updated (set on break camp)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
@@ -141,6 +336,172 @@ pub struct Camp<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Why camp was made
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CampReason<S: BosStr = DefaultStr> {
+    UserInitiated,
+    LightLow,
+    StaminaLow,
+    ConditionsHarsh,
+    Other(S),
+}
+
+impl<S: BosStr> CampReason<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::UserInitiated => "user_initiated",
+            Self::LightLow => "light_low",
+            Self::StaminaLow => "stamina_low",
+            Self::ConditionsHarsh => "conditions_harsh",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "user_initiated" => Self::UserInitiated,
+            "light_low" => Self::LightLow,
+            "stamina_low" => Self::StaminaLow,
+            "conditions_harsh" => Self::ConditionsHarsh,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CampReason<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CampReason<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CampReason<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CampReason<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CampReason<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CampReason<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CampReason<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CampReason::UserInitiated => CampReason::UserInitiated,
+            CampReason::LightLow => CampReason::LightLow,
+            CampReason::StaminaLow => CampReason::StaminaLow,
+            CampReason::ConditionsHarsh => CampReason::ConditionsHarsh,
+            CampReason::Other(v) => CampReason::Other(v.into_static()),
+        }
+    }
+}
+
+/// Whether the camp is currently active or has been broken
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CampStatus<S: BosStr = DefaultStr> {
+    Active,
+    Completed,
+    Other(S),
+}
+
+impl<S: BosStr> CampStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "active",
+            Self::Completed => "completed",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "active" => Self::Active,
+            "completed" => Self::Completed,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CampStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CampStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CampStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CampStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CampStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CampStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CampStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CampStatus::Active => CampStatus::Active,
+            CampStatus::Completed => CampStatus::Completed,
+            CampStatus::Other(v) => CampStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1087,9 +1448,9 @@ pub struct CampBuilder<St: camp_state::State, S: BosStr = DefaultStr> {
         Option<i64>,
         Option<AtUri<S>>,
         Option<camp::CampLight<S>>,
-        Option<S>,
+        Option<CampReason<S>>,
         Option<camp::ChronicleSignature<S>>,
-        Option<S>,
+        Option<CampStatus<S>>,
         Option<Datetime>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -1290,7 +1651,7 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<CampReason<S>>,
     ) -> CampBuilder<camp_state::SetReason<St>, S> {
         self._fields.8 = Option::Some(value.into());
         CampBuilder {
@@ -1328,7 +1689,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<CampStatus<S>>,
     ) -> CampBuilder<camp_state::SetStatus<St>, S> {
         self._fields.10 = Option::Some(value.into());
         CampBuilder {

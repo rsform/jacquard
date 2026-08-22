@@ -1,3 +1,8 @@
+source "jetstream" type="git" priority=100 {
+    repo "https://github.com/bluesky-social/jetstream"
+    pattern "lexicons/**/*.json"
+}
+
 output {
     lexicons "crates/jacquard-api/lexicons"
     codegen "crates/jacquard-api/src"

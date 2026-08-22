@@ -60,8 +60,9 @@ pub struct Deck<S: BosStr = DefaultStr> {
     ///Timestamp of last update.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
-    ///Visibility setting for the deck.
+    ///Visibility setting for the deck.  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_deck_visibility")]
     pub visibility: Option<DeckVisibility<S>>,
     #[serde(
         flatten,
@@ -304,6 +305,12 @@ where
         }
     }
     Ok(data)
+}
+
+fn _default_deck_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    DeckVisibility<S>,
+> {
+    Some(<DeckVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod deck_state {

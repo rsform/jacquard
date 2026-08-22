@@ -39,6 +39,7 @@ use alloc::{
     vec::Vec,
 };
 
+use bytes::Bytes;
 use smol_str::SmolStr;
 
 use crate::CowStr;
@@ -162,6 +163,7 @@ impl_bos! {
     std::ffi::OsString => std::ffi::OsStr
     std::path::PathBuf => std::path::Path
     alloc::ffi::CString => core::ffi::CStr
+    bytes::Bytes => [u8]
 }
 
 // --- SmolStr impl ---
@@ -232,6 +234,30 @@ impl<'a> FromStaticStr for Cow<'a, str> {
 impl<'a> FromStaticStr for &'a str {
     #[inline]
     fn from_static(s: &'a str) -> Self {
+        s
+    }
+}
+
+/// Constructor for borrowed-or-shared byte slice types
+pub trait FromBosSlice<'a> {
+    /// Constructs a borrowed or shared value as appropriate from a byte slice
+    fn from_bos_slice(s: &'a [u8]) -> Self;
+}
+
+impl FromBosSlice<'_> for String {
+    fn from_bos_slice(s: &[u8]) -> Self {
+        String::from_utf8_lossy(s).into_owned()
+    }
+}
+
+impl FromBosSlice<'_> for Bytes {
+    fn from_bos_slice(s: &[u8]) -> Self {
+        Bytes::copy_from_slice(s)
+    }
+}
+
+impl<'a> FromBosSlice<'a> for &'a [u8] {
+    fn from_bos_slice(s: &'a [u8]) -> Self {
         s
     }
 }

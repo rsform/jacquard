@@ -17,6 +17,88 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::verification::VerificationView;
+/// Sort direction for creation date
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListVerificationsSortDirection<S: BosStr = DefaultStr> {
+    Asc,
+    Desc,
+    Other(S),
+}
+
+impl<S: BosStr> ListVerificationsSortDirection<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Asc => "asc",
+            Self::Desc => "desc",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "asc" => Self::Asc,
+            "desc" => Self::Desc,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListVerificationsSortDirection<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListVerificationsSortDirection<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListVerificationsSortDirection<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ListVerificationsSortDirection<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListVerificationsSortDirection<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListVerificationsSortDirection<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListVerificationsSortDirection<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListVerificationsSortDirection::Asc => ListVerificationsSortDirection::Asc,
+            ListVerificationsSortDirection::Desc => ListVerificationsSortDirection::Desc,
+            ListVerificationsSortDirection::Other(v) => {
+                ListVerificationsSortDirection::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -38,7 +120,7 @@ pub struct ListVerifications<S: BosStr = DefaultStr> {
     /// Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort_direction: Option<S>,
+    pub sort_direction: Option<ListVerificationsSortDirection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subjects: Option<Vec<Did<S>>>,
 }
@@ -86,8 +168,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("desc"))
+fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    ListVerificationsSortDirection<S>,
+> {
+    Some(<ListVerificationsSortDirection<S>>::from_value(S::from_static("desc")))
 }
 
 pub mod list_verifications_state {
@@ -122,7 +206,7 @@ pub struct ListVerificationsBuilder<
         Option<bool>,
         Option<Vec<Did<S>>>,
         Option<i64>,
-        Option<S>,
+        Option<ListVerificationsSortDirection<S>>,
         Option<Vec<Did<S>>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -247,12 +331,18 @@ impl<St: list_verifications_state::State, S: BosStr> ListVerificationsBuilder<St
 
 impl<St: list_verifications_state::State, S: BosStr> ListVerificationsBuilder<St, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort_direction(
+        mut self,
+        value: impl Into<Option<ListVerificationsSortDirection<S>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort_direction(
+        mut self,
+        value: Option<ListVerificationsSortDirection<S>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }

@@ -37,9 +37,9 @@ pub struct LogEntry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub job_id: Option<S>,
     ///Log level
-    pub level: S,
+    pub level: LogEntryLevel<S>,
     ///Type of log entry
-    pub log_type: S,
+    pub log_type: LogEntryLogType<S>,
     ///Log message
     pub message: S,
     ///Additional metadata associated with the log entry
@@ -58,6 +58,176 @@ pub struct LogEntry<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Log level
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LogEntryLevel<S: BosStr = DefaultStr> {
+    Debug,
+    Info,
+    Warn,
+    Error,
+    Other(S),
+}
+
+impl<S: BosStr> LogEntryLevel<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Debug => "debug",
+            Self::Info => "info",
+            Self::Warn => "warn",
+            Self::Error => "error",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "debug" => Self::Debug,
+            "info" => Self::Info,
+            "warn" => Self::Warn,
+            "error" => Self::Error,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for LogEntryLevel<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for LogEntryLevel<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for LogEntryLevel<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for LogEntryLevel<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for LogEntryLevel<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for LogEntryLevel<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = LogEntryLevel<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LogEntryLevel::Debug => LogEntryLevel::Debug,
+            LogEntryLevel::Info => LogEntryLevel::Info,
+            LogEntryLevel::Warn => LogEntryLevel::Warn,
+            LogEntryLevel::Error => LogEntryLevel::Error,
+            LogEntryLevel::Other(v) => LogEntryLevel::Other(v.into_static()),
+        }
+    }
+}
+
+/// Type of log entry
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum LogEntryLogType<S: BosStr = DefaultStr> {
+    SyncJob,
+    Jetstream,
+    System,
+    Other(S),
+}
+
+impl<S: BosStr> LogEntryLogType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::SyncJob => "sync_job",
+            Self::Jetstream => "jetstream",
+            Self::System => "system",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "sync_job" => Self::SyncJob,
+            "jetstream" => Self::Jetstream,
+            "system" => Self::System,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for LogEntryLogType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for LogEntryLogType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for LogEntryLogType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for LogEntryLogType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for LogEntryLogType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for LogEntryLogType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = LogEntryLogType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            LogEntryLogType::SyncJob => LogEntryLogType::SyncJob,
+            LogEntryLogType::Jetstream => LogEntryLogType::Jetstream,
+            LogEntryLogType::System => LogEntryLogType::System,
+            LogEntryLogType::Other(v) => LogEntryLogType::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -235,8 +405,8 @@ pub struct LogEntryBuilder<St: log_entry_state::State, S: BosStr = DefaultStr> {
         Option<Datetime>,
         Option<i64>,
         Option<S>,
-        Option<S>,
-        Option<S>,
+        Option<LogEntryLevel<S>>,
+        Option<LogEntryLogType<S>>,
         Option<S>,
         Option<Data<S>>,
         Option<S>,
@@ -340,7 +510,7 @@ where
     /// Set the `level` field (required)
     pub fn level(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<LogEntryLevel<S>>,
     ) -> LogEntryBuilder<log_entry_state::SetLevel<St>, S> {
         self._fields.3 = Option::Some(value.into());
         LogEntryBuilder {
@@ -359,7 +529,7 @@ where
     /// Set the `logType` field (required)
     pub fn log_type(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<LogEntryLogType<S>>,
     ) -> LogEntryBuilder<log_entry_state::SetLogType<St>, S> {
         self._fields.4 = Option::Some(value.into());
         LogEntryBuilder {

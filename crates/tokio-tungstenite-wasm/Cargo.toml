@@ -1,0 +1,103 @@
+[package]
+name = "tokio-tungstenite-wasm"
+version = "0.6.99"
+edition = "2021"
+description = "Vendored fork of tokio-tungstenite-wasm with native upgrade-header support; see native connect_with_options"
+repository = "https://github.com/TannerRogalsky/tokio-tungstenite-wasm"
+license-file = "LICENSE"
+keywords = ["websocket", "cross-platform", "wasm", "tokio"]
+categories = ["wasm", "web-programming::websocket", "asynchronous", "network-programming"]
+exclude = ["Cargo.toml.orig"]
+
+[package.metadata.docs.rs]
+additional-targets = ["wasm32-unknown-unknown"]
+all-features = true
+
+[features]
+__rustls-tls = ["dep:rustls"]
+native-tls = [
+    "tokio-tungstenite/native-tls",
+    "dep:native-tls",
+]
+native-tls-vendored = [
+    "native-tls",
+    "tokio-tungstenite/native-tls-vendored",
+]
+rustls-tls-native-roots = [
+    "__rustls-tls",
+    "tokio-tungstenite/rustls-tls-native-roots",
+]
+rustls-tls-webpki-roots = [
+    "__rustls-tls",
+    "tokio-tungstenite/rustls-tls-webpki-roots",
+]
+
+[lib]
+name = "tokio_tungstenite_wasm"
+path = "src/lib.rs"
+
+[dependencies.futures-util]
+version = "0.3"
+features = ["sink", "std"]
+default-features = false
+
+[dependencies.http]
+version = "1"
+
+[dependencies.httparse]
+version = "1"
+
+[dependencies.thiserror]
+version = "2"
+
+[dev-dependencies]
+assert-impl = "0.1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.native-tls]
+version = "0.2"
+optional = true
+default-features = false
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.rustls]
+version = "0.23"
+optional = true
+default-features = false
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.tokio]
+version = "1"
+features = ["net"]
+default-features = false
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies.tokio-tungstenite]
+version = "0.26"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.bytes]
+version = "1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.futures-channel]
+version = "0.3"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.js-sys]
+version = "0.3"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.wasm-bindgen]
+version = "0.2"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies.web-sys]
+version = "0.3"
+features = [
+    "WebSocket",
+    "MessageEvent",
+    "CloseEvent",
+    "Event",
+    "ErrorEvent",
+    "BinaryType",
+    "Blob",
+]
+
+[lints.rust]
+unsafe_code = "forbid"

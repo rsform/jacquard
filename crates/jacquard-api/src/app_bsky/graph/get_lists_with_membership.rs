@@ -45,6 +45,91 @@ pub struct ListWithMembership<S: BosStr = DefaultStr> {
 }
 
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetListsWithMembershipPurposes<S: BosStr = DefaultStr> {
+    Modlist,
+    Curatelist,
+    Other(S),
+}
+
+impl<S: BosStr> GetListsWithMembershipPurposes<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Modlist => "modlist",
+            Self::Curatelist => "curatelist",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "modlist" => Self::Modlist,
+            "curatelist" => Self::Curatelist,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetListsWithMembershipPurposes<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetListsWithMembershipPurposes<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetListsWithMembershipPurposes<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for GetListsWithMembershipPurposes<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetListsWithMembershipPurposes<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetListsWithMembershipPurposes<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetListsWithMembershipPurposes<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetListsWithMembershipPurposes::Modlist => {
+                GetListsWithMembershipPurposes::Modlist
+            }
+            GetListsWithMembershipPurposes::Curatelist => {
+                GetListsWithMembershipPurposes::Curatelist
+            }
+            GetListsWithMembershipPurposes::Other(v) => {
+                GetListsWithMembershipPurposes::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetListsWithMembership<S: BosStr = DefaultStr> {
@@ -56,7 +141,7 @@ pub struct GetListsWithMembership<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub purposes: Option<Vec<S>>,
+    pub purposes: Option<Vec<GetListsWithMembershipPurposes<S>>>,
 }
 
 
@@ -406,7 +491,12 @@ pub struct GetListsWithMembershipBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<Vec<S>>),
+    _fields: (
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<i64>,
+        Option<Vec<GetListsWithMembershipPurposes<S>>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -513,12 +603,18 @@ impl<
     S: BosStr,
 > GetListsWithMembershipBuilder<St, S> {
     /// Set the `purposes` field (optional)
-    pub fn purposes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn purposes(
+        mut self,
+        value: impl Into<Option<Vec<GetListsWithMembershipPurposes<S>>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `purposes` field to an Option value (optional)
-    pub fn maybe_purposes(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_purposes(
+        mut self,
+        value: Option<Vec<GetListsWithMembershipPurposes<S>>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }

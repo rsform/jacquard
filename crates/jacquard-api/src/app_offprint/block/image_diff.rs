@@ -30,7 +30,7 @@ use crate::app_offprint::block::image_grid::GridImage;
 pub struct ImageDiff<S: BosStr = DefaultStr> {
     ///Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub alignment: Option<S>,
+    pub alignment: Option<ImageDiffAlignment<S>>,
     ///Comparison caption
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<S>,
@@ -49,6 +49,89 @@ pub struct ImageDiff<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Horizontal alignment
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ImageDiffAlignment<S: BosStr = DefaultStr> {
+    Left,
+    Center,
+    Right,
+    Other(S),
+}
+
+impl<S: BosStr> ImageDiffAlignment<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Left => "left",
+            Self::Center => "center",
+            Self::Right => "right",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "left" => Self::Left,
+            "center" => Self::Center,
+            "right" => Self::Right,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ImageDiffAlignment<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ImageDiffAlignment<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ImageDiffAlignment<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ImageDiffAlignment<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ImageDiffAlignment<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ImageDiffAlignment<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ImageDiffAlignment<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ImageDiffAlignment::Left => ImageDiffAlignment::Left,
+            ImageDiffAlignment::Center => ImageDiffAlignment::Center,
+            ImageDiffAlignment::Right => ImageDiffAlignment::Right,
+            ImageDiffAlignment::Other(v) => ImageDiffAlignment::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for ImageDiff<S> {
@@ -157,7 +240,7 @@ pub mod image_diff_state {
 pub struct ImageDiffBuilder<St: image_diff_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<S>,
+        Option<ImageDiffAlignment<S>>,
         Option<S>,
         Option<Vec<GridImage<S>>>,
         Option<Vec<S>>,
@@ -204,12 +287,12 @@ impl<S: BosStr> ImageDiffBuilder<image_diff_state::Empty, S> {
 
 impl<St: image_diff_state::State, S: BosStr> ImageDiffBuilder<St, S> {
     /// Set the `alignment` field (optional)
-    pub fn alignment(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn alignment(mut self, value: impl Into<Option<ImageDiffAlignment<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `alignment` field to an Option value (optional)
-    pub fn maybe_alignment(mut self, value: Option<S>) -> Self {
+    pub fn maybe_alignment(mut self, value: Option<ImageDiffAlignment<S>>) -> Self {
         self._fields.0 = value;
         self
     }

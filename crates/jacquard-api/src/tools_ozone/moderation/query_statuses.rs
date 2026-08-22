@@ -17,12 +17,481 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::SubjectStatusView;
+/// If specified, only subjects with the given age assurance state will be returned.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryStatusesAgeAssuranceState<S: BosStr = DefaultStr> {
+    Pending,
+    Assured,
+    Unknown,
+    Reset,
+    Blocked,
+    Other(S),
+}
+
+impl<S: BosStr> QueryStatusesAgeAssuranceState<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "pending",
+            Self::Assured => "assured",
+            Self::Unknown => "unknown",
+            Self::Reset => "reset",
+            Self::Blocked => "blocked",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            "unknown" => Self::Unknown,
+            "reset" => Self::Reset,
+            "blocked" => Self::Blocked,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryStatusesAgeAssuranceState<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryStatusesAgeAssuranceState<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryStatusesAgeAssuranceState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for QueryStatusesAgeAssuranceState<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryStatusesAgeAssuranceState<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryStatusesAgeAssuranceState<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryStatusesAgeAssuranceState<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryStatusesAgeAssuranceState::Pending => {
+                QueryStatusesAgeAssuranceState::Pending
+            }
+            QueryStatusesAgeAssuranceState::Assured => {
+                QueryStatusesAgeAssuranceState::Assured
+            }
+            QueryStatusesAgeAssuranceState::Unknown => {
+                QueryStatusesAgeAssuranceState::Unknown
+            }
+            QueryStatusesAgeAssuranceState::Reset => {
+                QueryStatusesAgeAssuranceState::Reset
+            }
+            QueryStatusesAgeAssuranceState::Blocked => {
+                QueryStatusesAgeAssuranceState::Blocked
+            }
+            QueryStatusesAgeAssuranceState::Other(v) => {
+                QueryStatusesAgeAssuranceState::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Specify when fetching subjects in a certain state
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryStatusesReviewState<S: BosStr = DefaultStr> {
+    ReviewOpen,
+    ReviewClosed,
+    ReviewEscalated,
+    ReviewNone,
+    Other(S),
+}
+
+impl<S: BosStr> QueryStatusesReviewState<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::ReviewOpen => "tools.ozone.moderation.defs#reviewOpen",
+            Self::ReviewClosed => "tools.ozone.moderation.defs#reviewClosed",
+            Self::ReviewEscalated => "tools.ozone.moderation.defs#reviewEscalated",
+            Self::ReviewNone => "tools.ozone.moderation.defs#reviewNone",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "tools.ozone.moderation.defs#reviewOpen" => Self::ReviewOpen,
+            "tools.ozone.moderation.defs#reviewClosed" => Self::ReviewClosed,
+            "tools.ozone.moderation.defs#reviewEscalated" => Self::ReviewEscalated,
+            "tools.ozone.moderation.defs#reviewNone" => Self::ReviewNone,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryStatusesReviewState<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryStatusesReviewState<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryStatusesReviewState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for QueryStatusesReviewState<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryStatusesReviewState<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryStatusesReviewState<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryStatusesReviewState<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryStatusesReviewState::ReviewOpen => QueryStatusesReviewState::ReviewOpen,
+            QueryStatusesReviewState::ReviewClosed => {
+                QueryStatusesReviewState::ReviewClosed
+            }
+            QueryStatusesReviewState::ReviewEscalated => {
+                QueryStatusesReviewState::ReviewEscalated
+            }
+            QueryStatusesReviewState::ReviewNone => QueryStatusesReviewState::ReviewNone,
+            QueryStatusesReviewState::Other(v) => {
+                QueryStatusesReviewState::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryStatusesSortDirection<S: BosStr = DefaultStr> {
+    Asc,
+    Desc,
+    Other(S),
+}
+
+impl<S: BosStr> QueryStatusesSortDirection<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Asc => "asc",
+            Self::Desc => "desc",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "asc" => Self::Asc,
+            "desc" => Self::Desc,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryStatusesSortDirection<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryStatusesSortDirection<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryStatusesSortDirection<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for QueryStatusesSortDirection<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryStatusesSortDirection<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryStatusesSortDirection<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryStatusesSortDirection<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryStatusesSortDirection::Asc => QueryStatusesSortDirection::Asc,
+            QueryStatusesSortDirection::Desc => QueryStatusesSortDirection::Desc,
+            QueryStatusesSortDirection::Other(v) => {
+                QueryStatusesSortDirection::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryStatusesSortField<S: BosStr = DefaultStr> {
+    LastReviewedAt,
+    LastReportedAt,
+    ReportedRecordsCount,
+    TakendownRecordsCount,
+    PriorityScore,
+    Other(S),
+}
+
+impl<S: BosStr> QueryStatusesSortField<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::LastReviewedAt => "lastReviewedAt",
+            Self::LastReportedAt => "lastReportedAt",
+            Self::ReportedRecordsCount => "reportedRecordsCount",
+            Self::TakendownRecordsCount => "takendownRecordsCount",
+            Self::PriorityScore => "priorityScore",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "lastReviewedAt" => Self::LastReviewedAt,
+            "lastReportedAt" => Self::LastReportedAt,
+            "reportedRecordsCount" => Self::ReportedRecordsCount,
+            "takendownRecordsCount" => Self::TakendownRecordsCount,
+            "priorityScore" => Self::PriorityScore,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryStatusesSortField<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryStatusesSortField<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryStatusesSortField<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryStatusesSortField<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryStatusesSortField<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryStatusesSortField<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryStatusesSortField<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryStatusesSortField::LastReviewedAt => {
+                QueryStatusesSortField::LastReviewedAt
+            }
+            QueryStatusesSortField::LastReportedAt => {
+                QueryStatusesSortField::LastReportedAt
+            }
+            QueryStatusesSortField::ReportedRecordsCount => {
+                QueryStatusesSortField::ReportedRecordsCount
+            }
+            QueryStatusesSortField::TakendownRecordsCount => {
+                QueryStatusesSortField::TakendownRecordsCount
+            }
+            QueryStatusesSortField::PriorityScore => {
+                QueryStatusesSortField::PriorityScore
+            }
+            QueryStatusesSortField::Other(v) => {
+                QueryStatusesSortField::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// If specified, subjects of the given type (account, record, or conversation) will be returned. When this is set to 'account' the 'collections' parameter will be ignored. When includeAllUserRecords or subject is set, this will be ignored.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryStatusesSubjectType<S: BosStr = DefaultStr> {
+    Account,
+    Record,
+    Conversation,
+    Other(S),
+}
+
+impl<S: BosStr> QueryStatusesSubjectType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Account => "account",
+            Self::Record => "record",
+            Self::Conversation => "conversation",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "account" => Self::Account,
+            "record" => Self::Record,
+            "conversation" => Self::Conversation,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryStatusesSubjectType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryStatusesSubjectType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryStatusesSubjectType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for QueryStatusesSubjectType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryStatusesSubjectType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryStatusesSubjectType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryStatusesSubjectType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryStatusesSubjectType::Account => QueryStatusesSubjectType::Account,
+            QueryStatusesSubjectType::Record => QueryStatusesSubjectType::Record,
+            QueryStatusesSubjectType::Conversation => {
+                QueryStatusesSubjectType::Conversation
+            }
+            QueryStatusesSubjectType::Other(v) => {
+                QueryStatusesSubjectType::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct QueryStatuses<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub age_assurance_state: Option<S>,
+    pub age_assurance_state: Option<QueryStatusesAgeAssuranceState<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub appealed: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -80,7 +549,7 @@ pub struct QueryStatuses<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reported_before: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub review_state: Option<S>,
+    pub review_state: Option<QueryStatusesReviewState<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reviewed_after: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -88,15 +557,15 @@ pub struct QueryStatuses<S: BosStr = DefaultStr> {
     /// Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort_direction: Option<S>,
+    pub sort_direction: Option<QueryStatusesSortDirection<S>>,
     /// Defaults to `"lastReportedAt"`.
     #[serde(default = "_default_sort_field")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort_field: Option<S>,
+    pub sort_field: Option<QueryStatusesSortField<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subject_type: Option<S>,
+    pub subject_type: Option<QueryStatusesSubjectType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -146,12 +615,16 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("desc"))
+fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    QueryStatusesSortDirection<S>,
+> {
+    Some(<QueryStatusesSortDirection<S>>::from_value(S::from_static("desc")))
 }
 
-fn _default_sort_field<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("lastReportedAt"))
+fn _default_sort_field<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    QueryStatusesSortField<S>,
+> {
+    Some(<QueryStatusesSortField<S>>::from_value(S::from_static("lastReportedAt")))
 }
 
 pub mod query_statuses_state {
@@ -180,7 +653,7 @@ pub struct QueryStatusesBuilder<
 > {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<S>,
+        Option<QueryStatusesAgeAssuranceState<S>>,
         Option<bool>,
         Option<Vec<Nsid<S>>>,
         Option<S>,
@@ -207,13 +680,13 @@ pub struct QueryStatusesBuilder<
         Option<S>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<S>,
+        Option<QueryStatusesReviewState<S>>,
         Option<Datetime>,
         Option<Datetime>,
-        Option<S>,
-        Option<S>,
+        Option<QueryStatusesSortDirection<S>>,
+        Option<QueryStatusesSortField<S>>,
         Option<UriValue<S>>,
-        Option<S>,
+        Option<QueryStatusesSubjectType<S>>,
         Option<Vec<S>>,
         Option<bool>,
     ),
@@ -332,12 +805,18 @@ impl<S: BosStr> QueryStatusesBuilder<query_statuses_state::Empty, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `ageAssuranceState` field (optional)
-    pub fn age_assurance_state(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn age_assurance_state(
+        mut self,
+        value: impl Into<Option<QueryStatusesAgeAssuranceState<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `ageAssuranceState` field to an Option value (optional)
-    pub fn maybe_age_assurance_state(mut self, value: Option<S>) -> Self {
+    pub fn maybe_age_assurance_state(
+        mut self,
+        value: Option<QueryStatusesAgeAssuranceState<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }
@@ -686,12 +1165,18 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `reviewState` field (optional)
-    pub fn review_state(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn review_state(
+        mut self,
+        value: impl Into<Option<QueryStatusesReviewState<S>>>,
+    ) -> Self {
         self._fields.27 = value.into();
         self
     }
     /// Set the `reviewState` field to an Option value (optional)
-    pub fn maybe_review_state(mut self, value: Option<S>) -> Self {
+    pub fn maybe_review_state(
+        mut self,
+        value: Option<QueryStatusesReviewState<S>>,
+    ) -> Self {
         self._fields.27 = value;
         self
     }
@@ -725,12 +1210,18 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort_direction(
+        mut self,
+        value: impl Into<Option<QueryStatusesSortDirection<S>>>,
+    ) -> Self {
         self._fields.30 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort_direction(
+        mut self,
+        value: Option<QueryStatusesSortDirection<S>>,
+    ) -> Self {
         self._fields.30 = value;
         self
     }
@@ -738,12 +1229,15 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `sortField` field (optional)
-    pub fn sort_field(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort_field(
+        mut self,
+        value: impl Into<Option<QueryStatusesSortField<S>>>,
+    ) -> Self {
         self._fields.31 = value.into();
         self
     }
     /// Set the `sortField` field to an Option value (optional)
-    pub fn maybe_sort_field(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort_field(mut self, value: Option<QueryStatusesSortField<S>>) -> Self {
         self._fields.31 = value;
         self
     }
@@ -764,12 +1258,18 @@ impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
 
 impl<St: query_statuses_state::State, S: BosStr> QueryStatusesBuilder<St, S> {
     /// Set the `subjectType` field (optional)
-    pub fn subject_type(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn subject_type(
+        mut self,
+        value: impl Into<Option<QueryStatusesSubjectType<S>>>,
+    ) -> Self {
         self._fields.33 = value.into();
         self
     }
     /// Set the `subjectType` field to an Option value (optional)
-    pub fn maybe_subject_type(mut self, value: Option<S>) -> Self {
+    pub fn maybe_subject_type(
+        mut self,
+        value: Option<QueryStatusesSubjectType<S>>,
+    ) -> Self {
         self._fields.33 = value;
         self
     }

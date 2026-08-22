@@ -43,6 +43,7 @@ e2e = [
     "dep:tower",
     "dep:tokio",
     "dep:reqwest",
+    "dep:n0-future",
     "dep:serde",
     "dep:serde_json",
     "dep:serde_html_form",
@@ -54,6 +55,12 @@ e2e = [
 # never run against the other provider.
 tranquil = []
 reference = []
+jetstream = [
+    "e2e",
+    "jacquard/streaming",
+    "jacquard/zstd",
+    "jacquard-common/websocket",
+]
 
 [dependencies.jacquard]
 path = "../jacquard"
@@ -94,7 +101,11 @@ optional = true
 [dependencies.reqwest]
 version = "0.12"
 default-features = false
-features = ["rustls-tls", "json", "cookies"]
+features = ["rustls-tls", "json", "cookies", "stream"]
+optional = true
+
+[dependencies.n0-future]
+workspace = true
 optional = true
 
 [dependencies.serde]
@@ -132,6 +143,11 @@ required-features = ["e2e", "tranquil"]
 name = "resolver_probe"
 path = "tests/scenarios/resolver_probe.rs"
 required-features = ["e2e"]
+
+[[test]]
+name = "jetstream_replay"
+path = "tests/scenarios/jetstream_replay.rs"
+required-features = ["jetstream"]
 
 [[test]]
 name = "axum_generated"

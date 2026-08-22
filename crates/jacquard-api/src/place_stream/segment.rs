@@ -36,7 +36,7 @@ use crate::place_stream::segment;
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Audio<S: BosStr = DefaultStr> {
     pub channels: i64,
-    pub codec: S,
+    pub codec: AudioCodec<S>,
     pub rate: i64,
     #[serde(
         flatten,
@@ -45,6 +45,84 @@ pub struct Audio<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AudioCodec<S: BosStr = DefaultStr> {
+    Opus,
+    Aac,
+    Other(S),
+}
+
+impl<S: BosStr> AudioCodec<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Opus => "opus",
+            Self::Aac => "aac",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "opus" => Self::Opus,
+            "aac" => Self::Aac,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for AudioCodec<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for AudioCodec<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for AudioCodec<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AudioCodec<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for AudioCodec<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for AudioCodec<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AudioCodec<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            AudioCodec::Opus => AudioCodec::Opus,
+            AudioCodec::Aac => AudioCodec::Aac,
+            AudioCodec::Other(v) => AudioCodec::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -136,7 +214,7 @@ pub struct SegmentView<S: BosStr = DefaultStr> {
 pub struct Video<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bframes: Option<bool>,
-    pub codec: S,
+    pub codec: VideoCodec<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub framerate: Option<segment::Framerate<S>>,
     pub height: i64,
@@ -148,6 +226,80 @@ pub struct Video<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum VideoCodec<S: BosStr = DefaultStr> {
+    H264,
+    Other(S),
+}
+
+impl<S: BosStr> VideoCodec<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::H264 => "h264",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "h264" => Self::H264,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for VideoCodec<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for VideoCodec<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for VideoCodec<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VideoCodec<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for VideoCodec<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for VideoCodec<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VideoCodec<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            VideoCodec::H264 => VideoCodec::H264,
+            VideoCodec::Other(v) => VideoCodec::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> Segment<S> {
@@ -332,7 +484,7 @@ pub mod audio_state {
 /// Builder for constructing an instance of this type.
 pub struct AudioBuilder<St: audio_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<S>, Option<i64>),
+    _fields: (Option<i64>, Option<AudioCodec<S>>, Option<i64>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -399,7 +551,7 @@ where
     /// Set the `codec` field (required)
     pub fn codec(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<AudioCodec<S>>,
     ) -> AudioBuilder<audio_state::SetCodec<St>, S> {
         self._fields.1 = Option::Some(value.into());
         AudioBuilder {
@@ -1502,7 +1654,7 @@ pub struct VideoBuilder<St: video_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
-        Option<S>,
+        Option<VideoCodec<S>>,
         Option<segment::Framerate<S>>,
         Option<i64>,
         Option<i64>,
@@ -1567,7 +1719,7 @@ where
     /// Set the `codec` field (required)
     pub fn codec(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<VideoCodec<S>>,
     ) -> VideoBuilder<video_state::SetCodec<St>, S> {
         self._fields.1 = Option::Some(value.into());
         VideoBuilder {

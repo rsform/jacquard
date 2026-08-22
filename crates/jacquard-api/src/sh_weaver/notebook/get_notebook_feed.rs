@@ -18,13 +18,96 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::NotebookView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetNotebookFeedAlgorithm<S: BosStr = DefaultStr> {
+    Chronological,
+    Popular,
+    Other(S),
+}
+
+impl<S: BosStr> GetNotebookFeedAlgorithm<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Chronological => "chronological",
+            Self::Popular => "popular",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "chronological" => Self::Chronological,
+            "popular" => Self::Popular,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetNotebookFeedAlgorithm<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetNotebookFeedAlgorithm<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetNotebookFeedAlgorithm<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for GetNotebookFeedAlgorithm<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetNotebookFeedAlgorithm<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetNotebookFeedAlgorithm<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetNotebookFeedAlgorithm<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetNotebookFeedAlgorithm::Chronological => {
+                GetNotebookFeedAlgorithm::Chronological
+            }
+            GetNotebookFeedAlgorithm::Popular => GetNotebookFeedAlgorithm::Popular,
+            GetNotebookFeedAlgorithm::Other(v) => {
+                GetNotebookFeedAlgorithm::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetNotebookFeed<S: BosStr = DefaultStr> {
     /// Defaults to `"chronological"`.
     #[serde(default = "_default_algorithm")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub algorithm: Option<S>,
+    pub algorithm: Option<GetNotebookFeedAlgorithm<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -76,8 +159,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookFeedRequest {
     type Response = GetNotebookFeedResponse;
 }
 
-fn _default_algorithm<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("chronological"))
+fn _default_algorithm<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetNotebookFeedAlgorithm<S>,
+> {
+    Some(<GetNotebookFeedAlgorithm<S>>::from_value(S::from_static("chronological")))
 }
 
 fn _default_limit() -> Option<i64> {
@@ -109,7 +194,13 @@ pub struct GetNotebookFeedBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<i64>, Option<Vec<S>>),
+    _fields: (
+        Option<GetNotebookFeedAlgorithm<S>>,
+        Option<S>,
+        Option<AtUri<S>>,
+        Option<i64>,
+        Option<Vec<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -151,12 +242,18 @@ impl<S: BosStr> GetNotebookFeedBuilder<get_notebook_feed_state::Empty, S> {
 
 impl<St: get_notebook_feed_state::State, S: BosStr> GetNotebookFeedBuilder<St, S> {
     /// Set the `algorithm` field (optional)
-    pub fn algorithm(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn algorithm(
+        mut self,
+        value: impl Into<Option<GetNotebookFeedAlgorithm<S>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `algorithm` field to an Option value (optional)
-    pub fn maybe_algorithm(mut self, value: Option<S>) -> Self {
+    pub fn maybe_algorithm(
+        mut self,
+        value: Option<GetNotebookFeedAlgorithm<S>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }

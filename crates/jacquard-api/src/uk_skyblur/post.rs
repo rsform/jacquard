@@ -58,7 +58,7 @@ pub struct Post<S: BosStr = DefaultStr> {
     pub text: S,
     pub uri: AtUri<S>,
     ///For 'login', the post requires login to view (Bluesky account required). For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody. 'followers' restricted to author's followers. 'following' restricted to users author follows. 'mutual' restricted to mutual followers.
-    pub visibility: S,
+    pub visibility: PostVisibility<S>,
     #[serde(
         flatten,
         default,
@@ -66,6 +66,101 @@ pub struct Post<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// For 'login', the post requires login to view (Bluesky account required). For 'password', the text only contains blurred text, and additional is always empty. The unblurred text and additional are included in the encryptBody. 'followers' restricted to author's followers. 'following' restricted to users author follows. 'mutual' restricted to mutual followers.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PostVisibility<S: BosStr = DefaultStr> {
+    Public,
+    Password,
+    Login,
+    Followers,
+    Following,
+    Mutual,
+    Other(S),
+}
+
+impl<S: BosStr> PostVisibility<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Password => "password",
+            Self::Login => "login",
+            Self::Followers => "followers",
+            Self::Following => "following",
+            Self::Mutual => "mutual",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "public" => Self::Public,
+            "password" => Self::Password,
+            "login" => Self::Login,
+            "followers" => Self::Followers,
+            "following" => Self::Following,
+            "mutual" => Self::Mutual,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for PostVisibility<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for PostVisibility<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for PostVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PostVisibility<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for PostVisibility<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for PostVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PostVisibility<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PostVisibility::Public => PostVisibility::Public,
+            PostVisibility::Password => PostVisibility::Password,
+            PostVisibility::Login => PostVisibility::Login,
+            PostVisibility::Followers => PostVisibility::Followers,
+            PostVisibility::Following => PostVisibility::Following,
+            PostVisibility::Mutual => PostVisibility::Mutual,
+            PostVisibility::Other(v) => PostVisibility::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -299,7 +394,7 @@ pub struct PostBuilder<St: post_state::State, S: BosStr = DefaultStr> {
         Option<BlobRef<S>>,
         Option<S>,
         Option<AtUri<S>>,
-        Option<S>,
+        Option<PostVisibility<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -431,7 +526,7 @@ where
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<PostVisibility<S>>,
     ) -> PostBuilder<post_state::SetVisibility<St>, S> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {

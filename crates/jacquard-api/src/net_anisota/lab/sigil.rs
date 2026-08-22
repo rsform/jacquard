@@ -43,7 +43,7 @@ pub struct Sigil<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub meta: Option<Data<S>>,
     ///Which crafting method produced it
-    pub method: S,
+    pub method: SigilMethod<S>,
     ///Display name for the sigil
     pub name: S,
     ///The normalised core path: x and y interleaved, each scaled to 0..1000
@@ -59,6 +59,93 @@ pub struct Sigil<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Which crafting method produced it
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SigilMethod<S: BosStr = DefaultStr> {
+    Intent,
+    Square,
+    Wheel,
+    Draw,
+    Other(S),
+}
+
+impl<S: BosStr> SigilMethod<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Intent => "intent",
+            Self::Square => "square",
+            Self::Wheel => "wheel",
+            Self::Draw => "draw",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "intent" => Self::Intent,
+            "square" => Self::Square,
+            "wheel" => Self::Wheel,
+            "draw" => Self::Draw,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SigilMethod<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SigilMethod<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SigilMethod<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SigilMethod<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SigilMethod<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SigilMethod<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SigilMethod<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SigilMethod::Intent => SigilMethod::Intent,
+            SigilMethod::Square => SigilMethod::Square,
+            SigilMethod::Wheel => SigilMethod::Wheel,
+            SigilMethod::Draw => SigilMethod::Draw,
+            SigilMethod::Other(v) => SigilMethod::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -247,7 +334,7 @@ pub struct SigilBuilder<St: sigil_state::State, S: BosStr = DefaultStr> {
     _fields: (
         Option<Datetime>,
         Option<Data<S>>,
-        Option<S>,
+        Option<SigilMethod<S>>,
         Option<S>,
         Option<Vec<i64>>,
         Option<S>,
@@ -331,7 +418,7 @@ where
     /// Set the `method` field (required)
     pub fn method(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<SigilMethod<S>>,
     ) -> SigilBuilder<sigil_state::SetMethod<St>, S> {
         self._fields.2 = Option::Some(value.into());
         SigilBuilder {

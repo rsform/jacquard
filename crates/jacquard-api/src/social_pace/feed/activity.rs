@@ -50,7 +50,7 @@ pub struct Activity<S: BosStr = DefaultStr> {
     pub distance: Option<S>,
     ///The units used for distance measurement.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub distance_units: Option<S>,
+    pub distance_units: Option<ActivityDistanceUnits<S>>,
     ///When the activity ended.
     pub ended_at: Datetime,
     ///An export of the route taken during the activity, if any. A GPX or TCX file. Reminder, all atproto blobs are public. And is recommended if you do this to trim start and end.
@@ -72,6 +72,95 @@ pub struct Activity<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The units used for distance measurement.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ActivityDistanceUnits<S: BosStr = DefaultStr> {
+    Feet,
+    Miles,
+    Meters,
+    Kilometers,
+    Other(S),
+}
+
+impl<S: BosStr> ActivityDistanceUnits<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Feet => "feet",
+            Self::Miles => "miles",
+            Self::Meters => "meters",
+            Self::Kilometers => "kilometers",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "feet" => Self::Feet,
+            "miles" => Self::Miles,
+            "meters" => Self::Meters,
+            "kilometers" => Self::Kilometers,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ActivityDistanceUnits<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ActivityDistanceUnits<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ActivityDistanceUnits<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ActivityDistanceUnits<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ActivityDistanceUnits<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ActivityDistanceUnits<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ActivityDistanceUnits<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ActivityDistanceUnits::Feet => ActivityDistanceUnits::Feet,
+            ActivityDistanceUnits::Miles => ActivityDistanceUnits::Miles,
+            ActivityDistanceUnits::Meters => ActivityDistanceUnits::Meters,
+            ActivityDistanceUnits::Kilometers => ActivityDistanceUnits::Kilometers,
+            ActivityDistanceUnits::Other(v) => {
+                ActivityDistanceUnits::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -286,7 +375,7 @@ pub struct ActivityBuilder<St: activity_state::State, S: BosStr = DefaultStr> {
         Option<i64>,
         Option<Datetime>,
         Option<S>,
-        Option<S>,
+        Option<ActivityDistanceUnits<S>>,
         Option<Datetime>,
         Option<BlobRef<S>>,
         Option<Vec<Split<S>>>,
@@ -380,12 +469,18 @@ impl<St: activity_state::State, S: BosStr> ActivityBuilder<St, S> {
 
 impl<St: activity_state::State, S: BosStr> ActivityBuilder<St, S> {
     /// Set the `distanceUnits` field (optional)
-    pub fn distance_units(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn distance_units(
+        mut self,
+        value: impl Into<Option<ActivityDistanceUnits<S>>>,
+    ) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `distanceUnits` field to an Option value (optional)
-    pub fn maybe_distance_units(mut self, value: Option<S>) -> Self {
+    pub fn maybe_distance_units(
+        mut self,
+        value: Option<ActivityDistanceUnits<S>>,
+    ) -> Self {
         self._fields.3 = value;
         self
     }

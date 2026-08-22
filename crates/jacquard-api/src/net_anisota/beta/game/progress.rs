@@ -70,7 +70,7 @@ pub struct Progress<S: BosStr = DefaultStr> {
     pub total_xp: i64,
     ///What action triggered this progress save
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub trigger_source: Option<S>,
+    pub trigger_source: Option<ProgressTriggerSource<S>>,
     ///Experience points gained since the last progress save
     #[serde(skip_serializing_if = "Option::is_none")]
     pub xp_gained_since_last_save: Option<i64>,
@@ -83,6 +83,121 @@ pub struct Progress<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// What action triggered this progress save
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ProgressTriggerSource<S: BosStr = DefaultStr> {
+    CardAdvance,
+    Post,
+    PostToList,
+    SpecimenDiscover,
+    SpecimenCatchNew,
+    SpecimenCatchRepeat,
+    LevelUp,
+    ManualSave,
+    SessionEnd,
+    Other(S),
+}
+
+impl<S: BosStr> ProgressTriggerSource<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::CardAdvance => "card_advance",
+            Self::Post => "post",
+            Self::PostToList => "post_to_list",
+            Self::SpecimenDiscover => "specimen_discover",
+            Self::SpecimenCatchNew => "specimen_catch_new",
+            Self::SpecimenCatchRepeat => "specimen_catch_repeat",
+            Self::LevelUp => "level_up",
+            Self::ManualSave => "manual_save",
+            Self::SessionEnd => "session_end",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "card_advance" => Self::CardAdvance,
+            "post" => Self::Post,
+            "post_to_list" => Self::PostToList,
+            "specimen_discover" => Self::SpecimenDiscover,
+            "specimen_catch_new" => Self::SpecimenCatchNew,
+            "specimen_catch_repeat" => Self::SpecimenCatchRepeat,
+            "level_up" => Self::LevelUp,
+            "manual_save" => Self::ManualSave,
+            "session_end" => Self::SessionEnd,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ProgressTriggerSource<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ProgressTriggerSource<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ProgressTriggerSource<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProgressTriggerSource<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ProgressTriggerSource<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ProgressTriggerSource<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ProgressTriggerSource<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ProgressTriggerSource::CardAdvance => ProgressTriggerSource::CardAdvance,
+            ProgressTriggerSource::Post => ProgressTriggerSource::Post,
+            ProgressTriggerSource::PostToList => ProgressTriggerSource::PostToList,
+            ProgressTriggerSource::SpecimenDiscover => {
+                ProgressTriggerSource::SpecimenDiscover
+            }
+            ProgressTriggerSource::SpecimenCatchNew => {
+                ProgressTriggerSource::SpecimenCatchNew
+            }
+            ProgressTriggerSource::SpecimenCatchRepeat => {
+                ProgressTriggerSource::SpecimenCatchRepeat
+            }
+            ProgressTriggerSource::LevelUp => ProgressTriggerSource::LevelUp,
+            ProgressTriggerSource::ManualSave => ProgressTriggerSource::ManualSave,
+            ProgressTriggerSource::SessionEnd => ProgressTriggerSource::SessionEnd,
+            ProgressTriggerSource::Other(v) => {
+                ProgressTriggerSource::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -470,7 +585,7 @@ pub struct ProgressBuilder<St: progress_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<progress::Stats<S>>,
         Option<i64>,
-        Option<S>,
+        Option<ProgressTriggerSource<S>>,
         Option<i64>,
         Option<i64>,
     ),
@@ -727,12 +842,18 @@ where
 
 impl<St: progress_state::State, S: BosStr> ProgressBuilder<St, S> {
     /// Set the `triggerSource` field (optional)
-    pub fn trigger_source(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn trigger_source(
+        mut self,
+        value: impl Into<Option<ProgressTriggerSource<S>>>,
+    ) -> Self {
         self._fields.12 = value.into();
         self
     }
     /// Set the `triggerSource` field to an Option value (optional)
-    pub fn maybe_trigger_source(mut self, value: Option<S>) -> Self {
+    pub fn maybe_trigger_source(
+        mut self,
+        value: Option<ProgressTriggerSource<S>>,
+    ) -> Self {
         self._fields.12 = value;
         self
     }

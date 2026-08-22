@@ -52,14 +52,14 @@ pub struct Info<S: BosStr = DefaultStr> {
     ///The long description of the organization or project in richtext
     pub long_description: S,
     ///The objectives of the organization or project
-    pub objectives: Vec<S>,
+    pub objectives: Vec<InfoObjectives<S>>,
     ///The description of the organization or project
     pub short_description: S,
     ///The start date of the organization or project
     #[serde(skip_serializing_if = "Option::is_none")]
     pub start_date: Option<Datetime>,
     ///The visibility of the organization or project in the Green Globe
-    pub visibility: S,
+    pub visibility: InfoVisibility<S>,
     ///The website of the organization or project
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<UriValue<S>>,
@@ -70,6 +70,177 @@ pub struct Info<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum InfoObjectives<S: BosStr = DefaultStr> {
+    Conservation,
+    Research,
+    Education,
+    Community,
+    Other,
+    UnknownValue(S),
+}
+
+impl<S: BosStr> InfoObjectives<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Conservation => "Conservation",
+            Self::Research => "Research",
+            Self::Education => "Education",
+            Self::Community => "Community",
+            Self::Other => "Other",
+            Self::UnknownValue(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "Conservation" => Self::Conservation,
+            "Research" => Self::Research,
+            "Education" => Self::Education,
+            "Community" => Self::Community,
+            "Other" => Self::Other,
+            _ => Self::UnknownValue(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for InfoObjectives<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for InfoObjectives<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for InfoObjectives<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for InfoObjectives<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for InfoObjectives<S> {
+    fn default() -> Self {
+        Self::UnknownValue(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for InfoObjectives<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = InfoObjectives<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            InfoObjectives::Conservation => InfoObjectives::Conservation,
+            InfoObjectives::Research => InfoObjectives::Research,
+            InfoObjectives::Education => InfoObjectives::Education,
+            InfoObjectives::Community => InfoObjectives::Community,
+            InfoObjectives::Other => InfoObjectives::Other,
+            InfoObjectives::UnknownValue(v) => {
+                InfoObjectives::UnknownValue(v.into_static())
+            }
+        }
+    }
+}
+
+/// The visibility of the organization or project in the Green Globe
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum InfoVisibility<S: BosStr = DefaultStr> {
+    Public,
+    Hidden,
+    Other(S),
+}
+
+impl<S: BosStr> InfoVisibility<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "Public",
+            Self::Hidden => "Hidden",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "Public" => Self::Public,
+            "Hidden" => Self::Hidden,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for InfoVisibility<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for InfoVisibility<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for InfoVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for InfoVisibility<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for InfoVisibility<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for InfoVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = InfoVisibility<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            InfoVisibility::Public => InfoVisibility::Public,
+            InfoVisibility::Hidden => InfoVisibility::Hidden,
+            InfoVisibility::Other(v) => InfoVisibility::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -360,10 +531,10 @@ pub struct InfoBuilder<St: info_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<Data<S>>,
         Option<S>,
-        Option<Vec<S>>,
+        Option<Vec<InfoObjectives<S>>>,
         Option<S>,
         Option<Datetime>,
-        Option<S>,
+        Option<InfoVisibility<S>>,
         Option<UriValue<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -515,7 +686,7 @@ where
     /// Set the `objectives` field (required)
     pub fn objectives(
         mut self,
-        value: impl Into<Vec<S>>,
+        value: impl Into<Vec<InfoObjectives<S>>>,
     ) -> InfoBuilder<info_state::SetObjectives<St>, S> {
         self._fields.6 = Option::Some(value.into());
         InfoBuilder {
@@ -566,7 +737,7 @@ where
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<InfoVisibility<S>>,
     ) -> InfoBuilder<info_state::SetVisibility<St>, S> {
         self._fields.9 = Option::Some(value.into());
         InfoBuilder {

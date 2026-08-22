@@ -84,7 +84,7 @@ pub struct Document<S: BosStr = DefaultStr> {
     ///Controls who can view this document  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_document_visibility")]
-    pub visibility: Option<S>,
+    pub visibility: Option<DocumentVisibility<S>>,
     #[serde(
         flatten,
         default,
@@ -92,6 +92,89 @@ pub struct Document<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Controls who can view this document
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DocumentVisibility<S: BosStr = DefaultStr> {
+    Public,
+    Url,
+    Author,
+    Other(S),
+}
+
+impl<S: BosStr> DocumentVisibility<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Public => "public",
+            Self::Url => "url",
+            Self::Author => "author",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "public" => Self::Public,
+            "url" => Self::Url,
+            "author" => Self::Author,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for DocumentVisibility<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for DocumentVisibility<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for DocumentVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DocumentVisibility<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for DocumentVisibility<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for DocumentVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = DocumentVisibility<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DocumentVisibility::Public => DocumentVisibility::Public,
+            DocumentVisibility::Url => DocumentVisibility::Url,
+            DocumentVisibility::Author => DocumentVisibility::Author,
+            DocumentVisibility::Other(v) => DocumentVisibility::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -614,8 +697,10 @@ fn _default_document_latex() -> Option<bool> {
     Some(false)
 }
 
-fn _default_document_visibility<S: FromStaticStr>() -> ::core::option::Option<S> {
-    Some(S::from_static("public"))
+fn _default_document_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    DocumentVisibility<S>,
+> {
+    Some(<DocumentVisibility<S>>::from_value(S::from_static("public")))
 }
 
 pub mod document_state {
@@ -725,7 +810,7 @@ pub struct DocumentBuilder<St: document_state::State, S: BosStr = DefaultStr> {
         Option<Theme<S>>,
         Option<S>,
         Option<UriValue<S>>,
-        Option<S>,
+        Option<DocumentVisibility<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -967,12 +1052,15 @@ where
 
 impl<St: document_state::State, S: BosStr> DocumentBuilder<St, S> {
     /// Set the `visibility` field (optional)
-    pub fn visibility(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn visibility(
+        mut self,
+        value: impl Into<Option<DocumentVisibility<S>>>,
+    ) -> Self {
         self._fields.11 = value.into();
         self
     }
     /// Set the `visibility` field to an Option value (optional)
-    pub fn maybe_visibility(mut self, value: Option<S>) -> Self {
+    pub fn maybe_visibility(mut self, value: Option<DocumentVisibility<S>>) -> Self {
         self._fields.11 = value;
         self
     }
@@ -1001,7 +1089,7 @@ where
             theme: self._fields.8,
             title: self._fields.9.unwrap(),
             url: self._fields.10.unwrap(),
-            visibility: self._fields.11.or_else(|| Some(S::from_static("public"))),
+            visibility: self._fields.11,
             extra_data: Default::default(),
         }
     }
@@ -1019,7 +1107,7 @@ where
             theme: self._fields.8,
             title: self._fields.9.unwrap(),
             url: self._fields.10.unwrap(),
-            visibility: self._fields.11.or_else(|| Some(S::from_static("public"))),
+            visibility: self._fields.11,
             extra_data: Some(extra_data),
         }
     }

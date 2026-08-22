@@ -49,7 +49,7 @@ pub struct Blob<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///When set, Blob fills its container height. 'cover' crops to fill; 'contain' letterboxes.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub fit: Option<S>,
+    pub fit: Option<BlobFit<S>>,
     ///Known aspect ratio for CLS prevention. Reserves space before the image loads.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ratio: Option<blob::AspectRatio<S>>,
@@ -57,6 +57,85 @@ pub struct Blob<S: BosStr = DefaultStr> {
     pub src: Data<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// When set, Blob fills its container height. 'cover' crops to fill; 'contain' letterboxes.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum BlobFit<S: BosStr = DefaultStr> {
+    Cover,
+    Contain,
+    Other(S),
+}
+
+impl<S: BosStr> BlobFit<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Cover => "cover",
+            Self::Contain => "contain",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "cover" => Self::Cover,
+            "contain" => Self::Contain,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for BlobFit<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for BlobFit<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for BlobFit<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for BlobFit<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for BlobFit<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for BlobFit<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = BlobFit<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            BlobFit::Cover => BlobFit::Cover,
+            BlobFit::Contain => BlobFit::Contain,
+            BlobFit::Other(v) => BlobFit::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -452,7 +531,12 @@ pub mod blob_state {
 /// Builder for constructing an instance of this type.
 pub struct BlobBuilder<St: blob_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Did<S>>, Option<S>, Option<blob::AspectRatio<S>>, Option<Data<S>>),
+    _fields: (
+        Option<Did<S>>,
+        Option<BlobFit<S>>,
+        Option<blob::AspectRatio<S>>,
+        Option<Data<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -513,12 +597,12 @@ where
 
 impl<St: blob_state::State, S: BosStr> BlobBuilder<St, S> {
     /// Set the `fit` field (optional)
-    pub fn fit(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn fit(mut self, value: impl Into<Option<BlobFit<S>>>) -> Self {
         self._fields.1 = value.into();
         self
     }
     /// Set the `fit` field to an Option value (optional)
-    pub fn maybe_fit(mut self, value: Option<S>) -> Self {
+    pub fn maybe_fit(mut self, value: Option<BlobFit<S>>) -> Self {
         self._fields.1 = value;
         self
     }

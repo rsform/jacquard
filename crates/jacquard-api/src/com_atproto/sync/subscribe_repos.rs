@@ -306,15 +306,15 @@ pub struct SubscribeRepos {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubscribeReposMessage<S: BosStr = DefaultStr> {
-    #[serde(rename = "#commit")]
+    #[serde(rename = "com.atproto.sync.subscribeRepos#commit")]
     Commit(Box<subscribe_repos::Commit<S>>),
-    #[serde(rename = "#sync")]
+    #[serde(rename = "com.atproto.sync.subscribeRepos#sync")]
     Sync(Box<subscribe_repos::Sync<S>>),
-    #[serde(rename = "#identity")]
+    #[serde(rename = "com.atproto.sync.subscribeRepos#identity")]
     Identity(Box<subscribe_repos::Identity<S>>),
-    #[serde(rename = "#account")]
+    #[serde(rename = "com.atproto.sync.subscribeRepos#account")]
     Account(Box<subscribe_repos::Account<S>>),
-    #[serde(rename = "#info")]
+    #[serde(rename = "com.atproto.sync.subscribeRepos#info")]
     Info(Box<subscribe_repos::Info<S>>),
 }
 

@@ -52,6 +52,7 @@ tracing = ["std", "dep:tracing"]
 streaming = ["n0-future", "futures", "reqwest/stream"]
 websocket = ["streaming", "tokio-tungstenite-wasm", "dep:ciborium", "dep:ciborium-io"]
 zstd = ["dep:zstd"]
+jss = ["dep:xxhash-rust"]
 reqwest-compression = ["reqwest/gzip", "reqwest/brotli", "reqwest/deflate"]
 
 [dependencies]
@@ -91,10 +92,11 @@ tokio = { workspace = true, default-features = false, features = ["sync"], optio
 # Streaming support (optional)
 n0-future = { workspace = true, optional = true }
 futures = { version = "0.3", optional = true, default-features = false, features = ["alloc"] }
-tokio-tungstenite-wasm = { version = "0.4", default-features = false, optional = true }
+tokio-tungstenite-wasm = { version = "0.6", path = "../tokio-tungstenite-wasm", default-features = false, optional = true }
 ciborium = { version = "0.2.0", default-features = false, optional = true }
 ciborium-io = { version = "0.2.0", default-features = false, optional = true }
-zstd = { version = "0.13", optional = true }
+zstd = { workspace = true, optional = true }
+xxhash-rust = { workspace = true, optional = true }
 postcard = { version = "1.1.3" }
 
 # regex-automata for no_std embedded, regex-lite for wasm, full regex with std on native
@@ -108,12 +110,12 @@ getrandom_02 = { package = "getrandom", version = "0.2", features = ["js"] }
 regex-lite = "0.1"
 #ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"]}
 reqwest = { workspace = true, optional = true, features = [ "json", "gzip", "rustls-tls-manual-roots"] }
-tokio-tungstenite-wasm = { version = "0.4", features = [], optional = true }
+tokio-tungstenite-wasm = { version = "0.6", path = "../tokio-tungstenite-wasm", features = [], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 reqwest = { workspace = true, optional = true, features = [ "http2", "gzip", "system-proxy", "rustls-tls"] }
 tokio-util = { version = "0.7.16", features = ["io"], optional = true }
-tokio-tungstenite-wasm = { version = "0.4", features = ["rustls-tls-native-roots"], optional = true }
+tokio-tungstenite-wasm = { version = "0.6", path = "../tokio-tungstenite-wasm", features = ["rustls-tls-native-roots"], optional = true }
 
 
 [dependencies.ed25519-dalek]

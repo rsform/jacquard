@@ -987,7 +987,7 @@ pub struct ModEventTakedown<S: BosStr = DefaultStr> {
     pub strike_expires_at: Option<Datetime>,
     ///List of services where the takedown should be applied. If empty or not provided, takedown is applied on all configured services.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub target_services: Option<Vec<S>>,
+    pub target_services: Option<Vec<ModEventTakedownTargetServices<S>>>,
     #[serde(
         flatten,
         default,
@@ -995,6 +995,89 @@ pub struct ModEventTakedown<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ModEventTakedownTargetServices<S: BosStr = DefaultStr> {
+    Appview,
+    Pds,
+    Other(S),
+}
+
+impl<S: BosStr> ModEventTakedownTargetServices<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Appview => "appview",
+            Self::Pds => "pds",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "appview" => Self::Appview,
+            "pds" => Self::Pds,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ModEventTakedownTargetServices<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ModEventTakedownTargetServices<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ModEventTakedownTargetServices<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ModEventTakedownTargetServices<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ModEventTakedownTargetServices<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ModEventTakedownTargetServices<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ModEventTakedownTargetServices<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ModEventTakedownTargetServices::Appview => {
+                ModEventTakedownTargetServices::Appview
+            }
+            ModEventTakedownTargetServices::Pds => ModEventTakedownTargetServices::Pds,
+            ModEventTakedownTargetServices::Other(v) => {
+                ModEventTakedownTargetServices::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Unmute action on a subject

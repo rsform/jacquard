@@ -68,7 +68,7 @@ pub struct SiweMessage<S: BosStr = DefaultStr> {
     ///URI of the application requesting the signature, e.g. 'https://wallet-link.stellz.club'
     pub uri: UriValue<S>,
     ///Sign in With Ethereum message version
-    pub version: S,
+    pub version: SiweMessageVersion<S>,
     #[serde(
         flatten,
         default,
@@ -76,6 +76,81 @@ pub struct SiweMessage<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Sign in With Ethereum message version
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SiweMessageVersion<S: BosStr = DefaultStr> {
+    _1,
+    Other(S),
+}
+
+impl<S: BosStr> SiweMessageVersion<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_1 => "1",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "1" => Self::_1,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SiweMessageVersion<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SiweMessageVersion<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SiweMessageVersion<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SiweMessageVersion<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SiweMessageVersion<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SiweMessageVersion<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SiweMessageVersion<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SiweMessageVersion::_1 => SiweMessageVersion::_1,
+            SiweMessageVersion::Other(v) => SiweMessageVersion::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for AddressControl<S> {
@@ -738,7 +813,7 @@ pub struct SiweMessageBuilder<St: siwe_message_state::State, S: BosStr = Default
         Option<S>,
         Option<S>,
         Option<UriValue<S>>,
-        Option<S>,
+        Option<SiweMessageVersion<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -920,7 +995,7 @@ where
     /// Set the `version` field (required)
     pub fn version(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<SiweMessageVersion<S>>,
     ) -> SiweMessageBuilder<siwe_message_state::SetVersion<St>, S> {
         self._fields.7 = Option::Some(value.into());
         SiweMessageBuilder {

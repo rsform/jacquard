@@ -199,29 +199,19 @@ nix build
 
 There's also a [`justfile`](https://just.systems/) for Makefile-esque commands to be run inside of the devShell, and you can generally `cargo ...` or `just ...` whatever just fine if you don't want to use Nix and have the prerequisites installed.
 
-### Full-stack e2e harness (opt-in)
+### Full-stack e2e testing harness
 
-The e2e harness exercises generated bindings, sessions, blobs, and typed
-server integration against private local PDS fixtures (Tranquil PDS and the
-reference spaces-alpha PDS). It is strictly opt-in and never runs as part of
-ordinary `cargo nextest run` or `just publish`.
+For more comprehensive testing, there is an e2e testing harness. Currently this can test against tranquil-pds, the reference PDS implementation, and jetstream v2.
 
 Prerequisites: rootful Docker with bridge networking, and
 `docker login atcr.io` (ATProto handle + app-password) for the Tranquil
 provider image.
 
 ```bash
-nix develop .#e2e -c just e2e                  # all stable providers
-nix develop .#e2e -c just e2e-provider reference  # iterate on one provider
-just e2e-logs <run-id>                         # inspect a retained bundle
+just e2e                       # all stable providers
+just e2e-provider reference    # iterate on one provider
+just e2e-logs <run-id>         # inspect a retained bundle
 ```
-
-Each run resolves its provider image tag once and records the effective
-image metadata. It tears down that run's containers and volumes on success.
-On failure (or `--keep`), sanitized diagnostics are retained under
-`target/e2e/<run-id>/` — protocol bodies may appear there, but never secrets.
-See
-[`plans/e2e-harness.md`](./plans/e2e-harness.md) for topology and design.
 
 
 

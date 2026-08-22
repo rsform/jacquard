@@ -1,5 +1,55 @@
 # Changelog
 
+## [0.13.0] - 2026-08-23
+
+
+### Permissioned data and spaces
+
+- Added proposal-0016 permissioned-data primitives across `jacquard-common`,
+  `jacquard-api`, `jacquard-lexicon`, and `jacquard-repo`, including generated
+  `com.atproto.space` and `com.atproto.simplespace` bindings, permissioned
+  repository verification, delegation-token authentication, and canonical
+  record decoding.
+- Added `AtSpaceUri`, `SpaceRef`, and `SpacePath`. `AtUri` now accepts both
+  public repository URIs and canonical permissioned-space URIs while exposing
+  typed space, author, collection, and record-key accessors.
+
+### Full-stack e2e harness
+
+- Added the opt-in `jacquard-e2e` harness with pinned, isolated Docker fixtures
+  for Tranquil PDS, the reference spaces-alpha PDS, and Jetstream v2. It covers
+  sessions, OAuth/DPoP, identity resolution, blobs, generated Axum endpoints,
+  permissioned spaces, archive replay, and live WebSocket cutover.
+- Added the `.#e2e` Nix development shell and `just e2e` provider lifecycle,
+  including ephemeral TLS ingress, deterministic fixture identities, digest
+  capture, teardown, and sanitized failure diagnostics.
+
+### Jetstream v2 support
+
+- Added the `network.bsky.jetstream` lexicon surface to codegen, including
+  subscription `subprotocol` support. JSON subscription
+  unions use full-NSID `$type` tags while DAG-CBOR frame headers
+  retain local `#fragment` tags.
+- Added `jacquard::jetstream`: bounded `.jss` segment and block decoding with
+  sealed-checksum verification, various types to adapt to the lexicon API generated types,
+  and low-level unmanaged `subscribeEvents` streams.
+- Added replay and snapshot orchestration with paged planning, exact client-side
+  filtering, bounded concurrent and resumable downloads, and archive-to-live
+  cutover.
+- The v2 server dictionary differs from the vendored v1 dictionary (id
+  1612007021), so v2 clients fetch and cache the server generation. Dictionary
+  rotation recovery refetches once and falls back to an uncompressed reconnect
+  only when recovery cannot obtain a usable generation.
+
+### Code generation and correctness
+
+- Fixed generated record decoding, binary payload bindings, parent-module import
+  collisions, builder generic inference, multiline documentation output, and
+  schema typing used by permissioned data and subscription unions.
+- WebSocket connection options now carry headers and subprotocols together, and
+  rejected upgrades expose status, headers, and a bounded body through
+  `WebSocketError::HandshakeRejected` for typed recovery.
+
 ## [0.12.1] - 2026-06-26
 
 ## Additions (possibly breaking)

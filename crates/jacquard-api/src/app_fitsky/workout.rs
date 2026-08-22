@@ -808,17 +808,29 @@ pub struct StrengthDetails<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct VisibilitySettings<S: BosStr = DefaultStr> {
+    /// Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_visibility_settings_calories")]
     pub calories: Option<VisibilitySettingsCalories<S>>,
+    /// Defaults to `"private"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_visibility_settings_cardio_zones")]
     pub cardio_zones: Option<VisibilitySettingsCardioZones<S>>,
+    /// Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_visibility_settings_details")]
     pub details: Option<VisibilitySettingsDetails<S>>,
+    /// Defaults to `"private"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_visibility_settings_heart_rate")]
     pub heart_rate: Option<VisibilitySettingsHeartRate<S>>,
+    /// Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_visibility_settings_notes")]
     pub notes: Option<VisibilitySettingsNotes<S>>,
+    /// Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_visibility_settings_steps")]
     pub steps: Option<VisibilitySettingsSteps<S>>,
     #[serde(
         flatten,
@@ -3857,4 +3869,40 @@ where
         BTreeMap<SmolStr, Data<S>>,
     > as serde::Deserialize<'de>>::deserialize(deserializer)?;
     Ok(data.filter(|extra_data| !extra_data.is_empty()))
+}
+
+fn _default_visibility_settings_calories<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    VisibilitySettingsCalories<S>,
+> {
+    Some(<VisibilitySettingsCalories<S>>::from_value(S::from_static("public")))
+}
+
+fn _default_visibility_settings_cardio_zones<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    VisibilitySettingsCardioZones<S>,
+> {
+    Some(<VisibilitySettingsCardioZones<S>>::from_value(S::from_static("private")))
+}
+
+fn _default_visibility_settings_details<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    VisibilitySettingsDetails<S>,
+> {
+    Some(<VisibilitySettingsDetails<S>>::from_value(S::from_static("public")))
+}
+
+fn _default_visibility_settings_heart_rate<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    VisibilitySettingsHeartRate<S>,
+> {
+    Some(<VisibilitySettingsHeartRate<S>>::from_value(S::from_static("private")))
+}
+
+fn _default_visibility_settings_notes<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    VisibilitySettingsNotes<S>,
+> {
+    Some(<VisibilitySettingsNotes<S>>::from_value(S::from_static("public")))
+}
+
+fn _default_visibility_settings_steps<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    VisibilitySettingsSteps<S>,
+> {
+    Some(<VisibilitySettingsSteps<S>>::from_value(S::from_static("public")))
 }

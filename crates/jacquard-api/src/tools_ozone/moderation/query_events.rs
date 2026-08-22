@@ -17,6 +17,275 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::ModEventView;
+/// If specified, only events where the age assurance state matches the given value are returned
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryEventsAgeAssuranceState<S: BosStr = DefaultStr> {
+    Pending,
+    Assured,
+    Unknown,
+    Reset,
+    Blocked,
+    Other(S),
+}
+
+impl<S: BosStr> QueryEventsAgeAssuranceState<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "pending",
+            Self::Assured => "assured",
+            Self::Unknown => "unknown",
+            Self::Reset => "reset",
+            Self::Blocked => "blocked",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "pending" => Self::Pending,
+            "assured" => Self::Assured,
+            "unknown" => Self::Unknown,
+            "reset" => Self::Reset,
+            "blocked" => Self::Blocked,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryEventsAgeAssuranceState<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryEventsAgeAssuranceState<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryEventsAgeAssuranceState<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for QueryEventsAgeAssuranceState<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryEventsAgeAssuranceState<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryEventsAgeAssuranceState<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryEventsAgeAssuranceState<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryEventsAgeAssuranceState::Pending => {
+                QueryEventsAgeAssuranceState::Pending
+            }
+            QueryEventsAgeAssuranceState::Assured => {
+                QueryEventsAgeAssuranceState::Assured
+            }
+            QueryEventsAgeAssuranceState::Unknown => {
+                QueryEventsAgeAssuranceState::Unknown
+            }
+            QueryEventsAgeAssuranceState::Reset => QueryEventsAgeAssuranceState::Reset,
+            QueryEventsAgeAssuranceState::Blocked => {
+                QueryEventsAgeAssuranceState::Blocked
+            }
+            QueryEventsAgeAssuranceState::Other(v) => {
+                QueryEventsAgeAssuranceState::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Sort direction for the events. Defaults to descending order of created at timestamp.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryEventsSortDirection<S: BosStr = DefaultStr> {
+    Asc,
+    Desc,
+    Other(S),
+}
+
+impl<S: BosStr> QueryEventsSortDirection<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Asc => "asc",
+            Self::Desc => "desc",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "asc" => Self::Asc,
+            "desc" => Self::Desc,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryEventsSortDirection<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryEventsSortDirection<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryEventsSortDirection<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for QueryEventsSortDirection<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryEventsSortDirection<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryEventsSortDirection<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryEventsSortDirection<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryEventsSortDirection::Asc => QueryEventsSortDirection::Asc,
+            QueryEventsSortDirection::Desc => QueryEventsSortDirection::Desc,
+            QueryEventsSortDirection::Other(v) => {
+                QueryEventsSortDirection::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// If specified, only events where the subject is of the given type (account, record, or conversation) will be returned. When this is set to 'account' the 'collections' parameter will be ignored. When includeAllUserRecords or subject is set, this will be ignored.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum QueryEventsSubjectType<S: BosStr = DefaultStr> {
+    Account,
+    Record,
+    Conversation,
+    Other(S),
+}
+
+impl<S: BosStr> QueryEventsSubjectType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Account => "account",
+            Self::Record => "record",
+            Self::Conversation => "conversation",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "account" => Self::Account,
+            "record" => Self::Record,
+            "conversation" => Self::Conversation,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for QueryEventsSubjectType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for QueryEventsSubjectType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for QueryEventsSubjectType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryEventsSubjectType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for QueryEventsSubjectType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for QueryEventsSubjectType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryEventsSubjectType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            QueryEventsSubjectType::Account => QueryEventsSubjectType::Account,
+            QueryEventsSubjectType::Record => QueryEventsSubjectType::Record,
+            QueryEventsSubjectType::Conversation => QueryEventsSubjectType::Conversation,
+            QueryEventsSubjectType::Other(v) => {
+                QueryEventsSubjectType::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -26,7 +295,7 @@ pub struct QueryEvents<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added_tags: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub age_assurance_state: Option<S>,
+    pub age_assurance_state: Option<QueryEventsAgeAssuranceState<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub batch_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,11 +333,11 @@ pub struct QueryEvents<S: BosStr = DefaultStr> {
     /// Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort_direction: Option<S>,
+    pub sort_direction: Option<QueryEventsSortDirection<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subject_type: Option<S>,
+    pub subject_type: Option<QueryEventsSubjectType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub types: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -122,8 +391,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("desc"))
+fn _default_sort_direction<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    QueryEventsSortDirection<S>,
+> {
+    Some(<QueryEventsSortDirection<S>>::from_value(S::from_static("desc")))
 }
 
 pub mod query_events_state {
@@ -151,7 +422,7 @@ pub struct QueryEventsBuilder<St: query_events_state::State, S: BosStr = Default
     _fields: (
         Option<Vec<S>>,
         Option<Vec<S>>,
-        Option<S>,
+        Option<QueryEventsAgeAssuranceState<S>>,
         Option<S>,
         Option<Vec<Nsid<S>>>,
         Option<S>,
@@ -167,9 +438,9 @@ pub struct QueryEventsBuilder<St: query_events_state::State, S: BosStr = Default
         Option<Vec<S>>,
         Option<Vec<S>>,
         Option<Vec<S>>,
-        Option<S>,
+        Option<QueryEventsSortDirection<S>>,
         Option<UriValue<S>>,
-        Option<S>,
+        Option<QueryEventsSubjectType<S>>,
         Option<Vec<S>>,
         Option<bool>,
     ),
@@ -288,12 +559,18 @@ impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
 
 impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
     /// Set the `ageAssuranceState` field (optional)
-    pub fn age_assurance_state(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn age_assurance_state(
+        mut self,
+        value: impl Into<Option<QueryEventsAgeAssuranceState<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `ageAssuranceState` field to an Option value (optional)
-    pub fn maybe_age_assurance_state(mut self, value: Option<S>) -> Self {
+    pub fn maybe_age_assurance_state(
+        mut self,
+        value: Option<QueryEventsAgeAssuranceState<S>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }
@@ -496,12 +773,18 @@ impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
 
 impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
     /// Set the `sortDirection` field (optional)
-    pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort_direction(
+        mut self,
+        value: impl Into<Option<QueryEventsSortDirection<S>>>,
+    ) -> Self {
         self._fields.18 = value.into();
         self
     }
     /// Set the `sortDirection` field to an Option value (optional)
-    pub fn maybe_sort_direction(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort_direction(
+        mut self,
+        value: Option<QueryEventsSortDirection<S>>,
+    ) -> Self {
         self._fields.18 = value;
         self
     }
@@ -522,12 +805,18 @@ impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
 
 impl<St: query_events_state::State, S: BosStr> QueryEventsBuilder<St, S> {
     /// Set the `subjectType` field (optional)
-    pub fn subject_type(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn subject_type(
+        mut self,
+        value: impl Into<Option<QueryEventsSubjectType<S>>>,
+    ) -> Self {
         self._fields.20 = value.into();
         self
     }
     /// Set the `subjectType` field to an Option value (optional)
-    pub fn maybe_subject_type(mut self, value: Option<S>) -> Self {
+    pub fn maybe_subject_type(
+        mut self,
+        value: Option<QueryEventsSubjectType<S>>,
+    ) -> Self {
         self._fields.20 = value;
         self
     }

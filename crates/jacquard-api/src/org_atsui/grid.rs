@@ -25,8 +25,9 @@ pub struct Grid<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_grid_columns")]
     pub columns: Option<i64>,
-    ///Space between children.
+    ///Space between children.  Defaults to `"small"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_grid_gap")]
     pub gap: Option<GridGap<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -163,6 +164,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for GridRequest {
 
 fn _default_grid_columns() -> Option<i64> {
     Some(3i64)
+}
+
+fn _default_grid_gap<S: FromStaticStr + BosStr>() -> ::core::option::Option<GridGap<S>> {
+    Some(<GridGap<S>>::from_value(S::from_static("small")))
 }
 
 pub mod grid_state {

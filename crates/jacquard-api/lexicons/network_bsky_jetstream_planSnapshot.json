@@ -1,0 +1,193 @@
+{
+  "lexicon": 1,
+  "id": "network.bsky.jetstream.planSnapshot",
+  "defs": {
+    "blockRange": {
+      "type": "object",
+      "required": [
+        "first",
+        "last"
+      ],
+      "properties": {
+        "first": {
+          "type": "integer",
+          "description": "Index of the first block in the range.",
+          "minimum": 0
+        },
+        "last": {
+          "type": "integer",
+          "description": "Index of the last block in the range.",
+          "minimum": 0
+        }
+      }
+    },
+    "main": {
+      "type": "procedure",
+      "description": "Build a download plan for the desired data pattern. The plan lists whole segments or block ranges that might contain events for the requested kinds, DIDs, and collections.",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "afterSeq": {
+              "type": "integer",
+              "description": "Start after this sequence number. Events at or below it are not included.",
+              "minimum": 0
+            },
+            "beforeSeq": {
+              "type": "integer",
+              "description": "Stop at this sequence number. Events above it are not included.",
+              "minimum": 0
+            },
+            "collections": {
+              "type": "array",
+              "description": "Collection NSIDs or namespace wildcards such as app.bsky.feed.*; constrains commit events only. Non-commit kinds are unaffected, so combine with kinds=commit for a commits-only collection plan. Rejected when kinds is set and excludes commit. Omit or pass an empty array to include all collections.",
+              "items": {
+                "type": "string"
+              },
+              "maxLength": 100
+            },
+            "dids": {
+              "type": "array",
+              "description": "Only include data for these DIDs. Omit this field or pass an empty array to include all DIDs.",
+              "items": {
+                "type": "string",
+                "format": "did"
+              },
+              "maxLength": 10000
+            },
+            "kinds": {
+              "type": "array",
+              "description": "Event kinds to include. Omit this field or pass an empty array to include all kinds.",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "commit",
+                  "identity",
+                  "account",
+                  "sync"
+                ]
+              },
+              "maxLength": 4
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "required": [
+            "plannedThroughSeq",
+            "sealedTipSeq",
+            "segments",
+            "stats"
+          ],
+          "properties": {
+            "plannedThroughSeq": {
+              "type": "integer",
+              "description": "The last sealed sequence covered by this page. Use this value as afterSeq for the next page. If the response hits the server's page limit, this is the maxSeq of the last item returned; otherwise it equals sealedTipSeq. Planning is complete when plannedThroughSeq reaches sealedTipSeq.",
+              "minimum": 0
+            },
+            "sealedTipSeq": {
+              "type": "integer",
+              "description": "The end of the sealed archive for this snapshot, capped by beforeSeq when provided. Use this value as beforeSeq on later pages so the snapshot does not move while it is being downloaded.",
+              "minimum": 0
+            },
+            "segments": {
+              "type": "array",
+              "items": {
+                "type": "ref",
+                "ref": "#segment"
+              }
+            },
+            "stats": {
+              "type": "ref",
+              "ref": "#stats"
+            }
+          }
+        }
+      }
+    },
+    "segment": {
+      "type": "object",
+      "required": [
+        "name",
+        "index",
+        "checksum",
+        "minSeq",
+        "maxSeq",
+        "mode"
+      ],
+      "properties": {
+        "blocks": {
+          "type": "array",
+          "description": "Block ranges to download, including both endpoints. This field is present only when mode is blocks.",
+          "items": {
+            "type": "ref",
+            "ref": "#blockRange"
+          }
+        },
+        "checksum": {
+          "type": "string",
+          "description": "The segment's xxh3 metadata checksum, encoded as 16 hexadecimal characters.",
+          "minLength": 16,
+          "maxLength": 16
+        },
+        "index": {
+          "type": "integer",
+          "description": "Zero-based segment index.",
+          "minimum": 0
+        },
+        "maxSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minSeq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "mode": {
+          "type": "string",
+          "description": "How to download this segment. For segment, download the whole file with getSegment. For blocks, download the ranges listed in blocks with getBlock.",
+          "knownValues": [
+            "segment",
+            "blocks"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "description": "Segment filename to pass to getSegment or getBlock."
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "required": [
+        "segmentsExamined",
+        "segmentsMatched",
+        "blocksMatched",
+        "entries"
+      ],
+      "properties": {
+        "blocksMatched": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "entries": {
+          "type": "integer",
+          "description": "Number of items counted toward the server's per-page plan limit.",
+          "minimum": 0
+        },
+        "segmentsExamined": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "segmentsMatched": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

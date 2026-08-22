@@ -523,6 +523,10 @@ pub mod net_snrp;
 pub mod net_wafrn;
 
 
+#[cfg(feature = "network_bsky")]
+pub mod network_bsky;
+
+
 #[cfg(feature = "network_cosmik")]
 pub mod network_cosmik;
 

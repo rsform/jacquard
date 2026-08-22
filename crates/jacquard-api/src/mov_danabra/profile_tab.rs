@@ -24,7 +24,9 @@ pub struct ProfileTab<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_tab_limit")]
     pub limit: Option<i64>,
+    /// Defaults to `"posts_and_author_threads"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_profile_tab_tab")]
     pub tab: Option<ProfileTabTab<S>>,
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -153,6 +155,12 @@ impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
 
 fn _default_profile_tab_limit() -> Option<i64> {
     Some(10i64)
+}
+
+fn _default_profile_tab_tab<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ProfileTabTab<S>,
+> {
+    Some(<ProfileTabTab<S>>::from_value(S::from_static("posts_and_author_threads")))
 }
 
 pub mod profile_tab_state {

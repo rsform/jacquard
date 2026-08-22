@@ -265,6 +265,16 @@ pub enum LexiconRefResolution {
         parent: syn::Ident,
         type_name: syn::Ident,
     },
+    /// Two module segments + type name: `embed::post::Post`. Used when two
+    /// referenced modules share a parent leaf name (`community::post` vs
+    /// `embed::post`), which would make single-segment qualification
+    /// ambiguous after both use statements bind that leaf. Emits
+    /// `use crate::path::embed;` and refs as `embed::post::Post`.
+    GrandparentQualified {
+        ancestor: syn::Ident,
+        parent: syn::Ident,
+        type_name: syn::Ident,
+    },
     // Fully-qualified refs are simply absent from the map.
 }
 
@@ -361,6 +371,18 @@ impl ResolvedImports {
                     }
                 }
 
+                // Extract grandparent for the same path shape:
+                // "crate::a::embed::post::Post" -> ("a", "embed").
+                fn extract_ancestors(full_path: &str) -> Option<(&str, &str)> {
+                    let parts: Vec<&str> = full_path.rsplit("::").collect();
+                    // [.., grandparent, parent, type_name]
+                    if parts.len() >= 3 {
+                        Some((parts[2], parts[1]))
+                    } else {
+                        None
+                    }
+                }
+
                 // Count parent-qualified forms for colliding names.
                 let mut parent_qualified_counts: BTreeMap<String, usize> = BTreeMap::new();
                 for (full_path, type_name) in lexicon_paths.iter() {
@@ -373,6 +395,27 @@ impl ResolvedImports {
                     }
                 }
 
+                // A parent leaf binds once per file: `use ..::community::post;`
+                // and `use ..::embed::post;` would both bind `post` (E0252).
+                // Each Tier-2 candidate passes in isolation, so detect leaves
+                // claimed by two distinct module paths and escalate those to
+                // grandparent qualification.
+                let mut leaf_modules: BTreeMap<&str, BTreeSet<&str>> = BTreeMap::new();
+                for (full_path, type_name) in lexicon_paths.iter() {
+                    let count = name_counts.get(type_name.as_str()).copied().unwrap_or(0);
+                    if count > 1 || local_type_names.contains(type_name) {
+                        if let Some(parent) = extract_parent(full_path) {
+                            let module = &full_path[..full_path.rfind("::").expect("has ::")];
+                            leaf_modules.entry(parent).or_default().insert(module);
+                        }
+                    }
+                }
+                let colliding_leaves: BTreeSet<&str> = leaf_modules
+                    .into_iter()
+                    .filter(|(_, modules)| modules.len() > 1)
+                    .map(|(leaf, _)| leaf)
+                    .collect();
+
                 let mut lexicon_short = BTreeMap::new();
                 for (full_path, type_name) in lexicon_paths {
                     let name_count = name_counts.get(type_name.as_str()).copied().unwrap_or(0);
@@ -382,12 +425,32 @@ impl ResolvedImports {
                         // Tier 1: unique short name.
                         let ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
                         lexicon_short.insert(full_path.clone(), LexiconRefResolution::Short(ident));
-                    } else if let Some(parent) = extract_parent(full_path) {
+                    } else if let Some((ancestor, parent)) =
+                        extract_ancestors(&full_path).filter(|(a, p)| {
+                            colliding_leaves.contains(p) && !colliding_leaves.contains(a)
+                        })
+                    {
+                        // Tier 2b: parent leaf is contested by another module;
+                        // qualify through the grandparent instead. If the
+                        // grandparent leaf is itself contested, fall through
+                        // to Tier 3 (fully-qualified) by not inserting.
+                        lexicon_short.insert(
+                            full_path.clone(),
+                            LexiconRefResolution::GrandparentQualified {
+                                ancestor: syn::Ident::new(ancestor, proc_macro2::Span::call_site()),
+                                parent: syn::Ident::new(parent, proc_macro2::Span::call_site()),
+                                type_name: syn::Ident::new(
+                                    type_name,
+                                    proc_macro2::Span::call_site(),
+                                ),
+                            },
+                        );
+                    } else if let Some(parent) = extract_parent(&full_path) {
                         let pq = format!("{}::{}", parent, type_name);
                         let pq_count = parent_qualified_counts.get(&pq).copied().unwrap_or(0);
                         let parent_collides =
                             local_type_names.contains(parent) || submodule_names.contains(parent);
-                        if pq_count <= 1 && !parent_collides {
+                        if pq_count <= 1 && !parent_collides && !colliding_leaves.contains(parent) {
                             // Tier 2: parent-qualified.
                             let parent_ident =
                                 syn::Ident::new(parent, proc_macro2::Span::call_site());
@@ -425,6 +488,11 @@ impl ResolvedImports {
             LexiconRefResolution::ParentQualified { parent, type_name } => {
                 Some(quote! { #parent::#type_name })
             }
+            LexiconRefResolution::GrandparentQualified {
+                ancestor,
+                parent,
+                type_name,
+            } => Some(quote! { #ancestor::#parent::#type_name }),
         }
     }
 
@@ -719,7 +787,9 @@ impl ResolvedImports {
         }
 
         // Generate use statements for cross-namespace lexicon refs.
-        // Collect parent module paths to deduplicate.
+        // Collect parent module paths to deduplicate. For grandparent-
+        // qualified refs, the use statement binds the grandparent leaf and
+        // the ref renders as ancestor::parent::Type.
         let mut parent_modules: BTreeSet<String> = BTreeSet::new();
         for (full_path, resolution) in &self.lexicon_short {
             match resolution {
@@ -730,6 +800,13 @@ impl ResolvedImports {
                 }
                 LexiconRefResolution::ParentQualified { .. } => {
                     let module_path_str = &full_path[..full_path.rfind("::").expect("has ::")];
+                    parent_modules.insert(module_path_str.to_string());
+                }
+                LexiconRefResolution::GrandparentQualified { .. } => {
+                    // Strip "::Type" to reach `..::ancestor::parent`.
+                    let without_type = &full_path[..full_path.rfind("::").expect("has ::")];
+                    let module_path_str =
+                        &without_type[..without_type.rfind("::").expect("has ::")];
                     parent_modules.insert(module_path_str.to_string());
                 }
             }

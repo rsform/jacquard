@@ -18,6 +18,141 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notification::Notification;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListNotificationsReasons<S: BosStr = DefaultStr> {
+    Like,
+    Bookmark,
+    Follow,
+    FollowAccept,
+    Subscribe,
+    SubscribeAccept,
+    CollaborationInvite,
+    CollaborationAccept,
+    NewEntry,
+    EntryUpdate,
+    Mention,
+    Tag,
+    Comment,
+    Other(S),
+}
+
+impl<S: BosStr> ListNotificationsReasons<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Like => "like",
+            Self::Bookmark => "bookmark",
+            Self::Follow => "follow",
+            Self::FollowAccept => "followAccept",
+            Self::Subscribe => "subscribe",
+            Self::SubscribeAccept => "subscribeAccept",
+            Self::CollaborationInvite => "collaborationInvite",
+            Self::CollaborationAccept => "collaborationAccept",
+            Self::NewEntry => "newEntry",
+            Self::EntryUpdate => "entryUpdate",
+            Self::Mention => "mention",
+            Self::Tag => "tag",
+            Self::Comment => "comment",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "like" => Self::Like,
+            "bookmark" => Self::Bookmark,
+            "follow" => Self::Follow,
+            "followAccept" => Self::FollowAccept,
+            "subscribe" => Self::Subscribe,
+            "subscribeAccept" => Self::SubscribeAccept,
+            "collaborationInvite" => Self::CollaborationInvite,
+            "collaborationAccept" => Self::CollaborationAccept,
+            "newEntry" => Self::NewEntry,
+            "entryUpdate" => Self::EntryUpdate,
+            "mention" => Self::Mention,
+            "tag" => Self::Tag,
+            "comment" => Self::Comment,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListNotificationsReasons<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListNotificationsReasons<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListNotificationsReasons<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for ListNotificationsReasons<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListNotificationsReasons<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListNotificationsReasons<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListNotificationsReasons<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListNotificationsReasons::Like => ListNotificationsReasons::Like,
+            ListNotificationsReasons::Bookmark => ListNotificationsReasons::Bookmark,
+            ListNotificationsReasons::Follow => ListNotificationsReasons::Follow,
+            ListNotificationsReasons::FollowAccept => {
+                ListNotificationsReasons::FollowAccept
+            }
+            ListNotificationsReasons::Subscribe => ListNotificationsReasons::Subscribe,
+            ListNotificationsReasons::SubscribeAccept => {
+                ListNotificationsReasons::SubscribeAccept
+            }
+            ListNotificationsReasons::CollaborationInvite => {
+                ListNotificationsReasons::CollaborationInvite
+            }
+            ListNotificationsReasons::CollaborationAccept => {
+                ListNotificationsReasons::CollaborationAccept
+            }
+            ListNotificationsReasons::NewEntry => ListNotificationsReasons::NewEntry,
+            ListNotificationsReasons::EntryUpdate => {
+                ListNotificationsReasons::EntryUpdate
+            }
+            ListNotificationsReasons::Mention => ListNotificationsReasons::Mention,
+            ListNotificationsReasons::Tag => ListNotificationsReasons::Tag,
+            ListNotificationsReasons::Comment => ListNotificationsReasons::Comment,
+            ListNotificationsReasons::Other(v) => {
+                ListNotificationsReasons::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListNotifications<S: BosStr = DefaultStr> {
@@ -28,7 +163,7 @@ pub struct ListNotifications<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub reasons: Option<Vec<S>>,
+    pub reasons: Option<Vec<ListNotificationsReasons<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub seen_at: Option<Datetime>,
 }
@@ -103,7 +238,12 @@ pub struct ListNotificationsBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<Vec<S>>, Option<Datetime>),
+    _fields: (
+        Option<S>,
+        Option<i64>,
+        Option<Vec<ListNotificationsReasons<S>>>,
+        Option<Datetime>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -174,12 +314,18 @@ impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St
 
 impl<St: list_notifications_state::State, S: BosStr> ListNotificationsBuilder<St, S> {
     /// Set the `reasons` field (optional)
-    pub fn reasons(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn reasons(
+        mut self,
+        value: impl Into<Option<Vec<ListNotificationsReasons<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `reasons` field to an Option value (optional)
-    pub fn maybe_reasons(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_reasons(
+        mut self,
+        value: Option<Vec<ListNotificationsReasons<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }

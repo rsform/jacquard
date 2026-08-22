@@ -50,8 +50,9 @@ pub struct Folder<S: BosStr = DefaultStr> {
     pub icon: Option<S>,
     ///Display name of the folder
     pub name: S,
-    ///Visibility setting for the folder
+    ///Visibility setting for the folder  Defaults to `"hidden"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_folder_visibility")]
     pub visibility: Option<FolderVisibility<S>>,
     #[serde(
         flatten,
@@ -282,6 +283,12 @@ where
         }
     }
     Ok(data)
+}
+
+fn _default_folder_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    FolderVisibility<S>,
+> {
+    Some(<FolderVisibility<S>>::from_value(S::from_static("hidden")))
 }
 
 pub mod folder_state {

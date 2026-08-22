@@ -107,7 +107,7 @@ pub struct Session<S: BosStr = DefaultStr> {
     pub duration: Option<i64>,
     ///Why the session ended
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub end_reason: Option<S>,
+    pub end_reason: Option<SessionEndReason<S>>,
     ///When the session ended (ISO 8601)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<Datetime>,
@@ -120,7 +120,7 @@ pub struct Session<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_session_uri: Option<S>,
     ///Platform where the session occurred
-    pub platform: S,
+    pub platform: SessionPlatform<S>,
     ///URIs of log records that occurred during this session
     #[serde(skip_serializing_if = "Option::is_none")]
     pub related_log_uris: Option<Vec<S>>,
@@ -135,7 +135,7 @@ pub struct Session<S: BosStr = DefaultStr> {
     ///When the session began (ISO 8601)
     pub started_at: Datetime,
     ///Current status of the session
-    pub status: S,
+    pub status: SessionStatus<S>,
     ///When the session record was last updated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<Datetime>,
@@ -146,6 +146,279 @@ pub struct Session<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Why the session ended
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SessionEndReason<S: BosStr = DefaultStr> {
+    Logout,
+    Timeout,
+    Inactivity,
+    UserInitiated,
+    DeviceSwitch,
+    AppClose,
+    ForcedEnd,
+    Other(S),
+}
+
+impl<S: BosStr> SessionEndReason<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Logout => "logout",
+            Self::Timeout => "timeout",
+            Self::Inactivity => "inactivity",
+            Self::UserInitiated => "user_initiated",
+            Self::DeviceSwitch => "device_switch",
+            Self::AppClose => "app_close",
+            Self::ForcedEnd => "forced_end",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "logout" => Self::Logout,
+            "timeout" => Self::Timeout,
+            "inactivity" => Self::Inactivity,
+            "user_initiated" => Self::UserInitiated,
+            "device_switch" => Self::DeviceSwitch,
+            "app_close" => Self::AppClose,
+            "forced_end" => Self::ForcedEnd,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SessionEndReason<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SessionEndReason<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SessionEndReason<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SessionEndReason<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SessionEndReason<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SessionEndReason<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SessionEndReason<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SessionEndReason::Logout => SessionEndReason::Logout,
+            SessionEndReason::Timeout => SessionEndReason::Timeout,
+            SessionEndReason::Inactivity => SessionEndReason::Inactivity,
+            SessionEndReason::UserInitiated => SessionEndReason::UserInitiated,
+            SessionEndReason::DeviceSwitch => SessionEndReason::DeviceSwitch,
+            SessionEndReason::AppClose => SessionEndReason::AppClose,
+            SessionEndReason::ForcedEnd => SessionEndReason::ForcedEnd,
+            SessionEndReason::Other(v) => SessionEndReason::Other(v.into_static()),
+        }
+    }
+}
+
+/// Platform where the session occurred
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SessionPlatform<S: BosStr = DefaultStr> {
+    Web,
+    Mobile,
+    Desktop,
+    Pwa,
+    Other(S),
+}
+
+impl<S: BosStr> SessionPlatform<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Web => "web",
+            Self::Mobile => "mobile",
+            Self::Desktop => "desktop",
+            Self::Pwa => "pwa",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "web" => Self::Web,
+            "mobile" => Self::Mobile,
+            "desktop" => Self::Desktop,
+            "pwa" => Self::Pwa,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SessionPlatform<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SessionPlatform<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SessionPlatform<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SessionPlatform<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SessionPlatform<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SessionPlatform<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SessionPlatform<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SessionPlatform::Web => SessionPlatform::Web,
+            SessionPlatform::Mobile => SessionPlatform::Mobile,
+            SessionPlatform::Desktop => SessionPlatform::Desktop,
+            SessionPlatform::Pwa => SessionPlatform::Pwa,
+            SessionPlatform::Other(v) => SessionPlatform::Other(v.into_static()),
+        }
+    }
+}
+
+/// Current status of the session
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SessionStatus<S: BosStr = DefaultStr> {
+    Active,
+    Ended,
+    Expired,
+    Invalidated,
+    Other(S),
+}
+
+impl<S: BosStr> SessionStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "active",
+            Self::Ended => "ended",
+            Self::Expired => "expired",
+            Self::Invalidated => "invalidated",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "active" => Self::Active,
+            "ended" => Self::Ended,
+            "expired" => Self::Expired,
+            "invalidated" => Self::Invalidated,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SessionStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SessionStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SessionStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SessionStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SessionStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SessionStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SessionStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SessionStatus::Active => SessionStatus::Active,
+            SessionStatus::Ended => SessionStatus::Ended,
+            SessionStatus::Expired => SessionStatus::Expired,
+            SessionStatus::Invalidated => SessionStatus::Invalidated,
+            SessionStatus::Other(v) => SessionStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -169,7 +442,7 @@ pub struct Metadata<S: BosStr = DefaultStr> {
     pub features: Option<Vec<S>>,
     ///Network condition during session
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub network_condition: Option<S>,
+    pub network_condition: Option<MetadataNetworkCondition<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub performance_metrics: Option<session::PerformanceMetrics<S>>,
     #[serde(
@@ -179,6 +452,96 @@ pub struct Metadata<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Network condition during session
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MetadataNetworkCondition<S: BosStr = DefaultStr> {
+    Online,
+    Offline,
+    Slow,
+    Unknown,
+    Other(S),
+}
+
+impl<S: BosStr> MetadataNetworkCondition<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Online => "online",
+            Self::Offline => "offline",
+            Self::Slow => "slow",
+            Self::Unknown => "unknown",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "online" => Self::Online,
+            "offline" => Self::Offline,
+            "slow" => Self::Slow,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for MetadataNetworkCondition<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for MetadataNetworkCondition<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for MetadataNetworkCondition<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for MetadataNetworkCondition<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for MetadataNetworkCondition<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for MetadataNetworkCondition<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MetadataNetworkCondition<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MetadataNetworkCondition::Online => MetadataNetworkCondition::Online,
+            MetadataNetworkCondition::Offline => MetadataNetworkCondition::Offline,
+            MetadataNetworkCondition::Slow => MetadataNetworkCondition::Slow,
+            MetadataNetworkCondition::Unknown => MetadataNetworkCondition::Unknown,
+            MetadataNetworkCondition::Other(v) => {
+                MetadataNetworkCondition::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Performance-related data
@@ -208,10 +571,10 @@ pub struct PerformanceMetrics<S: BosStr = DefaultStr> {
 pub struct SessionContext<S: BosStr = DefaultStr> {
     ///How the user was authenticated
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub authentication_method: Option<S>,
+    pub authentication_method: Option<SessionContextAuthenticationMethod<S>>,
     ///How the user entered the app
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub entry_point: Option<S>,
+    pub entry_point: Option<SessionContextEntryPoint<S>>,
     ///Whether this was a new user's first session
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_new_user: Option<bool>,
@@ -225,6 +588,198 @@ pub struct SessionContext<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// How the user was authenticated
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SessionContextAuthenticationMethod<S: BosStr = DefaultStr> {
+    Oauth,
+    ExistingSession,
+    Anonymous,
+    Other(S),
+}
+
+impl<S: BosStr> SessionContextAuthenticationMethod<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Oauth => "oauth",
+            Self::ExistingSession => "existing_session",
+            Self::Anonymous => "anonymous",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "oauth" => Self::Oauth,
+            "existing_session" => Self::ExistingSession,
+            "anonymous" => Self::Anonymous,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SessionContextAuthenticationMethod<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SessionContextAuthenticationMethod<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SessionContextAuthenticationMethod<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for SessionContextAuthenticationMethod<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SessionContextAuthenticationMethod<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SessionContextAuthenticationMethod<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SessionContextAuthenticationMethod<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SessionContextAuthenticationMethod::Oauth => {
+                SessionContextAuthenticationMethod::Oauth
+            }
+            SessionContextAuthenticationMethod::ExistingSession => {
+                SessionContextAuthenticationMethod::ExistingSession
+            }
+            SessionContextAuthenticationMethod::Anonymous => {
+                SessionContextAuthenticationMethod::Anonymous
+            }
+            SessionContextAuthenticationMethod::Other(v) => {
+                SessionContextAuthenticationMethod::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// How the user entered the app
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SessionContextEntryPoint<S: BosStr = DefaultStr> {
+    Direct,
+    Refresh,
+    Login,
+    OauthCallback,
+    PwaLaunch,
+    DeepLink,
+    Other(S),
+}
+
+impl<S: BosStr> SessionContextEntryPoint<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Direct => "direct",
+            Self::Refresh => "refresh",
+            Self::Login => "login",
+            Self::OauthCallback => "oauth_callback",
+            Self::PwaLaunch => "pwa_launch",
+            Self::DeepLink => "deep_link",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "direct" => Self::Direct,
+            "refresh" => Self::Refresh,
+            "login" => Self::Login,
+            "oauth_callback" => Self::OauthCallback,
+            "pwa_launch" => Self::PwaLaunch,
+            "deep_link" => Self::DeepLink,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SessionContextEntryPoint<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SessionContextEntryPoint<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SessionContextEntryPoint<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for SessionContextEntryPoint<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SessionContextEntryPoint<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SessionContextEntryPoint<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SessionContextEntryPoint<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SessionContextEntryPoint::Direct => SessionContextEntryPoint::Direct,
+            SessionContextEntryPoint::Refresh => SessionContextEntryPoint::Refresh,
+            SessionContextEntryPoint::Login => SessionContextEntryPoint::Login,
+            SessionContextEntryPoint::OauthCallback => {
+                SessionContextEntryPoint::OauthCallback
+            }
+            SessionContextEntryPoint::PwaLaunch => SessionContextEntryPoint::PwaLaunch,
+            SessionContextEntryPoint::DeepLink => SessionContextEntryPoint::DeepLink,
+            SessionContextEntryPoint::Other(v) => {
+                SessionContextEntryPoint::Other(v.into_static())
+            }
+        }
+    }
 }
 
 impl<S: BosStr> Session<S> {
@@ -1041,18 +1596,18 @@ pub struct SessionBuilder<St: session_state::State, S: BosStr = DefaultStr> {
         Option<S>,
         Option<Datetime>,
         Option<i64>,
-        Option<S>,
+        Option<SessionEndReason<S>>,
         Option<Datetime>,
         Option<Datetime>,
         Option<session::Metadata<S>>,
         Option<S>,
-        Option<S>,
+        Option<SessionPlatform<S>>,
         Option<Vec<S>>,
         Option<Vec<S>>,
         Option<Vec<S>>,
         Option<session::SessionContext<S>>,
         Option<Datetime>,
-        Option<S>,
+        Option<SessionStatus<S>>,
         Option<Datetime>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -1196,12 +1751,12 @@ impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
 
 impl<St: session_state::State, S: BosStr> SessionBuilder<St, S> {
     /// Set the `endReason` field (optional)
-    pub fn end_reason(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn end_reason(mut self, value: impl Into<Option<SessionEndReason<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `endReason` field to an Option value (optional)
-    pub fn maybe_end_reason(mut self, value: Option<S>) -> Self {
+    pub fn maybe_end_reason(mut self, value: Option<SessionEndReason<S>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -1267,7 +1822,7 @@ where
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<SessionPlatform<S>>,
     ) -> SessionBuilder<session_state::SetPlatform<St>, S> {
         self._fields.9 = Option::Some(value.into());
         SessionBuilder {
@@ -1363,7 +1918,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<SessionStatus<S>>,
     ) -> SessionBuilder<session_state::SetStatus<St>, S> {
         self._fields.15 = Option::Some(value.into());
         SessionBuilder {

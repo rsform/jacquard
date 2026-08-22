@@ -113,7 +113,7 @@ pub struct RefUpdate<S: BosStr = DefaultStr> {
     pub owner_did: Option<Did<S>>,
     ///push options passed on git-push
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub push_options: Option<Vec<S>>,
+    pub push_options: Option<Vec<RefUpdatePushOptions<S>>>,
     ///Ref being updated
     pub r#ref: S,
     ///DID of the repo itself
@@ -125,6 +125,94 @@ pub struct RefUpdate<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RefUpdatePushOptions<S: BosStr = DefaultStr> {
+    CiSkip,
+    CiVerbose,
+    SkipCi,
+    VerboseCi,
+    Other(S),
+}
+
+impl<S: BosStr> RefUpdatePushOptions<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::CiSkip => "ci-skip",
+            Self::CiVerbose => "ci-verbose",
+            Self::SkipCi => "skip-ci",
+            Self::VerboseCi => "verbose-ci",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "ci-skip" => Self::CiSkip,
+            "ci-verbose" => Self::CiVerbose,
+            "skip-ci" => Self::SkipCi,
+            "verbose-ci" => Self::VerboseCi,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for RefUpdatePushOptions<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for RefUpdatePushOptions<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for RefUpdatePushOptions<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RefUpdatePushOptions<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for RefUpdatePushOptions<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for RefUpdatePushOptions<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RefUpdatePushOptions<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            RefUpdatePushOptions::CiSkip => RefUpdatePushOptions::CiSkip,
+            RefUpdatePushOptions::CiVerbose => RefUpdatePushOptions::CiVerbose,
+            RefUpdatePushOptions::SkipCi => RefUpdatePushOptions::SkipCi,
+            RefUpdatePushOptions::VerboseCi => RefUpdatePushOptions::VerboseCi,
+            RefUpdatePushOptions::Other(v) => {
+                RefUpdatePushOptions::Other(v.into_static())
+            }
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1162,7 +1250,7 @@ pub struct RefUpdateBuilder<St: ref_update_state::State, S: BosStr = DefaultStr>
         Option<S>,
         Option<S>,
         Option<Did<S>>,
-        Option<Vec<S>>,
+        Option<Vec<RefUpdatePushOptions<S>>>,
         Option<S>,
         Option<Did<S>>,
     ),
@@ -1309,12 +1397,18 @@ impl<St: ref_update_state::State, S: BosStr> RefUpdateBuilder<St, S> {
 
 impl<St: ref_update_state::State, S: BosStr> RefUpdateBuilder<St, S> {
     /// Set the `pushOptions` field (optional)
-    pub fn push_options(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn push_options(
+        mut self,
+        value: impl Into<Option<Vec<RefUpdatePushOptions<S>>>>,
+    ) -> Self {
         self._fields.6 = value.into();
         self
     }
     /// Set the `pushOptions` field to an Option value (optional)
-    pub fn maybe_push_options(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_push_options(
+        mut self,
+        value: Option<Vec<RefUpdatePushOptions<S>>>,
+    ) -> Self {
         self._fields.6 = value;
         self
     }

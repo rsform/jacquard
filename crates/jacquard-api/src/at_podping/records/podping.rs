@@ -40,9 +40,9 @@ pub struct Podping<S: BosStr = DefaultStr> {
     ///The updated feeds, e.g. [ "https://example.com/path/to/feed.xml" ]
     pub iris: Vec<UriValue<S>>,
     ///Common medium, e.g. podcast
-    pub medium: S,
+    pub medium: PodpingMedium<S>,
     ///Common reason, e.g. update
-    pub reason: S,
+    pub reason: PodpingReason<S>,
     ///Optional identifier for the writer session, e.g. 9624937909978522000
     #[serde(skip_serializing_if = "Option::is_none")]
     pub session_id: Option<S>,
@@ -52,7 +52,7 @@ pub struct Podping<S: BosStr = DefaultStr> {
     ///Sender timestamp in ISO format, untrustworthy due to client bugs, not so useful for global ordering, in either millisecond (3 decimals) or nanosecond precision (9 decimals), e.g. 2025-12-29T22:25:09.123456789Z
     pub timestamp: Datetime,
     ///Podping schema version, e.g. 1.1
-    pub version: S,
+    pub version: PodpingVersion<S>,
     #[serde(
         flatten,
         default,
@@ -60,6 +60,335 @@ pub struct Podping<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Common medium, e.g. podcast
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PodpingMedium<S: BosStr = DefaultStr> {
+    Podcast,
+    Video,
+    Music,
+    Publisher,
+    Audiobook,
+    Film,
+    Blog,
+    Newsletter,
+    Mixed,
+    Course,
+    PodcastL,
+    VideoL,
+    MusicL,
+    PublisherL,
+    AudiobookL,
+    FilmL,
+    BlogL,
+    NewsletterL,
+    MixedL,
+    CourseL,
+    Other(S),
+}
+
+impl<S: BosStr> PodpingMedium<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Podcast => "podcast",
+            Self::Video => "video",
+            Self::Music => "music",
+            Self::Publisher => "publisher",
+            Self::Audiobook => "audiobook",
+            Self::Film => "film",
+            Self::Blog => "blog",
+            Self::Newsletter => "newsletter",
+            Self::Mixed => "mixed",
+            Self::Course => "course",
+            Self::PodcastL => "podcastL",
+            Self::VideoL => "videoL",
+            Self::MusicL => "musicL",
+            Self::PublisherL => "publisherL",
+            Self::AudiobookL => "audiobookL",
+            Self::FilmL => "filmL",
+            Self::BlogL => "blogL",
+            Self::NewsletterL => "newsletterL",
+            Self::MixedL => "mixedL",
+            Self::CourseL => "courseL",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "podcast" => Self::Podcast,
+            "video" => Self::Video,
+            "music" => Self::Music,
+            "publisher" => Self::Publisher,
+            "audiobook" => Self::Audiobook,
+            "film" => Self::Film,
+            "blog" => Self::Blog,
+            "newsletter" => Self::Newsletter,
+            "mixed" => Self::Mixed,
+            "course" => Self::Course,
+            "podcastL" => Self::PodcastL,
+            "videoL" => Self::VideoL,
+            "musicL" => Self::MusicL,
+            "publisherL" => Self::PublisherL,
+            "audiobookL" => Self::AudiobookL,
+            "filmL" => Self::FilmL,
+            "blogL" => Self::BlogL,
+            "newsletterL" => Self::NewsletterL,
+            "mixedL" => Self::MixedL,
+            "courseL" => Self::CourseL,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for PodpingMedium<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for PodpingMedium<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for PodpingMedium<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PodpingMedium<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for PodpingMedium<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for PodpingMedium<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PodpingMedium<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PodpingMedium::Podcast => PodpingMedium::Podcast,
+            PodpingMedium::Video => PodpingMedium::Video,
+            PodpingMedium::Music => PodpingMedium::Music,
+            PodpingMedium::Publisher => PodpingMedium::Publisher,
+            PodpingMedium::Audiobook => PodpingMedium::Audiobook,
+            PodpingMedium::Film => PodpingMedium::Film,
+            PodpingMedium::Blog => PodpingMedium::Blog,
+            PodpingMedium::Newsletter => PodpingMedium::Newsletter,
+            PodpingMedium::Mixed => PodpingMedium::Mixed,
+            PodpingMedium::Course => PodpingMedium::Course,
+            PodpingMedium::PodcastL => PodpingMedium::PodcastL,
+            PodpingMedium::VideoL => PodpingMedium::VideoL,
+            PodpingMedium::MusicL => PodpingMedium::MusicL,
+            PodpingMedium::PublisherL => PodpingMedium::PublisherL,
+            PodpingMedium::AudiobookL => PodpingMedium::AudiobookL,
+            PodpingMedium::FilmL => PodpingMedium::FilmL,
+            PodpingMedium::BlogL => PodpingMedium::BlogL,
+            PodpingMedium::NewsletterL => PodpingMedium::NewsletterL,
+            PodpingMedium::MixedL => PodpingMedium::MixedL,
+            PodpingMedium::CourseL => PodpingMedium::CourseL,
+            PodpingMedium::Other(v) => PodpingMedium::Other(v.into_static()),
+        }
+    }
+}
+
+/// Common reason, e.g. update
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PodpingReason<S: BosStr = DefaultStr> {
+    Update,
+    Live,
+    LiveEnd,
+    Other(S),
+}
+
+impl<S: BosStr> PodpingReason<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Update => "update",
+            Self::Live => "live",
+            Self::LiveEnd => "liveEnd",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "update" => Self::Update,
+            "live" => Self::Live,
+            "liveEnd" => Self::LiveEnd,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for PodpingReason<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for PodpingReason<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for PodpingReason<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PodpingReason<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for PodpingReason<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for PodpingReason<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PodpingReason<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PodpingReason::Update => PodpingReason::Update,
+            PodpingReason::Live => PodpingReason::Live,
+            PodpingReason::LiveEnd => PodpingReason::LiveEnd,
+            PodpingReason::Other(v) => PodpingReason::Other(v.into_static()),
+        }
+    }
+}
+
+/// Podping schema version, e.g. 1.1
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PodpingVersion<S: BosStr = DefaultStr> {
+    _00,
+    _02,
+    _03,
+    _06,
+    _10,
+    _11,
+    Other(S),
+}
+
+impl<S: BosStr> PodpingVersion<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::_00 => "0.0",
+            Self::_02 => "0.2",
+            Self::_03 => "0.3",
+            Self::_06 => "0.6",
+            Self::_10 => "1.0",
+            Self::_11 => "1.1",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "0.0" => Self::_00,
+            "0.2" => Self::_02,
+            "0.3" => Self::_03,
+            "0.6" => Self::_06,
+            "1.0" => Self::_10,
+            "1.1" => Self::_11,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for PodpingVersion<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for PodpingVersion<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for PodpingVersion<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PodpingVersion<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for PodpingVersion<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for PodpingVersion<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PodpingVersion<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            PodpingVersion::_00 => PodpingVersion::_00,
+            PodpingVersion::_02 => PodpingVersion::_02,
+            PodpingVersion::_03 => PodpingVersion::_03,
+            PodpingVersion::_06 => PodpingVersion::_06,
+            PodpingVersion::_10 => PodpingVersion::_10,
+            PodpingVersion::_11 => PodpingVersion::_11,
+            PodpingVersion::Other(v) => PodpingVersion::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -237,12 +566,12 @@ pub struct PodpingBuilder<St: podping_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<UriValue<S>>>,
-        Option<S>,
-        Option<S>,
+        Option<PodpingMedium<S>>,
+        Option<PodpingReason<S>>,
         Option<S>,
         Option<S>,
         Option<Datetime>,
-        Option<S>,
+        Option<PodpingVersion<S>>,
     ),
     _type: PhantomData<fn() -> S>,
 }
@@ -310,7 +639,7 @@ where
     /// Set the `medium` field (required)
     pub fn medium(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<PodpingMedium<S>>,
     ) -> PodpingBuilder<podping_state::SetMedium<St>, S> {
         self._fields.1 = Option::Some(value.into());
         PodpingBuilder {
@@ -329,7 +658,7 @@ where
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<PodpingReason<S>>,
     ) -> PodpingBuilder<podping_state::SetReason<St>, S> {
         self._fields.2 = Option::Some(value.into());
         PodpingBuilder {
@@ -393,7 +722,7 @@ where
     /// Set the `version` field (required)
     pub fn version(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<PodpingVersion<S>>,
     ) -> PodpingBuilder<podping_state::SetVersion<St>, S> {
         self._fields.6 = Option::Some(value.into());
         PodpingBuilder {

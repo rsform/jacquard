@@ -41,8 +41,9 @@ pub struct Text<S: BosStr = DefaultStr> {
     pub content: S,
     ///Creation timestamp
     pub created_at: Datetime,
-    ///Content format
+    ///Content format  Defaults to `"markdown"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_text_format")]
     pub format: Option<TextFormat<S>>,
     ///Block title
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -261,6 +262,12 @@ where
         }
     }
     Ok(data)
+}
+
+fn _default_text_format<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    TextFormat<S>,
+> {
+    Some(<TextFormat<S>>::from_value(S::from_static("markdown")))
 }
 
 pub mod text_state {

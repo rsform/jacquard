@@ -89,7 +89,7 @@ pub struct Webhook<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error_count: Option<i64>,
     ///The types of events this webhook should receive.
-    pub events: Vec<S>,
+    pub events: Vec<WebhookEvents<S>>,
     ///Unique identifier for this webhook.
     pub id: S,
     ///When this webhook was last triggered.
@@ -122,6 +122,96 @@ pub struct Webhook<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WebhookEvents<S: BosStr = DefaultStr> {
+    Chat,
+    Livestream,
+    Follow,
+    Mention,
+    StreamReceived,
+    Other(S),
+}
+
+impl<S: BosStr> WebhookEvents<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Chat => "chat",
+            Self::Livestream => "livestream",
+            Self::Follow => "follow",
+            Self::Mention => "mention",
+            Self::StreamReceived => "stream.received",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "chat" => Self::Chat,
+            "livestream" => Self::Livestream,
+            "follow" => Self::Follow,
+            "mention" => Self::Mention,
+            "stream.received" => Self::StreamReceived,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WebhookEvents<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WebhookEvents<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WebhookEvents<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WebhookEvents<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WebhookEvents<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WebhookEvents<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WebhookEvents<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WebhookEvents::Chat => WebhookEvents::Chat,
+            WebhookEvents::Livestream => WebhookEvents::Livestream,
+            WebhookEvents::Follow => WebhookEvents::Follow,
+            WebhookEvents::Mention => WebhookEvents::Mention,
+            WebhookEvents::StreamReceived => WebhookEvents::StreamReceived,
+            WebhookEvents::Other(v) => WebhookEvents::Other(v.into_static()),
+        }
+    }
 }
 
 impl<S: BosStr> LexiconSchema for RewriteRule<S> {
@@ -799,7 +889,7 @@ pub struct WebhookBuilder<St: webhook_state::State, S: BosStr = DefaultStr> {
         Option<Datetime>,
         Option<S>,
         Option<i64>,
-        Option<Vec<S>>,
+        Option<Vec<WebhookEvents<S>>>,
         Option<S>,
         Option<Datetime>,
         Option<Vec<S>>,
@@ -951,7 +1041,7 @@ where
     /// Set the `events` field (required)
     pub fn events(
         mut self,
-        value: impl Into<Vec<S>>,
+        value: impl Into<Vec<WebhookEvents<S>>>,
     ) -> WebhookBuilder<webhook_state::SetEvents<St>, S> {
         self._fields.4 = Option::Some(value.into());
         WebhookBuilder {

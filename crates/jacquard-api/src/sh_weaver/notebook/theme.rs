@@ -109,7 +109,7 @@ pub struct Theme<S: BosStr = DefaultStr> {
     /// Defaults to `"auto"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_theme_default_theme")]
-    pub default_theme: Option<S>,
+    pub default_theme: Option<ThemeDefaultTheme<S>>,
     ///Fonts to be used in the notebook. Can specify a name or list of names (will load if available) or a file or list of files for each. Empty lists will use site defaults.
     pub fonts: ThemeFonts<S>,
     ///Syntax highlighting theme for light mode
@@ -135,6 +135,88 @@ pub enum ThemeDarkCodeTheme<S: BosStr = DefaultStr> {
     CodeThemeName(Box<theme::CodeThemeName<S>>),
     #[serde(rename = "sh.weaver.notebook.theme#codeThemeFile")]
     CodeThemeFile(Box<theme::CodeThemeFile<S>>),
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ThemeDefaultTheme<S: BosStr = DefaultStr> {
+    Light,
+    Dark,
+    Auto,
+    Other(S),
+}
+
+impl<S: BosStr> ThemeDefaultTheme<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Light => "light",
+            Self::Dark => "dark",
+            Self::Auto => "auto",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "light" => Self::Light,
+            "dark" => Self::Dark,
+            "auto" => Self::Auto,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ThemeDefaultTheme<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ThemeDefaultTheme<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ThemeDefaultTheme<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeDefaultTheme<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ThemeDefaultTheme<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeDefaultTheme<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeDefaultTheme<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ThemeDefaultTheme::Light => ThemeDefaultTheme::Light,
+            ThemeDefaultTheme::Dark => ThemeDefaultTheme::Dark,
+            ThemeDefaultTheme::Auto => ThemeDefaultTheme::Auto,
+            ThemeDefaultTheme::Other(v) => ThemeDefaultTheme::Other(v.into_static()),
+        }
+    }
 }
 
 /// Fonts to be used in the notebook. Can specify a name or list of names (will load if available) or a file or list of files for each. Empty lists will use site defaults.
@@ -1199,8 +1281,10 @@ where
     Ok(data)
 }
 
-fn _default_theme_default_theme<S: FromStaticStr>() -> ::core::option::Option<S> {
-    Some(S::from_static("auto"))
+fn _default_theme_default_theme<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ThemeDefaultTheme<S>,
+> {
+    Some(<ThemeDefaultTheme<S>>::from_value(S::from_static("auto")))
 }
 
 impl<S: BosStr> LexiconSchema for ThemeFonts<S> {
@@ -1569,7 +1653,7 @@ pub struct ThemeBuilder<St: theme_state::State, S: BosStr = DefaultStr> {
     _fields: (
         Option<ThemeDarkCodeTheme<S>>,
         Option<StrongRef<S>>,
-        Option<S>,
+        Option<ThemeDefaultTheme<S>>,
         Option<ThemeFonts<S>>,
         Option<ThemeLightCodeTheme<S>>,
         Option<StrongRef<S>>,
@@ -1654,12 +1738,15 @@ where
 
 impl<St: theme_state::State, S: BosStr> ThemeBuilder<St, S> {
     /// Set the `defaultTheme` field (optional)
-    pub fn default_theme(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn default_theme(
+        mut self,
+        value: impl Into<Option<ThemeDefaultTheme<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `defaultTheme` field to an Option value (optional)
-    pub fn maybe_default_theme(mut self, value: Option<S>) -> Self {
+    pub fn maybe_default_theme(mut self, value: Option<ThemeDefaultTheme<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1756,7 +1843,7 @@ where
         Theme {
             dark_code_theme: self._fields.0.unwrap(),
             dark_scheme: self._fields.1.unwrap(),
-            default_theme: self._fields.2.or_else(|| Some(S::from_static("auto"))),
+            default_theme: self._fields.2,
             fonts: self._fields.3.unwrap(),
             light_code_theme: self._fields.4.unwrap(),
             light_scheme: self._fields.5.unwrap(),
@@ -1769,7 +1856,7 @@ where
         Theme {
             dark_code_theme: self._fields.0.unwrap(),
             dark_scheme: self._fields.1.unwrap(),
-            default_theme: self._fields.2.or_else(|| Some(S::from_static("auto"))),
+            default_theme: self._fields.2,
             fonts: self._fields.3.unwrap(),
             light_code_theme: self._fields.4.unwrap(),
             light_scheme: self._fields.5.unwrap(),

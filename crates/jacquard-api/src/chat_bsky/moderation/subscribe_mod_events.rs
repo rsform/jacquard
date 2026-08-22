@@ -772,31 +772,41 @@ pub struct SubscribeModEvents<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubscribeModEventsMessage<S: BosStr = DefaultStr> {
-    #[serde(rename = "#eventConvoFirstMessage")]
+    #[serde(rename = "chat.bsky.moderation.subscribeModEvents#eventConvoFirstMessage")]
     EventConvoFirstMessage(Box<subscribe_mod_events::EventConvoFirstMessage<S>>),
-    #[serde(rename = "#eventGroupChatCreated")]
+    #[serde(rename = "chat.bsky.moderation.subscribeModEvents#eventGroupChatCreated")]
     EventGroupChatCreated(Box<subscribe_mod_events::EventGroupChatCreated<S>>),
-    #[serde(rename = "#eventGroupChatMemberAdded")]
+    #[serde(
+        rename = "chat.bsky.moderation.subscribeModEvents#eventGroupChatMemberAdded"
+    )]
     EventGroupChatMemberAdded(Box<subscribe_mod_events::EventGroupChatMemberAdded<S>>),
-    #[serde(rename = "#eventGroupChatMemberJoined")]
+    #[serde(
+        rename = "chat.bsky.moderation.subscribeModEvents#eventGroupChatMemberJoined"
+    )]
     EventGroupChatMemberJoined(Box<subscribe_mod_events::EventGroupChatMemberJoined<S>>),
-    #[serde(rename = "#eventGroupChatJoinRequest")]
+    #[serde(
+        rename = "chat.bsky.moderation.subscribeModEvents#eventGroupChatJoinRequest"
+    )]
     EventGroupChatJoinRequest(Box<subscribe_mod_events::EventGroupChatJoinRequest<S>>),
-    #[serde(rename = "#eventGroupChatJoinRequestApproved")]
+    #[serde(
+        rename = "chat.bsky.moderation.subscribeModEvents#eventGroupChatJoinRequestApproved"
+    )]
     EventGroupChatJoinRequestApproved(
         Box<subscribe_mod_events::EventGroupChatJoinRequestApproved<S>>,
     ),
-    #[serde(rename = "#eventGroupChatJoinRequestRejected")]
+    #[serde(
+        rename = "chat.bsky.moderation.subscribeModEvents#eventGroupChatJoinRequestRejected"
+    )]
     EventGroupChatJoinRequestRejected(
         Box<subscribe_mod_events::EventGroupChatJoinRequestRejected<S>>,
     ),
-    #[serde(rename = "#eventChatAccepted")]
+    #[serde(rename = "chat.bsky.moderation.subscribeModEvents#eventChatAccepted")]
     EventChatAccepted(Box<subscribe_mod_events::EventChatAccepted<S>>),
-    #[serde(rename = "#eventGroupChatMemberLeft")]
+    #[serde(rename = "chat.bsky.moderation.subscribeModEvents#eventGroupChatMemberLeft")]
     EventGroupChatMemberLeft(Box<subscribe_mod_events::EventGroupChatMemberLeft<S>>),
-    #[serde(rename = "#eventGroupChatUpdated")]
+    #[serde(rename = "chat.bsky.moderation.subscribeModEvents#eventGroupChatUpdated")]
     EventGroupChatUpdated(Box<subscribe_mod_events::EventGroupChatUpdated<S>>),
-    #[serde(rename = "#eventRateLimitExceeded")]
+    #[serde(rename = "chat.bsky.moderation.subscribeModEvents#eventRateLimitExceeded")]
     EventRateLimitExceeded(Box<subscribe_mod_events::EventRateLimitExceeded<S>>),
 }
 

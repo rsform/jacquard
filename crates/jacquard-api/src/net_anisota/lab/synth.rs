@@ -49,7 +49,7 @@ pub struct Synth<S: BosStr = DefaultStr> {
     pub root: Option<i64>,
     ///Scale the tone tracks' degrees are drawn from
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub scale: Option<S>,
+    pub scale: Option<SynthScale<S>>,
     ///Number of sixteenth-note steps in the loop
     pub steps: i64,
     ///Loop tempo in beats per minute
@@ -87,6 +87,93 @@ pub struct SynthFx<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Scale the tone tracks' degrees are drawn from
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SynthScale<S: BosStr = DefaultStr> {
+    Pentatonic,
+    Minor,
+    Major,
+    Dorian,
+    Other(S),
+}
+
+impl<S: BosStr> SynthScale<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pentatonic => "pentatonic",
+            Self::Minor => "minor",
+            Self::Major => "major",
+            Self::Dorian => "dorian",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "pentatonic" => Self::Pentatonic,
+            "minor" => Self::Minor,
+            "major" => Self::Major,
+            "dorian" => Self::Dorian,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SynthScale<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SynthScale<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SynthScale<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SynthScale<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SynthScale<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SynthScale<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SynthScale<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SynthScale::Pentatonic => SynthScale::Pentatonic,
+            SynthScale::Minor => SynthScale::Minor,
+            SynthScale::Major => SynthScale::Major,
+            SynthScale::Dorian => SynthScale::Dorian,
+            SynthScale::Other(v) => SynthScale::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -615,7 +702,7 @@ pub struct SynthBuilder<St: synth_state::State, S: BosStr = DefaultStr> {
         Option<SynthFx<S>>,
         Option<S>,
         Option<i64>,
-        Option<S>,
+        Option<SynthScale<S>>,
         Option<i64>,
         Option<i64>,
         Option<Vec<Data<S>>>,
@@ -725,12 +812,12 @@ impl<St: synth_state::State, S: BosStr> SynthBuilder<St, S> {
 
 impl<St: synth_state::State, S: BosStr> SynthBuilder<St, S> {
     /// Set the `scale` field (optional)
-    pub fn scale(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn scale(mut self, value: impl Into<Option<SynthScale<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `scale` field to an Option value (optional)
-    pub fn maybe_scale(mut self, value: Option<S>) -> Self {
+    pub fn maybe_scale(mut self, value: Option<SynthScale<S>>) -> Self {
         self._fields.4 = value;
         self
     }

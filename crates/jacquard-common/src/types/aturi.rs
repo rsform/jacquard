@@ -777,9 +777,9 @@ where
 /// at://AUTHORITY/space/SPACE_TYPE/SKEY/AUTHOR/COLLECTION/RKEY
 /// ```
 ///
-/// This is intentionally a separate type from [`AtUri`]. It follows AtUri's
-/// generic backing storage, byte-index accessors, serde, `IntoStatic`, and
-/// niche optimization without broadening ordinary AT URI validation.
+/// This is separate for those specific instances where you want to exclude non-permissioned records.
+///
+/// TODO: Before release, maybe do the same for public at:// URIs as well. Current question is how enum-y to make the type.
 #[derive(Clone, Debug)]
 pub struct AtSpaceUri<S: Bos<str> + AsRef<str> = DefaultStr> {
     uri: S,

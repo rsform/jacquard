@@ -25,9 +25,91 @@ pub struct Store<S: BosStr = DefaultStr> {
     pub text: S,
     ///The URI must include the logged-in user's DID in the format at://did...
     pub uri: AtUri<S>,
-    pub visibility: S,
+    pub visibility: StoreVisibility<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum StoreVisibility<S: BosStr = DefaultStr> {
+    Followers,
+    Following,
+    Mutual,
+    Other(S),
+}
+
+impl<S: BosStr> StoreVisibility<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Followers => "followers",
+            Self::Following => "following",
+            Self::Mutual => "mutual",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "followers" => Self::Followers,
+            "following" => Self::Following,
+            "mutual" => Self::Mutual,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for StoreVisibility<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for StoreVisibility<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for StoreVisibility<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for StoreVisibility<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for StoreVisibility<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for StoreVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = StoreVisibility<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            StoreVisibility::Followers => StoreVisibility::Followers,
+            StoreVisibility::Following => StoreVisibility::Following,
+            StoreVisibility::Mutual => StoreVisibility::Mutual,
+            StoreVisibility::Other(v) => StoreVisibility::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -134,7 +216,7 @@ pub mod store_state {
 /// Builder for constructing an instance of this type.
 pub struct StoreBuilder<St: store_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<S>),
+    _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<StoreVisibility<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -233,7 +315,7 @@ where
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<StoreVisibility<S>>,
     ) -> StoreBuilder<store_state::SetVisibility<St>, S> {
         self._fields.3 = Option::Some(value.into());
         StoreBuilder {

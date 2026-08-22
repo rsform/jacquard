@@ -56,8 +56,9 @@ pub struct Create<S: BosStr = DefaultStr> {
     ///Community rules
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rules: Option<Vec<S>>,
-    ///Community visibility level
+    ///Community visibility level  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_create_visibility")]
     pub visibility: Option<CreateVisibility<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -253,4 +254,10 @@ fn _default_create_allow_external_discovery() -> Option<bool> {
 
 fn _default_create_membership_threshold() -> Option<i64> {
     Some(100i64)
+}
+
+fn _default_create_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    CreateVisibility<S>,
+> {
+    Some(<CreateVisibility<S>>::from_value(S::from_static("public")))
 }

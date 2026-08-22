@@ -175,7 +175,7 @@ pub struct WordlistGetRecordOutput<S: BosStr = DefaultStr> {
     pub value: Wordlist<S>,
 }
 
-/// A recurring active window. Days and time window combine: the list applies only on the listed days (absent/empty = every day) and only inside the time window (absent = all day). A window whose end is at or before its start wraps past midnight.
+/// A recurring active window. Days and time window combine: the list applies only on the listed days (absent/empty = every day) and only inside the time window (absent = all day). A window whose end is before its start wraps past midnight; equal start and end means no time bound (all day on the listed days).
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -314,7 +314,7 @@ pub struct Word<S: BosStr = DefaultStr> {
     pub actor_target: Option<WordActorTarget<S>>,
     ///What to match against: post text ('content') and/or hashtags ('tag'). Absent means both.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub targets: Option<Vec<S>>,
+    pub targets: Option<Vec<WordTargets<S>>>,
     ///The word or phrase to mute
     pub value: S,
     #[serde(
@@ -401,6 +401,84 @@ where
             WordActorTarget::All => WordActorTarget::All,
             WordActorTarget::ExcludeFollowing => WordActorTarget::ExcludeFollowing,
             WordActorTarget::Other(v) => WordActorTarget::Other(v.into_static()),
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WordTargets<S: BosStr = DefaultStr> {
+    Content,
+    Tag,
+    Other(S),
+}
+
+impl<S: BosStr> WordTargets<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Content => "content",
+            Self::Tag => "tag",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "content" => Self::Content,
+            "tag" => Self::Tag,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for WordTargets<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for WordTargets<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for WordTargets<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WordTargets<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for WordTargets<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for WordTargets<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WordTargets<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            WordTargets::Content => WordTargets::Content,
+            WordTargets::Tag => WordTargets::Tag,
+            WordTargets::Other(v) => WordTargets::Other(v.into_static()),
         }
     }
 }
@@ -1177,7 +1255,7 @@ fn lexicon_doc_net_anisota_graph_wordlist() -> LexiconDoc<'static> {
                 LexUserType::Object(LexObject {
                     description: Some(
                         CowStr::new_static(
-                            "A recurring active window. Days and time window combine: the list applies only on the listed days (absent/empty = every day) and only inside the time window (absent = all day). A window whose end is at or before its start wraps past midnight.",
+                            "A recurring active window. Days and time window combine: the list applies only on the listed days (absent/empty = every day) and only inside the time window (absent = all day). A window whose end is before its start wraps past midnight; equal start and end means no time bound (all day on the listed days).",
                         ),
                     ),
                     properties: {

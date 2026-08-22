@@ -38,7 +38,7 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Resolution<S: BosStr = DefaultStr> {
-    pub answer: S,
+    pub answer: ResolutionAnswer<S>,
     pub created_at: Datetime,
     ///The record containing the Cumulus Market for this Resolution
     pub market: StrongRef<S>,
@@ -49,6 +49,84 @@ pub struct Resolution<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ResolutionAnswer<S: BosStr = DefaultStr> {
+    Yes,
+    No,
+    Other(S),
+}
+
+impl<S: BosStr> ResolutionAnswer<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Yes => "yes",
+            Self::No => "no",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "yes" => Self::Yes,
+            "no" => Self::No,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ResolutionAnswer<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ResolutionAnswer<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ResolutionAnswer<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ResolutionAnswer<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ResolutionAnswer<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ResolutionAnswer<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ResolutionAnswer<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ResolutionAnswer::Yes => ResolutionAnswer::Yes,
+            ResolutionAnswer::No => ResolutionAnswer::No,
+            ResolutionAnswer::Other(v) => ResolutionAnswer::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -212,7 +290,7 @@ pub mod resolution_state {
 /// Builder for constructing an instance of this type.
 pub struct ResolutionBuilder<St: resolution_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Datetime>, Option<StrongRef<S>>),
+    _fields: (Option<ResolutionAnswer<S>>, Option<Datetime>, Option<StrongRef<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -260,7 +338,7 @@ where
     /// Set the `answer` field (required)
     pub fn answer(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<ResolutionAnswer<S>>,
     ) -> ResolutionBuilder<resolution_state::SetAnswer<St>, S> {
         self._fields.0 = Option::Some(value.into());
         ResolutionBuilder {

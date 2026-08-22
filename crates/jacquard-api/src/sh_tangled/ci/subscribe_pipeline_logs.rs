@@ -34,10 +34,10 @@ pub struct Control<S: BosStr = DefaultStr> {
     pub content: S,
     ///Step kind
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub kind: Option<S>,
+    pub kind: Option<ControlKind<S>>,
     ///Step status
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<ControlStatus<S>>,
     ///Step ID
     pub step: i64,
     pub time: Datetime,
@@ -52,6 +52,164 @@ pub struct Control<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, jacquard_common::types::value::Data<S>>>,
 }
 
+/// Step kind
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ControlKind<S: BosStr = DefaultStr> {
+    System,
+    User,
+    Other(S),
+}
+
+impl<S: BosStr> ControlKind<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::System => "system",
+            Self::User => "user",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "system" => Self::System,
+            "user" => Self::User,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ControlKind<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ControlKind<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ControlKind<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ControlKind<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ControlKind<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ControlKind<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ControlKind<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ControlKind::System => ControlKind::System,
+            ControlKind::User => ControlKind::User,
+            ControlKind::Other(v) => ControlKind::Other(v.into_static()),
+        }
+    }
+}
+
+/// Step status
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ControlStatus<S: BosStr = DefaultStr> {
+    Start,
+    End,
+    Other(S),
+}
+
+impl<S: BosStr> ControlStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Start => "start",
+            Self::End => "end",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "start" => Self::Start,
+            "end" => Self::End,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ControlStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ControlStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ControlStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ControlStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ControlStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ControlStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ControlStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ControlStatus::Start => ControlStatus::Start,
+            ControlStatus::End => ControlStatus::End,
+            ControlStatus::Other(v) => ControlStatus::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -59,7 +217,7 @@ pub struct Data<S: BosStr = DefaultStr> {
     pub content: S,
     ///Step ID
     pub step: i64,
-    pub stream: S,
+    pub stream: DataStream<S>,
     pub time: Datetime,
     ///workflow name
     pub workflow: S,
@@ -70,6 +228,84 @@ pub struct Data<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, jacquard_common::types::value::Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DataStream<S: BosStr = DefaultStr> {
+    Stdout,
+    Stderr,
+    Other(S),
+}
+
+impl<S: BosStr> DataStream<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Stdout => "stdout",
+            Self::Stderr => "stderr",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "stdout" => Self::Stdout,
+            "stderr" => Self::Stderr,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for DataStream<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for DataStream<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for DataStream<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DataStream<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for DataStream<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for DataStream<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = DataStream<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            DataStream::Stdout => DataStream::Stdout,
+            DataStream::Stderr => DataStream::Stderr,
+            DataStream::Other(v) => DataStream::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -86,9 +322,9 @@ pub struct SubscribePipelineLogs<S: BosStr = DefaultStr> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(tag = "$type", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub enum SubscribePipelineLogsMessage<S: BosStr = DefaultStr> {
-    #[serde(rename = "#control")]
+    #[serde(rename = "sh.tangled.ci.subscribePipelineLogs#control")]
     Control(Box<subscribe_pipeline_logs::Control<S>>),
-    #[serde(rename = "#data")]
+    #[serde(rename = "sh.tangled.ci.subscribePipelineLogs#data")]
     Data(Box<subscribe_pipeline_logs::Data<S>>),
 }
 
@@ -325,8 +561,8 @@ pub struct ControlBuilder<St: control_state::State, S: BosStr = DefaultStr> {
     _fields: (
         Option<S>,
         Option<S>,
-        Option<S>,
-        Option<S>,
+        Option<ControlKind<S>>,
+        Option<ControlStatus<S>>,
         Option<i64>,
         Option<Datetime>,
         Option<S>,
@@ -404,12 +640,12 @@ where
 
 impl<St: control_state::State, S: BosStr> ControlBuilder<St, S> {
     /// Set the `kind` field (optional)
-    pub fn kind(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn kind(mut self, value: impl Into<Option<ControlKind<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `kind` field to an Option value (optional)
-    pub fn maybe_kind(mut self, value: Option<S>) -> Self {
+    pub fn maybe_kind(mut self, value: Option<ControlKind<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -417,12 +653,12 @@ impl<St: control_state::State, S: BosStr> ControlBuilder<St, S> {
 
 impl<St: control_state::State, S: BosStr> ControlBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ControlStatus<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ControlStatus<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -791,7 +1027,13 @@ pub mod data_state {
 /// Builder for constructing an instance of this type.
 pub struct DataBuilder<St: data_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<i64>, Option<S>, Option<Datetime>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<i64>,
+        Option<DataStream<S>>,
+        Option<Datetime>,
+        Option<S>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -877,7 +1119,7 @@ where
     /// Set the `stream` field (required)
     pub fn stream(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<DataStream<S>>,
     ) -> DataBuilder<data_state::SetStream<St>, S> {
         self._fields.2 = Option::Some(value.into());
         DataBuilder {

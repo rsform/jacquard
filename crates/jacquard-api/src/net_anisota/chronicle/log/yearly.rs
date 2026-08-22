@@ -109,7 +109,7 @@ pub struct Yearly<S: BosStr = DefaultStr> {
     pub patterns: Option<yearly::YearlyPatterns<S>>,
     pub signature: yearly::ChronicleSignature<S>,
     ///Whether this year is still being updated or has been finalized
-    pub status: S,
+    pub status: YearlyStatus<S>,
     ///Year string in YYYY format (e.g. 2026)
     pub year: S,
     #[serde(
@@ -119,6 +119,85 @@ pub struct Yearly<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Whether this year is still being updated or has been finalized
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum YearlyStatus<S: BosStr = DefaultStr> {
+    Active,
+    Finalized,
+    Other(S),
+}
+
+impl<S: BosStr> YearlyStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Active => "active",
+            Self::Finalized => "finalized",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "active" => Self::Active,
+            "finalized" => Self::Finalized,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for YearlyStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for YearlyStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for YearlyStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for YearlyStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for YearlyStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for YearlyStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = YearlyStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            YearlyStatus::Active => YearlyStatus::Active,
+            YearlyStatus::Finalized => YearlyStatus::Finalized,
+            YearlyStatus::Other(v) => YearlyStatus::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1300,7 +1379,7 @@ pub struct YearlyBuilder<St: yearly_state::State, S: BosStr = DefaultStr> {
         Option<Vec<S>>,
         Option<yearly::YearlyPatterns<S>>,
         Option<yearly::ChronicleSignature<S>>,
-        Option<S>,
+        Option<YearlyStatus<S>>,
         Option<S>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -1462,7 +1541,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<YearlyStatus<S>>,
     ) -> YearlyBuilder<yearly_state::SetStatus<St>, S> {
         self._fields.7 = Option::Some(value.into());
         YearlyBuilder {

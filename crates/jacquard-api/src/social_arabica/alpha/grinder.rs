@@ -39,12 +39,12 @@ use serde::{Serialize, Deserialize};
 pub struct Grinder<S: BosStr = DefaultStr> {
     ///Type of burr (empty string for unknown)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub burr_type: Option<S>,
+    pub burr_type: Option<GrinderBurrType<S>>,
     ///Timestamp when the grinder record was created
     pub created_at: Datetime,
     ///Type of grinder mechanism
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub grinder_type: Option<S>,
+    pub grinder_type: Option<GrinderGrinderType<S>>,
     ///Optional product, manual, or information URL for the grinder
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<UriValue<S>>,
@@ -63,6 +63,176 @@ pub struct Grinder<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// Type of burr (empty string for unknown)
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GrinderBurrType<S: BosStr = DefaultStr> {
+    Conical,
+    Flat,
+    Blade,
+    Unknown,
+    Other(S),
+}
+
+impl<S: BosStr> GrinderBurrType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Conical => "conical",
+            Self::Flat => "flat",
+            Self::Blade => "blade",
+            Self::Unknown => "",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "conical" => Self::Conical,
+            "flat" => Self::Flat,
+            "blade" => Self::Blade,
+            "" => Self::Unknown,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GrinderBurrType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GrinderBurrType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GrinderBurrType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GrinderBurrType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GrinderBurrType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GrinderBurrType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GrinderBurrType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GrinderBurrType::Conical => GrinderBurrType::Conical,
+            GrinderBurrType::Flat => GrinderBurrType::Flat,
+            GrinderBurrType::Blade => GrinderBurrType::Blade,
+            GrinderBurrType::Unknown => GrinderBurrType::Unknown,
+            GrinderBurrType::Other(v) => GrinderBurrType::Other(v.into_static()),
+        }
+    }
+}
+
+/// Type of grinder mechanism
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GrinderGrinderType<S: BosStr = DefaultStr> {
+    Hand,
+    Electric,
+    PortableElectric,
+    Other(S),
+}
+
+impl<S: BosStr> GrinderGrinderType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hand => "hand",
+            Self::Electric => "electric",
+            Self::PortableElectric => "portable_electric",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "hand" => Self::Hand,
+            "electric" => Self::Electric,
+            "portable_electric" => Self::PortableElectric,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GrinderGrinderType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GrinderGrinderType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GrinderGrinderType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GrinderGrinderType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GrinderGrinderType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GrinderGrinderType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GrinderGrinderType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GrinderGrinderType::Hand => GrinderGrinderType::Hand,
+            GrinderGrinderType::Electric => GrinderGrinderType::Electric,
+            GrinderGrinderType::PortableElectric => GrinderGrinderType::PortableElectric,
+            GrinderGrinderType::Other(v) => GrinderGrinderType::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -242,9 +412,9 @@ pub mod grinder_state {
 pub struct GrinderBuilder<St: grinder_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
     _fields: (
-        Option<S>,
+        Option<GrinderBurrType<S>>,
         Option<Datetime>,
-        Option<S>,
+        Option<GrinderGrinderType<S>>,
         Option<UriValue<S>>,
         Option<S>,
         Option<S>,
@@ -291,12 +461,12 @@ impl<S: BosStr> GrinderBuilder<grinder_state::Empty, S> {
 
 impl<St: grinder_state::State, S: BosStr> GrinderBuilder<St, S> {
     /// Set the `burrType` field (optional)
-    pub fn burr_type(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn burr_type(mut self, value: impl Into<Option<GrinderBurrType<S>>>) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `burrType` field to an Option value (optional)
-    pub fn maybe_burr_type(mut self, value: Option<S>) -> Self {
+    pub fn maybe_burr_type(mut self, value: Option<GrinderBurrType<S>>) -> Self {
         self._fields.0 = value;
         self
     }
@@ -323,12 +493,15 @@ where
 
 impl<St: grinder_state::State, S: BosStr> GrinderBuilder<St, S> {
     /// Set the `grinderType` field (optional)
-    pub fn grinder_type(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn grinder_type(
+        mut self,
+        value: impl Into<Option<GrinderGrinderType<S>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `grinderType` field to an Option value (optional)
-    pub fn maybe_grinder_type(mut self, value: Option<S>) -> Self {
+    pub fn maybe_grinder_type(mut self, value: Option<GrinderGrinderType<S>>) -> Self {
         self._fields.2 = value;
         self
     }

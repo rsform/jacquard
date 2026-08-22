@@ -176,6 +176,7 @@ fn build_user_type(
             };
             Ok(LexUserType::XrpcSubscription(LexXrpcSubscription {
                 description: None,
+                subprotocol: None,
                 parameters: Some(LexXrpcSubscriptionParameter::Params(params)),
                 message: None,
                 infos: None,

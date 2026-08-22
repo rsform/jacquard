@@ -18,6 +18,84 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::setting::DefsOption;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListOptionsScope<S: BosStr = DefaultStr> {
+    Instance,
+    Personal,
+    Other(S),
+}
+
+impl<S: BosStr> ListOptionsScope<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Instance => "instance",
+            Self::Personal => "personal",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "instance" => Self::Instance,
+            "personal" => Self::Personal,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListOptionsScope<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListOptionsScope<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListOptionsScope<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListOptionsScope<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListOptionsScope<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListOptionsScope<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListOptionsScope<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListOptionsScope::Instance => ListOptionsScope::Instance,
+            ListOptionsScope::Personal => ListOptionsScope::Personal,
+            ListOptionsScope::Other(v) => ListOptionsScope::Other(v.into_static()),
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct ListOptions<S: BosStr = DefaultStr> {
@@ -34,7 +112,7 @@ pub struct ListOptions<S: BosStr = DefaultStr> {
     /// Defaults to `"instance"`.
     #[serde(default = "_default_scope")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub scope: Option<S>,
+    pub scope: Option<ListOptionsScope<S>>,
 }
 
 
@@ -80,8 +158,10 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_scope<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("instance"))
+fn _default_scope<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    ListOptionsScope<S>,
+> {
+    Some(<ListOptionsScope<S>>::from_value(S::from_static("instance")))
 }
 
 pub mod list_options_state {
@@ -106,7 +186,13 @@ pub mod list_options_state {
 /// Builder for constructing an instance of this type.
 pub struct ListOptionsBuilder<St: list_options_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Vec<Nsid<S>>>, Option<i64>, Option<S>, Option<S>),
+    _fields: (
+        Option<S>,
+        Option<Vec<Nsid<S>>>,
+        Option<i64>,
+        Option<S>,
+        Option<ListOptionsScope<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -200,12 +286,12 @@ impl<St: list_options_state::State, S: BosStr> ListOptionsBuilder<St, S> {
 
 impl<St: list_options_state::State, S: BosStr> ListOptionsBuilder<St, S> {
     /// Set the `scope` field (optional)
-    pub fn scope(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn scope(mut self, value: impl Into<Option<ListOptionsScope<S>>>) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `scope` field to an Option value (optional)
-    pub fn maybe_scope(mut self, value: Option<S>) -> Self {
+    pub fn maybe_scope(mut self, value: Option<ListOptionsScope<S>>) -> Self {
         self._fields.4 = value;
         self
     }

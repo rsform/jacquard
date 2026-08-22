@@ -175,6 +175,11 @@ impl FixtureStack {
                     Provider::Tranquil => {
                         crate::reference_bootstrap::ensure_tranquil_account(self).await
                     }
+                    // The jetstream provider is seeded by the simulator
+                    // before scenarios run; there is no account bootstrap.
+                    Provider::Jetstream => {
+                        std::fs::write(&marker, b"simulator-seeded").map_err(|e| e.to_string())
+                    }
                 };
                 let _ = std::fs::remove_file(&lock);
                 result

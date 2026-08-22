@@ -1,0 +1,136 @@
+on: [push, pull_request]
+
+name: Continuous integration
+
+jobs:
+  check_minimal_versions:
+    name: Check Minimal Versions
+    # Explicitly use an old version of ubuntu
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download OpenSSL packages
+        run: |
+          wget http://launchpadlibrarian.net/774729480/libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
+          wget http://launchpadlibrarian.net/774729475/libssl-dev_1.1.1f-1ubuntu2.24_amd64.deb
+          wget http://launchpadlibrarian.net/774729481/openssl_1.1.1f-1ubuntu2.24_amd64.deb
+      - name: Install OpenSSL packages
+        run: |
+          sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.24_amd64.deb
+          sudo dpkg -i libssl-dev_1.1.1f-1ubuntu2.24_amd64.deb
+          sudo dpkg -i --force-confnew openssl_1.1.1f-1ubuntu2.24_amd64.deb
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: nightly
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: update
+          args: -Z minimal-versions
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --tests
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --features native-tls
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --features rustls-tls-native-roots
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --features rustls-tls-webpki-roots
+
+  check_native:
+    name: Check Native
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --tests
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --features native-tls
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --features rustls-tls-native-roots
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --features rustls-tls-webpki-roots
+
+  check_wasm:
+    name: Check WASM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+          target: wasm32-unknown-unknown
+      - uses: actions-rs/cargo@v1
+        with:
+          command: check
+          args: --tests
+
+
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - uses: actions-rs/cargo@v1
+        with:
+          command: test
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - run: rustup component add rustfmt
+      - uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - run: rustup component add clippy
+      - uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: -- -D warnings

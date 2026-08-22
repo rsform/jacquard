@@ -118,6 +118,108 @@ pub struct HandleUpdated<S: BosStr = DefaultStr> {
 }
 
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetAccountHistoryEvents<S: BosStr = DefaultStr> {
+    AccountCreated,
+    EmailUpdated,
+    EmailConfirmed,
+    PasswordUpdated,
+    HandleUpdated,
+    Other(S),
+}
+
+impl<S: BosStr> GetAccountHistoryEvents<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::AccountCreated => "accountCreated",
+            Self::EmailUpdated => "emailUpdated",
+            Self::EmailConfirmed => "emailConfirmed",
+            Self::PasswordUpdated => "passwordUpdated",
+            Self::HandleUpdated => "handleUpdated",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "accountCreated" => Self::AccountCreated,
+            "emailUpdated" => Self::EmailUpdated,
+            "emailConfirmed" => Self::EmailConfirmed,
+            "passwordUpdated" => Self::PasswordUpdated,
+            "handleUpdated" => Self::HandleUpdated,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetAccountHistoryEvents<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetAccountHistoryEvents<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetAccountHistoryEvents<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetAccountHistoryEvents<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetAccountHistoryEvents<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetAccountHistoryEvents<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetAccountHistoryEvents<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetAccountHistoryEvents::AccountCreated => {
+                GetAccountHistoryEvents::AccountCreated
+            }
+            GetAccountHistoryEvents::EmailUpdated => {
+                GetAccountHistoryEvents::EmailUpdated
+            }
+            GetAccountHistoryEvents::EmailConfirmed => {
+                GetAccountHistoryEvents::EmailConfirmed
+            }
+            GetAccountHistoryEvents::PasswordUpdated => {
+                GetAccountHistoryEvents::PasswordUpdated
+            }
+            GetAccountHistoryEvents::HandleUpdated => {
+                GetAccountHistoryEvents::HandleUpdated
+            }
+            GetAccountHistoryEvents::Other(v) => {
+                GetAccountHistoryEvents::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetAccountHistory<S: BosStr = DefaultStr> {
@@ -125,7 +227,7 @@ pub struct GetAccountHistory<S: BosStr = DefaultStr> {
     pub cursor: Option<S>,
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub events: Option<Vec<S>>,
+    pub events: Option<Vec<GetAccountHistoryEvents<S>>>,
     /// Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -876,7 +978,12 @@ pub struct GetAccountHistoryBuilder<
     S: BosStr = DefaultStr,
 > {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<S>, Option<Did<S>>, Option<Vec<S>>, Option<i64>),
+    _fields: (
+        Option<S>,
+        Option<Did<S>>,
+        Option<Vec<GetAccountHistoryEvents<S>>>,
+        Option<i64>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -953,12 +1060,18 @@ where
 
 impl<St: get_account_history_state::State, S: BosStr> GetAccountHistoryBuilder<St, S> {
     /// Set the `events` field (optional)
-    pub fn events(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn events(
+        mut self,
+        value: impl Into<Option<Vec<GetAccountHistoryEvents<S>>>>,
+    ) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `events` field to an Option value (optional)
-    pub fn maybe_events(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_events(
+        mut self,
+        value: Option<Vec<GetAccountHistoryEvents<S>>>,
+    ) -> Self {
         self._fields.2 = value;
         self
     }

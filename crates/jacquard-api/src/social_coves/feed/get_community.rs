@@ -17,6 +17,186 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::social_coves::feed::FeedViewPost;
+/// Sort order for community feed
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetCommunitySort<S: BosStr = DefaultStr> {
+    Hot,
+    Top,
+    New,
+    Other(S),
+}
+
+impl<S: BosStr> GetCommunitySort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hot => "hot",
+            Self::Top => "top",
+            Self::New => "new",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "hot" => Self::Hot,
+            "top" => Self::Top,
+            "new" => Self::New,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetCommunitySort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetCommunitySort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetCommunitySort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetCommunitySort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetCommunitySort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetCommunitySort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetCommunitySort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetCommunitySort::Hot => GetCommunitySort::Hot,
+            GetCommunitySort::Top => GetCommunitySort::Top,
+            GetCommunitySort::New => GetCommunitySort::New,
+            GetCommunitySort::Other(v) => GetCommunitySort::Other(v.into_static()),
+        }
+    }
+}
+
+/// Timeframe for top sorting (only applies when sort=top)
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetCommunityTimeframe<S: BosStr = DefaultStr> {
+    Hour,
+    Day,
+    Week,
+    Month,
+    Year,
+    All,
+    Other(S),
+}
+
+impl<S: BosStr> GetCommunityTimeframe<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Hour => "hour",
+            Self::Day => "day",
+            Self::Week => "week",
+            Self::Month => "month",
+            Self::Year => "year",
+            Self::All => "all",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "hour" => Self::Hour,
+            "day" => Self::Day,
+            "week" => Self::Week,
+            "month" => Self::Month,
+            "year" => Self::Year,
+            "all" => Self::All,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetCommunityTimeframe<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetCommunityTimeframe<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetCommunityTimeframe<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetCommunityTimeframe<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetCommunityTimeframe<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetCommunityTimeframe<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetCommunityTimeframe<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetCommunityTimeframe::Hour => GetCommunityTimeframe::Hour,
+            GetCommunityTimeframe::Day => GetCommunityTimeframe::Day,
+            GetCommunityTimeframe::Week => GetCommunityTimeframe::Week,
+            GetCommunityTimeframe::Month => GetCommunityTimeframe::Month,
+            GetCommunityTimeframe::Year => GetCommunityTimeframe::Year,
+            GetCommunityTimeframe::All => GetCommunityTimeframe::All,
+            GetCommunityTimeframe::Other(v) => {
+                GetCommunityTimeframe::Other(v.into_static())
+            }
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -32,11 +212,11 @@ pub struct GetCommunity<S: BosStr = DefaultStr> {
     /// Defaults to `"hot"`. Max length: 64.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<GetCommunitySort<S>>,
     /// Defaults to `"day"`. Max length: 64.
     #[serde(default = "_default_timeframe")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub timeframe: Option<S>,
+    pub timeframe: Option<GetCommunityTimeframe<S>>,
 }
 
 
@@ -82,12 +262,16 @@ fn _default_limit() -> Option<i64> {
     Some(15i64)
 }
 
-fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("hot"))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetCommunitySort<S>,
+> {
+    Some(<GetCommunitySort<S>>::from_value(S::from_static("hot")))
 }
 
-fn _default_timeframe<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("day"))
+fn _default_timeframe<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetCommunityTimeframe<S>,
+> {
+    Some(<GetCommunityTimeframe<S>>::from_value(S::from_static("day")))
 }
 
 pub mod get_community_state {
@@ -125,7 +309,13 @@ pub mod get_community_state {
 /// Builder for constructing an instance of this type.
 pub struct GetCommunityBuilder<St: get_community_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<S>, Option<S>),
+    _fields: (
+        Option<AtIdentifier<S>>,
+        Option<S>,
+        Option<i64>,
+        Option<GetCommunitySort<S>>,
+        Option<GetCommunityTimeframe<S>>,
+    ),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -212,12 +402,12 @@ impl<St: get_community_state::State, S: BosStr> GetCommunityBuilder<St, S> {
 
 impl<St: get_community_state::State, S: BosStr> GetCommunityBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<GetCommunitySort<S>>>) -> Self {
         self._fields.3 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<GetCommunitySort<S>>) -> Self {
         self._fields.3 = value;
         self
     }
@@ -225,12 +415,15 @@ impl<St: get_community_state::State, S: BosStr> GetCommunityBuilder<St, S> {
 
 impl<St: get_community_state::State, S: BosStr> GetCommunityBuilder<St, S> {
     /// Set the `timeframe` field (optional)
-    pub fn timeframe(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn timeframe(
+        mut self,
+        value: impl Into<Option<GetCommunityTimeframe<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `timeframe` field to an Option value (optional)
-    pub fn maybe_timeframe(mut self, value: Option<S>) -> Self {
+    pub fn maybe_timeframe(mut self, value: Option<GetCommunityTimeframe<S>>) -> Self {
         self._fields.4 = value;
         self
     }

@@ -37,27 +37,32 @@ use serde::{Serialize, Deserialize};
     bound(deserialize = "S: Deserialize<'de> + BosStr")
 )]
 pub struct Profile<S: BosStr = DefaultStr> {
-    ///Who can tag this user in beacons
+    ///Who can tag this user in beacons  Defaults to `"all"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_profile_allow_tags")]
     pub allow_tags: Option<ProfileAllowTags<S>>,
     ///Timestamp when settings were first created
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
-    ///Default delayed reveal setting for new beacons
+    ///Default delayed reveal setting for new beacons  Defaults to `"none"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_profile_default_delayed_reveal")]
     pub default_delayed_reveal: Option<ProfileDefaultDelayedReveal<S>>,
-    ///Default visibility for new beacons
+    ///Default visibility for new beacons  Defaults to `"public"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_profile_default_visibility")]
     pub default_visibility: Option<ProfileDefaultVisibility<S>>,
-    ///Preferred distance unit
+    ///Preferred distance unit  Defaults to `"km"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_profile_distance_unit")]
     pub distance_unit: Option<ProfileDistanceUnit<S>>,
     ///Whether to hide past beacons from public view  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_hide_past_beacons")]
     pub hide_past_beacons: Option<bool>,
-    ///Preferred language setting
+    ///Preferred language setting  Defaults to `"auto"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_profile_language")]
     pub language: Option<ProfileLanguage<S>>,
     ///Hex color code for map marker (e.g., #e24630)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -680,8 +685,38 @@ where
     Ok(data)
 }
 
+fn _default_profile_allow_tags<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ProfileAllowTags<S>,
+> {
+    Some(<ProfileAllowTags<S>>::from_value(S::from_static("all")))
+}
+
+fn _default_profile_default_delayed_reveal<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ProfileDefaultDelayedReveal<S>,
+> {
+    Some(<ProfileDefaultDelayedReveal<S>>::from_value(S::from_static("none")))
+}
+
+fn _default_profile_default_visibility<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ProfileDefaultVisibility<S>,
+> {
+    Some(<ProfileDefaultVisibility<S>>::from_value(S::from_static("public")))
+}
+
+fn _default_profile_distance_unit<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ProfileDistanceUnit<S>,
+> {
+    Some(<ProfileDistanceUnit<S>>::from_value(S::from_static("km")))
+}
+
 fn _default_profile_hide_past_beacons() -> Option<bool> {
     Some(false)
+}
+
+fn _default_profile_language<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    ProfileLanguage<S>,
+> {
+    Some(<ProfileLanguage<S>>::from_value(S::from_static("auto")))
 }
 
 fn _default_profile_post_beacon_links() -> Option<bool> {

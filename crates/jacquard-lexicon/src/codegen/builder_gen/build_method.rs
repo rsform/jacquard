@@ -176,9 +176,16 @@ fn schema_default_expr(
             let v = i.default?;
             Some(quote! { #v })
         }
-        LexObjectProperty::String(s) if s.known_values.is_none() => {
+        LexObjectProperty::String(s) if s.default.is_some() => {
             let v = s.default.as_ref()?.as_ref();
-            Some(quote! { S::from_static(#v) })
+            if s.known_values.is_some() || s.r#enum.is_some() {
+                // Enum-constrained field: construct through from_value.
+                // The caller (generate_nested_types) guarantees the enum
+                // type exists with a matching name.
+                None
+            } else {
+                Some(quote! { S::from_static(#v) })
+            }
         }
         _ => None,
     }

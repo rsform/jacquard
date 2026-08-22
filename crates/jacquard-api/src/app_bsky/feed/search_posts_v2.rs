@@ -18,6 +18,179 @@ use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::PostView;
+/// Language analyzer hint for the query text. If unset, the server auto-detects when possible.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchPostsV2QueryLanguage<S: BosStr = DefaultStr> {
+    Ja,
+    Zh,
+    Ko,
+    Th,
+    Ar,
+    Other(S),
+}
+
+impl<S: BosStr> SearchPostsV2QueryLanguage<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ja => "ja",
+            Self::Zh => "zh",
+            Self::Ko => "ko",
+            Self::Th => "th",
+            Self::Ar => "ar",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "ja" => Self::Ja,
+            "zh" => Self::Zh,
+            "ko" => Self::Ko,
+            "th" => Self::Th,
+            "ar" => Self::Ar,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchPostsV2QueryLanguage<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchPostsV2QueryLanguage<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchPostsV2QueryLanguage<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for SearchPostsV2QueryLanguage<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchPostsV2QueryLanguage<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SearchPostsV2QueryLanguage<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchPostsV2QueryLanguage<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchPostsV2QueryLanguage::Ja => SearchPostsV2QueryLanguage::Ja,
+            SearchPostsV2QueryLanguage::Zh => SearchPostsV2QueryLanguage::Zh,
+            SearchPostsV2QueryLanguage::Ko => SearchPostsV2QueryLanguage::Ko,
+            SearchPostsV2QueryLanguage::Th => SearchPostsV2QueryLanguage::Th,
+            SearchPostsV2QueryLanguage::Ar => SearchPostsV2QueryLanguage::Ar,
+            SearchPostsV2QueryLanguage::Other(v) => {
+                SearchPostsV2QueryLanguage::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Ranking order for results. 'recent' sorts by recency; 'top' uses search ranking.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchPostsV2Sort<S: BosStr = DefaultStr> {
+    Recent,
+    Top,
+    Other(S),
+}
+
+impl<S: BosStr> SearchPostsV2Sort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Recent => "recent",
+            Self::Top => "top",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "recent" => Self::Recent,
+            "top" => Self::Top,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchPostsV2Sort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchPostsV2Sort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchPostsV2Sort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SearchPostsV2Sort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchPostsV2Sort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SearchPostsV2Sort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchPostsV2Sort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchPostsV2Sort::Recent => SearchPostsV2Sort::Recent,
+            SearchPostsV2Sort::Top => SearchPostsV2Sort::Top,
+            SearchPostsV2Sort::Other(v) => SearchPostsV2Sort::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -67,7 +240,7 @@ pub struct SearchPostsV2<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub query: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub query_language: Option<S>,
+    pub query_language: Option<SearchPostsV2QueryLanguage<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub replies_only: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -75,7 +248,7 @@ pub struct SearchPostsV2<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub since: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<SearchPostsV2Sort<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thread_root_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -93,7 +266,9 @@ pub struct SearchPostsV2Output<S: BosStr = DefaultStr> {
     pub cursor: Option<S>,
     ///Query languages detected for CJK, Thai, or Arabic text. Empty or omitted for other scripts.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub detected_query_languages: Option<Vec<S>>,
+    pub detected_query_languages: Option<
+        Vec<SearchPostsV2OutputDetectedQueryLanguages<S>>,
+    >,
     ///Estimated total number of matching hits. May be rounded or truncated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hits_total: Option<i64>,
@@ -101,6 +276,110 @@ pub struct SearchPostsV2Output<S: BosStr = DefaultStr> {
     pub posts: Vec<PostView<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchPostsV2OutputDetectedQueryLanguages<S: BosStr = DefaultStr> {
+    Ja,
+    Zh,
+    Ko,
+    Th,
+    Ar,
+    Other(S),
+}
+
+impl<S: BosStr> SearchPostsV2OutputDetectedQueryLanguages<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Ja => "ja",
+            Self::Zh => "zh",
+            Self::Ko => "ko",
+            Self::Th => "th",
+            Self::Ar => "ar",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "ja" => Self::Ja,
+            "zh" => Self::Zh,
+            "ko" => Self::Ko,
+            "th" => Self::Th,
+            "ar" => Self::Ar,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchPostsV2OutputDetectedQueryLanguages<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchPostsV2OutputDetectedQueryLanguages<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchPostsV2OutputDetectedQueryLanguages<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for SearchPostsV2OutputDetectedQueryLanguages<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchPostsV2OutputDetectedQueryLanguages<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic
+for SearchPostsV2OutputDetectedQueryLanguages<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchPostsV2OutputDetectedQueryLanguages<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchPostsV2OutputDetectedQueryLanguages::Ja => {
+                SearchPostsV2OutputDetectedQueryLanguages::Ja
+            }
+            SearchPostsV2OutputDetectedQueryLanguages::Zh => {
+                SearchPostsV2OutputDetectedQueryLanguages::Zh
+            }
+            SearchPostsV2OutputDetectedQueryLanguages::Ko => {
+                SearchPostsV2OutputDetectedQueryLanguages::Ko
+            }
+            SearchPostsV2OutputDetectedQueryLanguages::Th => {
+                SearchPostsV2OutputDetectedQueryLanguages::Th
+            }
+            SearchPostsV2OutputDetectedQueryLanguages::Ar => {
+                SearchPostsV2OutputDetectedQueryLanguages::Ar
+            }
+            SearchPostsV2OutputDetectedQueryLanguages::Other(v) => {
+                SearchPostsV2OutputDetectedQueryLanguages::Other(v.into_static())
+            }
+        }
+    }
 }
 
 
@@ -224,11 +503,11 @@ pub struct SearchPostsV2Builder<
         Option<i64>,
         Option<Vec<AtIdentifier<S>>>,
         Option<S>,
-        Option<S>,
+        Option<SearchPostsV2QueryLanguage<S>>,
         Option<bool>,
         Option<AtUri<S>>,
         Option<S>,
-        Option<S>,
+        Option<SearchPostsV2Sort<S>>,
         Option<AtUri<S>>,
         Option<S>,
         Option<Vec<UriValue<S>>>,
@@ -622,12 +901,18 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
 
 impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
     /// Set the `queryLanguage` field (optional)
-    pub fn query_language(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn query_language(
+        mut self,
+        value: impl Into<Option<SearchPostsV2QueryLanguage<S>>>,
+    ) -> Self {
         self._fields.21 = value.into();
         self
     }
     /// Set the `queryLanguage` field to an Option value (optional)
-    pub fn maybe_query_language(mut self, value: Option<S>) -> Self {
+    pub fn maybe_query_language(
+        mut self,
+        value: Option<SearchPostsV2QueryLanguage<S>>,
+    ) -> Self {
         self._fields.21 = value;
         self
     }
@@ -674,12 +959,12 @@ impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
 
 impl<St: search_posts_v2_state::State, S: BosStr> SearchPostsV2Builder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<SearchPostsV2Sort<S>>>) -> Self {
         self._fields.25 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<SearchPostsV2Sort<S>>) -> Self {
         self._fields.25 = value;
         self
     }

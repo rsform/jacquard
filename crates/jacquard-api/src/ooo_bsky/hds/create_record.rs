@@ -39,9 +39,94 @@ pub struct CreateRecord<S: BosStr = DefaultStr> {
 pub struct CreateRecordOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: UriValue<S>,
-    pub validation_status: S,
+    pub validation_status: CreateRecordOutputValidationStatus<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum CreateRecordOutputValidationStatus<S: BosStr = DefaultStr> {
+    Valid,
+    Unknown,
+    Other(S),
+}
+
+impl<S: BosStr> CreateRecordOutputValidationStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Valid => "valid",
+            Self::Unknown => "unknown",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "valid" => Self::Valid,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for CreateRecordOutputValidationStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for CreateRecordOutputValidationStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for CreateRecordOutputValidationStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for CreateRecordOutputValidationStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for CreateRecordOutputValidationStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for CreateRecordOutputValidationStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CreateRecordOutputValidationStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            CreateRecordOutputValidationStatus::Valid => {
+                CreateRecordOutputValidationStatus::Valid
+            }
+            CreateRecordOutputValidationStatus::Unknown => {
+                CreateRecordOutputValidationStatus::Unknown
+            }
+            CreateRecordOutputValidationStatus::Other(v) => {
+                CreateRecordOutputValidationStatus::Other(v.into_static())
+            }
+        }
+    }
 }
 
 

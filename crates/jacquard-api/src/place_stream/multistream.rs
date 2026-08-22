@@ -39,7 +39,7 @@ use crate::place_stream::multistream;
 pub struct Event<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub message: S,
-    pub status: S,
+    pub status: EventStatus<S>,
     #[serde(
         flatten,
         default,
@@ -47,6 +47,92 @@ pub struct Event<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum EventStatus<S: BosStr = DefaultStr> {
+    Inactive,
+    Pending,
+    Active,
+    Error,
+    Other(S),
+}
+
+impl<S: BosStr> EventStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Inactive => "inactive",
+            Self::Pending => "pending",
+            Self::Active => "active",
+            Self::Error => "error",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "inactive" => Self::Inactive,
+            "pending" => Self::Pending,
+            "active" => Self::Active,
+            "error" => Self::Error,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for EventStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for EventStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for EventStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EventStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for EventStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for EventStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EventStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            EventStatus::Inactive => EventStatus::Inactive,
+            EventStatus::Pending => EventStatus::Pending,
+            EventStatus::Active => EventStatus::Active,
+            EventStatus::Error => EventStatus::Error,
+            EventStatus::Other(v) => EventStatus::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -171,7 +257,7 @@ pub mod event_state {
 /// Builder for constructing an instance of this type.
 pub struct EventBuilder<St: event_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Datetime>, Option<S>, Option<S>),
+    _fields: (Option<Datetime>, Option<S>, Option<EventStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -257,7 +343,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<EventStatus<S>>,
     ) -> EventBuilder<event_state::SetStatus<St>, S> {
         self._fields.2 = Option::Some(value.into());
         EventBuilder {

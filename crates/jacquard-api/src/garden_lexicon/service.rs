@@ -75,7 +75,7 @@ pub struct ServiceGetRecordOutput<S: BosStr = DefaultStr> {
 pub struct Method<S: BosStr = DefaultStr> {
     ///Authentication methods supported by this method.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub auth_methods: Option<Vec<S>>,
+    pub auth_methods: Option<Vec<MethodAuthMethods<S>>>,
     ///Whether this method is deprecated and should no longer be used.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deprecated: Option<bool>,
@@ -88,6 +88,98 @@ pub struct Method<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MethodAuthMethods<S: BosStr = DefaultStr> {
+    None,
+    AtprotoAdmin,
+    AtprotoBearer,
+    AtprotoOauth,
+    AtprotoInterService,
+    Other(S),
+}
+
+impl<S: BosStr> MethodAuthMethods<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::None => "none",
+            Self::AtprotoAdmin => "atproto.admin",
+            Self::AtprotoBearer => "atproto.bearer",
+            Self::AtprotoOauth => "atproto.oauth",
+            Self::AtprotoInterService => "atproto.inter-service",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "none" => Self::None,
+            "atproto.admin" => Self::AtprotoAdmin,
+            "atproto.bearer" => Self::AtprotoBearer,
+            "atproto.oauth" => Self::AtprotoOauth,
+            "atproto.inter-service" => Self::AtprotoInterService,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for MethodAuthMethods<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for MethodAuthMethods<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for MethodAuthMethods<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MethodAuthMethods<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for MethodAuthMethods<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for MethodAuthMethods<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MethodAuthMethods<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            MethodAuthMethods::None => MethodAuthMethods::None,
+            MethodAuthMethods::AtprotoAdmin => MethodAuthMethods::AtprotoAdmin,
+            MethodAuthMethods::AtprotoBearer => MethodAuthMethods::AtprotoBearer,
+            MethodAuthMethods::AtprotoOauth => MethodAuthMethods::AtprotoOauth,
+            MethodAuthMethods::AtprotoInterService => {
+                MethodAuthMethods::AtprotoInterService
+            }
+            MethodAuthMethods::Other(v) => MethodAuthMethods::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -664,7 +756,7 @@ pub mod method_state {
 /// Builder for constructing an instance of this type.
 pub struct MethodBuilder<St: method_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<Vec<S>>, Option<bool>, Option<AtUri<S>>),
+    _fields: (Option<Vec<MethodAuthMethods<S>>>, Option<bool>, Option<AtUri<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -706,12 +798,18 @@ impl<S: BosStr> MethodBuilder<method_state::Empty, S> {
 
 impl<St: method_state::State, S: BosStr> MethodBuilder<St, S> {
     /// Set the `authMethods` field (optional)
-    pub fn auth_methods(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn auth_methods(
+        mut self,
+        value: impl Into<Option<Vec<MethodAuthMethods<S>>>>,
+    ) -> Self {
         self._fields.0 = value.into();
         self
     }
     /// Set the `authMethods` field to an Option value (optional)
-    pub fn maybe_auth_methods(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_auth_methods(
+        mut self,
+        value: Option<Vec<MethodAuthMethods<S>>>,
+    ) -> Self {
         self._fields.0 = value;
         self
     }

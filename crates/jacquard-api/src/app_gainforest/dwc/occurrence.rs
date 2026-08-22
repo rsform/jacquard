@@ -53,7 +53,7 @@ pub struct Occurrence<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub audio_evidence: Option<Data<S>>,
     ///The specific nature of the data record. Must be one of the Darwin Core class names.
-    pub basis_of_record: S,
+    pub basis_of_record: OccurrenceBasisOfRecord<S>,
     ///The behavior shown by the subject at the time of occurrence (e.g., 'foraging', 'nesting', 'roosting').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub behavior: Option<S>,
@@ -88,7 +88,7 @@ pub struct Occurrence<S: BosStr = DefaultStr> {
     pub date_identified: Option<S>,
     ///The Dublin Core type class that best describes the resource (dc:type).
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub dc_type: Option<S>,
+    pub dc_type: Option<OccurrenceDcType<S>>,
     ///Geographic latitude in decimal degrees (WGS84). Positive values are north of the Equator. Range: -90 to 90.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub decimal_latitude: Option<S>,
@@ -192,7 +192,7 @@ pub struct Occurrence<S: BosStr = DefaultStr> {
     pub municipality: Option<S>,
     ///The nomenclatural code under which the scientificName is constructed.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub nomenclatural_code: Option<S>,
+    pub nomenclatural_code: Option<OccurrenceNomenclaturalCode<S>>,
     ///A globally unique identifier for the occurrence record. Recommended: a persistent URI (e.g., DOI, LSID, or UUID-based URI).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub occurrence_id: Option<S>,
@@ -201,7 +201,7 @@ pub struct Occurrence<S: BosStr = DefaultStr> {
     pub occurrence_remarks: Option<S>,
     ///Statement about the presence or absence of a taxon at a location.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub occurrence_status: Option<S>,
+    pub occurrence_status: Option<OccurrenceOccurrenceStatus<S>>,
     ///The full scientific name of the order.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub order: Option<S>,
@@ -245,7 +245,7 @@ pub struct Occurrence<S: BosStr = DefaultStr> {
     pub scientific_name_authorship: Option<S>,
     ///The sex of the biological individual(s).
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sex: Option<S>,
+    pub sex: Option<OccurrenceSex<S>>,
     ///The name of the species epithet of the scientificName.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub specific_epithet: Option<S>,
@@ -257,7 +257,7 @@ pub struct Occurrence<S: BosStr = DefaultStr> {
     pub state_province: Option<S>,
     ///The taxonomic rank of the most specific name in scientificName.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub taxon_rank: Option<S>,
+    pub taxon_rank: Option<OccurrenceTaxonRank<S>>,
     ///The status of the use of the scientificName (e.g., 'accepted', 'synonym', 'doubtful').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub taxonomic_status: Option<S>,
@@ -277,6 +277,604 @@ pub struct Occurrence<S: BosStr = DefaultStr> {
         skip_serializing_if = "Option::is_none"
     )]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+/// The specific nature of the data record. Must be one of the Darwin Core class names.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OccurrenceBasisOfRecord<S: BosStr = DefaultStr> {
+    HumanObservation,
+    MachineObservation,
+    PreservedSpecimen,
+    LivingSpecimen,
+    FossilSpecimen,
+    MaterialSample,
+    MaterialEntity,
+    MaterialCitation,
+    Other(S),
+}
+
+impl<S: BosStr> OccurrenceBasisOfRecord<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::HumanObservation => "HumanObservation",
+            Self::MachineObservation => "MachineObservation",
+            Self::PreservedSpecimen => "PreservedSpecimen",
+            Self::LivingSpecimen => "LivingSpecimen",
+            Self::FossilSpecimen => "FossilSpecimen",
+            Self::MaterialSample => "MaterialSample",
+            Self::MaterialEntity => "MaterialEntity",
+            Self::MaterialCitation => "MaterialCitation",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "HumanObservation" => Self::HumanObservation,
+            "MachineObservation" => Self::MachineObservation,
+            "PreservedSpecimen" => Self::PreservedSpecimen,
+            "LivingSpecimen" => Self::LivingSpecimen,
+            "FossilSpecimen" => Self::FossilSpecimen,
+            "MaterialSample" => Self::MaterialSample,
+            "MaterialEntity" => Self::MaterialEntity,
+            "MaterialCitation" => Self::MaterialCitation,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for OccurrenceBasisOfRecord<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for OccurrenceBasisOfRecord<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for OccurrenceBasisOfRecord<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for OccurrenceBasisOfRecord<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for OccurrenceBasisOfRecord<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for OccurrenceBasisOfRecord<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = OccurrenceBasisOfRecord<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OccurrenceBasisOfRecord::HumanObservation => {
+                OccurrenceBasisOfRecord::HumanObservation
+            }
+            OccurrenceBasisOfRecord::MachineObservation => {
+                OccurrenceBasisOfRecord::MachineObservation
+            }
+            OccurrenceBasisOfRecord::PreservedSpecimen => {
+                OccurrenceBasisOfRecord::PreservedSpecimen
+            }
+            OccurrenceBasisOfRecord::LivingSpecimen => {
+                OccurrenceBasisOfRecord::LivingSpecimen
+            }
+            OccurrenceBasisOfRecord::FossilSpecimen => {
+                OccurrenceBasisOfRecord::FossilSpecimen
+            }
+            OccurrenceBasisOfRecord::MaterialSample => {
+                OccurrenceBasisOfRecord::MaterialSample
+            }
+            OccurrenceBasisOfRecord::MaterialEntity => {
+                OccurrenceBasisOfRecord::MaterialEntity
+            }
+            OccurrenceBasisOfRecord::MaterialCitation => {
+                OccurrenceBasisOfRecord::MaterialCitation
+            }
+            OccurrenceBasisOfRecord::Other(v) => {
+                OccurrenceBasisOfRecord::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// The Dublin Core type class that best describes the resource (dc:type).
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OccurrenceDcType<S: BosStr = DefaultStr> {
+    PhysicalObject,
+    StillImage,
+    MovingImage,
+    Sound,
+    Text,
+    Event,
+    Dataset,
+    Other(S),
+}
+
+impl<S: BosStr> OccurrenceDcType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::PhysicalObject => "PhysicalObject",
+            Self::StillImage => "StillImage",
+            Self::MovingImage => "MovingImage",
+            Self::Sound => "Sound",
+            Self::Text => "Text",
+            Self::Event => "Event",
+            Self::Dataset => "Dataset",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "PhysicalObject" => Self::PhysicalObject,
+            "StillImage" => Self::StillImage,
+            "MovingImage" => Self::MovingImage,
+            "Sound" => Self::Sound,
+            "Text" => Self::Text,
+            "Event" => Self::Event,
+            "Dataset" => Self::Dataset,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for OccurrenceDcType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for OccurrenceDcType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for OccurrenceDcType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for OccurrenceDcType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for OccurrenceDcType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for OccurrenceDcType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = OccurrenceDcType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OccurrenceDcType::PhysicalObject => OccurrenceDcType::PhysicalObject,
+            OccurrenceDcType::StillImage => OccurrenceDcType::StillImage,
+            OccurrenceDcType::MovingImage => OccurrenceDcType::MovingImage,
+            OccurrenceDcType::Sound => OccurrenceDcType::Sound,
+            OccurrenceDcType::Text => OccurrenceDcType::Text,
+            OccurrenceDcType::Event => OccurrenceDcType::Event,
+            OccurrenceDcType::Dataset => OccurrenceDcType::Dataset,
+            OccurrenceDcType::Other(v) => OccurrenceDcType::Other(v.into_static()),
+        }
+    }
+}
+
+/// The nomenclatural code under which the scientificName is constructed.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OccurrenceNomenclaturalCode<S: BosStr = DefaultStr> {
+    Iczn,
+    Icn,
+    Icnp,
+    Ictv,
+    BioCode,
+    Other(S),
+}
+
+impl<S: BosStr> OccurrenceNomenclaturalCode<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Iczn => "ICZN",
+            Self::Icn => "ICN",
+            Self::Icnp => "ICNP",
+            Self::Ictv => "ICTV",
+            Self::BioCode => "BioCode",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "ICZN" => Self::Iczn,
+            "ICN" => Self::Icn,
+            "ICNP" => Self::Icnp,
+            "ICTV" => Self::Ictv,
+            "BioCode" => Self::BioCode,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for OccurrenceNomenclaturalCode<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for OccurrenceNomenclaturalCode<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for OccurrenceNomenclaturalCode<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for OccurrenceNomenclaturalCode<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for OccurrenceNomenclaturalCode<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for OccurrenceNomenclaturalCode<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = OccurrenceNomenclaturalCode<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OccurrenceNomenclaturalCode::Iczn => OccurrenceNomenclaturalCode::Iczn,
+            OccurrenceNomenclaturalCode::Icn => OccurrenceNomenclaturalCode::Icn,
+            OccurrenceNomenclaturalCode::Icnp => OccurrenceNomenclaturalCode::Icnp,
+            OccurrenceNomenclaturalCode::Ictv => OccurrenceNomenclaturalCode::Ictv,
+            OccurrenceNomenclaturalCode::BioCode => OccurrenceNomenclaturalCode::BioCode,
+            OccurrenceNomenclaturalCode::Other(v) => {
+                OccurrenceNomenclaturalCode::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// Statement about the presence or absence of a taxon at a location.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OccurrenceOccurrenceStatus<S: BosStr = DefaultStr> {
+    Present,
+    Absent,
+    Other(S),
+}
+
+impl<S: BosStr> OccurrenceOccurrenceStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Present => "present",
+            Self::Absent => "absent",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "present" => Self::Present,
+            "absent" => Self::Absent,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for OccurrenceOccurrenceStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for OccurrenceOccurrenceStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for OccurrenceOccurrenceStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for OccurrenceOccurrenceStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for OccurrenceOccurrenceStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for OccurrenceOccurrenceStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = OccurrenceOccurrenceStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OccurrenceOccurrenceStatus::Present => OccurrenceOccurrenceStatus::Present,
+            OccurrenceOccurrenceStatus::Absent => OccurrenceOccurrenceStatus::Absent,
+            OccurrenceOccurrenceStatus::Other(v) => {
+                OccurrenceOccurrenceStatus::Other(v.into_static())
+            }
+        }
+    }
+}
+
+/// The sex of the biological individual(s).
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OccurrenceSex<S: BosStr = DefaultStr> {
+    Male,
+    Female,
+    Hermaphrodite,
+    Other(S),
+}
+
+impl<S: BosStr> OccurrenceSex<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Male => "male",
+            Self::Female => "female",
+            Self::Hermaphrodite => "hermaphrodite",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "male" => Self::Male,
+            "female" => Self::Female,
+            "hermaphrodite" => Self::Hermaphrodite,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for OccurrenceSex<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for OccurrenceSex<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for OccurrenceSex<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for OccurrenceSex<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for OccurrenceSex<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for OccurrenceSex<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = OccurrenceSex<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OccurrenceSex::Male => OccurrenceSex::Male,
+            OccurrenceSex::Female => OccurrenceSex::Female,
+            OccurrenceSex::Hermaphrodite => OccurrenceSex::Hermaphrodite,
+            OccurrenceSex::Other(v) => OccurrenceSex::Other(v.into_static()),
+        }
+    }
+}
+
+/// The taxonomic rank of the most specific name in scientificName.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OccurrenceTaxonRank<S: BosStr = DefaultStr> {
+    Kingdom,
+    Phylum,
+    Class,
+    Order,
+    Family,
+    Subfamily,
+    Genus,
+    Subgenus,
+    Species,
+    Subspecies,
+    Variety,
+    Form,
+    Other(S),
+}
+
+impl<S: BosStr> OccurrenceTaxonRank<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Kingdom => "kingdom",
+            Self::Phylum => "phylum",
+            Self::Class => "class",
+            Self::Order => "order",
+            Self::Family => "family",
+            Self::Subfamily => "subfamily",
+            Self::Genus => "genus",
+            Self::Subgenus => "subgenus",
+            Self::Species => "species",
+            Self::Subspecies => "subspecies",
+            Self::Variety => "variety",
+            Self::Form => "form",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "kingdom" => Self::Kingdom,
+            "phylum" => Self::Phylum,
+            "class" => Self::Class,
+            "order" => Self::Order,
+            "family" => Self::Family,
+            "subfamily" => Self::Subfamily,
+            "genus" => Self::Genus,
+            "subgenus" => Self::Subgenus,
+            "species" => Self::Species,
+            "subspecies" => Self::Subspecies,
+            "variety" => Self::Variety,
+            "form" => Self::Form,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for OccurrenceTaxonRank<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for OccurrenceTaxonRank<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for OccurrenceTaxonRank<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for OccurrenceTaxonRank<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for OccurrenceTaxonRank<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for OccurrenceTaxonRank<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = OccurrenceTaxonRank<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            OccurrenceTaxonRank::Kingdom => OccurrenceTaxonRank::Kingdom,
+            OccurrenceTaxonRank::Phylum => OccurrenceTaxonRank::Phylum,
+            OccurrenceTaxonRank::Class => OccurrenceTaxonRank::Class,
+            OccurrenceTaxonRank::Order => OccurrenceTaxonRank::Order,
+            OccurrenceTaxonRank::Family => OccurrenceTaxonRank::Family,
+            OccurrenceTaxonRank::Subfamily => OccurrenceTaxonRank::Subfamily,
+            OccurrenceTaxonRank::Genus => OccurrenceTaxonRank::Genus,
+            OccurrenceTaxonRank::Subgenus => OccurrenceTaxonRank::Subgenus,
+            OccurrenceTaxonRank::Species => OccurrenceTaxonRank::Species,
+            OccurrenceTaxonRank::Subspecies => OccurrenceTaxonRank::Subspecies,
+            OccurrenceTaxonRank::Variety => OccurrenceTaxonRank::Variety,
+            OccurrenceTaxonRank::Form => OccurrenceTaxonRank::Form,
+            OccurrenceTaxonRank::Other(v) => OccurrenceTaxonRank::Other(v.into_static()),
+        }
+    }
 }
 
 /// Typed wrapper for GetRecord response with this collection's record type.
@@ -1279,7 +1877,7 @@ pub struct OccurrenceBuilder<St: occurrence_state::State, S: BosStr = DefaultStr
         Option<S>,
         Option<S>,
         Option<Data<S>>,
-        Option<S>,
+        Option<OccurrenceBasisOfRecord<S>>,
         Option<S>,
         Option<S>,
         Option<S>,
@@ -1291,7 +1889,7 @@ pub struct OccurrenceBuilder<St: occurrence_state::State, S: BosStr = DefaultStr
         Option<S>,
         Option<S>,
         Option<S>,
-        Option<S>,
+        Option<OccurrenceDcType<S>>,
         Option<S>,
         Option<S>,
         Option<S>,
@@ -1326,10 +1924,10 @@ pub struct OccurrenceBuilder<St: occurrence_state::State, S: BosStr = DefaultStr
         Option<i64>,
         Option<i64>,
         Option<S>,
+        Option<OccurrenceNomenclaturalCode<S>>,
         Option<S>,
         Option<S>,
-        Option<S>,
-        Option<S>,
+        Option<OccurrenceOccurrenceStatus<S>>,
         Option<S>,
         Option<S>,
         Option<S>,
@@ -1344,11 +1942,11 @@ pub struct OccurrenceBuilder<St: occurrence_state::State, S: BosStr = DefaultStr
         Option<S>,
         Option<S>,
         Option<S>,
-        Option<S>,
+        Option<OccurrenceSex<S>>,
         Option<S>,
         Option<Data<S>>,
         Option<S>,
-        Option<S>,
+        Option<OccurrenceTaxonRank<S>>,
         Option<S>,
         Option<S>,
         Option<S>,
@@ -1626,7 +2224,7 @@ where
     /// Set the `basisOfRecord` field (required)
     pub fn basis_of_record(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<OccurrenceBasisOfRecord<S>>,
     ) -> OccurrenceBuilder<occurrence_state::SetBasisOfRecord<St>, S> {
         self._fields.5 = Option::Some(value.into());
         OccurrenceBuilder {
@@ -1791,12 +2389,12 @@ impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
 
 impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
     /// Set the `dcType` field (optional)
-    pub fn dc_type(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn dc_type(mut self, value: impl Into<Option<OccurrenceDcType<S>>>) -> Self {
         self._fields.17 = value.into();
         self
     }
     /// Set the `dcType` field to an Option value (optional)
-    pub fn maybe_dc_type(mut self, value: Option<S>) -> Self {
+    pub fn maybe_dc_type(mut self, value: Option<OccurrenceDcType<S>>) -> Self {
         self._fields.17 = value;
         self
     }
@@ -2252,12 +2850,18 @@ impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
 
 impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
     /// Set the `nomenclaturalCode` field (optional)
-    pub fn nomenclatural_code(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn nomenclatural_code(
+        mut self,
+        value: impl Into<Option<OccurrenceNomenclaturalCode<S>>>,
+    ) -> Self {
         self._fields.52 = value.into();
         self
     }
     /// Set the `nomenclaturalCode` field to an Option value (optional)
-    pub fn maybe_nomenclatural_code(mut self, value: Option<S>) -> Self {
+    pub fn maybe_nomenclatural_code(
+        mut self,
+        value: Option<OccurrenceNomenclaturalCode<S>>,
+    ) -> Self {
         self._fields.52 = value;
         self
     }
@@ -2291,12 +2895,18 @@ impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
 
 impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
     /// Set the `occurrenceStatus` field (optional)
-    pub fn occurrence_status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn occurrence_status(
+        mut self,
+        value: impl Into<Option<OccurrenceOccurrenceStatus<S>>>,
+    ) -> Self {
         self._fields.55 = value.into();
         self
     }
     /// Set the `occurrenceStatus` field to an Option value (optional)
-    pub fn maybe_occurrence_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_occurrence_status(
+        mut self,
+        value: Option<OccurrenceOccurrenceStatus<S>>,
+    ) -> Self {
         self._fields.55 = value;
         self
     }
@@ -2492,12 +3102,12 @@ impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
 
 impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
     /// Set the `sex` field (optional)
-    pub fn sex(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sex(mut self, value: impl Into<Option<OccurrenceSex<S>>>) -> Self {
         self._fields.70 = value.into();
         self
     }
     /// Set the `sex` field to an Option value (optional)
-    pub fn maybe_sex(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sex(mut self, value: Option<OccurrenceSex<S>>) -> Self {
         self._fields.70 = value;
         self
     }
@@ -2544,12 +3154,15 @@ impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
 
 impl<St: occurrence_state::State, S: BosStr> OccurrenceBuilder<St, S> {
     /// Set the `taxonRank` field (optional)
-    pub fn taxon_rank(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn taxon_rank(
+        mut self,
+        value: impl Into<Option<OccurrenceTaxonRank<S>>>,
+    ) -> Self {
         self._fields.74 = value.into();
         self
     }
     /// Set the `taxonRank` field to an Option value (optional)
-    pub fn maybe_taxon_rank(mut self, value: Option<S>) -> Self {
+    pub fn maybe_taxon_rank(mut self, value: Option<OccurrenceTaxonRank<S>>) -> Self {
         self._fields.74 = value;
         self
     }

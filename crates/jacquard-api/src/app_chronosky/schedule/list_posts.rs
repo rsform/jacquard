@@ -75,6 +75,97 @@ pub struct ImageViewImage<S: BosStr = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
+/// Filter by post status.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ListPostsStatus<S: BosStr = DefaultStr> {
+    Pending,
+    Executing,
+    Completed,
+    Failed,
+    Cancelled,
+    Other(S),
+}
+
+impl<S: BosStr> ListPostsStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "PENDING",
+            Self::Executing => "EXECUTING",
+            Self::Completed => "COMPLETED",
+            Self::Failed => "FAILED",
+            Self::Cancelled => "CANCELLED",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "PENDING" => Self::Pending,
+            "EXECUTING" => Self::Executing,
+            "COMPLETED" => Self::Completed,
+            "FAILED" => Self::Failed,
+            "CANCELLED" => Self::Cancelled,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ListPostsStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ListPostsStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ListPostsStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListPostsStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ListPostsStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ListPostsStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListPostsStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ListPostsStatus::Pending => ListPostsStatus::Pending,
+            ListPostsStatus::Executing => ListPostsStatus::Executing,
+            ListPostsStatus::Completed => ListPostsStatus::Completed,
+            ListPostsStatus::Failed => ListPostsStatus::Failed,
+            ListPostsStatus::Cancelled => ListPostsStatus::Cancelled,
+            ListPostsStatus::Other(v) => ListPostsStatus::Other(v.into_static()),
+        }
+    }
+}
+
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
@@ -89,7 +180,7 @@ pub struct ListPosts<S: BosStr = DefaultStr> {
     pub page: Option<i64>,
     /// (max length: 20)
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub status: Option<S>,
+    pub status: Option<ListPostsStatus<S>>,
 }
 
 
@@ -176,7 +267,7 @@ pub struct ScheduledPost<S: BosStr = DefaultStr> {
     ///Scheduled publication datetime (ISO 8601).
     pub scheduled_at: Datetime,
     ///Post status.
-    pub status: S,
+    pub status: ScheduledPostStatus<S>,
     ///Post content text (app.bsky.feed.post#text). May be empty if embeds are present.
     pub text: S,
     ///Thread depth level (0 for root post, 1 for direct reply, etc.).
@@ -224,6 +315,97 @@ pub enum ScheduledPostEmbed<S: BosStr = DefaultStr> {
     Video(Box<Video<S>>),
     #[serde(rename = "app.bsky.embed.recordWithMedia")]
     RecordWithMedia(Box<RecordWithMedia<S>>),
+}
+
+/// Post status.
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ScheduledPostStatus<S: BosStr = DefaultStr> {
+    Pending,
+    Executing,
+    Completed,
+    Failed,
+    Cancelled,
+    Other(S),
+}
+
+impl<S: BosStr> ScheduledPostStatus<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Pending => "PENDING",
+            Self::Executing => "EXECUTING",
+            Self::Completed => "COMPLETED",
+            Self::Failed => "FAILED",
+            Self::Cancelled => "CANCELLED",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "PENDING" => Self::Pending,
+            "EXECUTING" => Self::Executing,
+            "COMPLETED" => Self::Completed,
+            "FAILED" => Self::Failed,
+            "CANCELLED" => Self::Cancelled,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for ScheduledPostStatus<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for ScheduledPostStatus<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for ScheduledPostStatus<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ScheduledPostStatus<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for ScheduledPostStatus<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for ScheduledPostStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ScheduledPostStatus<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            ScheduledPostStatus::Pending => ScheduledPostStatus::Pending,
+            ScheduledPostStatus::Executing => ScheduledPostStatus::Executing,
+            ScheduledPostStatus::Completed => ScheduledPostStatus::Completed,
+            ScheduledPostStatus::Failed => ScheduledPostStatus::Failed,
+            ScheduledPostStatus::Cancelled => ScheduledPostStatus::Cancelled,
+            ScheduledPostStatus::Other(v) => ScheduledPostStatus::Other(v.into_static()),
+        }
+    }
 }
 
 
@@ -1278,7 +1460,7 @@ pub mod list_posts_state {
 /// Builder for constructing an instance of this type.
 pub struct ListPostsBuilder<St: list_posts_state::State, S: BosStr = DefaultStr> {
     _state: PhantomData<fn() -> St>,
-    _fields: (Option<i64>, Option<i64>, Option<S>),
+    _fields: (Option<i64>, Option<i64>, Option<ListPostsStatus<S>>),
     _type: PhantomData<fn() -> S>,
 }
 
@@ -1346,12 +1528,12 @@ impl<St: list_posts_state::State, S: BosStr> ListPostsBuilder<St, S> {
 
 impl<St: list_posts_state::State, S: BosStr> ListPostsBuilder<St, S> {
     /// Set the `status` field (optional)
-    pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn status(mut self, value: impl Into<Option<ListPostsStatus<S>>>) -> Self {
         self._fields.2 = value.into();
         self
     }
     /// Set the `status` field to an Option value (optional)
-    pub fn maybe_status(mut self, value: Option<S>) -> Self {
+    pub fn maybe_status(mut self, value: Option<ListPostsStatus<S>>) -> Self {
         self._fields.2 = value;
         self
     }
@@ -1831,7 +2013,7 @@ pub struct ScheduledPostBuilder<
         Option<S>,
         Option<i64>,
         Option<Datetime>,
-        Option<S>,
+        Option<ScheduledPostStatus<S>>,
         Option<S>,
         Option<i64>,
         Option<i64>,
@@ -2199,7 +2381,7 @@ where
     /// Set the `status` field (required)
     pub fn status(
         mut self,
-        value: impl Into<S>,
+        value: impl Into<ScheduledPostStatus<S>>,
     ) -> ScheduledPostBuilder<scheduled_post_state::SetStatus<St>, S> {
         self._fields.17 = Option::Some(value.into());
         ScheduledPostBuilder {

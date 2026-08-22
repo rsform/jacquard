@@ -19,6 +19,175 @@ use crate::sh_weaver::graph::TagView;
 use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetTaggedResourcesResourceType<S: BosStr = DefaultStr> {
+    Notebook,
+    Entry,
+    All,
+    Other(S),
+}
+
+impl<S: BosStr> GetTaggedResourcesResourceType<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Notebook => "notebook",
+            Self::Entry => "entry",
+            Self::All => "all",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "notebook" => Self::Notebook,
+            "entry" => Self::Entry,
+            "all" => Self::All,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetTaggedResourcesResourceType<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetTaggedResourcesResourceType<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetTaggedResourcesResourceType<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
+for GetTaggedResourcesResourceType<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetTaggedResourcesResourceType<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetTaggedResourcesResourceType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetTaggedResourcesResourceType<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetTaggedResourcesResourceType::Notebook => {
+                GetTaggedResourcesResourceType::Notebook
+            }
+            GetTaggedResourcesResourceType::Entry => {
+                GetTaggedResourcesResourceType::Entry
+            }
+            GetTaggedResourcesResourceType::All => GetTaggedResourcesResourceType::All,
+            GetTaggedResourcesResourceType::Other(v) => {
+                GetTaggedResourcesResourceType::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GetTaggedResourcesSort<S: BosStr = DefaultStr> {
+    Recent,
+    Popular,
+    Other(S),
+}
+
+impl<S: BosStr> GetTaggedResourcesSort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Recent => "recent",
+            Self::Popular => "popular",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "recent" => Self::Recent,
+            "popular" => Self::Popular,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for GetTaggedResourcesSort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for GetTaggedResourcesSort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for GetTaggedResourcesSort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetTaggedResourcesSort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for GetTaggedResourcesSort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for GetTaggedResourcesSort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetTaggedResourcesSort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            GetTaggedResourcesSort::Recent => GetTaggedResourcesSort::Recent,
+            GetTaggedResourcesSort::Popular => GetTaggedResourcesSort::Popular,
+            GetTaggedResourcesSort::Other(v) => {
+                GetTaggedResourcesSort::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct GetTaggedResources<S: BosStr = DefaultStr> {
@@ -39,11 +208,11 @@ pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     /// Defaults to `"all"`.
     #[serde(default = "_default_resource_type")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub resource_type: Option<S>,
+    pub resource_type: Option<GetTaggedResourcesResourceType<S>>,
     /// Defaults to `"recent"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<GetTaggedResourcesSort<S>>,
     pub tag: S,
 }
 
@@ -111,12 +280,16 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_resource_type<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("all"))
+fn _default_resource_type<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetTaggedResourcesResourceType<S>,
+> {
+    Some(<GetTaggedResourcesResourceType<S>>::from_value(S::from_static("all")))
 }
 
-fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("recent"))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    GetTaggedResourcesSort<S>,
+> {
+    Some(<GetTaggedResourcesSort<S>>::from_value(S::from_static("recent")))
 }
 
 pub mod get_tagged_resources_state {
@@ -162,8 +335,8 @@ pub struct GetTaggedResourcesBuilder<
         Option<bool>,
         Option<bool>,
         Option<i64>,
-        Option<S>,
-        Option<S>,
+        Option<GetTaggedResourcesResourceType<S>>,
+        Option<GetTaggedResourcesSort<S>>,
         Option<S>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -262,12 +435,18 @@ impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder
 
 impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder<St, S> {
     /// Set the `resourceType` field (optional)
-    pub fn resource_type(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn resource_type(
+        mut self,
+        value: impl Into<Option<GetTaggedResourcesResourceType<S>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `resourceType` field to an Option value (optional)
-    pub fn maybe_resource_type(mut self, value: Option<S>) -> Self {
+    pub fn maybe_resource_type(
+        mut self,
+        value: Option<GetTaggedResourcesResourceType<S>>,
+    ) -> Self {
         self._fields.4 = value;
         self
     }
@@ -275,12 +454,12 @@ impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder
 
 impl<St: get_tagged_resources_state::State, S: BosStr> GetTaggedResourcesBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<GetTaggedResourcesSort<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<GetTaggedResourcesSort<S>>) -> Self {
         self._fields.5 = value;
         self
     }

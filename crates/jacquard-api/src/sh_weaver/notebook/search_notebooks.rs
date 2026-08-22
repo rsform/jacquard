@@ -18,6 +18,176 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::NotebookView;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchNotebooksRating<S: BosStr = DefaultStr> {
+    General,
+    Teen,
+    Mature,
+    Explicit,
+    Other(S),
+}
+
+impl<S: BosStr> SearchNotebooksRating<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::General => "general",
+            Self::Teen => "teen",
+            Self::Mature => "mature",
+            Self::Explicit => "explicit",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "general" => Self::General,
+            "teen" => Self::Teen,
+            "mature" => Self::Mature,
+            "explicit" => Self::Explicit,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchNotebooksRating<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchNotebooksRating<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchNotebooksRating<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SearchNotebooksRating<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchNotebooksRating<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SearchNotebooksRating<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchNotebooksRating<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchNotebooksRating::General => SearchNotebooksRating::General,
+            SearchNotebooksRating::Teen => SearchNotebooksRating::Teen,
+            SearchNotebooksRating::Mature => SearchNotebooksRating::Mature,
+            SearchNotebooksRating::Explicit => SearchNotebooksRating::Explicit,
+            SearchNotebooksRating::Other(v) => {
+                SearchNotebooksRating::Other(v.into_static())
+            }
+        }
+    }
+}
+
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SearchNotebooksSort<S: BosStr = DefaultStr> {
+    Relevance,
+    Recent,
+    Popular,
+    Other(S),
+}
+
+impl<S: BosStr> SearchNotebooksSort<S> {
+    pub fn as_str(&self) -> &str {
+        match self {
+            Self::Relevance => "relevance",
+            Self::Recent => "recent",
+            Self::Popular => "popular",
+            Self::Other(s) => s.as_ref(),
+        }
+    }
+    /// Construct from a string-like value, matching known values.
+    pub fn from_value(s: S) -> Self {
+        match s.as_ref() {
+            "relevance" => Self::Relevance,
+            "recent" => Self::Recent,
+            "popular" => Self::Popular,
+            _ => Self::Other(s),
+        }
+    }
+}
+
+impl<S: BosStr> core::fmt::Display for SearchNotebooksSort<S> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.as_str())
+    }
+}
+
+impl<S: BosStr> AsRef<str> for SearchNotebooksSort<S> {
+    fn as_ref(&self) -> &str {
+        self.as_str()
+    }
+}
+
+impl<S: BosStr> Serialize for SearchNotebooksSort<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
+    where
+        Ser: serde::Serializer,
+    {
+        serializer.serialize_str(self.as_str())
+    }
+}
+
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SearchNotebooksSort<S> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = S::deserialize(deserializer)?;
+        Ok(Self::from_value(s))
+    }
+}
+
+impl<S: BosStr + Default> Default for SearchNotebooksSort<S> {
+    fn default() -> Self {
+        Self::Other(Default::default())
+    }
+}
+
+impl<S: BosStr> jacquard_common::IntoStatic for SearchNotebooksSort<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SearchNotebooksSort<S::Output>;
+    fn into_static(self) -> Self::Output {
+        match self {
+            SearchNotebooksSort::Relevance => SearchNotebooksSort::Relevance,
+            SearchNotebooksSort::Recent => SearchNotebooksSort::Recent,
+            SearchNotebooksSort::Popular => SearchNotebooksSort::Popular,
+            SearchNotebooksSort::Other(v) => SearchNotebooksSort::Other(v.into_static()),
+        }
+    }
+}
+
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct SearchNotebooks<S: BosStr = DefaultStr> {
@@ -31,11 +201,11 @@ pub struct SearchNotebooks<S: BosStr = DefaultStr> {
     pub limit: Option<i64>,
     pub q: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub rating: Option<Vec<S>>,
+    pub rating: Option<Vec<SearchNotebooksRating<S>>>,
     /// Defaults to `"relevance"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub sort: Option<S>,
+    pub sort: Option<SearchNotebooksSort<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<S>>,
 }
@@ -83,8 +253,10 @@ fn _default_limit() -> Option<i64> {
     Some(25i64)
 }
 
-fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
-    Some(S::from_static("relevance"))
+fn _default_sort<S: jacquard_common::BosStr + jacquard_common::FromStaticStr>() -> Option<
+    SearchNotebooksSort<S>,
+> {
+    Some(<SearchNotebooksSort<S>>::from_value(S::from_static("relevance")))
 }
 
 pub mod search_notebooks_state {
@@ -130,8 +302,8 @@ pub struct SearchNotebooksBuilder<
         Option<S>,
         Option<i64>,
         Option<S>,
-        Option<Vec<S>>,
-        Option<S>,
+        Option<Vec<SearchNotebooksRating<S>>>,
+        Option<SearchNotebooksSort<S>>,
         Option<Vec<S>>,
     ),
     _type: PhantomData<fn() -> S>,
@@ -233,12 +405,15 @@ where
 
 impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S> {
     /// Set the `rating` field (optional)
-    pub fn rating(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
+    pub fn rating(
+        mut self,
+        value: impl Into<Option<Vec<SearchNotebooksRating<S>>>>,
+    ) -> Self {
         self._fields.4 = value.into();
         self
     }
     /// Set the `rating` field to an Option value (optional)
-    pub fn maybe_rating(mut self, value: Option<Vec<S>>) -> Self {
+    pub fn maybe_rating(mut self, value: Option<Vec<SearchNotebooksRating<S>>>) -> Self {
         self._fields.4 = value;
         self
     }
@@ -246,12 +421,12 @@ impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S>
 
 impl<St: search_notebooks_state::State, S: BosStr> SearchNotebooksBuilder<St, S> {
     /// Set the `sort` field (optional)
-    pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
+    pub fn sort(mut self, value: impl Into<Option<SearchNotebooksSort<S>>>) -> Self {
         self._fields.5 = value.into();
         self
     }
     /// Set the `sort` field to an Option value (optional)
-    pub fn maybe_sort(mut self, value: Option<S>) -> Self {
+    pub fn maybe_sort(mut self, value: Option<SearchNotebooksSort<S>>) -> Self {
         self._fields.5 = value;
         self
     }

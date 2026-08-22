@@ -20,18 +20,21 @@ use crate::at_inlay::Response;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(rename_all = "camelCase", bound(deserialize = "S: Deserialize<'de> + BosStr"))]
 pub struct Row<S: BosStr = DefaultStr> {
-    ///Cross-axis (vertical) alignment of children.
+    ///Cross-axis (vertical) alignment of children.  Defaults to `"center"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_row_align")]
     pub align: Option<RowAlign<S>>,
     pub children: Data<S>,
-    ///Space between children.
+    ///Space between children.  Defaults to `"medium"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_row_gap")]
     pub gap: Option<RowGap<S>>,
     ///Whether this container has inset padding. The theme controls the amount.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub inset: Option<bool>,
-    ///Main-axis distribution of children.
+    ///Main-axis distribution of children.  Defaults to `"start"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_row_justify")]
     pub justify: Option<RowJustify<S>>,
     ///Whether the container has an opaque background.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -344,6 +347,22 @@ impl jacquard_common::xrpc::XrpcEndpoint for RowRequest {
     );
     type Request<S: BosStr> = Row<S>;
     type Response = RowResponse;
+}
+
+fn _default_row_align<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    RowAlign<S>,
+> {
+    Some(<RowAlign<S>>::from_value(S::from_static("center")))
+}
+
+fn _default_row_gap<S: FromStaticStr + BosStr>() -> ::core::option::Option<RowGap<S>> {
+    Some(<RowGap<S>>::from_value(S::from_static("medium")))
+}
+
+fn _default_row_justify<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    RowJustify<S>,
+> {
+    Some(<RowJustify<S>>::from_value(S::from_static("start")))
 }
 
 pub mod row_state {

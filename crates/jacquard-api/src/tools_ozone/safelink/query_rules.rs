@@ -40,8 +40,9 @@ pub struct QueryRules<S: BosStr = DefaultStr> {
     ///Filter by reason type
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<S>,
-    ///Sort direction
+    ///Sort direction  Defaults to `"desc"`.
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default = "_default_query_rules_sort_direction")]
     pub sort_direction: Option<QueryRulesSortDirection<S>>,
     ///Filter by specific URLs or domains
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -177,4 +178,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
 
 fn _default_query_rules_limit() -> Option<i64> {
     Some(50i64)
+}
+
+fn _default_query_rules_sort_direction<S: FromStaticStr + BosStr>() -> ::core::option::Option<
+    QueryRulesSortDirection<S>,
+> {
+    Some(<QueryRulesSortDirection<S>>::from_value(S::from_static("desc")))
 }
