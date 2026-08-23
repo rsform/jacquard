@@ -67,6 +67,7 @@ use jacquard_common::{
 use jacquard_identity::resolver::{
     DidDocResponse, IdentityError, IdentityResolver, ResolverOptions,
 };
+#[cfg(feature = "reqwest-client")]
 use jacquard_identity::{PublicResolver, slingshot_resolver_default};
 use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::{OAuthClient, OAuthSession};
@@ -114,6 +115,7 @@ pub type CredentialAgent<S, T> = Agent<CredentialSession<S, T>>;
 pub type OAuthAgent<T, S> = Agent<OAuthSession<T, S>>;
 
 /// BasicClient: in-memory store + public resolver over a credential session.
+#[cfg(feature = "reqwest-client")]
 pub type BasicClient = Agent<
     CredentialSession<
         MemorySessionStore<SessionKey, AtpSession>,
@@ -121,6 +123,7 @@ pub type BasicClient = Agent<
     >,
 >;
 
+#[cfg(feature = "reqwest-client")]
 impl BasicClient {
     /// Create an unauthenticated BasicClient for public API access.
     ///
@@ -152,6 +155,7 @@ impl BasicClient {
     }
 }
 
+#[cfg(feature = "reqwest-client")]
 impl Default for BasicClient {
     fn default() -> Self {
         Self::unauthenticated()
@@ -166,12 +170,14 @@ pub struct UnauthenticatedSession<T> {
     options: Arc<RwLock<CallOptions>>,
 }
 
+#[cfg(feature = "reqwest-client")]
 impl Default for UnauthenticatedSession<PublicResolver> {
     fn default() -> Self {
         Self::new_public()
     }
 }
 
+#[cfg(feature = "reqwest-client")]
 impl UnauthenticatedSession<PublicResolver> {
     /// Create a new unauthenticated session using the public bluesky appview api as a fallback resolver
     pub fn new_public() -> Self {
@@ -408,11 +414,13 @@ impl<T: IdentityResolver + Sync> IdentityResolver for UnauthenticatedSession<T> 
 }
 
 /// MemoryCredentialSession: credential session with in memory store and identity resolver
+#[cfg(feature = "reqwest-client")]
 pub type MemoryCredentialSession = CredentialSession<
     MemorySessionStore<SessionKey, AtpSession>,
     jacquard_identity::JacquardResolver<reqwest::Client>,
 >;
 
+#[cfg(feature = "reqwest-client")]
 impl MemoryCredentialSession {
     /// Create an unauthenticated MemoryCredentialSession.
     ///
@@ -463,6 +471,7 @@ impl MemoryCredentialSession {
     }
 }
 
+#[cfg(feature = "reqwest-client")]
 impl Default for MemoryCredentialSession {
     fn default() -> Self {
         MemoryCredentialSession::unauthenticated()

@@ -344,8 +344,11 @@ impl<C: HttpClient> crate::JacquardResolver<C> {
             .map_err(|e| LexiconResolutionError::dns_lookup_failed(authority, e))?;
 
         // Parse TXT records looking for "did=..."
-        for txt in response.iter() {
-            for data in txt.txt_data().iter() {
+        for record in response.answers() {
+            let hickory_resolver::proto::rr::RData::TXT(txt) = &record.data else {
+                continue;
+            };
+            for data in &txt.txt_data {
                 let text = std::str::from_utf8(data).unwrap_or("");
                 if let Some(did_str) = text.strip_prefix("did=") {
                     return Did::new_owned(did_str).map_err(|_| {

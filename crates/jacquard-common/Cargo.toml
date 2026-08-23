@@ -12,7 +12,7 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["std", "service-auth", "reqwest-client", "crypto", "reqwest-compression"]
+default = ["std", "service-auth", "crypto"]
 std = [
     "dep:tokio",
     "dep:tokio-util",
@@ -39,6 +39,7 @@ std = [
     "chrono/clock",
     "http/std",
     "bytes/std",
+    "base64/std",
     "oxilangtag/std",
     "serde_bytes/std"
 ]
@@ -48,12 +49,35 @@ crypto-k256 = ["crypto", "dep:k256", "k256/ecdsa"]
 crypto-p256 = ["crypto", "dep:p256", "p256/ecdsa"]
 service-auth = ["crypto-k256", "crypto-p256", "dep:signature"]
 reqwest-client = ["std", "dep:reqwest"]
+reqwest-charset = ["reqwest-client", "reqwest/charset"]
+reqwest-json = ["reqwest-client", "reqwest/json"]
+reqwest-form = ["reqwest-client", "reqwest/form"]
+reqwest-multipart = ["reqwest-client", "reqwest/multipart"]
+reqwest-stream = ["reqwest-client", "streaming", "reqwest/stream"]
+reqwest-http2 = ["reqwest-client", "reqwest/http2"]
+reqwest-system-proxy = ["reqwest-client", "reqwest/system-proxy"]
+reqwest-hickory-dns = ["reqwest-client", "reqwest/hickory-dns"]
+reqwest-socks = ["reqwest-client", "reqwest/socks"]
+reqwest-default-tls = ["reqwest-client", "reqwest/default-tls"]
+reqwest-rustls = ["reqwest-client", "reqwest/rustls"]
+# Select this instead of `reqwest-rustls` when the application uses ring.
+reqwest-rustls-ring = ["reqwest-client", "reqwest/rustls-no-provider", "dep:rustls", "rustls/ring"]
+# Select this instead of a provider feature when the application installs one manually.
+reqwest-rustls-no-provider = ["reqwest-client", "reqwest/rustls-no-provider"]
+reqwest-native-tls = ["reqwest-client", "reqwest/native-tls"]
+reqwest-native-tls-vendored = ["reqwest-client", "reqwest/native-tls-vendored"]
+reqwest-native-tls-no-alpn = ["reqwest-client", "reqwest/native-tls-no-alpn"]
+reqwest-native-tls-vendored-no-alpn = ["reqwest-client", "reqwest/native-tls-vendored-no-alpn"]
+reqwest-gzip = ["reqwest-client", "reqwest/gzip"]
+reqwest-brotli = ["reqwest-client", "reqwest/brotli"]
+reqwest-deflate = ["reqwest-client", "reqwest/deflate"]
+reqwest-zstd = ["reqwest-client", "reqwest/zstd"]
+reqwest-compression = ["reqwest-gzip", "reqwest-brotli", "reqwest-deflate", "reqwest-zstd"]
 tracing = ["std", "dep:tracing"]
-streaming = ["n0-future", "futures", "reqwest/stream"]
+streaming = ["n0-future", "futures"]
 websocket = ["streaming", "tokio-tungstenite-wasm", "dep:ciborium", "dep:ciborium-io"]
 zstd = ["dep:zstd"]
 jss = ["dep:xxhash-rust"]
-reqwest-compression = ["reqwest/gzip", "reqwest/brotli", "reqwest/deflate"]
 
 [dependencies]
 trait-variant.workspace = true
@@ -79,13 +103,14 @@ unicode-segmentation.workspace = true
 fluent-uri.workspace = true
 http.workspace = true
 serde_bytes.workspace = true
-spin = { version = "0.10", default-features = false, features = ["lazy"] }
-maitake-sync = { version = "0.1", default-features = false }
-hashbrown = "0.15"
+spin = { version = "0.12", default-features = false, features = ["lazy"] }
+maitake-sync = { version = "0.3", default-features = false }
+hashbrown = "0.17"
 
-reqwest = { workspace = true, optional = true, features = ["json", "charset"] }
+reqwest = { workspace = true, optional = true }
+rustls = { workspace = true, optional = true }
 serde_ipld_dagcbor.workspace = true
-signature = { version = "2", optional = true }
+signature = { workspace = true, optional = true }
 tracing = { workspace = true, optional = true }
 tokio = { workspace = true, default-features = false, features = ["sync"], optional = true }
 
@@ -104,16 +129,14 @@ regex-automata = { version = "0.4", default-features = false, features = ["alloc
 regex = { version = "1.11.3", default-features = false, features = ["perf-literal"], optional = true }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-getrandom = { version = "0.3.4", features = ["wasm_js"] }
+getrandom = { version = "0.4.3", features = ["wasm_js"] }
 chrono = { workspace = true, features = ["wasmbind"] }
 getrandom_02 = { package = "getrandom", version = "0.2", features = ["js"] }
 regex-lite = "0.1"
 #ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"]}
-reqwest = { workspace = true, optional = true, features = [ "json", "gzip", "rustls-tls-manual-roots"] }
 tokio-tungstenite-wasm = { version = "0.6", path = "../tokio-tungstenite-wasm", features = [], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-reqwest = { workspace = true, optional = true, features = [ "http2", "gzip", "system-proxy", "rustls-tls"] }
 tokio-util = { version = "0.7.16", features = ["io"], optional = true }
 tokio-tungstenite-wasm = { version = "0.6", path = "../tokio-tungstenite-wasm", features = ["rustls-tls-native-roots"], optional = true }
 
@@ -125,7 +148,7 @@ default-features = false
 features = ["pkcs8"]
 
 [dependencies.k256]
-version = "0.13"
+workspace = true
 optional = true
 default-features = false
 features = ["arithmetic"]
@@ -136,7 +159,7 @@ optional = true
 features = ["arithmetic"]
 
 [dev-dependencies]
-tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
 futures-lite = "2.6"
 
 [package.metadata.docs.rs]

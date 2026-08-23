@@ -1,6 +1,6 @@
 #![cfg(all(
     feature = "streaming",
-    feature = "reqwest-client",
+    feature = "reqwest-stream",
     not(target_arch = "wasm32")
 ))]
 

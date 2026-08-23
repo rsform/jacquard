@@ -224,6 +224,7 @@ pub mod prelude {
     pub use crate::client::AgentSession;
     #[cfg(feature = "api")]
     pub use crate::client::AgentSessionExt;
+    #[cfg(feature = "reqwest-client")]
     pub use crate::client::BasicClient;
     pub use crate::common::http_client::HttpClient;
     pub use crate::common::xrpc::XrpcClient;

@@ -24,14 +24,14 @@ description = "Simple and powerful AT Protocol client library for Rust"
 # CLI
 clap = { version = "4.5", features = ["derive"] }
 clap_complete = "4.5"
-clap_mangen = "0.2"
+clap_mangen = "0.3"
 
 # Serialization
 serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
 serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
 serde_with =  { version = "3.14", default-features = false, features = ["alloc", "macros"] }
-serde_html_form = { version = "0.3", default-features = false }
-serde_ipld_dagcbor = { version = "0.6", default-features = false }
+serde_html_form = { version = "0.4", default-features = false, features = ["ser", "de"] }
+serde_ipld_dagcbor = { version = "0.7", default-features = false }
 serde_repr = { version = "0.1" }
 serde_bytes = { version = "0.11", default-features = false }
 facet = "0.6"
@@ -65,28 +65,32 @@ smallvec = { version = "1", features = ["const_generics"] }
 # Proc macros
 proc-macro2 = "1.0"
 quote = "1.0"
-syn = "2.0"
+syn = { version = "3.0", features = ["full"] }
 heck = "0.5"
 itertools = "0.14"
-prettyplease = "0.2"
+prettyplease = "0.3"
 
 # HTTP
 http = { version = "1.4", default-features = false }
-reqwest = { version = "0.12", default-features = false }
+reqwest = { version = "0.13", default-features = false }
+rustls = { version = "0.23", default-features = false }
+tower-http = { version = "0.7", default-features = false }
 
 # Async and runtimes
 tokio = { version = "1", default-features = false }
-n0-future = "0.1"
+n0-future = "0.3"
 
 # Observability
 tracing = "0.1"
+tracing-subscriber = "0.3"
 
 # Encoding and crypto building blocks
-base64 = { version = "0.22", default-features = false, features = ["alloc"] }
+base64 = { version = "0.23", default-features = false, features = ["alloc"] }
 rand_core = { version = "0.6.4", default-features = false, features = [
     "alloc",
 ] }
-sha2 = "0.10"
+sha2 = "0.11"
+sha2_legacy = { package = "sha2", version = "0.10" }
 xxhash-rust = { version = "0.8", default-features = false, features = ["xxh3"] }
 zstd = { version = "0.13", default-features = false }
 
@@ -94,10 +98,14 @@ zstd = { version = "0.13", default-features = false }
 chrono = { version = "0.4", default-features = false, features = ["serde"] }
 
 # Crypto curves and JOSE
-p256 = "0.13"
-jose-jwk = "0.1"
+elliptic-curve = { version = "0.13.8", default-features = false, features = ["pkcs8"] }
+k256 = { version = "0.13", default-features = false }
+p256 = { version = "0.13", default-features = false, features = ["pem", "pkcs8"] }
+p384 = { version = "0.13", default-features = false }
+signature = { version = "2", default-features = false }
+jose-jwk = { version = "0.1", default-features = false }
 
 # Text processing
 regex = { version = "1.12", default-features = false }
 webpage = { version = "2.0", default-features = false }
-phf = { version = "0.11", features = ["macros"] }
+phf = { version = "0.14", features = ["macros"] }

@@ -11,7 +11,7 @@ use jose_jwa::{Algorithm, Signing};
 use jose_jwk::{Jwk, Key, crypto};
 use p256::ecdsa::SigningKey;
 use rand::{RngCore, SeedableRng};
-use sha2::Digest;
+use sha2_legacy::Digest;
 use smol_str::{SmolStr, ToSmolStr};
 
 use crate::{
@@ -467,7 +467,7 @@ fn extract_ath(headers: &http::HeaderMap) -> Option<SmolStr> {
         .get("authorization")
         .filter(|v| v.to_str().is_ok_and(|s| s.starts_with("DPoP ")))
         .map(|auth| {
-            SmolStr::new(URL_SAFE_NO_PAD.encode(sha2::Sha256::digest(&auth.as_bytes()[5..])))
+            SmolStr::new(URL_SAFE_NO_PAD.encode(sha2_legacy::Sha256::digest(&auth.as_bytes()[5..])))
         })
 }
 
@@ -793,7 +793,7 @@ pub(crate) fn generate_jti() -> SmolStr {
 pub fn jkt(key: &Key) -> Result<SmolStr> {
     use base64::Engine as _;
     use p256::elliptic_curve::sec1::ToEncodedPoint;
-    use sha2::Digest as _;
+    use sha2_legacy::Digest as _;
 
     let public = match crypto::Key::try_from(key).map_err(DpopError::crypto)? {
         crypto::Key::P256(crypto::Kind::Secret(sk)) => sk.public_key(),
@@ -809,7 +809,7 @@ pub fn jkt(key: &Key) -> Result<SmolStr> {
         y.map(|b| URL_SAFE_NO_PAD.encode(b)).unwrap_or_default(),
     );
     Ok(SmolStr::from(
-        URL_SAFE_NO_PAD.encode(sha2::Sha256::digest(thumbprint_input.as_bytes())),
+        URL_SAFE_NO_PAD.encode(sha2_legacy::Sha256::digest(thumbprint_input.as_bytes())),
     ))
 }
 

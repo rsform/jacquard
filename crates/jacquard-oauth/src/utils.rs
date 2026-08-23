@@ -4,7 +4,7 @@ use elliptic_curve::SecretKey;
 use jacquard_common::BosStr;
 use jose_jwk::{Key, crypto};
 use rand::{CryptoRng, RngCore, rngs::ThreadRng};
-use sha2::{Digest, Sha256};
+use sha2_legacy::{Digest, Sha256};
 use smol_str::SmolStr;
 use std::cmp::Ordering;
 

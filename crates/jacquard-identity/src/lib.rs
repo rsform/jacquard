@@ -75,6 +75,7 @@ use crate::resolver::{
     MiniDoc, PlcSource, ResolverOptions,
 };
 use bytes::Bytes;
+use http::StatusCode;
 use jacquard_common::BosStr;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
@@ -94,11 +95,10 @@ use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Handle;
 use jacquard_common::xrpc::XrpcExt;
 use jacquard_common::xrpc::atproto::{ResolveDid, ResolveHandle};
-use reqwest::StatusCode;
 
 #[cfg(all(feature = "dns", not(target_family = "wasm")))]
 use {
-    hickory_resolver::{TokioAsyncResolver, config::ResolverConfig},
+    hickory_resolver::{TokioResolver, config::ResolverConfig},
     std::sync::Arc,
 };
 
@@ -331,7 +331,7 @@ pub struct JacquardResolver<C> {
     http: C,
     opts: ResolverOptions,
     #[cfg(feature = "dns")]
-    dns: Option<Arc<TokioAsyncResolver>>,
+    dns: Option<Arc<TokioResolver>>,
     #[cfg(feature = "cache")]
     caches: Option<ResolverCaches>,
 }
@@ -363,10 +363,11 @@ impl<C: HttpClient> JacquardResolver<C> {
         Self {
             http,
             opts,
-            dns: Some(Arc::new(TokioAsyncResolver::tokio(
-                ResolverConfig::default(),
-                Default::default(),
-            ))),
+            dns: Some(Arc::new(
+                TokioResolver::builder_with_config(ResolverConfig::default(), Default::default())
+                    .build()
+                    .expect("dns resolver build failed"),
+            )),
             #[cfg(feature = "cache")]
             caches: None,
         }
@@ -375,10 +376,11 @@ impl<C: HttpClient> JacquardResolver<C> {
     #[cfg(feature = "dns")]
     /// Add default DNS resolution to the resolver
     pub fn with_system_dns(mut self) -> Self {
-        self.dns = Some(Arc::new(TokioAsyncResolver::tokio(
-            ResolverConfig::default(),
-            Default::default(),
-        )));
+        self.dns = Some(Arc::new(
+            TokioResolver::builder_with_config(ResolverConfig::default(), Default::default())
+                .build()
+                .expect("dns resolver build failed"),
+        ));
         self
     }
 
@@ -504,8 +506,11 @@ impl<C: HttpClient> JacquardResolver<C> {
         let fqdn = format!("_atproto.{name}.");
         let response = dns.txt_lookup(fqdn).await?;
         let mut out = Vec::new();
-        for txt in response.iter() {
-            for data in txt.txt_data().iter() {
+        for record in response.answers() {
+            let hickory_resolver::proto::rr::RData::TXT(txt) = &record.data else {
+                continue;
+            };
+            for data in &txt.txt_data {
                 out.push(String::from_utf8_lossy(data).to_string());
             }
         }
@@ -1219,8 +1224,10 @@ impl MiniDocResponse {
 }
 
 /// Resolver specialized for unauthenticated/public flows using reqwest and stateless XRPC
+#[cfg(feature = "reqwest-client")]
 pub type PublicResolver = JacquardResolver<reqwest::Client>;
 
+#[cfg(feature = "reqwest-client")]
 impl Default for JacquardResolver<reqwest::Client> {
     /// Build a resolver with:
     /// - reqwest HTTP client
@@ -1246,6 +1253,7 @@ impl Default for JacquardResolver<reqwest::Client> {
 
 /// Build a resolver configured to use Slingshot (`https://slingshot.microcosm.blue`) for PLC and
 /// mini-doc fallbacks, unauthenticated by default.
+#[cfg(feature = "reqwest-client")]
 pub fn slingshot_resolver_default() -> JacquardResolver<reqwest::Client> {
     let http = reqwest::Client::new();
     let mut opts = ResolverOptions::default();
@@ -1262,6 +1270,7 @@ pub fn slingshot_resolver_default() -> JacquardResolver<reqwest::Client> {
 mod tests {
     use super::*;
 
+    #[cfg(feature = "reqwest-client")]
     #[test]
     fn did_web_urls() {
         let r = JacquardResolver::new(reqwest::Client::new(), ResolverOptions::default());
@@ -1280,6 +1289,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "reqwest-client")]
     #[test]
     fn slingshot_mini_doc_url_build() {
         let r = JacquardResolver::new(reqwest::Client::new(), ResolverOptions::default());
@@ -1344,6 +1354,7 @@ mod tests {
         }
     }
 
+    #[cfg(feature = "reqwest-client")]
     #[test]
     fn did_web_resolution_basic() {
         // AC6.1: `did:web:example.com` resolves to `https://example.com/.well-known/did.json`
@@ -1354,6 +1365,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "reqwest-client")]
     #[test]
     fn did_web_resolution_with_path() {
         // AC6.1: `did:web:example.com:path:to` resolves to `https://example.com/path/to/did.json`

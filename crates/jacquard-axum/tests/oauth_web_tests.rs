@@ -271,7 +271,7 @@ async fn metadata_route_serves_client_metadata_from_state_oauth_client() {
     let expected = serde_json::to_value(expected).unwrap();
     let app = routes::<MockClient, MemoryAuthStore, AppState>(&OAuthWebConfig::default())
         .with_state(state);
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server.get("/oauth-client-metadata.json").await;
     response.assert_status_ok();
@@ -306,7 +306,7 @@ async fn strict_extractor_loads_cookie_bound_session() {
             }),
         )
         .with_state(state);
-    let server = TestServer::builder().save_cookies().build(app).unwrap();
+    let server = TestServer::builder().save_cookies().build(app);
 
     server.get("/issue").await.assert_status_ok();
     let response = server.get("/protected").await;
@@ -330,7 +330,7 @@ async fn strict_extractor_loads_header_bound_session() {
     let app = Router::new()
         .route("/protected", get(strict_handler))
         .with_state(state);
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/protected")
@@ -345,7 +345,7 @@ async fn strict_extractor_rejects_missing_session() {
     let app = Router::new()
         .route("/protected", get(strict_handler))
         .with_state(state);
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     server.get("/protected").await.assert_status_unauthorized();
 }
@@ -356,7 +356,7 @@ async fn browser_extractor_redirects_missing_session_to_login_with_return_to() {
     let app = Router::new()
         .route("/protected", get(browser_handler))
         .with_state(state);
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server.get("/protected?x=1").await;
     response.assert_status(StatusCode::TEMPORARY_REDIRECT);
@@ -385,7 +385,7 @@ async fn browser_extractor_redirects_deleted_session_to_start_with_did() {
             }),
         )
         .with_state(state);
-    let server = TestServer::builder().save_cookies().build(app).unwrap();
+    let server = TestServer::builder().save_cookies().build(app);
 
     server.get("/issue").await.assert_status_ok();
     let response = server.get("/protected").await;
@@ -415,7 +415,7 @@ async fn start_auth_query_redirects_to_authorization_endpoint() {
         )
         .await;
     let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/oauth/start?identifier=alice.bsky.social&return_to=/protected")
@@ -431,7 +431,7 @@ async fn start_auth_query_redirects_to_authorization_endpoint() {
 async fn callback_rejects_unknown_state() {
     let (state, _) = app_state();
     let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     server
         .get("/oauth/callback?code=abc&state=missing&iss=https%3A%2F%2Fissuer")
@@ -529,7 +529,7 @@ async fn callback_success_sets_session_cookie() {
     let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config)
         .route("/protected", get(strict_handler))
         .with_state(state);
-    let server = TestServer::builder().save_cookies().build(app).unwrap();
+    let server = TestServer::builder().save_cookies().build(app);
     let response = server
         .get("/oauth/callback?code=abc&state=known-state&iss=https%3A%2F%2Fissuer")
         .await;
@@ -616,7 +616,7 @@ async fn start_auth_return_to_callback_redirects_back_and_cookie_states_do_not_c
     let (state, client) = app_state();
     let app =
         routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state.clone());
-    let server = TestServer::builder().save_cookies().build(app).unwrap();
+    let server = TestServer::builder().save_cookies().build(app);
 
     queue_par_response(&client, "urn:par:first").await;
     let first = server
@@ -676,7 +676,7 @@ async fn logout_deletes_session_and_clears_cookie() {
             }),
         )
         .with_state(state.clone());
-    let server = TestServer::builder().save_cookies().build(app).unwrap();
+    let server = TestServer::builder().save_cookies().build(app);
 
     server.get("/issue").await.assert_status_ok();
     server.get("/protected").await.assert_status_ok();
@@ -717,7 +717,7 @@ async fn custom_config_paths_are_honored_by_routes() {
     // The start route needs a PAR response before it can redirect.
     queue_par_response(&client, "urn:par:custom").await;
     let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     // The custom start path issues a redirect to the authorization endpoint.
     let response = server.get("/auth/begin?identifier=alice.bsky.social").await;
@@ -749,7 +749,7 @@ async fn default_config_metadata_route_remains_fixed() {
     // The client-metadata route is intentionally not configurable.
     let (state, _) = app_state();
     let app = routes::<MockClient, MemoryAuthStore, AppState>(&state.config).with_state(state);
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     server
         .get("/oauth-client-metadata.json")

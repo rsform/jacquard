@@ -12,7 +12,7 @@ use cid::Cid as IpldCid;
 
 type CarCid = IpldCid;
 use ed25519_dalek::{Signature, Signer, Verifier, VerifyingKey};
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use jacquard_common::SmolStr;
 use jacquard_common::types::aturi::AtSpaceUri;
 use jacquard_common::types::cid::{Cid as AtCid, CidLink};

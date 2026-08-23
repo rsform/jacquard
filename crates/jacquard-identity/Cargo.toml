@@ -17,15 +17,17 @@ dns = ["dep:hickory-resolver"]
 tracing = ["dep:tracing"]
 streaming = ["jacquard-common/streaming"]
 cache = ["dep:mini-moka"]
+reqwest-client = ["dep:reqwest", "jacquard-common/reqwest-client", "jacquard-common/std"]
 
 [dependencies]
 percent-encoding = "2"
 trait-variant.workspace = true
 bon.workspace = true
 bytes.workspace = true
-jacquard-common = { version = "0.12.1", path = "../jacquard-common", features = ["reqwest-client"] }
+jacquard-common = { version = "0.12.1", path = "../jacquard-common" }
 jacquard-lexicon = { version = "0.12.1", path = "../jacquard-lexicon", default-features = false }
-reqwest.workspace = true
+
+reqwest = { workspace = true, optional = true }
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
@@ -38,7 +40,7 @@ mini-moka = { package = "mini-moka-wasm", version = "0.10", path = "../mini-moka
 # mini-moka = { version = "0.10",   optional = true }
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-hickory-resolver = { optional = true, version = "0.24", default-features = false, features = ["system-config", "tokio-runtime"]}
+hickory-resolver = { optional = true, version = "0.26", default-features = false, features = ["system-config", "tokio"]}
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 

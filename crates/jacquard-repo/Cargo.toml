@@ -38,10 +38,10 @@ bytes.workspace = true
 smol_str.workspace = true
 
 # Hashing
-sha2 = "0.10"
+sha2 = "0.11"
 blake3 = "1"
-hkdf = "0.12"
-hmac = "0.12"
+hkdf = "0.13"
+hmac = "0.13"
 rand = "0.8"
 serde_json = "1.0"
 url = "2.5"
@@ -58,8 +58,8 @@ tokio = { workspace = true, default-features = false, features = ["fs", "io-util
 
 # Crypto (for commit signing/verification)
 ed25519-dalek = { version = "2", features = ["rand_core"] }
-k256 = { version = "0.13", features = ["ecdsa", "sha256"] }
-p256 = { version = "0.13", features = ["ecdsa", "sha256"] }
+k256 = { workspace = true, features = ["ecdsa", "sha256"] }
+p256 = { workspace = true, features = ["ecdsa", "sha256"] }
 
 [dev-dependencies]
 serde_ipld_dagjson = "0.2"

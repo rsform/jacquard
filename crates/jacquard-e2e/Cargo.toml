@@ -14,13 +14,13 @@ jacquard-oauth = { path = "../jacquard-oauth" }
 jacquard-repo = { path = "../jacquard-repo" }
 http = "1"
 thiserror = { workspace = true }
-tokio-rustls = { version = "0.26", default-features = false, features = ["ring", "logging"], optional = true }
-base64 = { version = "0.22", optional = true }
+tokio-rustls = { version = "0.26", default-features = false, features = ["aws-lc-rs", "logging"], optional = true }
+base64 = { workspace = true, optional = true }
 sha2 = { version = "0.10", optional = true }
-k256 = { version = "0.13", default-features = false, features = ["ecdsa"], optional = true }
+k256 = { workspace = true, default-features = false, features = ["ecdsa"], optional = true }
 bs58 = { version = "0.5", features = ["std"], optional = true }
-p256 = { version = "0.13", default-features = false, features = ["ecdsa"], optional = true }
-jose-jwk = { version = "0.1", optional = true }
+p256 = { workspace = true, default-features = false, features = ["ecdsa"], optional = true }
+jose-jwk = { workspace = true, features = ["p256"], optional = true }
 
 [features]
 # No default features: e2e scenario targets are strictly opt-in and must never
@@ -83,7 +83,7 @@ version = "0.8.6"
 optional = true
 
 [dependencies.axum-extra]
-version = "0.10.3"
+version = "0.12.6"
 features = ["cookie", "cookie-private"]
 optional = true
 
@@ -93,15 +93,15 @@ features = ["util"]
 optional = true
 
 [dependencies.tokio]
-version = "1"
+workspace = true
 default-features = false
 features = ["rt-multi-thread", "macros", "net", "time", "sync"]
 optional = true
 
 [dependencies.reqwest]
-version = "0.12"
+workspace = true
 default-features = false
-features = ["rustls-tls", "json", "cookies", "stream"]
+features = ["rustls", "json", "cookies", "stream"]
 optional = true
 
 [dependencies.n0-future]

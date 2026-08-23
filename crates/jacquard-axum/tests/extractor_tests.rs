@@ -171,7 +171,7 @@ async fn std_cow_procedure_handler(
 async fn test_url_encoded_did_in_query_params() {
     let app = Router::new().merge(TestQueryRequest::into_router(test_query_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/xrpc/com.example.test.query?did=did%3Aplc%3A123abc")
@@ -188,7 +188,7 @@ async fn test_url_encoded_did_in_query_params() {
 async fn test_unencoded_did_in_query_params() {
     let app = Router::new().merge(TestQueryRequest::into_router(test_query_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/xrpc/com.example.test.query?did=did:plc:123abc")
@@ -205,7 +205,7 @@ async fn test_unencoded_did_in_query_params() {
 async fn test_multiple_params_with_encoded_did() {
     let app = Router::new().merge(TestQueryRequest::into_router(test_query_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/xrpc/com.example.test.query?did=did%3Aweb%3Aexample.com&limit=50")
@@ -222,7 +222,7 @@ async fn test_multiple_params_with_encoded_did() {
 async fn test_string_extractor_decodes_query() {
     let app = Router::new().merge(TestQueryRequest::into_router(string_query_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/xrpc/com.example.test.query?did=did%3Aplc%3Astring")
@@ -237,7 +237,7 @@ async fn test_string_extractor_decodes_query() {
 async fn test_cowstr_static_extractor_decodes_query() {
     let app = Router::new().merge(TestQueryRequest::into_router(cowstr_query_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/xrpc/com.example.test.query?did=did%3Aplc%3Acowstr")
@@ -252,7 +252,7 @@ async fn test_cowstr_static_extractor_decodes_query() {
 async fn test_std_cow_static_extractor_decodes_query() {
     let app = Router::new().merge(TestQueryRequest::into_router(std_cow_query_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/xrpc/com.example.test.query?did=did%3Aplc%3Astd-cow")
@@ -267,7 +267,7 @@ async fn test_std_cow_static_extractor_decodes_query() {
 async fn test_malformed_query_returns_xrpc_invalid_request() {
     let app = Router::new().merge(TestQueryRequest::into_router(test_query_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server.get("/xrpc/com.example.test.query?limit=50").await;
 
@@ -280,7 +280,7 @@ async fn test_malformed_query_returns_xrpc_invalid_request() {
 async fn test_procedure_post_decodes_body() {
     let app = Router::new().merge(TestProcedureRequest::into_router(test_procedure_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .post("/xrpc/com.example.test.procedure")
@@ -300,7 +300,7 @@ async fn test_procedure_post_decodes_body() {
 async fn test_string_procedure_extractor_decodes_body() {
     let app = Router::new().merge(TestProcedureRequest::into_router(string_procedure_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .post("/xrpc/com.example.test.procedure")
@@ -320,7 +320,7 @@ async fn test_string_procedure_extractor_decodes_body() {
 async fn test_cowstr_static_procedure_extractor_decodes_body() {
     let app = Router::new().merge(TestProcedureRequest::into_router(cowstr_procedure_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .post("/xrpc/com.example.test.procedure")
@@ -340,7 +340,7 @@ async fn test_cowstr_static_procedure_extractor_decodes_body() {
 async fn test_std_cow_static_procedure_extractor_decodes_body() {
     let app = Router::new().merge(TestProcedureRequest::into_router(std_cow_procedure_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .post("/xrpc/com.example.test.procedure")
@@ -360,7 +360,7 @@ async fn test_std_cow_static_procedure_extractor_decodes_body() {
 async fn test_get_to_procedure_route_is_rejected() {
     let app = Router::new().merge(TestProcedureRequest::into_router(test_procedure_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server.get("/xrpc/com.example.test.procedure").await;
 
@@ -371,7 +371,7 @@ async fn test_get_to_procedure_route_is_rejected() {
 async fn test_malformed_procedure_body_returns_xrpc_invalid_request() {
     let app = Router::new().merge(TestProcedureRequest::into_router(test_procedure_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .post("/xrpc/com.example.test.procedure")
@@ -387,7 +387,7 @@ async fn test_malformed_procedure_body_returns_xrpc_invalid_request() {
 async fn test_xrpc_response_encodes_typed_output() {
     let app = Router::new().merge(TestQueryRequest::into_router(typed_query_handler));
 
-    let server = TestServer::new(app).unwrap();
+    let server = TestServer::new(app);
 
     let response = server
         .get("/xrpc/com.example.test.query?did=did%3Aplc%3Atyped")

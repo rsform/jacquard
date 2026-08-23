@@ -45,14 +45,6 @@ check-wasm:
     cargo build --target wasm32-unknown-unknown -p jacquard-common --features websocket,reqwest-client
     cargo build --target wasm32-unknown-unknown -p jacquard --no-default-features --features api_bluesky,streaming,zstd
 
-# Run 'cargo run' on the project
-run *ARGS:
-    cargo run {{ ARGS }}
-
-# Run 'bacon' to run the project (auto-recompiles)
-watch *ARGS:
-    bacon --job run -- -- {{ ARGS }}
-
 update-api:
     cargo run -p jacquard-lexgen --bin lex-fetch -- -v
 

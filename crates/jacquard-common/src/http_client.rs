@@ -115,7 +115,7 @@ impl<T: HttpClient> HttpClient for Arc<T> {
     }
 }
 
-#[cfg(all(feature = "streaming", feature = "reqwest-client"))]
+#[cfg(all(feature = "streaming", feature = "reqwest-stream"))]
 impl HttpClientExt for reqwest::Client {
     async fn send_http_streaming(
         &self,

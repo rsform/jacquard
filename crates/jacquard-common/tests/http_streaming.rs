@@ -1,4 +1,4 @@
-#![cfg(all(feature = "streaming", feature = "reqwest-client"))]
+#![cfg(all(feature = "streaming", feature = "reqwest-stream"))]
 
 use jacquard_common::http_client::HttpClientExt;
 

@@ -12,15 +12,69 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["api_full", "dns", "loopback", "derive", "cache"]
+default = [
+    "api_full",
+    "dns",
+    "loopback",
+    "derive",
+    "cache",
+    "reqwest-client",
+    "reqwest-charset",
+    "reqwest-json",
+    "reqwest-http2",
+    "reqwest-system-proxy",
+    "reqwest-rustls",
+    "reqwest-compression",
+]
 derive = ["dep:jacquard-derive"]
+reqwest-client = [
+    "jacquard-common/reqwest-client",
+    "jacquard-identity/reqwest-client",
+    "jacquard-oauth/reqwest-client",
+    "dep:reqwest",
+]
+reqwest-charset = ["reqwest-client", "jacquard-common/reqwest-charset"]
+reqwest-json = ["reqwest-client", "jacquard-common/reqwest-json"]
+reqwest-form = ["reqwest-client", "jacquard-common/reqwest-form"]
+reqwest-multipart = ["reqwest-client", "jacquard-common/reqwest-multipart"]
+reqwest-stream = ["reqwest-client", "jacquard-common/reqwest-stream"]
+reqwest-http2 = ["reqwest-client", "jacquard-common/reqwest-http2"]
+reqwest-system-proxy = ["reqwest-client", "jacquard-common/reqwest-system-proxy"]
+reqwest-hickory-dns = ["reqwest-client", "jacquard-common/reqwest-hickory-dns"]
+reqwest-socks = ["reqwest-client", "jacquard-common/reqwest-socks"]
+reqwest-default-tls = ["reqwest-client", "jacquard-common/reqwest-default-tls"]
+reqwest-rustls = ["reqwest-client", "jacquard-common/reqwest-rustls"]
+# Select this instead of `reqwest-rustls` when the application uses ring.
+reqwest-rustls-ring = ["reqwest-client", "jacquard-common/reqwest-rustls-ring"]
+# Select this instead of a provider feature when the application installs one manually.
+reqwest-rustls-no-provider = ["reqwest-client", "jacquard-common/reqwest-rustls-no-provider"]
+reqwest-native-tls = ["reqwest-client", "jacquard-common/reqwest-native-tls"]
+reqwest-native-tls-vendored = ["reqwest-client", "jacquard-common/reqwest-native-tls-vendored"]
+reqwest-native-tls-no-alpn = ["reqwest-client", "jacquard-common/reqwest-native-tls-no-alpn"]
+reqwest-native-tls-vendored-no-alpn = ["reqwest-client", "jacquard-common/reqwest-native-tls-vendored-no-alpn"]
+reqwest-gzip = ["reqwest-client", "jacquard-common/reqwest-gzip"]
+reqwest-brotli = ["reqwest-client", "jacquard-common/reqwest-brotli"]
+reqwest-deflate = ["reqwest-client", "jacquard-common/reqwest-deflate"]
+reqwest-zstd = ["reqwest-client", "jacquard-common/reqwest-zstd"]
+reqwest-compression = [
+    "reqwest-gzip",
+    "reqwest-brotli",
+    "reqwest-deflate",
+    "reqwest-zstd",
+]
 # Minimal API bindings
-api = ["jacquard-api/minimal"]
+api = [
+    "jacquard-api/minimal",
+    "jacquard-api/std",
+    "jacquard-common/std",
+]
 # Bluesky API bindings
 api_bluesky = ["api", "jacquard-api/bluesky"]
 # Bluesky API bindings, plus a curated selection of community lexicons
 api_full = [
     "api_bluesky",
+    "jacquard-api/std",
+    "jacquard-common/std",
     "jacquard-api/other",
     "jacquard-api/lexicon_community",
     "jacquard-api/network_bsky",
@@ -37,7 +91,7 @@ tracing = [
     "jacquard-oauth/tracing",
     "jacquard-identity/tracing",
 ]
-dns = ["jacquard-identity/dns", ]
+dns = ["jacquard-identity/dns"]
 streaming = [
     "jacquard-common/websocket",
     "jacquard-common/jss",
@@ -136,13 +190,12 @@ path = "../../examples/moderated_timeline.rs"
 required-features = ["api_bluesky", "loopback"]
 
 [dependencies]
-jacquard-api = { version = "0.12.1", path = "../jacquard-api" }
-jacquard-common = { version = "0.12.1", path = "../jacquard-common", features = [
-    "reqwest-client",
-] }
-jacquard-oauth = { version = "0.12.1", path = "../jacquard-oauth" }
+jacquard-api = { version = "0.12.1", path = "../jacquard-api", default-features = false }
+jacquard-common = { version = "0.12.1", path = "../jacquard-common", default-features = false }
+jacquard-oauth = { version = "0.12.1", path = "../jacquard-oauth", default-features = false }
+reqwest = { workspace = true, optional = true }
 jacquard-derive = { version = "0.12.1", path = "../jacquard-derive", optional = true }
-jacquard-identity = { version = "0.12.1", path = "../jacquard-identity" }
+jacquard-identity = { version = "0.12.1", path = "../jacquard-identity", default-features = false }
 
 
 
@@ -151,7 +204,7 @@ trait-variant.workspace = true
 bytes.workspace = true
 http.workspace = true
 miette = { workspace = true }
-reqwest = { workspace = true, features = ["json"] }
+# reqwest is enabled through the reqwest-client feature.
 serde.workspace = true
 serde_html_form.workspace = true
 serde_json.workspace = true
@@ -172,29 +225,23 @@ serde_ipld_dagcbor.workspace = true
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 jacquard-identity = { version = "0.12.1", path = "../jacquard-identity", features = ["cache"] }
-reqwest = { workspace = true, features = [
-    "http2",
-    "gzip",
-    "rustls-tls",
-] }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "fs"] }
 regex = { workspace = true, default-features = false, features = ["std", "perf-literal", "unicode"] }
 
 [target.'cfg(target_family = "wasm")'.dependencies]
-getrandom = { version = "0.2", features = ["js"] }
+getrandom = { version = "0.4.3", features = ["wasm_js"] }
 regex-lite = "0.1"
 #ring = { version = "0.17", features = ["wasm32_unknown_unknown_js"]}
-reqwest = { workspace = true }
 
 [target.'cfg(all(target_family = "wasm", target_os = "unknown"))'.dependencies]
-gloo-storage = "0.3"
+gloo-storage = "0.4"
 
 [dev-dependencies]
 clap.workspace = true
 miette = { workspace = true, features = ["fancy"] }
 tokio = { workspace = true, features = ["signal"] }
-viuer = { version =  "0.9", features = ["print-file"] }
-tiff = { version = "0.6.0-alpha" }
+viuer = { version = "0.11", features = ["print-file"] }
+tiff = { version = "0.11" }
 image = { version = "0.25" }
 wiremock = "0.6"
 

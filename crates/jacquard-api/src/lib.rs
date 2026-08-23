@@ -603,6 +603,10 @@ pub mod org_user_intents;
 pub mod parts_page;
 
 
+#[cfg(feature = "party_tenna")]
+pub mod party_tenna;
+
+
 #[cfg(feature = "pink_vase")]
 pub mod pink_vase;
 

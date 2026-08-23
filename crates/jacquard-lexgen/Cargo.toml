@@ -32,20 +32,20 @@ path = "../../examples/extract_inventory.rs"
 clap.workspace = true
 glob = "0.3"
 inventory = "0.3"
-jacquard-common = { version = "0.12.1", features = [ "reqwest-client" ], path = "../jacquard-common" }
+jacquard-common = { version = "0.12.1", features = [ "reqwest-client", "std" ], path = "../jacquard-common", default-features = false }
 jacquard-derive = { version = "0.12.1", path = "../jacquard-derive" }
-jacquard-identity = { version = "0.12.1", path = "../jacquard-identity", features = ["dns"] }
+jacquard-identity = { version = "0.12.1", path = "../jacquard-identity", features = ["dns", "reqwest-client"] }
 jacquard-lexicon = { version = "0.12.1", path = "../jacquard-lexicon" }
 kdl = "6"
 miette = { workspace = true, features = ["fancy"] }
-reqwest = { workspace = true, features = ["json", "http2", "system-proxy", "rustls-tls"] }
+reqwest = { workspace = true, default-features = false, features = ["json", "http2", "system-proxy", "rustls"] }
 serde.workspace = true
 serde_json = { workspace = true, features = ["preserve_order"] }
 syn.workspace = true
 tempfile = "3.23"
 thiserror.workspace = true
 tokio = { workspace = true, features = ["full"] }
-toml = "0.8"
+toml = "1.1"
 walkdir = "2.5"
 
 [dev-dependencies]

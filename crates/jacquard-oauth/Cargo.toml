@@ -20,30 +20,31 @@ tracing = ["dep:tracing"]
 websocket = ["jacquard-common/websocket"]
 streaming = ["jacquard-common/streaming", "dep:n0-future"]
 scope-check = ["dep:jacquard-lexicon"]
+reqwest-client = ["dep:reqwest", "jacquard-common/reqwest-client", "jacquard-common/std", "jacquard-identity/reqwest-client"]
 
 [dependencies]
-jacquard-common = { version = "0.12.1", path = "../jacquard-common", features = ["reqwest-client"] }
-jacquard-identity = { version = "0.12.1", path = "../jacquard-identity" }
-jacquard-lexicon = { version = "0.12.1", path = "../jacquard-lexicon", optional = true }
+jacquard-common = { version = "0.12.1", path = "../jacquard-common" }
+jacquard-identity = { version = "0.12.1", path = "../jacquard-identity", default-features = false }
+jacquard-lexicon = { version = "0.12.1", path = "../jacquard-lexicon", default-features = false, optional = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 smol_str = { workspace = true }
 base64.workspace = true
-sha2 = { version = "0.10" }
+sha2_legacy.workspace = true
 thiserror = { workspace = true }
 serde_html_form = { workspace = true }
 miette = { workspace = true }
 p256 = { workspace = true, features = ["ecdsa"] }
-p384 = { version = "0.13", features = ["ecdsa"] }
-k256 = { version = "0.13", features = ["ecdsa"] }
+p384 = { workspace = true, features = ["ecdsa"] }
+k256 = { workspace = true, features = ["ecdsa"] }
 ed25519-dalek = { version = "2", features = ["rand_core"] }
 jose-jwa = "0.1"
 jose-jwk = { workspace = true, features = ["p256", "p384"] }
 chrono.workspace = true
-elliptic-curve = "0.13.8"
+elliptic-curve.workspace = true
 http.workspace = true
 bytes.workspace = true
-rand = { version = "0.8.5", features = ["small_rng"] }
+rand = { version = "0.8.7", features = ["small_rng"] }
 dashmap = "6.1.0"
 mini-moka = { package = "mini-moka-wasm", version = "0.10", path = "../mini-moka-wasm" }
 tokio = { workspace = true, default-features = false, features = ["sync"] }
@@ -52,7 +53,7 @@ n0-future = { workspace = true, optional = true }
 webbrowser = { version = "1", optional = true }
 tracing = { workspace = true, optional = true }
 smallvec.workspace = true
-reqwest.workspace = true
+reqwest = { workspace = true, optional = true }
 
 [target.'cfg(not(all(target_arch = "wasm32", target_os = "unknown")))'.dependencies]
 tokio = { workspace = true, features = ["rt", "net", "time", "io-util"] }

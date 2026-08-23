@@ -866,8 +866,8 @@ impl From<IdentityError> for jacquard_common::error::ClientError {
 }
 
 #[cfg(all(feature = "dns", not(target_family = "wasm")))]
-impl From<hickory_resolver::error::ResolveError> for IdentityError {
-    fn from(e: hickory_resolver::error::ResolveError) -> Self {
+impl From<hickory_resolver::net::NetError> for IdentityError {
+    fn from(e: hickory_resolver::net::NetError) -> Self {
         let msg = smol_str::format_smolstr!("{:?}", e);
         Self::new(IdentityErrorKind::Dns, Some(Box::new(e)))
             .with_context(msg)
@@ -893,6 +893,7 @@ impl From<AtDataError> for IdentityError {
     }
 }
 
+#[cfg(feature = "reqwest-client")]
 impl From<reqwest::Error> for IdentityError {
     fn from(e: reqwest::Error) -> Self {
         let url = e

@@ -124,6 +124,7 @@ impl<S: ClientAuthStore, C: HttpClient + Sync> OAuthClient<JacquardResolver<C>, 
     }
 }
 
+#[cfg(feature = "reqwest-client")]
 impl<S: ClientAuthStore> OAuthClient<JacquardResolver<reqwest::Client>, S> {
     /// Create an OAuth client with the provided store and default localhost client metadata.
     ///
@@ -151,6 +152,7 @@ impl<S: ClientAuthStore> OAuthClient<JacquardResolver<reqwest::Client>, S> {
     }
 }
 
+#[cfg(feature = "reqwest-client")]
 impl OAuthClient<JacquardResolver<reqwest::Client>, crate::authstore::MemoryAuthStore> {
     /// Create an OAuth client with an in-memory auth store and default localhost client metadata.
     ///
@@ -1170,7 +1172,7 @@ where
         use base64::Engine as _;
         use jacquard_common::AuthorizationToken;
         use jacquard_common::xrpc::CallOptions;
-        use sha2::Digest as _;
+        use sha2_legacy::Digest as _;
 
         let base_uri = self.base_uri().await;
         let method = match R::METHOD {
@@ -1184,7 +1186,7 @@ where
         // require a nonce (use_dpop_nonce); the response's DPoP-Nonce
         // header is folded into a single retry.
         let ath = base64::engine::general_purpose::URL_SAFE_NO_PAD
-            .encode(sha2::Sha256::digest(credential.as_bytes()));
+            .encode(sha2_legacy::Sha256::digest(credential.as_bytes()));
 
         let build_opts = |nonce: Option<&str>| -> crate::error::Result<CallOptions> {
             let proof = crate::dpop::build_dpop_proof(dpop_key, method, &url, nonce, Some(&ath))?;

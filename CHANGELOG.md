@@ -50,6 +50,11 @@
   rejected upgrades expose status, headers, and a bounded body through
   `WebSocketError::HandshakeRejected` for typed recovery.
 
+## New and updated crates
+
+- Vendored `tokio-tungstenite-wasm` with a patch to its native handling to allow setting headers where supported
+- Updated reqwest version and properly gated it and its features across jacquard, with the main jacquard crate continuing to default to enabling it.
+
 ## [0.12.1] - 2026-06-26
 
 ## Additions (possibly breaking)

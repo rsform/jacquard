@@ -40,7 +40,7 @@ fn monomorphic_schema_type(input: &DeriveInput) -> syn::Result<TokenStream> {
         match param {
             GenericParam::Lifetime(_) => args.push(quote! { 'static }),
             GenericParam::Type(param) => {
-                let Some(default) = &param.default else {
+                let Some((_, default)) = &param.default else {
                     return Err(syn::Error::new_spanned(
                         param,
                         "LexiconSchema inventory registration for generic types requires default type parameters",
@@ -49,7 +49,7 @@ fn monomorphic_schema_type(input: &DeriveInput) -> syn::Result<TokenStream> {
                 args.push(quote! { #default });
             }
             GenericParam::Const(param) => {
-                let Some(default) = &param.default else {
+                let Some((_, default)) = &param.default else {
                     return Err(syn::Error::new_spanned(
                         param,
                         "LexiconSchema inventory registration for const-generic types requires default const parameters",

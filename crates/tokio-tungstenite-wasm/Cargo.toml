@@ -55,7 +55,7 @@ assert-impl = "0.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
 rand = "0.8"
-tokio = { version = "1", features = ["full"] }
+tokio = { workspace = true, features = ["full"] }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies.native-tls]
 version = "0.2"
