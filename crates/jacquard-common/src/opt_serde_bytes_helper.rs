@@ -1,5 +1,6 @@
 //! Custom serde helpers for bytes::Bytes using serde_bytes
 
+use alloc::borrow::Cow;
 use alloc::string::String;
 use alloc::vec::Vec;
 use base64::{
@@ -102,8 +103,8 @@ impl<'de> Visitor<'de> for OptBytesVisitor {
     {
         let mut bytes = None;
 
-        while let Some(key) = map.next_key()? {
-            match key {
+        while let Some(key) = map.next_key::<Cow<'de, str>>()? {
+            match key.as_ref() {
                 "$bytes" => {
                     if bytes.is_some() {
                         return Err(de::Error::duplicate_field("$bytes"));
@@ -122,8 +123,8 @@ impl<'de> Visitor<'de> for OptBytesVisitor {
                         return Err(de::Error::custom("invalid base64 string"));
                     }
                 }
-                _ => {
-                    return Err(de::Error::unknown_field(key, &["$bytes"]));
+                other => {
+                    return Err(de::Error::unknown_field(other, &["$bytes"]));
                 }
             }
         }

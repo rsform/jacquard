@@ -1,5 +1,6 @@
 //! Custom serde helpers for bytes::Bytes using serde_bytes
 
+use alloc::borrow::Cow;
 use alloc::string::String;
 use alloc::vec::Vec;
 use core::fmt;
@@ -91,8 +92,8 @@ impl<'de> Visitor<'de> for BytesVisitor {
     {
         let mut bytes = None;
 
-        while let Some(key) = map.next_key()? {
-            match key {
+        while let Some(key) = map.next_key::<Cow<'de, str>>()? {
+            match key.as_ref() {
                 "$bytes" => {
                     if bytes.is_some() {
                         return Err(de::Error::duplicate_field("$bytes"));
@@ -111,8 +112,8 @@ impl<'de> Visitor<'de> for BytesVisitor {
                         return Err(de::Error::custom("invalid base64 string"));
                     }
                 }
-                _ => {
-                    return Err(de::Error::unknown_field(key, &["$bytes"]));
+                other => {
+                    return Err(de::Error::unknown_field(other, &["$bytes"]));
                 }
             }
         }
@@ -130,6 +131,15 @@ mod tests {
     struct BytePayload {
         #[serde(with = "super")]
         bytes: Bytes,
+    }
+
+    #[test]
+    fn json_from_value_accepts_owned_map_keys() {
+        let value = serde_json::json!({
+            "bytes": {"$bytes": BASE64_STANDARD.encode([0, 1, 2, 255])}
+        });
+        let parsed: BytePayload = serde_json::from_value(value).unwrap();
+        assert_eq!(parsed.bytes, Bytes::from_static(&[0, 1, 2, 255]));
     }
 
     #[derive(Debug, PartialEq, Eq, Serialize, Deserialize)]
